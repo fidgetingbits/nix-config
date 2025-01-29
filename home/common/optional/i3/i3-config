@@ -1,0 +1,260 @@
+# Please see http://i3wm.org/docs/userguide.html for a complete reference!
+
+set $workspace1 "1"
+set $workspace2 "2"
+set $workspace3  "3"
+set $workspace4  "4"
+set $workspace5  "5"
+set $workspace6  "6"
+set $workspace7  "7"
+set $workspace8  "8"
+set $workspace9  "9"
+set $workspace10 "10"
+
+# Add host-specific commands
+#include ~/.i3/config_`uname -n`
+
+set $mod Mod4
+
+focus_follows_mouse no
+
+# thin borders
+#hide_edge_borders both
+#font Noto Sans Mono 9
+font pango:Inconsolata Nerd Font Mono 10
+
+# Use Mouse+$mod to drag floating windows to their wanted position
+floating_modifier $mod
+
+# start a terminal
+bindsym $mod+Return exec kitty nvim -c ':term'
+#bindsym $mod+Return exec neovide -- -c ':term'
+#bindsym $mod+Shift+Return exec kitty nvim -u /home/aa/.vim/testing/minimal.vimrc -c ':term'
+
+# kill focused window
+bindsym $mod+Shift+q kill
+
+# start rofi (a program launcher)
+#bindsym $mod+d exec rofi -show run -lines 3 -eh 2 -width 10 -opacity "85" -font "Inconsolata 10"
+# NOTE: We use zsh to make sure that rofi inherits the PATH to execute commands
+# outside of the normal /bin/sh PATH i3 uses
+# See: https://github.com/davatorium/rofi/issues/100
+bindsym $mod+b exec --no-startup-id rofi-bluetooth
+# There also is the (new) i3-dmenu-desktop which only displays applications
+# shipping a .desktop file. It is a wrapper around dmenu, so you need that
+# installed.
+#bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
+
+# change focus
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
+
+# change workspace
+bindsym $mod+y workspace prev
+bindsym $mod+o workspace next
+bindsym $mod+u workspace back_and_forth
+
+# alternatively, you can use the cursor keys:
+#bindsym $mod+Left focus left
+#bindsym $mod+Down focus down
+#bindsym $mod+Up focus up
+#bindsym $mod+Right focus right
+
+# move focused window
+bindsym $mod+Shift+h move left
+bindsym $mod+Shift+j move down
+bindsym $mod+Shift+k move up
+bindsym $mod+Shift+l move right
+bindsym $mod+Shift+b move container to workspace back_and_forth
+
+# alternatively, you can use the cursor keys:
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
+# split in horizontal orientation
+bindsym $mod+semicolon split h
+
+# split in vertical orientation
+bindsym $mod+v split v
+
+# enter fullscreen mode for the focused container
+bindsym $mod+f fullscreen
+
+# change container layout (stacked, tabbed, toggle split)
+bindsym $mod+s layout stacking
+bindsym $mod+w layout tabbed
+bindsym $mod+e layout toggle split
+
+# toggle tiling / floating
+bindsym $mod+Shift+space floating toggle
+bindsym $mod+Shift+d move position center
+
+# change focus between tiling / floating windows
+bindsym $mod+space focus mode_toggle
+
+# focus the parent container
+bindsym $mod+a focus parent
+# focus the child container
+bindsym $mod+Shift+a focus child
+
+# this is required for screenshots with talon
+#bindsym Shift+Print exec /home/aa/scripts/screenshot.sh
+
+
+
+# switch to workspace
+bindsym $mod+1 workspace $workspace1
+bindsym $mod+2 workspace $workspace2
+bindsym $mod+3 workspace $workspace3
+bindsym $mod+4 workspace $workspace4
+bindsym $mod+5 workspace $workspace5
+bindsym $mod+6 workspace $workspace6
+bindsym $mod+7 workspace $workspace7
+bindsym $mod+8 workspace $workspace8
+bindsym $mod+9 workspace $workspace9
+bindsym $mod+0 workspace $workspace10
+
+# move focused container to workspace
+bindsym $mod+Shift+1 move container to workspace $workspace1
+bindsym $mod+Shift+2 move container to workspace $workspace2
+bindsym $mod+Shift+3 move container to workspace $workspace3
+bindsym $mod+Shift+4 move container to workspace $workspace4
+bindsym $mod+Shift+5 move container to workspace $workspace5
+bindsym $mod+Shift+6 move container to workspace $workspace6
+bindsym $mod+Shift+7 move container to workspace $workspace7
+bindsym $mod+Shift+8 move container to workspace $workspace8
+bindsym $mod+Shift+9 move container to workspace $workspace9
+bindsym $mod+Shift+0 move container to workspace $workspace10
+
+# scratchpad
+bindsym $mod+Shift+minus move scratchpad
+bindsym $mod+minus scratchpad show
+
+# Spotify control
+#set $sp /home/aa/.i3/scripts/sp
+#bindsym XF86AudioPlay exec --no-startup-id $sp play
+#bindsym XF86AudioPrev exec --no-startup-id $sp prev
+#bindsym XF86AudioNext exec --no-startup-id $sp next
+
+# reload the configuration file
+bindsym $mod+Shift+c reload
+# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+bindsym $mod+Shift+r restart
+# exit i3 (logs you out of your X session)
+bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+
+# talon wake / sleep
+#bindsym XF86Launch6 exec /home/aa/scripts/talon/talon_sleep.sh
+#bindsym XF86Launch7 exec /home/aa/scripts/talon/talon_wake.sh
+
+# resize window (you can also use the mouse for that)
+mode "resize" {
+        # These bindings trigger as soon as you enter the resize mode
+
+        # Pressing left will shrink the window’s width.
+        # Pressing right will grow the window’s width.
+        # Pressing up will shrink the window’s height.
+        # Pressing down will grow the window’s height.
+        bindsym h resize shrink width 10 px or 10 ppt
+        bindsym j resize grow height 10 px or 10 ppt
+        bindsym k resize shrink height 10 px or 10 ppt
+        bindsym l resize grow width 10 px or 10 ppt
+
+        # same bindings, but for the arrow keys
+        bindsym Left resize shrink width 10 px or 10 ppt
+        bindsym Down resize grow height 10 px or 10 ppt
+        bindsym Up resize shrink height 10 px or 10 ppt
+        bindsym Right resize grow width 10 px or 10 ppt
+
+        # back to normal: Enter or Escape
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+}
+
+# resize mode
+bindsym $mod+r mode "resize"
+
+# Move workspaces
+bindsym $mod+Shift+greater move container to output right
+bindsym $mod+Shift+less move container to output left
+
+# Lock
+#bindsym $mod+Shift+x exec i3lock --color 475263 -t -i ~/images/wallpaper2.png
+#bindsym $mod+Shift+x exec ~/.i3/scripts/multi_screen_lock.sh
+
+###
+# Startup Applications
+###
+
+
+# Screenshots
+#exec --no-startup-id flameshot
+# Notifications
+#exec --no-startup-id dunst -conf ~/.dunstrc
+# Animation
+#exec_always --no-startup-id flashfocus
+# Fix virtualbox scroll wheel problem
+#exec --no-startup-id imwheel -b45
+
+#exec_always --no-startup-id $HOME/.config/polybar/launch.sh
+
+
+##
+# Tray Items
+##
+# NetworkManager
+exec --no-startup-id nm-applet
+# Bluetooth
+exec --no-startup-id blueman-tray
+# Userspace Firewall
+#exec --no-startup-id opensnitch-ui
+
+#exec --no-startup-id synology-drive
+# Needed for talon rust beta to show up on tray
+exec --no-startup-id snixembed
+##
+# Layout Specific
+##
+
+# Browser
+#exec --no-startup-id i3-msg 'workspace 2; exec firefox; layout tabbed'
+
+# Music
+#exec --no-startup-id i3-msg 'workspace 10; exec spotify;'
+
+#exec i3-msg "layout tabbed"
+
+# obs-studio desktop recording
+#exec --no-startup-id obs --minimize-to-tray --profile oedo-dpa
+
+###
+# Window layout management
+###
+for_window [class="(?i)slack"] move container to workspace $workspace1
+for_window [class="(?i)signal"] move container to workspace $workspace1
+# Teams is now restricted to virtual machine
+#for_window [class="(?i)teams"] move container to workspace $workspace1
+#for_window [title="Microsoft Teams Notification" class="microsoft teams - preview"] floating enable
+for_window [class="(?i)spotify"] move container to workspace $workspace10
+for_window [class="(?i)keepassxc"] move container to workspace $workspace10
+
+# This is a temporary hack to prevent IDA from stealing focus when I'm running
+# ret-sync in gdb. The ideal solution would be to make it ida-specific...
+no_focus [class="(?i)IDA"]
+no_focus [class="(?i)ida64"]
+#no_focus [all]
+# focus_on_window_activation none
+focus_on_window_activation smart
+
+###
+# Theme
+###
+
+#include ~/.i3/theme
+
+# Wallpaper
+#exec_always nitrogen --restore &

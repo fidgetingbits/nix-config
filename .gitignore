@@ -1,0 +1,16 @@
+.direnv
+.ruff_cache
+tmp
+# From build command testing
+result
+latest.iso
+
+# prettier?
+node_modules
+/.pre-commit-config.yaml
+
+# none public binary blobs
+ida-pro_90_x64linux.run
+binaryninja_linux_stable_commercial.zip
+
+/.git-crypt.key

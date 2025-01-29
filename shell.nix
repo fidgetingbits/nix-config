@@ -1,0 +1,58 @@
+# Shell for bootstrapping flake-enabled nix and other tooling
+{
+  pkgs ?
+    # If pkgs is not defined, instanciate nixpkgs from locked commit
+    let
+      lock = (builtins.fromJSON (builtins.readFile ./flake.lock)).nodes.nixpkgs.locked;
+      nixpkgs = fetchTarball {
+        url = "https://github.com/nixos/nixpkgs/archive/${lock.rev}.tar.gz";
+        sha256 = lock.narHash;
+      };
+    in
+    import nixpkgs { overlays = [ ]; },
+  checks,
+  ...
+}:
+{
+  default = pkgs.mkShell {
+    NIX_CONFIG = "extra-experimental-features = nix-command flakes";
+    BOOTSTRAP_USER = "aa";
+    BOOTSTRAP_SSH_PORT = "10022";
+    BOOTSTRAP_SSH_KEY = "~/.ssh/id_yubikey";
+    buildInputs = checks.pre-commit-check.enabledPackages;
+    nativeBuildInputs = builtins.attrValues {
+      inherit (pkgs)
+        nix
+        home-manager
+        git
+        just
+        pre-commit
+        alejandra
+        sops
+        deadnix
+        statix
+        git-crypt # encrypt secrets in git not suited for sops
+        attic-client # for attic backup
+        nh # fancier nix building
+        yq-go # jq for yaml, used for build scripts
+        flyctl # for fly.io
+        bats # for testing
+        ;
+    };
+    shellHook =
+      checks.pre-commit-check.shellHook or ""
+      + ''
+        # If we don't already have a .git-crypt.key file and have a git-crypt secret exposed via sops,
+        # then decode a copy and place it in the repo
+        if [ ! -f .git-crypt.key ] && [ -f ~/.config/sops-nix/secrets/keys/git-crypt ]; then
+            base64 -d ~/.config/sops-nix/secrets/keys/git-crypt > .git-crypt.key
+            git-crypt unlock .git-crypt.key
+        fi
+
+        # Setup fly token if the secret exists
+        if [ -f ~/.config/sops-nix/secrets/tokens/fly ]; then
+            export FLY_ACCESS_TOKEN=$(cat ~/.config/fly.io/token)
+        fi
+      '';
+  };
+}
