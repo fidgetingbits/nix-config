@@ -47,7 +47,7 @@
       );
       checks = forAllSystems (
         system:
-        import ./checks.nix {
+        import ./checks {
           inherit inputs system;
           pkgs = nixpkgs.legacyPackages.${system};
         }

@@ -61,6 +61,15 @@
       cargo-check.enable = true;
 
       end-of-file-fixer.enable = true;
+
+      git-crypt-check = {
+        enable = true;
+        name = "git-crypt encryption check";
+        entry = "${./git-crypt-check.sh}";
+        files = ".*"; # or whatever pattern matches your encrypted files
+        language = "script";
+        #pass_on_error = false;
+      };
     };
   };
 }
