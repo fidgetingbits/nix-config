@@ -33,6 +33,37 @@
         "type": "github"
       }
     },
+    "nixos-hardware": {
+      "locked": {
+        "lastModified": 1737751639,
+        "narHash": "sha256-ZEbOJ9iT72iwqXsiEMbEa8wWjyFvRA9Ugx8utmYbpz4=",
+        "owner": "nixos",
+        "repo": "nixos-hardware",
+        "rev": "dfad538f751a5aa5d4436d9781ab27a6128ec9d4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "repo": "nixos-hardware",
+        "type": "github"
+      }
+    },
+    "nixos-hardware-oedo": {
+      "locked": {
+        "lastModified": 1733479043,
+        "narHash": "sha256-blvO1CtHha5fhjhggIRgJG14RIwBlvi53tPh4J33IKQ=",
+        "owner": "fidgetingbits",
+        "repo": "nixos-hardware",
+        "rev": "de37c4c0406a420479f54eb7bc0d0acd7be9f125",
+        "type": "github"
+      },
+      "original": {
+        "owner": "fidgetingbits",
+        "ref": "dell-precision-5570",
+        "repo": "nixos-hardware",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1736241350,
@@ -69,6 +100,8 @@
       "inputs": {
         "disko": "disko",
         "impermanence": "impermanence",
+        "nixos-hardware": "nixos-hardware",
+        "nixos-hardware-oedo": "nixos-hardware-oedo",
         "nixpkgs": "nixpkgs_2"
       }
     }

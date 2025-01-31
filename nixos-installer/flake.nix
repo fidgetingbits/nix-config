@@ -6,6 +6,9 @@
     disko.url = "github:nix-community/disko";
     impermanence.url = "github:nix-community/impermanence";
     nixos-hardware.url = "github:nixos/nixos-hardware";
+    nixos-hardware-oedo = {
+      url = "github:fidgetingbits/nixos-hardware?ref=dell-precision-5570";
+    };
   };
 
   outputs =
@@ -48,7 +51,7 @@
       nixosConfigurations = {
         oedo = newConfig "oedo" "/dev/nvme0n1" 64 true;
         ooze = newConfig "ooze" "/dev/nvme0n1" 64 true;
-        onyx = newConfig "onyx" "/dev/nvme0n1" 64 false;
+        #onyx = newConfig "onyx" "/dev/nvme0n1" 64 false;
         okra = newConfig "okra" "/dev/vda" 0 true;
       };
     };

@@ -19,7 +19,7 @@ rebuild-post: check-sops
 # Run a flake check on the config and installer
 check ARGS="":
 	NIXPKGS_ALLOW_UNFREE=1 REPO_PATH=$(pwd) nix flake check --impure --keep-going --show-trace {{ARGS}}
-	cd nixos-installer && nix flake check --keep-going --show-trace {{ARGS}}
+	cd nixos-installer && NIXPKGS_ALLOW_UNFREE=1 REPO_PATH=$(pwd) nix flake check --impure --keep-going --show-trace {{ARGS}}
 
 # Rebuild the system
 rebuild: rebuild-pre && rebuild-post

@@ -17,7 +17,7 @@
 
   fileSystems."/" = {
     device = "/dev/disk/by-uuid/f2daf8ee-c391-4e54-b387-93db4f242c8b";
-    fsType = "ext4";
+    fsType = lib.mkForce "ext4";
   };
 
   boot.initrd.luks.devices."luks-27824da5-5b37-4cf4-ba27-9901484ea742".device =
