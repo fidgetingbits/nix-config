@@ -14,6 +14,8 @@ ssh_key=${BOOTSTRAP_SSH_KEY-}
 persist_dir=""
 luks_passphrase="passphrase"
 luks_secondary_drive_labels=""
+git_root=$(git rev-parse --show-toplevel)
+nix_secrets_dir=${NIX_SECRETS_DIR:-"${git_root}"/../nix-secrets/}
 
 # Create a temp directory for generated host keys
 temp=$(mktemp -d)
@@ -120,8 +122,6 @@ ssh_cmd="ssh \
 # shellcheck disable=SC2001
 ssh_root_cmd=$(echo "$ssh_cmd" | sed "s|${target_user}@|root@|") # uses @ in the sed switch to avoid it triggering on the $ssh_key value
 scp_cmd="scp -oControlPath=none -oport=${ssh_port} -oStrictHostKeyChecking=no -i $ssh_key"
-
-git_root=$(git rev-parse --show-toplevel)
 
 # Setup minimal environment for nixos-anywhere and run it
 generated_hardware_config=0
@@ -236,8 +236,8 @@ function sops_generate_user_age_key() {
 }
 
 function sops_setup_user_age_key() {
-	secret_file="${git_root}"/../nix-secrets/sops/${target_hostname}.yaml
-	config="${git_root}"/../nix-secrets/.sops.yaml
+	secret_file="${nix_secrets_dir}/sops/${target_hostname}.yaml"
+	config="${nix_secrets_dir}/.sops.yaml"
 	# If the secret file doesn't exist, it means we're generating a new user key as well
 	if [ ! -f "$secret_file" ]; then
 		green "Host secret file does not exist. Creating $secret_file"
@@ -246,7 +246,7 @@ function sops_setup_user_age_key() {
 		sops --config "$config" -e "$secret_file" >"$secret_file.enc"
 		mv "$secret_file.enc" "$secret_file"
 		# We need to add the new file before we rekey later
-		cd ../nix-secrets
+		cd "$nix_secrets_dir"
 		git add sops/"${target_hostname}".yaml
 		cd - >/dev/null
 	fi
@@ -325,7 +325,7 @@ if yes_or_no "Do you want to copy your full nix-config and nix-secrets to $targe
 	green "Copying full nix-config to $target_hostname"
 	sync "$target_user" "${git_root}"/../nix-config
 	green "Copying full nix-secrets to $target_hostname"
-	sync "$target_user" "${git_root}"/../nix-secrets
+	sync "$target_user" "${nix_secrets_dir}"
 
 	# FIXME: Add some sort of key access from the target to download the config (if it's a cloud system)
 	if yes_or_no "Do you want to rebuild immediately?"; then
