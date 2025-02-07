@@ -25,6 +25,7 @@ stdenv.mkDerivation rec {
 
   cmakeFlags = [
     "-DCMAKE_C_FLAGS=-static" # prevent using -llibgcc_s which will fail
+    "-DWITH_PRECOMPILED_STUBS=OFF"
   ];
 
   installPhase = ''
