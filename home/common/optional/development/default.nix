@@ -115,7 +115,6 @@ in
       includeIf."gitdir:${config.home.homeDirectory}/source/".path = privateGitConfig;
       includeIf."gitdir:${config.home.homeDirectory}/work/".path = workGitConfig;
       includeIf."gitdir:${config.home.homeDirectory}/persist/work/".path = workGitConfig;
-      # FIXME: Testing difftastic from https://github.com/thled/nix-config
       diff.tool = "difftastic";
       difftool = {
         prompt = "false";
@@ -138,8 +137,6 @@ in
     ];
   };
 
-  # NOTE: To verify github.com update commit signatures, you need to manually import
-  # https://github.com/web-flow.gpg... would be nice to do that here
   home.file.".ssh/allowed_signers".text =
     let
       keypath = "hosts/common/users/primary/keys/yubikeys/";
