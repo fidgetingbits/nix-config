@@ -1,3 +1,4 @@
 hosts/nixos/ooze/initrd_ed25519_key filter=git-crypt .git-crypt.key diff=git-crypt .git-crypt.key
 nixos-installer/initrd_ed25519_key filter=git-crypt .git-crypt.key diff=git-crypt .git-crypt.key
 /flake.lock filter=git-crypt .git-crypt.key diff=git-crypt .git-crypt.key
+locks/**   filter=git-crypt .git-crypt.key diff=git-crypt .git-crypt.key
