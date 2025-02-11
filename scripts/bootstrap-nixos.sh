@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -eo pipefail
+set -euo pipefail
 
 # Helpers library
 # shellcheck disable=SC1091
@@ -164,7 +164,7 @@ function nixos_anywhere() {
 	fi
 
 	# if luks_secondary_drive_labels cli argument was set, assign the above passphrase to those disks
-	if [ -z "${luks_secondary_drive_labels}" ]; then
+	if [ -n "${luks_secondary_drive_labels}" ]; then
 		luks_setup_secondary_drive_decryption
 	fi
 
@@ -207,7 +207,7 @@ function sops_generate_host_age_key() {
 		exit 1
 	}
 
-	host_age_key=$(nix shell nixpkgs#ssh-to-age.out -c sh -c "echo $target_key | ssh-to-age")
+	host_age_key=$(echo "$target_key" | ssh-to-age)
 
 	if grep -qv '^age1' <<<"$host_age_key"; then
 		red "The result from generated age key does not match the expected format."
@@ -269,16 +269,6 @@ if [[ $updated_age_keys == 1 ]]; then
 	just rekey
 	green "Updating flake input to pick up new .sops.yaml"
 	nix flake update nix-secrets
-fi
-
-if yes_or_no "Add ssh host fingerprints for git{lab,hub}?"; then
-	if [ "$target_user" == "root" ]; then
-		home_path="/root"
-	else
-		home_path="/home/$target_user"
-	fi
-	green "Adding ssh host fingerprints for git{lab,hub}"
-	$ssh_cmd "mkdir -p $home_path/.ssh/; ssh-keyscan -t ssh-ed25519 gitlab.com github.com | grep -v '^#' >>$home_path/.ssh/known_hosts"
 fi
 
 if yes_or_no "Do you want to copy your full nix-config and nix-secrets to $target_hostname?"; then

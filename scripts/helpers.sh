@@ -152,8 +152,8 @@ function sops_generate_user_age_key() {
 }
 
 function sops_setup_user_age_key() {
-	target_hostname="$1"
-	target_user="$2"
+	target_user="$1"
+	target_hostname="$2"
 
 	secret_file="${nix_secrets_dir}/sops/${target_hostname}.yaml"
 	config="${nix_secrets_dir}/.sops.yaml"

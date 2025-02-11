@@ -37,7 +37,8 @@
         yq-go # jq for yaml, used for build scripts
         flyctl # for fly.io
         bats # for testing
-        age
+        age # bootstrap script
+        ssh-to-age # bootstrap script
         ;
     };
     shellHook =

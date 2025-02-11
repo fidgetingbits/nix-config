@@ -66,7 +66,7 @@ check-sops:
 
 # Update nix-secrets flake
 update-nix-secrets:
-	@(cd ~/dev/nix/nix-secrets && git fetch && git rebase > /dev/null) || true
+	@(cd ../nix-secrets && git fetch && git rebase > /dev/null) || true
 	nix flake update nix-secrets --timeout 5
 
 # Rebuild vscode extensions that update regularly
