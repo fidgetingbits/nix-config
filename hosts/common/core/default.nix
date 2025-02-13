@@ -49,6 +49,7 @@ in
       sopsFile = "${sopsFolder}/shared.yaml";
     };
   };
+
   nix =
     {
       settings = {

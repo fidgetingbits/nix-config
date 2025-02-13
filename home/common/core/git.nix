@@ -136,6 +136,8 @@
   home.packages = [
     pkgs.git-crypt # Needs to be global so talon dynamic lists work in repos with filters
   ];
+
+  # FIXME: This should be abstracted away from zsh in case I switch
   programs.zsh.sessionVariables = {
     GIT_EDITOR = if config.hostSpec.isServer then "nvim" else "code -w";
   };
