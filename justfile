@@ -18,13 +18,13 @@ rebuild-post: check-sops && save-lock-changes
 
 # Check if the local flake.lock changed, and if so commit it to locks/
 save-lock-changes:
-    @mkdir -p locks || true
-    @new_hash=$(md5sum flake.lock | cut -d' ' -f1) && \
-    @if [ ! -f "locks/$(hostname).lock" ] || [ "$new_hash" != "$(md5sum locks/$(hostname).lock | cut -d' ' -f1)" ]; then \
+    @mkdir -p locks || true; \
+    new_hash=$(md5sum flake.lock | cut -d' ' -f1); \
+    if [ ! -f "locks/$(hostname).lock" ] || [ "$new_hash" != "$(md5sum locks/$(hostname).lock | cut -d' ' -f1)" ]; then \
         cp flake.lock "locks/$(hostname).lock" && \
         git add "locks/$(hostname).lock" && \
         git commit -m "chore: update $(hostname)'s flake.lock" && \
-        git push \
+        git push; \
     fi
 
 # Run a flake check on the config and installer
