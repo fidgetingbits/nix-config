@@ -55,6 +55,17 @@
         if [ -f ~/.config/sops-nix/secrets/tokens/fly ]; then
             export FLY_ACCESS_TOKEN=$(cat ~/.config/fly.io/token)
         fi
+
+        # If we don't already have a flake.lock file setup, try to initialize it
+        if [ ! -f flake.lock ] && [ -f locks/$(hostname).lock ]; then
+            cp locks/$(hostname).lock flake.lock
+        fi
+
+        if [ ! -f flake.lock ]; then
+            echo "No flake.lock file found, generating one"
+            nix flake update
+        fi
+
       '';
   };
 }
