@@ -10,8 +10,8 @@
   imports = lib.flatten [
     inputs.impermanence.nixosModules.home-manager.impermanence
     (map lib.custom.relativeToRoot [
-      "modules/common/host-spec.nix"
-      "modules/home-manager"
+      "modules/hosts/common/host-spec.nix"
+      "modules/home/"
     ])
     ./tmux.nix
     ./zsh

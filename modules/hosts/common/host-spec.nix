@@ -66,62 +66,67 @@
     isMinimal = lib.mkOption {
       type = lib.types.bool;
       default = false;
-      description = "Used to indicate a minimal host";
+      description = "Indicate a minimal host";
     };
     isProduction = lib.mkOption {
       type = lib.types.bool;
       default = true;
-      description = "Used to indicate a production host";
+      description = "Indicate a production host";
     };
     isServer = lib.mkOption {
       type = lib.types.bool;
       default = false;
-      description = "Used to indicate a server host";
+      description = "Indicate a server host";
     };
     isWork = lib.mkOption {
       type = lib.types.bool;
       default = false;
-      description = "Used to indicate a host that uses work resources";
+      description = "Indicate a host that uses work resources";
+    };
+    isDevelopment = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Indicate a host used for development";
     };
     useYubikey = lib.mkOption {
       type = lib.types.bool;
       default = false;
-      description = "Used to indicate if the host uses a yubikey";
+      description = "Indicate if the host uses a yubikey";
     };
     voiceCoding = lib.mkOption {
       type = lib.types.bool;
       default = false;
-      description = "Used to indicate a host that uses voice coding";
+      description = "Indicate a host that uses voice coding";
     };
     isAutoStyled = lib.mkOption {
       type = lib.types.bool;
       default = false;
-      description = "Used to indicate a host that wants auto styling like stylix";
+      description = "Indicate a host that wants auto styling like stylix";
     };
     useNeovimTerminal = lib.mkOption {
       type = lib.types.bool;
       default = false;
-      description = "Used to indicate a host that uses neovim for terminals";
+      description = "Indicate a host that uses neovim for terminals";
     };
     useWindowManager = lib.mkOption {
       type = lib.types.bool;
       default = true;
-      description = "Used to indicate a host that uses a window manager";
+      description = "Indicate a host that uses a window manager";
     };
     useAtticCache = lib.mkOption {
       type = lib.types.bool;
       default = true;
-      description = "Used to indicate a host that uses LAN atticd for caching";
+      description = "Indicate a host that uses LAN atticd for caching";
     };
     hdr = lib.mkOption {
       type = lib.types.bool;
       default = false;
-      description = "Used to indicate a host that uses HDR";
+      description = "Indicate a host that uses HDR";
     };
     scaling = lib.mkOption {
       type = lib.types.str;
       default = "1";
-      description = "Used to indicate what scaling to use. Floating point number";
+      description = "Indicate what scaling to use. Floating point number";
     };
   };
 

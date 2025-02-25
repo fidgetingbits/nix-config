@@ -19,11 +19,13 @@ rebuild-post: check-sops && save-lock-changes
 # Check if the local flake.lock changed, and if so commit it to locks/
 save-lock-changes:
     @mkdir -p locks || true; \
+    hostname=$(hostname) \
+    lockfile="locks/$hostname.lock" \
     new_hash=$(md5sum flake.lock | cut -d' ' -f1); \
-    if [ ! -f "locks/$(hostname).lock" ] || [ "$new_hash" != "$(md5sum locks/$(hostname).lock | cut -d' ' -f1)" ]; then \
-        cp flake.lock "locks/$(hostname).lock" && \
-        git add "locks/$(hostname).lock" && \
-        git commit -m "chore: update $(hostname)'s flake.lock" && \
+    if [ ! -f "$lockfile" ] || [ "$new_hash" != "$(md5sum $lockfile | cut -d' ' -f1)" ]; then \
+        cp flake.lock "$lockfile" && \
+        git add "$lockfile" && \
+        git commit -m "chore: update $hostname's flake.lock" && \
         git push; \
     fi
 
@@ -33,7 +35,8 @@ check ARGS="":
 	cd nixos-installer && NIXPKGS_ALLOW_UNFREE=1 REPO_PATH=$(pwd) nix flake check --impure --keep-going --show-trace {{ARGS}}
 
 # Rebuild the system
-rebuild: rebuild-pre && rebuild-post
+#rebuild: rebuild-pre && rebuild-post
+rebuild:
 	# NOTE: Add --option eval-cache false if you end up caching a failure you cant get around
 	scripts/rebuild.sh
 	just rebuild-extensions-lite

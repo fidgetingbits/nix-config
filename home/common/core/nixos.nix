@@ -13,17 +13,14 @@
   home = rec {
     homeDirectory = config.hostSpec.home;
     username = config.hostSpec.username;
-    sessionPath =
+    sessionPath = lib.flatten (
+      [
+        "${homeDirectory}/scripts/"
+      ]
+      ++ lib.optional config.hostSpec.voiceCoding [ "${homeDirectory}/scripts/talon/" ]
+      ++ lib.optional config.hostSpec.isWork inputs.nix-secrets.work.extraPaths
+    );
 
-      lib.flatten (
-        [
-          "${homeDirectory}/scripts/"
-          "${homeDirectory}/scripts/talon/"
-        ]
-        ++ lib.optional config.hostSpec.isWork inputs.nix-secrets.work.extraPaths
-      );
-
-    # FIXME: isProduction technically isn't core
     packages = lib.optionals (config.hostSpec.isProduction) (
       builtins.attrValues {
         inherit (pkgs)

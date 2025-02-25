@@ -39,7 +39,7 @@
             }
             ./minimal-configuration.nix
             ../hosts/nixos/${name}/hardware-configuration.nix
-            ../modules/nixos/impermanence
+            ../modules/hosts/nixos/impermanence
             {
               networking.hostName = name;
               system.impermanence.enable = impermanence;

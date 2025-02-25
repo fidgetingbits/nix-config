@@ -48,16 +48,16 @@ in
     #   ex: /var/folders/pp/t8_sr4ln0qv5879cp3trt1b00000gn/T/id_dade
     secrets =
       {
-        # FIXME: Gate this behind some option
-        "tokens/openai" = {
-          sopsFile = "${sopsFolder}/shared.yaml";
-          path = "${homeDirectory}/.config/openai/token";
-        };
         "keys/git-crypt" = {
           sopsFile = "${sopsFolder}/shared.yaml";
         };
       }
-
+      // lib.optionalAttrs config.hostSpec.isDevelopment {
+        "tokens/openai" = {
+          sopsFile = "${sopsFolder}/shared.yaml";
+          path = "${homeDirectory}/.config/openai/token";
+        };
+      }
       // lib.optionalAttrs config.hostSpec.isWork {
         # FIXME(secrets): Need an activation script to build a config.yml using multiple files (ie: work and personal)
         "config/glab" = {

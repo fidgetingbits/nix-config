@@ -92,6 +92,7 @@ in
                 (extension "ignore-cookies" "jid1-KKzOGWgsW3Ao4Q@jetpack") # failed # Ignore cookie setting pop-ups
                 (extension "proton-pass" "78272b6fa58f4a1abaac99321d503a20@proton.me")
                 (extension "proton-vpn" "vpn@proton.ch") # failed
+                (extension "foxyproxy" "gcknhkkoolaabfmlnjonogaaifnjlfnp")
 
                 # Layout / Themeing
                 (extension "tree-style-tab" "treestyletab@piro.sakura.ne.jp")

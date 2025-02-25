@@ -60,6 +60,8 @@
     scaling = lib.mkForce "2";
     isProduction = lib.mkForce true;
     #useAtticCache = lib.mkForce false;
+    isDevelopment = lib.mkForce true;
+
   };
 
   boot.kernelPackages = pkgs.linuxPackages_latest;

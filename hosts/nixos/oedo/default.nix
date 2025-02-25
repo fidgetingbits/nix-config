@@ -72,6 +72,7 @@
     persistFolder = lib.mkForce "/persist";
     isProduction = lib.mkForce true;
     isAutoStyled = lib.mkForce true;
+    isDevelopment = lib.mkForce true;
   };
   system.impermanence.enable = true;
 
