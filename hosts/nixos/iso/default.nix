@@ -14,7 +14,7 @@
     (map lib.custom.relativeToRoot [
       "hosts/common/users/primary/"
       "hosts/common/optional/minimal-user.nix"
-      "modules/hosts/common/host-spec.nix"
+      "modules/common/host-spec.nix"
     ])
   ];
 

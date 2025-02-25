@@ -6,7 +6,6 @@
 {
   imports = [
     ../modules/common
-    ../modules/hosts/common/host-spec.nix
 
     ../hosts/common/core/ssh.nix
     ../hosts/common/users/primary
