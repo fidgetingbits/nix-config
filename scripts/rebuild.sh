@@ -63,9 +63,9 @@ else
 		REPO_PATH=$(pwd)
 		export REPO_PATH
 		# Stop nix from trying to update the flake.lock file since it's untracked
-		git add --intent-to-add -f flake.lock
+		#git add --intent-to-add -f flake.lock
 		nh os switch . -- --impure --show-trace
-		git rm --cached flake.lock
+		#git rm --cached flake.lock
 	else
 		sudo nixos-rebuild $switch_args
 	fi

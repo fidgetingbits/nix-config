@@ -3,18 +3,23 @@ SOPS_FILE := "../nix-secrets/.sops.yaml"
 # Define path to helpers
 export HELPERS_PATH := justfile_directory() + "/scripts/helpers.sh"
 
-
 # List available commands
 default:
   @just --list
 
+git-dance-pre:
+    git add --intent-to-add -f flake.lock
+
+git-dance-post:
+    git rm --cached flake.lock
+
 # Update commonly changing flakes and prep for a rebuild
-rebuild-pre: update-nix-secrets
+rebuild-pre: git-dance-pre update-nix-secrets
 	nix flake update nixvim-flake --timeout 5
 	@git add --intent-to-add .
 
 # Run post-rebuild checks, like if sops is running properly afterwards
-rebuild-post: check-sops && save-lock-changes
+rebuild-post: git-dance-post check-sops && save-lock-changes
 
 # Check if the local flake.lock changed, and if so commit it to locks/
 save-lock-changes:

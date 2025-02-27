@@ -6,16 +6,7 @@
   pkgs,
   ...
 }:
-let
-  sopsFolder = (builtins.toString inputs.nix-secrets) + "/sops";
-in
 {
-  sops.secrets = {
-    # formatted as extra-access-tokens = github.com=<PAT token>
-    "tokens/nix-access-tokens" = {
-      sopsFile = "${sopsFolder}/shared.yaml";
-    };
-  };
 
   nix =
     {
@@ -32,7 +23,6 @@ in
         trusted-users = [ "@wheel" ];
         builders-use-substitutes = true;
         fallback = true; # Don't hard fail if a binary cache isn't available, since some systems roam
-        substituters = [ ];
         extra-substituters =
           [
             "https://nix-community.cachix.org" # Nix community Cachix server
@@ -47,11 +37,12 @@ in
           ++ lib.optionals config.hostSpec.useAtticCache [
             "o-cache:TA5fD0hG38GHJo1z3rSoPnrBgZalPddmEh5DSn0DipA="
           ];
-
+        netrc-file = if config ? "sops" then "${config.sops.secrets."passwords/netrc".path}" else null;
       };
 
       # Access token prevents github rate limiting if you have to nix flake update a bunch
-      extraOptions = "!include ${config.sops.secrets."tokens/nix-access-tokens".path}";
+      extraOptions =
+        if config ? "sops" then "!include ${config.sops.secrets."tokens/nix-access-tokens".path}" else "";
 
       # Disabled because I am using nh
       # gc = {
@@ -65,13 +56,12 @@ in
       registry = lib.mapAttrs (_: value: { flake = value; }) inputs;
 
       # This will add your inputs to the system's legacy channels
-      # Making legacy nix commands consistent as well, awesome!
+      # Making legacy nix commands consistent as well
       # NOTE: on darwin I was getting:
       # error: The option `nix.registry.nixpkgs.to.path' has conflicting definition values:
       #   - In `/nix/store/3m75mdiiq4bkzm5qpx6arapz042na0vh-source/modules/nix': "/nix/store/m1g5a7agja7si7y9l1lzwhp3capbv7x9-source"
       #   - In `/nix/store/3m75mdiiq4bkzm5qpx6arapz042na0vh-source/modules/nix/nixpkgs-flake.nix': "/nix/store/fj58bk5dvyaxqfrsrncfg3bn1pmdj8q2-source"
       #   Use `lib.mkForce value` or `lib.mkDefault value` to change the priority on any of these definitions.
       nixPath = lib.mapAttrsToList (key: value: "${key}=${value.to.path}") config.nix.registry;
-
     });
 }

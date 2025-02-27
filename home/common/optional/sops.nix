@@ -51,6 +51,14 @@ in
         "keys/git-crypt" = {
           sopsFile = "${sopsFolder}/shared.yaml";
         };
+
+        "passwords/netrc" = {
+          sopsFile = "${sopsFolder}/shared.yaml";
+        };
+        # formatted as extra-access-tokens = github.com=<PAT token>
+        "tokens/nix-access-tokens" = {
+          sopsFile = "${sopsFolder}/shared.yaml";
+        };
       }
       // lib.optionalAttrs config.hostSpec.isDevelopment {
         "tokens/openai" = {
