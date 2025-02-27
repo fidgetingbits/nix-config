@@ -7,11 +7,14 @@ export HELPERS_PATH := justfile_directory() + "/scripts/helpers.sh"
 default:
   @just --list
 
+# Temporarily track the flake.lock with git to satisfy nix commands
 git-dance-pre:
-    git add --intent-to-add -f flake.lock
+    @git add --intent-to-add -f flake.lock
+    @git update-index --assume-unchanged flake.lock
 
+# Remove the flake.lock from git tracking
 git-dance-post:
-    git rm --cached flake.lock
+    @git rm --cached flake.lock || true
 
 # Update commonly changing flakes and prep for a rebuild
 rebuild-pre: git-dance-pre update-nix-secrets

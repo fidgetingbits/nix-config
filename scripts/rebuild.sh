@@ -9,6 +9,11 @@
 # shellcheck disable=SC1091
 source "$(dirname "${BASH_SOURCE[0]}")/helpers.sh"
 
+function cleanup() {
+	git rm --cached flake.lock 2>/dev/null || true
+}
+trap cleanup EXIT SIGINT
+
 switch_args="--show-trace --impure --flake "
 if [[ -n $1 && $1 == "trace" ]]; then
 	switch_args="$switch_args --show-trace "
@@ -62,12 +67,9 @@ else
 	if command -v nh &>/dev/null; then
 		REPO_PATH=$(pwd)
 		export REPO_PATH
-		# Stop nix from trying to update the flake.lock file since it's untracked
-		#git add --intent-to-add -f flake.lock
 		nh os switch . -- --impure --show-trace
-		#git rm --cached flake.lock
 	else
-		sudo nixos-rebuild $switch_args
+		nixos-rebuild $switch_args
 	fi
 fi
 
