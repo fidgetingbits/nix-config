@@ -110,7 +110,7 @@
   # Serial cables into lab systems
   # Two of these devices have identical serials, so we need to use the kernel path
   # https://askubuntu.com/questions/49910/how-to-distinguish-between-identical-usb-to-serial-adapters
-  # WARNING: If you re plug the cables, this may break
+  # WARNING: If you re-plug the cables, this may break
   services.udev.extraRules = ''
     # ttyUSB0
     ACTION=="add", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="A50285BI", KERNELS=="1-8.1", SYMLINK+="ttyUSB-fang"
