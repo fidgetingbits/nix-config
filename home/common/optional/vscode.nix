@@ -225,6 +225,14 @@ in
         };
         update.mode = "none";
         "github.copilot.editor.enableAutoCompletions" = true;
+        "github.copilot.nextEditSuggestions.enabled" = true;
+        # add recently edited files to the context of questions
+        "github.copilot.chat.editor.temporalContext.enabled" = true;
+
+        # always suggest at its below the line
+        "editor.inlineSuggest.edits.renderSideBySide" = false;
+        # auto accepting copilot changes
+        # chat.editing.autoAcceptDelay = 10;
         "direnv.path.executable" = lib.getExe pkgs.direnv;
 
         # vscode-neovim.neovimExecutablePaths.linux = "/usr/bin/nvim";
