@@ -79,13 +79,12 @@ in
           bindiff
 
           # windows
-          wine64
           clippy
           ;
       }
       # ++ [
-      #   pkgs.bindiff.override
-      #   { enableIDA = false; } # NOTE: This requires manual setup if enabled
+      # pkgs.bindiff.override
+      # { enableIDA = false; } # NOTE: This requires manual setup if enabled
       # ]
     ))
   ];

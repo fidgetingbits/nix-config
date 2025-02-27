@@ -33,6 +33,7 @@
     common/optional/gui-utilities.nix # core for any desktop
     common/optional/chat.nix
     common/optional/reversing
+    common/optional/wine.nix
   ];
 
   talon = {

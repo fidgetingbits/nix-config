@@ -34,6 +34,8 @@
     common/optional/gnome
 
     common/optional/reversing
+
+    common/optional/wine.nix
   ];
 
   services.yubikey-touch-detector.enable = true;
