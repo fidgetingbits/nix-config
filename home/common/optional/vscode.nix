@@ -41,7 +41,8 @@ let
     inherit (exts.rust-lang) rust-analyzer; # Rust LSP
 
     # Lua
-    inherit (exts.sumneko) lua; # lua lsp;
+    # FIXME: busted 2025-03-04
+    #inherit (exts.sumneko) lua; # lua lsp;
     inherit (exts.johnnymorganz) stylua; # lua linting
 
     # Talon
