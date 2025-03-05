@@ -14,6 +14,8 @@ function cleanup() {
 }
 trap cleanup EXIT SIGINT
 
+export NIXPKGS_ALLOW_UNFREE=1
+
 switch_args="--show-trace --impure --flake "
 if [[ -n $1 && $1 == "trace" ]]; then
 	switch_args="$switch_args --show-trace "
@@ -67,6 +69,8 @@ else
 	if command -v nh &>/dev/null; then
 		REPO_PATH=$(pwd)
 		export REPO_PATH
+		NIXPKGS_ALLOW_BROKEN=1
+		export NIXPKGS_ALLOW_BROKEN
 		nh os switch . -- --impure --show-trace
 	else
 		nixos-rebuild $switch_args
