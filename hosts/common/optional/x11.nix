@@ -1,12 +1,17 @@
 { pkgs, config, ... }:
 {
   # Enable the X11 windowing system.
-  services.xserver.enable = true;
+  services.xserver = {
+    enable = true;
 
-  # Configure keymap in X11
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "";
+    dpi = if config.hostSpec.hdr then 192 else 96;
+    upscaleDefaultCursor = config.hostSpec.hdr;
+
+    # Configure keymap in X11
+    xkb = {
+      layout = "us";
+      variant = "";
+    };
   };
 
   # Enable automatic login for the user.
