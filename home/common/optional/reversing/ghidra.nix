@@ -6,19 +6,18 @@
   ...
 }:
 let
-  #ghidra_pkg = pkgs.unstable.ghidra.withExtensions (
-  #  exts:
-  #  builtins.attrValues {
-  #    inherit (exts) ret-sync;
-  #  }
-  #);
+  ghidra_pkg = pkgs.unstable.ghidra.withExtensions (
+    exts:
+    builtins.attrValues {
+      inherit (exts) ret-sync;
+    }
+  );
   ghidra_dir = ".config/ghidra/${pkgs.unstable.ghidra.distroPrefix}";
 in
 {
   home = {
-    # FIXME: Ghidra building is broken atm
-    #packages = [ ghidra_pkg ];
-    #packages = [ pkgs.unstable.ghidra ];
+    packages = [ ghidra_pkg ];
+    # packages = [ pkgs.unstable.ghidra ];
     # Searching public preferences is useful, since our own updates won't change this file
     # eg: https://github.com/antkss/dots-hypr/blob/2da60e3ac490ad262977df83702663668494d79f/.ghidra/.ghidra_11.0.3_PUBLIC/preferences#L2
     file = {
