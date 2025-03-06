@@ -53,6 +53,5 @@
   systemd.services."getty@tty1".enable = false;
   systemd.services."autovt@tty1".enable = false;
 
-  # Fix an issue related to gnome 47 overlays
-  #services.gnome.gnome-online-miners.enable = lib.mkForce false;
+  systemd.oomd.enable = false; # Try to prrevent Gnome BSOD
 }
