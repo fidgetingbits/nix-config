@@ -182,6 +182,8 @@ in
 
       ga = "git add";
       gau = "git add --update";
+      # Only add updates to files that are already staged
+      gas = "git add --update $(git diff --name-only --cached)";
       gs = "git status --untracked-files=no";
       gsa = "git status";
       gst = "git stash";
