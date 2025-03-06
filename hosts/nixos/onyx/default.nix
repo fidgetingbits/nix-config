@@ -22,7 +22,12 @@
       "hosts/common/optional/locale.nix"
       "hosts/common/optional/x11.nix"
       "hosts/common/optional/sound.nix"
+
+      # Desktop environment and login manager
+      "hosts/common/optional/display-manager.nix"
       "hosts/common/optional/gnome.nix"
+      "hosts/common/optional/i3wm.nix"
+
       "hosts/common/optional/podman.nix"
       "hosts/common/optional/libvirt.nix"
       "hosts/common/optional/wireshark.nix"
