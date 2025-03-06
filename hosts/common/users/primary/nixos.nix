@@ -21,6 +21,7 @@ in
     hashedPasswordFile = sopsHashedPasswordFile; # Blank if sops isn't working
     extraGroups = lib.flatten [
       "wheel"
+      "plugdev"
       (ifTheyExist [
         "audio"
         "video"
