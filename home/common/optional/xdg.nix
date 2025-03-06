@@ -66,10 +66,19 @@ let
   };
 in
 {
-  xdg.mime.enable = true;
-  xdg.mimeApps.enable = true;
-  xdg.mimeApps.defaultApplications = associations;
-  xdg.mimeApps.associations.added = associations;
+  xdg = {
+    mime.enable = true;
+    mimeApps = {
+      enable = true;
+      defaultApplications = associations;
+      associations.added = associations;
+    };
+    # Disable pwntools auto-update
+    configFile."pwn.conf".text = ''
+      [update]
+      interval=never
+    '';
+  };
 
   home.packages = builtins.attrValues {
     inherit (pkgs)
