@@ -16,6 +16,7 @@
 {
   default = pkgs.mkShell {
     NIX_CONFIG = "extra-experimental-features = nix-command flakes";
+    NIXPKGS_ALLOW_BROKEN = "1";
     BOOTSTRAP_USER = "aa";
     BOOTSTRAP_SSH_PORT = "10022";
     BOOTSTRAP_SSH_KEY = "~/.ssh/id_yubikey";
