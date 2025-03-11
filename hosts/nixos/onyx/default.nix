@@ -38,6 +38,8 @@
       "hosts/common/optional/iphone-backup.nix"
 
       "hosts/common/optional/binaryninja.nix"
+      "hosts/common/optional/cynthion.nix"
+      "hosts/common/optional/saleae.nix"
 
       # Network management
       "hosts/common/optional/systemd-resolved.nix"
