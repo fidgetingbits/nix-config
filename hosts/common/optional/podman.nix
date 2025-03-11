@@ -1,7 +1,7 @@
 { config, lib, ... }:
 {
   virtualisation = {
-    #    virtualbox.host = { enable = true; enableExtensionPack = true; };
+
     podman = {
       enable = true;
       # Required for containers under podman-compose to be able to talk to each other.
