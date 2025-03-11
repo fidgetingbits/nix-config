@@ -128,8 +128,7 @@
           evince # pdf reader
           zathura # pdf reader
 
-          # diagnostics
-          wireshark
+          mdless # Markdown preview in cli
 
           xsel # X clipboard manager
 
