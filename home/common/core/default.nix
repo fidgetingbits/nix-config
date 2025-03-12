@@ -128,7 +128,7 @@
           evince # pdf reader
           zathura # pdf reader
 
-          mdless # Markdown preview in cli
+          mdcat # Markdown preview in cli
 
           xsel # X clipboard manager
 
