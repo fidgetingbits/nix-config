@@ -8,7 +8,6 @@
       tree # cli directory listing
       ripgrep # better grep
       findutils # find, xargs, locate, etc
-      bat # better cat
       eza # better cat
       htop # better top
       btop # even better top
@@ -30,6 +29,10 @@
       unrar
       # security
       checksec
+      ;
+    inherit (pkgs.unstable)
+      # cli tools
+      bat # better cat
       ;
   };
   services.locate = {
