@@ -13,7 +13,7 @@ let
     inherit (exts.mhutchie) git-graph; # Git graph
     inherit (exts.github) vscode-github-actions; # Github actions
     inherit (exts.github) vscode-pull-request-github; # Github PRs
-
+    inherit (exts.gitlab) gitlab-workflow; # Gitlab workflow
     # Misc Linting
     inherit (exts.esbenp) prettier-vscode;
     inherit (exts.joshbolduc) commitlint;
@@ -462,6 +462,7 @@ in
           "enableSmartCommit" = true;
         };
 
+        # github
         "github.copilot.enable" = {
           "*" = true;
           "scminput" = false;
@@ -478,6 +479,12 @@ in
             "file" = "${config.home.homeDirectory}/.config/vscode/copilot_prompt";
           }
         ];
+
+        # gitlab
+        "gitlab.duoCodeSuggestions.enabled" = false;
+        "gitlab.duoChat.enabled" = false;
+        "gitlab.duo.enabledWithoutGitlabProject" = false;
+        "gitlab.real-timeSecurityScan.scanFileOnSave" = false;
 
         "gitlens.currentLine.enabled" = false;
         "gitlens.hovers.currentLine.over" = "line";
