@@ -16,6 +16,7 @@ let
       exec make "$@"
     '';
   };
+
   # This is only for use by the make scripts, which has unpatchable FHS path expectations
   fhsEnv = pkgs.buildFHSUserEnv {
     name = "kernel-build-env";
@@ -37,6 +38,7 @@ let
             gdb
             strace
             gcc
+
             ;
 
           inherit (pkgs.openssl) dev;
@@ -82,13 +84,12 @@ pkgs.writeShellApplication {
   runtimeInputs = lib.flatten [
     (builtins.attrValues {
       inherit (pkgs)
-        debootstrap
         e2fsprogs # mkfs.ext4
         curl
         qemu
-
         ;
     })
+    pkgs.unstable.debootstrap # unstable important for zstd support
     pkgs.linux.nativeBuildInputs
   ];
   # propagatedBuildInputs =  builtins.attrValues {inherit (pkgs) gdb;};
