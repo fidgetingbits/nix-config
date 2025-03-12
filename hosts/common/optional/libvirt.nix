@@ -34,6 +34,8 @@ in
         #          }).fd
         #        ];
       };
+      # Allow shared folder with window's hosts - https://discourse.nixos.org/t/virt-manager-cannot-find-virtiofsd/26752/9
+      vhostUserPackages = [ pkgs.virtiofsd ];
     };
   };
   virtualisation.libvirt = {
