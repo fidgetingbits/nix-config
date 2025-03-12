@@ -58,7 +58,7 @@
             description = "Rollback BTRFS root subvolume to a pristine state";
             wantedBy = [ "initrd.target" ];
             after = [
-              # TNOTE: he \\x2d is a hyphen in the systemd unit name
+              # NOTE: he \\x2d is a hyphen in the systemd unit name
               "dev-mapper-encrypted\\x2dnixos.device"
               # LUKS/TPM process
               "systemd-cryptsetup@${hostname}.service"

@@ -9,13 +9,12 @@
 ## instead we delete the root and create a new one.
 
 mkdir /btrfs_tmp
-echo "Testing mount"
 
 mount -t btrfs -o subvol=/ /dev/mapper/encrypted-nixos /btrfs_tmp
 
 if [[ -e /btrfs_tmp/@root ]]; then
-	mkdir -p /btrfs_tmp/@old_roots
-	timestamp=$(date --date="@$(stat -c %Y /btrfs_tmp/@root)" "+%Y-%m-%-d_%H:%M:%S")
+	mkdir -p /btrfs_tmp/@old_roots || true
+	timestamp=$(date --date="@$(stat -c %Y /btrfs_tmp/@root)" "+%Y-%m-%d_%H:%M:%S")
 	mv /btrfs_tmp/@root "/btrfs_tmp/@old_roots/$timestamp"
 fi
 
