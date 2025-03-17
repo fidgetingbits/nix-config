@@ -272,7 +272,7 @@ in
       # systemctl services
       # NOTE: this kind of overlaps already with lots of sc-xxx aliases, so maybe revist
       s = "systemctl";
-      ss = "systemctl status";
+      sst = "systemctl status";
       sus = "systemctl --user status";
       sl = "systemctl list-units --type=service";
       sla = "systemctl list-units --all";
