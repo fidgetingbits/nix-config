@@ -30,42 +30,45 @@ in
 
   # FIXME: Some of the reversing stuff, etc can likely be moved
   home.packages = lib.flatten [
-    (builtins.attrValues {
-      inherit (pkgs)
-        # Development
-        direnv
-        delta # diffing
-        act # github workflow runner
-        gh # github cli
-        glab # gitlab cli
-        yq-go # Parser for Yaml and Toml Files, that mirrors jq
+    (
+      builtins.attrValues {
+        inherit (pkgs)
+          # Development
+          direnv
+          delta # diffing
+          act # github workflow runner
+          gh # github cli
+          glab # gitlab cli
+          yq-go # Parser for Yaml and Toml Files, that mirrors jq
 
-        # reversing
-        radare2
-        binwalk
+          # reversing
+          radare2
+          binwalk
 
-        # nix
-        nixpkgs-review
+          # nix
+          nixpkgs-review
 
-        # networking
-        nmap
+          # networking
+          nmap
 
-        # Diffing
-        difftastic
+          # Diffing
+          difftastic
 
-        # serial debugging
-        screen
+          # serial debugging
+          screen
 
-        # Standard man pages for linux API
-        man-pages
-        man-pages-posix
+          # Standard man pages for linux API
+          man-pages
+          man-pages-posix
 
-        # rust (global for when browsing public projects)
-        cargo
-        rust-analyzer
-        rustc
-        ;
-    })
+          # rust (global for when browsing public projects)
+          cargo
+          rust-analyzer
+          rustc
+          ;
+      }
+      ++ [ pkgs.unstable.imhex ]
+    )
 
     (lib.optionals pkgs.stdenv.isLinux (
       builtins.attrValues {
