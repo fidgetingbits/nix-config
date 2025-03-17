@@ -14,6 +14,7 @@ let
     inherit (exts.github) vscode-github-actions; # Github actions
     inherit (exts.github) vscode-pull-request-github; # Github PRs
     inherit (exts.gitlab) gitlab-workflow; # Gitlab workflow
+
     # Misc Linting
     inherit (exts.esbenp) prettier-vscode;
     inherit (exts.joshbolduc) commitlint;
@@ -99,6 +100,9 @@ let
     inherit (exts.yzhang) markdown-all-in-one; # Markdown helpers
     inherit (exts.davidanson) vscode-markdownlint; # Markdown linter
 
+    # ReStructuredText (rst)
+    inherit (exts.lextudio) restructuredtext;
+
     # CSV
     inherit (exts.mechatroner) rainbow-csv; # CSV linter, syntax highlighting
 
@@ -140,6 +144,9 @@ let
     # vscodevim.vim # Vim-style
     inherit (exts.koalamer) workspace-in-status-bar;
     inherit (exts.tonybaloney) vscode-pets; # essentials
+    inherit (exts.joshmu) periscope; # neovim telescope-style picker
+    inherit (exts.jpcrs) binocular; # neovim telescope-style picker
+    inherit (exts.ms-vscode-remote) vscode-remote-extensionpack; # Remote development (ssh, etc)
 
     # Syntax and File Detection
     inherit (exts.pierre-payen) gdb-syntax;
@@ -539,13 +546,14 @@ in
         ];
 
         "jsonColorToken.colorTokenCasing" = "Lowercase";
+        # Anything commented out is because conflicts to much with hex format strings
         "jsonColorToken.languages" = [
           "bat"
           "blade"
-          "c"
+          # "c"
           "css"
-          "csharp"
-          "cpp"
+          # "csharp"
+          # "cpp"
           "csv"
           "dart"
           "dialog"
@@ -561,12 +569,12 @@ in
           "javascript"
           "javascriptreact"
           "julia"
-          "lua"
+          # "lua"
           "makefile"
           "markdown"
           "nix"
-          "objective-c"
-          "objective-cpp"
+          # "objective-c"
+          # "objective-cpp"
           "php"
           "perl"
           "perl6"
@@ -574,11 +582,11 @@ in
           "powershell"
           "properties"
           "jade"
-          "python"
+          # "python"
           "r"
           "razor"
           "ruby"
-          # "rust" # conflicts to much with hex format strings
+          # "rust"
           "spwn"
           "shaderlab"
           "shellscript"
