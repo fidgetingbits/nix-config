@@ -211,6 +211,11 @@ in
         export BORG_BTRFS_VOLUME="''${BORG_BTRFS_VOLUME:-${cfg.borgBtrfsVolume}}"
         export BORG_BTRFS_SUBVOLUME="''${BORG_BTRFS_SUBVOLUME:-${cfg.borgBtrfsSubvolume}}"
         export BORG_PASSPHRASE="''${BORG_PASSPHRASE:-$(cat /etc/borg/passphrase)}"
+        if [ -z "$BORG_PASSPHRASE" ]; then
+          echo "No BORG_PASSPHRASE set, exiting"
+          exit 1
+        fi
+
         export BORG_RSH="ssh -i $BORG_SSH_KEY -l$BORG_USER -oport=$BORG_PORT"
         export BORG_EXPIRY="--keep-daily=${builtins.toString cfg.borgBackupExpiryDaily} \
           --keep-weekly=${builtins.toString cfg.borgBackupExpiryWeekly} \
@@ -227,17 +232,28 @@ in
       '';
       shellScriptEmail = ''
         function email_results() {
+          SUBJECT="${"1:-Backup"}"
           TMPDIR=$(mktemp -d)
           cat >"$TMPDIR"/backup-mail.txt <<-EOF
         From:${cfg.borgNotifyFrom}
-        Subject: [${config.networking.hostName}] $(date) Backup
+        Subject: [${config.networking.hostName}] $(date) $SUBJECT"
 
         $(cat "$LOGFILE")
         EOF
           msmtp -t ${cfg.borgNotifyTo} <"$TMPDIR"/backup-mail.txt
         }
       '';
-      #FIXME What happened here?
+      shellScriptCheckLock = ''
+        borg-backup-list > /dev/null 2>$LOGFILE
+        if grep -q "Failed to create/acquire the lock" $LOGFILE; then
+          # For now we don't auto-break the lock, but notify the user to do so
+          #borg-backup-break-lock
+          echo "Run borg-backup-break-lock to break the lock" >> $LOGFILE
+          email_results "Backup failed due to lock acquisition failure"
+        fi
+        echo > $LOGFILE
+      '';
+      # FIXME: Check where this disappeared to
       # On new systems doing their first backup, we may have to initialize a new repo.
       # This automates checking and initializing, instead of having to manually run
       # borg-backup-init
@@ -270,6 +286,7 @@ in
           ${shellScriptEmail}
           parse_args "0" "$@"
           LOGFILE="${cfg.borgBackupLogPath}"
+          ${shellScriptCheckLock}
           function borg_backup() {
             MOUNTDIR=$(mktemp -d)
             mount -t btrfs -o subvol=/ "$BORG_BTRFS_VOLUME" "$MOUNTDIR"
@@ -307,6 +324,7 @@ in
           parse_args "0" "$@"
           # FIXME: Would be nice if this part could just be generic
           LOGFILE="${cfg.borgBackupLogPath}"
+          ${shellScriptCheckLock}
           function borg_backup() {
               # samba mounts that we want to exclude from the backup
               MOUNT_EXCLUDES=()
