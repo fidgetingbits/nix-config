@@ -281,6 +281,8 @@ in
       sr = "systemctl restart";
       sur = "systemctl --user restart";
 
+      # ssh
+      sshnc = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o GlobalKnownHostsFile=/dev/null";
     };
   };
   programs.zoxide = {
