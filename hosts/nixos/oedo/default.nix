@@ -40,6 +40,8 @@
       "hosts/common/optional/gnome.nix"
 
       "hosts/common/optional/binaryninja.nix"
+      "hosts/common/optional/cynthion.nix"
+      "hosts/common/optional/saleae.nix"
 
       # Services
       "hosts/common/optional/mounts/oath-cifs.nix"
