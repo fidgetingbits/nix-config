@@ -92,18 +92,22 @@ in
         }
       ];
 
-    initExtraFirst = ''
-      zmodload zsh/zprof # profiling startup times
+    initContent = lib.mkMerge [
+      (lib.mkBefore ''
+        zmodload zsh/zprof # profiling startup times
 
-      # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-      # Initialization code that may require console input (password prompts, [y/n]
-      # confirmations, etc.) must go above this block; everything else may go below.
-      if [[ -r "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh" ]]; then
-        source "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh"
-      fi
-    '';
+        # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+        # Initialization code that may require console input (password prompts, [y/n]
+        # confirmations, etc.) must go above this block; everything else may go below.
+        if [[ -r "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh" ]]; then
+          source "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh"
+        fi
 
-    initExtra = lib.fileContents ./initExtra.zsh;
+        source "${pkgs.fzf-git-sh}/share/fzf-git-sh/fzf-git.sh"
+      '')
+      (lib.mkAfter (lib.readFile ./zshrc))
+    ];
+
     # + ''export OPENAI_API_KEY="$(cat ${homeDirectory}/.config/openai/token)"'';
 
     oh-my-zsh = {

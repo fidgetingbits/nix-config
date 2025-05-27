@@ -30,7 +30,7 @@ let
       "Utility"
     ];
   };
-  binaryninja = pkgs.buildFHSUserEnv {
+  binaryninja = pkgs.buildFHSEnv {
     name = "binaryninja";
     targetPkgs =
       pkgs:

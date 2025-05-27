@@ -37,7 +37,6 @@
   };
   services.locate = {
     enable = true;
-    localuser = null; # Silence warning about running as root
     package = pkgs.mlocate;
 
     pruneNames = [

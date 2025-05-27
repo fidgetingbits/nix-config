@@ -115,8 +115,8 @@
     # https://without.boats/blog/pinned-places/ with huge gaps after the ' character
     enableDefaultPackages = true;
     fontDir.enable = true;
-    packages =
-      (builtins.attrValues {
+    packages = (
+      builtins.attrValues {
         inherit (pkgs)
           # icon fonts
           material-design-icons
@@ -140,9 +140,14 @@
           julia-mono
           dejavu_fonts
           ;
-        inherit (pkgs.unstable.nerd-fonts) fira-code iosevka jetbrains-mono;
-      })
-      ++ [ (pkgs.nerdfonts.override { fonts = [ "NerdFontsSymbolsOnly" ]; }) ];
+        inherit (pkgs.unstable.nerd-fonts)
+          fira-code
+          iosevka
+          jetbrains-mono
+          #nerd-fonts-symbols-only
+          ;
+      }
+    );
 
     # the reason there's Noto Color Emoji everywhere is to override DejaVu's
     # B&W emojis that would sometimes show instead of some Color emojis
@@ -178,6 +183,33 @@
         "Noto Color Emoji"
         "Nerd Fonts Symbols Only"
       ];
+    };
+  };
+
+  services.keyd = {
+    enable = true;
+    keyboards.default = {
+      ids = [ "*" ]; # Apply to all keyboards
+      settings = {
+        main = {
+          capslock = "overload(control, esc)";
+          enter = "overload(control, enter)";
+          space = "overload(alt, space)";
+          rightalt = "overload(meta, compose)";
+          leftcontrol = "layer(layer1)";
+          rightcontrol = "layer(layer1)";
+        };
+        layer1 = {
+          h = "left";
+          j = "down";
+          k = "up";
+          l = "right";
+        };
+        shift = {
+          leftshift = "capslock";
+          rightshift = "capslock";
+        };
+      };
     };
   };
 

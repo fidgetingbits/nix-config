@@ -6,7 +6,6 @@
       yubikey-personalization
       yubikey-personalization-gui
       yubikey-manager
-      yubikey-manager-qt
       yubico-piv-tool
       ;
   };

@@ -40,7 +40,6 @@ in
           gh # github cli
           glab # gitlab cli
           yq-go # Parser for Yaml and Toml Files, that mirrors jq
-
           # reversing
           radare2
           binwalk
@@ -74,7 +73,7 @@ in
       builtins.attrValues {
         inherit (pkgs)
           gdb
-          pwndbg
+          #pwndbg
           gef
           #bata24-gef
           pe-bear

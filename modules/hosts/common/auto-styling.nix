@@ -19,16 +19,16 @@ in
     stylix = {
       enable = true;
       autoEnable = true;
-      cursor = {
-        package = pkgs.catppuccin-cursors;
-        name = "frappeDark";
-      };
+      #      cursor = {
+      #        package = pkgs.catppuccin-cursors;
+      #        name = "frappeDark";
+      #      };
       opacity.terminal = 0.97;
       base16Scheme = "${pkgs.base16-schemes}/share/themes/dracula.yaml";
       fonts = rec {
         monospace = {
           name = "FiraCode Nerd Font";
-          package = pkgs.nerdfonts.override { fonts = [ "FiraCode" ]; };
+          package = pkgs.nerd-fonts.fira-code;
         };
         sansSerif = monospace;
         serif = monospace;
