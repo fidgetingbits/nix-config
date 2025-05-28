@@ -194,7 +194,8 @@
         main = {
           capslock = "overload(control, esc)";
           enter = "overload(control, enter)";
-          space = "overload(alt, space)";
+          # Careful with this due to typing too fast
+          # space = "overload(alt, space)";
           rightalt = "overload(meta, compose)";
           leftcontrol = "layer(layer1)";
           rightcontrol = "layer(layer1)";
