@@ -36,8 +36,11 @@
     common/optional/reversing
 
     common/optional/wine.nix
+
+    # common/optional/i3
   ];
 
+  # modules.desktop.i3.enable = true;
   services.yubikey-touch-detector.enable = true;
   services.yubikey-touch-detector.notificationSound = true;
 
