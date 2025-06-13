@@ -33,7 +33,6 @@ let
         # blobs not tracked in our repo config
         callPackage = prev.lib.callPackageWith final;
         directory = ../pkgs/nixos;
-
       }
       // {
         talon-unwrapped =
@@ -48,6 +47,17 @@ let
               inherit (beta) url sha256;
             };
           });
+        # FIXME: error: function 'anonymous lambda' called with unexpected argument 'nativeBuildInputs'
+        # To add --print-targets support, since it may be years until a release
+        # gnumake = prev.gnumake.overrideAttrs (oldAttrs: {
+        #   patches = (oldAttrs.patches or [ ]) ++ [
+        #     (prev.fetchpatch {
+        #       name = "add-print-targets-support.patch";
+        #       url = "https://git.savannah.gnu.org/cgit/make.git/patch/?id=31036e648f4a92ae0cce215eb3d60a1311a09c60";
+        #       hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; # Replace with actual hash
+        #     })
+        #   ];
+        # });
       }
     else
       { };
