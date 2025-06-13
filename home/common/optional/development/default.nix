@@ -55,6 +55,7 @@ in
 
           # serial debugging
           screen
+          picocom
 
           # Standard man pages for linux API
           man-pages
