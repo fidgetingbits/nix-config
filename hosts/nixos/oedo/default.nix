@@ -102,6 +102,7 @@
   # FIXME(network): Ideally this should be done using the networking.interfaces approach, but doesn't seem to work...
   # In the interfaces change due to me using usb dongles, we should explicitly test if they interface being used is
   # assign to an IP address that we expect to be the one we want their route for
+  networking.dhcpcd.wait = "background";
   networking.dhcpcd.runHook =
     let
       network = inputs.nix-secrets.networking;
@@ -171,6 +172,9 @@
   #  };
   #};
   #systemd.network.wait-online.ignoredInterfaces = [ "wlan0" ];
+  #systemd.services.NetworkManager-wait-online.enable = false;
+  #systemd.services.systemd-networkd-wait-online.enable = false;
+  systemd.network.wait-online.enable = false;
 
   services.gnome.gnome-keyring.enable = true;
 
