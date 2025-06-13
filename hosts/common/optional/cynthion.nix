@@ -91,6 +91,7 @@ in
       inherit (pkgs.unstable.python3Packages)
         facedancer
         greatfet
+        kicad
         ;
     }
     ++ [
