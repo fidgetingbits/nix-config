@@ -2,7 +2,7 @@
   description = "Minimal NixOS configuration for bootstrapping systems";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     disko.url = "github:nix-community/disko";
     impermanence.url = "github:nix-community/impermanence";
     nixos-hardware.url = "github:nixos/nixos-hardware";
@@ -49,10 +49,12 @@
     in
     {
       nixosConfigurations = {
+        # name disk swapSize impermanence
         oedo = newConfig "oedo" "/dev/nvme0n1" 64 true;
         ooze = newConfig "ooze" "/dev/nvme0n1" 64 true;
         #onyx = newConfig "onyx" "/dev/nvme0n1" 64 false;
         okra = newConfig "okra" "/dev/vda" 0 true;
+        oppo = newConfig "oppo" "/dev/nvme0n1" 64 true;
       };
     };
 }
