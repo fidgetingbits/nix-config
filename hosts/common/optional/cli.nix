@@ -11,6 +11,7 @@
       eza # better cat
       htop # better top
       btop # even better top
+      cyme # better lsusb
       pciutils
       usbutils
       tokei
