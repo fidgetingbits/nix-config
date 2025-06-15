@@ -81,7 +81,8 @@ in
         #SUBSYSTEM=="usb", ATTR{idVendor}=="1209", ATTR{idProduct}=="000a", SYMLINK+="cynthion-tst-%k", TAG+="uaccess"
         #SUBSYSTEM=="usb", ATTR{idVendor}=="1209", ATTR{idProduct}=="000e", SYMLINK+="cynthion-example-%k", TAG+="uaccess"
 
-        #
+        # Cynthion Hub Testing (emulated Genesys Logic Hub)
+        SUBSYSTEM=="usb", ATTR{idVendor}=="05e3", ATTR{idProduct}=="0610", SYMLINK+="cynthion-hub-%k", TAG+="uaccess"
       '';
       destination = "/etc/udev/rules.d/10-cynthion.rules";
     })
