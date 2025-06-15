@@ -206,6 +206,9 @@ in
       gl = "git log";
       gc = "git clone";
 
+      # lsusb
+      lsusb = "cyme --tree";
+
       # nix
       nr = "nix run .";
       nri = "nix run . --impure";
