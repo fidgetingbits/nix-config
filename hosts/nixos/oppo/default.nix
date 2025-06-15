@@ -42,6 +42,14 @@
 
       # Gaming
       #"hosts/common/optional/gaming.nix"
+
+      # Impermanence
+      (lib.custom.relativeToRoot "hosts/common/disks/btrfs-luks-impermanence-disko.nix")
+      {
+        _module.args = {
+          withSwap = true;
+        };
+      }
     ])
   ];
 
@@ -61,6 +69,7 @@
     useAtticCache = lib.mkForce false;
     isDevelopment = lib.mkForce true;
   };
+  system.impermanence.enable = true;
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
   # Bootloader.
