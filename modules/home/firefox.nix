@@ -82,6 +82,7 @@ in
                   };
                 };
               in
+              # FIXME: Make some of these based on other options
               builtins.listToAttrs [
                 # Development
                 (extension "user-agent-switcher" "{a6c4a591-f1b2-4f03-b3ff-767e5bedf4e7}") # failed
