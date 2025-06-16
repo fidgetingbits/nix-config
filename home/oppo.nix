@@ -1,4 +1,5 @@
 {
+  pkgs,
   ...
 }:
 {
@@ -17,13 +18,12 @@
     common/optional/gpg.nix
     common/optional/kitty.nix
     #common/optional/wezterm.nix
-    common/optional/gnome-terminal.nix
     common/optional/media.nix
-    common/optional/graphics.nix
-    common/optional/ebooks.nix
     common/optional/networking/protonvpn.nix
     common/optional/atuin.nix
+
     common/optional/gnome
+    common/optional/gnome-terminal.nix
 
     # Maybe more role-specific stuff
     common/optional/document.nix # document editing
@@ -31,7 +31,11 @@
   ];
 
   home.packages = builtins.attrValues {
-
+    inherit (pkgs)
+      liquidctl # for controlling nzxt fan and pump
+      openrgb # for controlling RGB devices
+      ffmpeg # mp4 -> gif conversion, etc
+      ;
   };
 
   services.yubikey-touch-detector.enable = true;

@@ -1,4 +1,5 @@
 {
+  inputs,
   lib,
   pkgs,
   ...
@@ -6,6 +7,8 @@
 {
   imports = lib.flatten [
     ./hardware-configuration.nix
+    inputs.hardware.nixosModules.common-cpu-amd
+    inputs.hardware.nixosModules.common-gpu-amd
 
     (map lib.custom.relativeToRoot [
       "hosts/common/core"
@@ -38,7 +41,7 @@
       #"hosts/common/optional/services/syncthing.nix"
 
       # Gaming
-      #"hosts/common/optional/gaming.nix"
+      "hosts/common/optional/gaming.nix"
     ])
     # Impermanence
     (lib.custom.relativeToRoot "hosts/common/disks/btrfs-luks-impermanence-disko.nix")
@@ -61,8 +64,8 @@
     isAutoStyled = lib.mkForce true;
     wifi = lib.mkForce false;
     useNeovimTerminal = lib.mkForce true;
-    hdr = lib.mkForce false;
-    #scaling = lib.mkForce "2";
+    hdr = lib.mkForce true;
+    scaling = lib.mkForce "2";
     isProduction = lib.mkForce true;
     useAtticCache = lib.mkForce false;
     isDevelopment = lib.mkForce true;
@@ -71,14 +74,23 @@
   };
   system.impermanence.enable = true;
 
-  boot.kernelPackages = pkgs.linuxPackages_latest;
-  # Bootloader.
-  boot.loader.systemd-boot = {
-    enable = true;
-    # When using plymouth, initrd can expand by a lot each time, so limit how many we keep around
-    configurationLimit = lib.mkDefault 10;
+  boot = {
+    kernelPackages = pkgs.linuxPackages_latest;
+    # Bootloader.
+    loader.systemd-boot = {
+      enable = true;
+      # When using plymouth, initrd can expand by a lot each time, so limit how many we keep around
+      configurationLimit = lib.mkDefault 10;
+    };
+    loader.efi.canTouchEfiVariables = true;
+
+    initrd.kernelModules = [ "amdgpu" ];
+    kernelParams = [
+      "amdgpu.ppfeaturemask=0xfffd3fff" # https://kernel.org/doc/html/latest/gpu/amdgpu/module-parameters.html#ppfeaturemask-hexint
+      "split_lock_detect=off" # Alleged gaming perf increase
+    ];
   };
-  boot.loader.efi.canTouchEfiVariables = true;
+  graphics.enable = true;
 
   # Just set the console font, don't mess with the font settings
   #console.font = lib.mkDefault "${pkgs.terminus_font}/share/consolefonts/ter-v32n.psf.gz";
