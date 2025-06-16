@@ -18,6 +18,7 @@
     username = "aa";
     persistFolder = "/persist";
     isMinimal = lib.mkForce true;
+    domain = "local"; # Temporary domain for the installer
   };
 
   fileSystems."/boot".options = [ "umask=0077" ]; # Removes permissions and security warnings.

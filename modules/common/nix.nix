@@ -20,7 +20,7 @@
         log-lines = 25;
         min-free = 128000000; # 128MB
         max-free = 1000000000; # 1GB
-        experimental-features = "nix-command flakes"; # Enable flakes and new 'nix' command
+        experimental-features = lib.mkDefault "nix-command flakes"; # Enable flakes and new 'nix' command
         auto-optimise-store = true; # Deduplicate and optimize nix store
         warn-dirty = false;
         allow-import-from-derivation = true;

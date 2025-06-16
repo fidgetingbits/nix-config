@@ -1,6 +1,6 @@
 # Nix Environment Setup for an existing host
 
-This flake prepares a Nix environment for setting my systems up on a new machine, which allows easier testing and early
+Prepares a Nix environment for setting a new machine. This approach enables easier testing and early
 configuration tweaks.
 
 - [Nix Environment Setup for an existing host](#nix-environment-setup-for-an-existing-host)
@@ -38,8 +38,9 @@ The configuration of the main flake, [/flake.nix](/flake.nix), is heavy, and it 
 
 ## Steps to Deploying this flake
 
-- Update this flake with `nix flake update` in the `nixos-installer` folder
-- Run `just iso` to generate the iso file and use the `result/iso/*.iso` file to boot into it on the target machine/vm
+- Run `nix flake update` in the `nixos-installer` folder
+- Run `just iso` to generate the iso file
+- Use the generated `result/iso/*.iso` file to boot into it on the target machine/vm
 - Run `just iso-install <disk>` to generate the iso file automatically copy it to a USB drive
 
 ### 0. VM setup (optional)
@@ -75,7 +76,7 @@ This is an example of running it from `nix-config` base folder installing on a V
 scripts/bootstrap-nixos.sh -n=okra -d=192.168.122.29 -k=~/.ssh/id_yubikey -u=root --impermanence
 ```
 
-This will give you of few yes/no questions, but if everything works you should end up with a fully functional system
+This will give you a few yes/no questions, but if everything works you should end up with a fully functional system
 running the main flake (even though it first transitions through nixos-installer flake first).
 
 You should test the passwords work as expected.

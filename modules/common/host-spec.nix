@@ -37,6 +37,7 @@
     };
     domain = lib.mkOption {
       type = lib.types.str;
+      default = "local"; # Need a default for the installer
       description = "The domain of the host";
     };
     userFullName = lib.mkOption {

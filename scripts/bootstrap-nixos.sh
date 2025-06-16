@@ -175,6 +175,7 @@ function nixos_anywhere() {
 		$scp_cmd root@"$target_destination":/mnt/etc/nixos/hardware-configuration.nix \
 			"${git_root}"/hosts/nixos/"$target_hostname"/hardware-configuration.nix
 		generated_hardware_config=1
+		git add "${git_root}"/hosts/nixos/"$target_hostname"/hardware-configuration.nix
 	fi
 
 	# --extra-files here picks up the ssh host key we generated earlier and puts it onto the target machine

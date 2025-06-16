@@ -201,19 +201,21 @@ in
             port = config.hostSpec.networking.ports.tcp.ssh;
             # Serial consoles are attached to the server, so use socat to forward them as needed
             localForwards = lib.flatten (
-              lib.optionals config.hostSpec.isWork lib.map
-                (port: {
-                  bind.address = "localhost";
-                  bind.port = port;
-                  host.address = "localhost";
-                  host.port = port;
-                })
-                [
-                  5000
-                  5001
-                  5002
-                  5003
-                ]
+              lib.optionals config.hostSpec.isWork (
+                lib.map
+                  (port: {
+                    bind.address = "localhost";
+                    bind.port = port;
+                    host.address = "localhost";
+                    host.port = port;
+                  })
+                  [
+                    5000
+                    5001
+                    5002
+                    5003
+                  ]
+              )
             );
           };
 

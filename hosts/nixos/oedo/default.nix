@@ -56,6 +56,7 @@
     (lib.custom.relativeToRoot "hosts/common/disks/btrfs-luks-impermanence-disko.nix")
     {
       _module.args = {
+        disk = "/dev/nvme0n1";
         withSwap = true;
       };
     }
