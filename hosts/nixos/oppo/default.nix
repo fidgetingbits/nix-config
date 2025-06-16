@@ -22,6 +22,7 @@
       "hosts/common/optional/sound.nix"
 
       # Desktop environment and login manager
+      "hosts/common/optional/x11.nix"
       "hosts/common/optional/gdm.nix"
       #"hosts/common/optional/greetd.nix"
       #"hosts/common/optional/hyprland.nix"
