@@ -28,7 +28,7 @@
       "hosts/common/optional/gnome.nix"
 
       #"hosts/common/optional/podman.nix"
-      #"hosts/common/optional/libvirt.nix"
+      "hosts/common/optional/libvirt.nix"
       "hosts/common/optional/cli.nix"
       "hosts/common/optional/yubikey.nix"
       "hosts/common/optional/services/openssh.nix"
@@ -91,6 +91,12 @@
     ];
   };
   graphics.enable = true;
+
+  # xbox series s/x controller support
+  hardware = {
+    xpadneo.enable = true;
+    steam-hardware.enable = true;
+  };
 
   # Just set the console font, don't mess with the font settings
   #console.font = lib.mkDefault "${pkgs.terminus_font}/share/consolefonts/ter-v32n.psf.gz";
