@@ -7,8 +7,8 @@
 {
   imports = lib.flatten [
     ./hardware-configuration.nix
-    inputs.hardware.nixosModules.common-cpu-amd
-    inputs.hardware.nixosModules.common-gpu-amd
+    inputs.nixos-hardware.nixosModules.common-cpu-amd
+    inputs.nixos-hardware.nixosModules.common-gpu-amd
 
     (map lib.custom.relativeToRoot [
       "hosts/common/core"
@@ -16,7 +16,8 @@
 
       # Host-specific stuff
       #"hosts/common/optional/msmtp.nix"
-      "hosts/common/optional/plymouth.nix"
+      # WARNING: Blocks on boot on both gpus atm (Granite Ridge and 9070XT)
+      #"hosts/common/optional/plymouth.nix"
       "hosts/common/optional/locale.nix"
       #"hosts/common/optional/wayland.nix"
       "hosts/common/optional/sound.nix"
@@ -90,8 +91,9 @@
       "amdgpu.ppfeaturemask=0xfffd3fff" # https://kernel.org/doc/html/latest/gpu/amdgpu/module-parameters.html#ppfeaturemask-hexint
       "split_lock_detect=off" # Alleged gaming perf increase
     ];
+    # Fix for XBox controller disconnects
+    extraModprobeConfig = ''options bluetooth disable_ertm=1 '';
   };
-  graphics.enable = true;
 
   # xbox series s/x controller support
   hardware = {
@@ -122,6 +124,68 @@
   #  enable = true;
   #  borgBackupStartTime = "09:00:00";
   #};
+
+  # openrgb
+  # FIXME: Move all this
+  services.udev.packages = [ pkgs.openrgb-with-all-plugins ];
+  boot.kernelModules = [ "i2c-dev" ];
+  hardware.i2c.enable = true;
+  services.hardware.openrgb = {
+    enable = true;
+    package = pkgs.openrgb-with-all-plugins;
+    motherboard = "amd";
+    server = {
+      port = 6742;
+    };
+  };
+  systemd.services.openrgb-pre-suspend = {
+    description = "Set OpenRGB to off before suspend";
+    wantedBy = [
+      "halt.target"
+      "sleep.target"
+      "suspend.target"
+    ];
+    before = [
+      "sleep.target"
+      "suspend.target"
+    ];
+    partOf = [ "openrgb.service" ];
+    requires = [ "openrgb.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      TimeoutStartSec = "20s";
+      ExecStart = "${pkgs.openrgb}/bin/openrgb --mode off";
+    };
+  };
+  systemd.services.openrgb-post-resume = {
+    description = "Reload OpenRGB profile after resume";
+    wantedBy = [
+      "post-resume.target"
+      "suspend.target"
+    ];
+    after = [
+      "openrgb.service"
+      "suspend.target"
+    ];
+    requires = [ "openrgb.service" ];
+    partOf = [ "openrgb.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      TimeoutStartSec = "10s";
+      ExecStart = "${pkgs.openrgb}/bin/openrgb -m static --color FFFFFF";
+      # ExecStart = "${pkgs.openrgb}/bin/openrgb --profile ${./oppo.orp}";
+    };
+  };
+
+  systemd.services.openrgb = {
+    after = [ "network.target" ];
+    serviceConfig = {
+      TimeoutStopSec = "20s";
+      ExecStartPost = "${pkgs.openrgb}/bin/openrgb -m static --color FFFFFF";
+      ExecStart = "${pkgs.openrgb}/bin/openrgb -m static --color FFFFFF";
+      ExecStop = "${pkgs.openrgb}/bin/openrgb --mode off";
+    };
+  };
 
   #networking.granularFirewall.enable = true;
 

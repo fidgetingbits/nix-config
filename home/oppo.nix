@@ -33,7 +33,7 @@
   home.packages = builtins.attrValues {
     inherit (pkgs)
       liquidctl # for controlling nzxt fan and pump
-      openrgb # for controlling RGB devices
+      openrgb-with-all-plugins # for controlling RGB devices
       ffmpeg # mp4 -> gif conversion, etc
       ;
   };
