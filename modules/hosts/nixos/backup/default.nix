@@ -112,12 +112,12 @@ in
     borgNotifyFrom = lib.mkOption {
       type = lib.types.str;
       default = "box@${config.hostSpec.domain}";
-      description = "The email address that msmtp notificaitons will be sent from";
+      description = "The email address that msmtp notifications will be sent from";
     };
     borgNotifyTo = lib.mkOption {
       type = lib.types.str;
       default = "admin@${config.hostSpec.domain}";
-      description = "The email address that msmtp notificaitons will be sent to";
+      description = "The email address that msmtp notifications will be sent to";
     };
     borgRemotePath = lib.mkOption {
       type = lib.types.str;

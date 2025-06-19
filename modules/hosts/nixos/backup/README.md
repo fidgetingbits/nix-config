@@ -7,6 +7,29 @@ This module provides a service and options for automating the backup of host dat
 - msmtp for email notifications
 - A borg server. In the following example, we'll be using a borg server installed on a remote host but a local borg server can also be used.
 
+## Server SSH Setup
+
+The following assumes there is ssh access configured for some user to a remote ssh server. We define a
+private key in our sops files, which gets placed into the root users `~/.ssh/` folder. This is then used to authenticate
+to the remote backup server, which will need the associated `~/.ssh/authorized_key` entry to be edited.
+
+To generate a new private key run `ssh-keygen -t ed25519 -f id_borg`. Place the contents of `id_borg` into your hosts
+sops file, in the following location:
+
+```yaml
+keys:
+    ssh:
+        borg: |
+            -----BEGIN OPENSSH PRIVATE KEY-----
+            XXX
+            -----END OPENSSH PRIVATE KEY-----
+```
+
+Then add the contents of `id_borg.pub` to the `~/.ssh/authorized_key` of the backup user on the backup server manually
+or `ssh-copy-id`.
+
+Finally, delete the local `id_borg` and `id_borg.pub` copies once you've confirmed things are working.
+
 ## Setup
 
 1. First we'll need to create a passphrase that will secure the BORG_KEY that gets generated for our borg repo in  later steps. To do so, create and save a passphrase in your preferred password vault such as Proton Pass.
