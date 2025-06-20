@@ -117,6 +117,7 @@
       paperkey # printed gpg key backup utilitie
       pinentry-curses # for gpg-agent
       pinentry-gtk2 # for gpg-agent
+      liquidctl # control nxzt kraken rgb, not in home-manager because of udev rules
       ;
   };
   services.fwupd.enable = true;
@@ -186,6 +187,10 @@
       ExecStop = "${pkgs.openrgb}/bin/openrgb --mode off";
     };
   };
+
+  # FIXME: This should be part of nixpkgs or something
+
+  services.udev.extraRules = "${builtins.readFile "${pkgs.liquidctl}/lib/udev/rules.d/71-liquidctl.rules"}";
 
   #networking.granularFirewall.enable = true;
 
