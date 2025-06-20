@@ -271,7 +271,15 @@ You will need to do it for each yubikey you want to use.
 Here you should have a fully working system, but some stuff you still need to do:
 
 - login to proton
-- Add new u2f_keys to nix-secrets if a totally new host
+- Add new u2f_keys to nix-secrets if a totally new hosts
+  - Run `pamu2fcfg` for each yubikey token you want to add. Append additional yubikeys to the first line using `:` and
+    removing the username. Also note if using zsh the final `%` is not to be included. Place these into your sops file under a heading like:
+
+    ```yaml
+      keys:
+        u2f: xxx
+    ```
+
 - Recover any backup files needed
   - .mozilla
   - syncthing
