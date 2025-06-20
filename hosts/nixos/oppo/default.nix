@@ -2,6 +2,7 @@
   inputs,
   lib,
   pkgs,
+  config,
   ...
 }:
 {
@@ -121,10 +122,14 @@
       ;
   };
   services.fwupd.enable = true;
-  #services.backup = {
-  #  enable = true;
-  #  borgBackupStartTime = "09:00:00";
-  #};
+  services.backup = {
+    enable = false; # FIXME: wait until I rejig network
+    borgBackupStartTime = "11:00:00";
+    borgExcludes = [
+      "${config.hostSpec.home}/movies"
+      "${config.hostSpec.home}/.local/share/Steam"
+    ];
+  };
 
   # openrgb
   # FIXME: Move all this
