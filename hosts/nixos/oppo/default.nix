@@ -123,7 +123,7 @@
   };
   services.fwupd.enable = true;
   services.backup = {
-    enable = false; # FIXME: wait until I rejig network
+    enable = true;
     borgBackupStartTime = "11:00:00";
     borgExcludes = [
       "${config.hostSpec.home}/movies"
