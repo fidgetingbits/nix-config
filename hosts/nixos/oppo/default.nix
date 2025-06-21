@@ -183,18 +183,6 @@
     };
   };
 
-  systemd.services.openrgb = {
-    after = [ "network.target" ];
-    serviceConfig = {
-      TimeoutStopSec = "20s";
-      ExecStartPost = "${pkgs.openrgb}/bin/openrgb -m static --color FFFFFF";
-      ExecStart = "${pkgs.openrgb}/bin/openrgb -m static --color FFFFFF";
-      ExecStop = "${pkgs.openrgb}/bin/openrgb --mode off";
-    };
-  };
-
-  # FIXME: This should be part of nixpkgs or something
-
   services.udev.extraRules = "${builtins.readFile "${pkgs.liquidctl}/lib/udev/rules.d/71-liquidctl.rules"}";
 
   #networking.granularFirewall.enable = true;
