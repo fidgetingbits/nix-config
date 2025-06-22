@@ -16,7 +16,7 @@
       "hosts/common/core/nixos.nix"
 
       # Host-specific stuff
-      #"hosts/common/optional/msmtp.nix"
+      "hosts/common/optional/msmtp.nix"
       # WARNING: Blocks on boot on both gpus atm (Granite Ridge and 9070XT)
       #"hosts/common/optional/plymouth.nix"
       "hosts/common/optional/locale.nix"
