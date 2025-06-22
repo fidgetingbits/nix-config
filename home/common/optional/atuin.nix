@@ -40,7 +40,7 @@
     path = "${config.home.homeDirectory}/.local/share/atuin/key";
   };
 
-  programs.zsh.initExtra = ''
+  programs.zsh.initContent = ''
     # Bind down key for atuin, specifically because we use invert
     bindkey "$key[Down]"  atuin-up-search
   '';
