@@ -19,6 +19,7 @@ let
     "onus"
     "oxid"
     "ooze"
+    "oppo"
   ] ++ inputs.nix-secrets.networking.ssh.yubikeyHostsWithDomain;
   yubikeyHostsWithoutDomain = [
     "oath_gitlab" # FIXME(ssh): Would be nice to do per-port match on this, but HM doesn't support
@@ -74,6 +75,7 @@ let
     "onus"
     "oedo"
     "onyx"
+    "oppo"
   ];
   vanillaHostsConfig = lib.attrsets.mergeAttrsList (
     lib.lists.map (host: {
