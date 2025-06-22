@@ -190,3 +190,12 @@ talon OS URL:
   git add talon-versions.json && \
   git commit -nm "chore: update talon-{{OS}}-beta" && \
   git push
+
+#
+# ========= Admin Recipes ==========
+#
+
+# Create a new user with a password hash for dovecot, to be placed in ooze.yaml secrets
+dovecot-hash:
+    touch /tmp/empty-dovecot.conf
+    DOVECONF=/dev/null nix shell nixpkgs#dovecot.out -c doveadm -c /tmp/empty-dovecot.conf pw -s SHA512-CRYPT
