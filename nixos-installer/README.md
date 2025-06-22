@@ -280,15 +280,24 @@ Here you should have a fully working system, but some stuff you still need to do
         u2f: xxx
     ```
 
+- Add a postfix relay password to the new systems `host.yaml` if using backups. Use `just dovecot-hash` to generate the
+  entry for `ooze.yaml` sops file. You will have to rebuild `ooze`.
+
 - Recover any backup files needed
   - .mozilla
   - syncthing
-- Setup talon (for now)
-  - - Run bootstrap scripts (if not handled by backup recovery)
 - Log into firefox
 - Log into vscode
-- Rebuild cursorless/command-server extensions
 - Re-link signal
+- Setup atuin
+  - `atuin login`
+  - Use existing `aa` user login to get key
+  - Use `atuin key` output from any other box already logged in?
+    - FIXME: Not sure if this is right, because some hosts have different keys
+  - Add `.local/share/autin/key` to  `keys/atuin` in sops secrets
 - Manually set syncthing username/password
 - login to spotify
-- podman login :/
+- podman login
+- Setup talon
+  - Run bootstrap scripts (if not handled by backup recovery)
+  - Rebuild cursorless/command-server extensions
