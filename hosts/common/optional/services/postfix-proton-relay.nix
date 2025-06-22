@@ -99,7 +99,7 @@ in
     dnsPropagationCheck = true;
   };
 
-  # For passwd gen, search atuin for doveadm or SHA512-CRYPT
+  # For passwd gen use `just dovecot-hash`
   # Test auth with swaks
   services.dovecot2 =
     let
