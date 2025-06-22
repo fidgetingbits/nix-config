@@ -34,6 +34,9 @@
     inherit (pkgs)
       openrgb-with-all-plugins # for controlling RGB devices
       ffmpeg # mp4 -> gif conversion, etc
+      # FIXME: Switch to service and setup config (may need impermanence tweaks)
+      jellyfin # media server
+      jellyfin-ffmpeg # ffmpeg for jellyfin
       ;
   };
 
