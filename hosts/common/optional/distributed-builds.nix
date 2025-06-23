@@ -7,7 +7,11 @@
 }:
 {
   nix.distributedBuilds = true;
-  nix.settings.builders-use-substitutes = true;
+  nix.settings = {
+    builders-use-substitutes = true;
+    fallback = true;
+    connect-timeout = 5;
+  };
 
   nix.buildMachines = [
     {
@@ -20,6 +24,8 @@
         "big-parallel"
         "kvm"
       ];
+      speedFactor = 2;
+      maxJobs = 32;
     }
   ];
 
