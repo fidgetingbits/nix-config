@@ -37,7 +37,7 @@
   ];
 
   talon = {
-    enable = true;
+    enable = false;
     autostart = true;
     pynvim = true;
     #  gaze-ocr = true;
