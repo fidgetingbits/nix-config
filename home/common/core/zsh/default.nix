@@ -180,7 +180,8 @@ in
       gca = "git commit --amend";
       gcan = "git commit --amend --no-edit";
 
-      gsr = "git-smart-rebase";
+      # We use source because we want it to use other aliases, which allow yubikey signing over ssh
+      gsr = "source $(which git-smart-rebase)";
       grst = "git reset --soft ";
 
       gr = "git restore";
