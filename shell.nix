@@ -57,14 +57,17 @@
             export FLY_ACCESS_TOKEN=$(cat ~/.config/fly.io/token)
         fi
 
-        # If we don't already have a flake.lock file setup, try to initialize it
-        if [ ! -f flake.lock ] && [ -f locks/$(hostname).lock ]; then
-            cp locks/$(hostname).lock flake.lock
+        hostname_lock="locks/$(hostname).lock"
+        if [ ! -f $hostname_lock ]; then
+            nix flake update --reference-lock-file $hostname_lock
+            git add $hostname_lock
+            echo "Created a new lock file at $hostname_lock"
         fi
 
+        # If we don't already have a flake.lock file setup, try to initialize it
         if [ ! -f flake.lock ]; then
-            echo "No flake.lock file found, generating one"
-            nix flake update
+            ln -f locks/$(hostname).lock flake.lock
+            git --intent-to-add flake.lock
         fi
 
         if git remote -v | grep gitlab; then

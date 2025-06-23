@@ -17,51 +17,41 @@ git-dance-post:
     @git rm --cached flake.lock || true
 
 # Update commonly changing flakes and prep for a rebuild
-rebuild-pre: git-dance-pre update-nix-secrets
-	nix flake update nixvim-flake --timeout 5
+rebuild-pre HOST=`hostname`: git-dance-pre update-nix-secrets
+	nix flake update nixvim-flake --timeout 5 --reference-lock-file locks/{{HOST}}.lock
 	@git add --intent-to-add .
 
 # Run post-rebuild checks, like if sops is running properly afterwards
-rebuild-post: git-dance-post check-sops && save-lock-changes
+rebuild-post: git-dance-post check-sops
 
-# Check if the local flake.lock changed, and if so commit it to locks/
-save-lock-changes:
-    @mkdir -p locks || true; \
-    hostname=$(hostname) \
-    lockfile="locks/$hostname.lock" \
-    new_hash=$(md5sum flake.lock | cut -d' ' -f1); \
-    if [ ! -f "$lockfile" ] || [ "$new_hash" != "$(md5sum $lockfile | cut -d' ' -f1)" ]; then \
-        cp flake.lock "$lockfile" && \
-        git add "$lockfile" && \
-        git commit -m "chore: update $hostname's flake.lock" && \
-        git push; \
-    fi
 
 # Run a flake check on the config and installer
-check ARGS="":
-	NIXPKGS_ALLOW_UNFREE=1 REPO_PATH=$(pwd) nix flake check --impure --keep-going --show-trace {{ARGS}}
+check HOST=`hostname` ARGS="":
+	NIXPKGS_ALLOW_UNFREE=1 REPO_PATH=$(pwd) nix flake check --impure --keep-going --show-trace --reference-lock-file 	locks/{{HOST}}.lock {{ARGS}}
 	cd nixos-installer && NIXPKGS_ALLOW_UNFREE=1 REPO_PATH=$(pwd) nix flake check --impure --keep-going --show-trace {{ARGS}}
 
 # Rebuild the system
-rebuild: rebuild-pre && rebuild-post
-	@# NOTE: Add --option eval-cache false if you end up caching a failure you cant get around
-	@scripts/rebuild.sh
-	just rebuild-extensions-lite
+rebuild HOST=`hostname`: && rebuild-post
+    @just rebuild-pre {{HOST}}
+    @# NOTE: Add --option eval-cache false if you end up caching a failure you cant get around
+    @scripts/rebuild.sh
+    just rebuild-extensions-lite
 
 # Rebuild the system and run a flake check
-rebuild-full: rebuild-pre && rebuild-post
-	scripts/rebuild.sh
-	just check
-	just rebuild-extensions
+rebuild-full HOST=`hostname`: && rebuild-post
+    @just rebuild-pre {{HOST}}
+    scripts/rebuild.sh
+    just check {{HOST}}
+    just rebuild-extensions
 
 # Rebuild the system with tshow trace
 rebuild-trace: rebuild-pre && rebuild-post
 	scripts/rebuild.sh trace
 	just rebuild-extensions-lite
 
-# Update all flake inputs
-update:
-	nix flake update
+# Update all flake inputs for the specified host or the current host if none specified
+update HOST=`hostname`:
+	nix flake update --reference-lock-file locks/{{HOST}}.lock
 
 # Update and then rebuild
 rebuild-update: update rebuild
@@ -75,9 +65,9 @@ check-sops:
 	scripts/check-sops.sh
 
 # Update nix-secrets flake
-update-nix-secrets:
+update-nix-secrets HOST=`hostname`:
 	@(cd ../nix-secrets && git fetch && git rebase > /dev/null) || true
-	nix flake update nix-secrets --timeout 5
+	nix flake update nix-secrets --timeout 5 --reference-lock-file locks/{{HOST}}.lock
 
 # Rebuild vscode extensions that update regularly
 rebuild-extensions:
@@ -88,14 +78,15 @@ rebuild-extensions-lite:
 	scripts/build-vscode-extensions.sh lite || true
 
 # Build an iso image for installing new systems and create a symlink for qemu usage
-iso:
+iso HOST:
 	# If we dont remove this folder, libvirtd VM doesnt run with the new iso
 	rm -rf result
-	nix build --impure .#nixosConfigurations.iso.config.system.build.isoImage && ln -sf result/iso/*.iso latest.iso
+	nix build --impure .#nixosConfigurations.iso.config.system.build.isoImage --reference-lock-file locks/{{HOST}}.lock && ln -sf result/iso/*.iso latest_{{HOST}}.iso
 
 # Install the latest iso to a flash drive
-iso-install DRIVE: iso
-	sudo dd if=$(eza --sort changed result/iso/*.iso | tail -n1) of={{DRIVE}} bs=4M status=progress oflag=sync
+iso-install DRIVE HOST=`hostname`:
+    just iso {{HOST}}
+    sudo dd if=$(eza --sort changed result/iso/*.iso | tail -n1) of={{DRIVE}} bs=4M status=progress oflag=sync
 
 # Configure a drive password using disko
 disko DRIVE PASSWORD:
