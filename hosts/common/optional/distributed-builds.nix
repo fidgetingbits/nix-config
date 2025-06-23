@@ -1,4 +1,7 @@
-{ pkgs, ... }:
+{
+  pkgs,
+  ...
+}:
 {
   nix.distributedBuilds = true;
   nix.settings.builders-use-substitutes = true;
@@ -16,4 +19,11 @@
       ];
     }
   ];
+
+  sops.secrets = {
+    "keys/ssh/builder" = {
+      owner = "root";
+      path = "/root/.ssh/id_builder";
+    };
+  };
 }
