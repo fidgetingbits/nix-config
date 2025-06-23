@@ -1,6 +1,6 @@
 { ... }:
 {
-  users.users.remotebuild = {
+  users.users.builder = {
     isNormalUser = true;
     createHome = false;
     group = "builder";
@@ -10,7 +10,7 @@
     ];
   };
 
-  users.groups.remotebuild = { };
+  users.groups.builder = { };
 
   nix.settings.trusted-users = [ "builder" ];
 }
