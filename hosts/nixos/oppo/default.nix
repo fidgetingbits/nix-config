@@ -45,6 +45,9 @@
 
       # Gaming
       "hosts/common/optional/gaming.nix"
+
+      "hosts/common/optional/remote-builder.nix"
+
     ])
     # Impermanence
     (lib.custom.relativeToRoot "hosts/common/disks/btrfs-luks-impermanence-disko.nix")

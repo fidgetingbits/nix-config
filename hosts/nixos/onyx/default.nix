@@ -51,6 +51,8 @@
 
       # Gaming
       "hosts/common/optional/gaming.nix"
+
+      "hosts/common/optional/distributed-builds.nix"
     ])
   ];
 
