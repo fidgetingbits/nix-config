@@ -239,3 +239,10 @@ nix_log_extract() {
 
 alias nix='nix_wrapper'
 alias nix-log-last='NIX_PAGER=cat nix log $NIX_LAST_DERIVATION'
+
+git_smart_rebase() {
+	GIT_STASH_MESSAGE="git_smart_rebase: $RANDOM"
+	git stash push -m "$GIT_STASH_MESSAGE"
+	git fetch && git rebase
+	git stash list | (grep "${GIT_STASH_MESSAGE}" && git stash pop) || true
+}

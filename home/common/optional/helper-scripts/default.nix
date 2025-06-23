@@ -34,11 +34,6 @@ let
     runtimeInputs = builtins.attrValues { inherit (pkgs) git; };
     text = builtins.readFile ./update-core-repos.sh;
   };
-  git-smart-rebase = pkgs.writeShellApplication {
-    name = "git-smart-rebase";
-    runtimeInputs = builtins.attrValues { inherit (pkgs) git; };
-    text = builtins.readFile ./git-smart-rebase.sh;
-  };
   dockertags = pkgs.writeShellApplication {
     name = "dockertags";
     runtimeInputs = builtins.attrValues { inherit (pkgs) wget jq; };
@@ -85,7 +80,6 @@ in
     build-cursorless-pr-bundle
     build-command-server-pr-bundle
     update-core-repos
-    git-smart-rebase
     dockertags
     calculate-flac-hours
     nixvim-plugins-dir
