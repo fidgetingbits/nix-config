@@ -35,7 +35,6 @@ in
         inherit (pkgs)
           # Development
           direnv
-          delta # diffing
           act # github workflow runner
           gh # github cli
           glab # gitlab cli
@@ -92,7 +91,6 @@ in
     ))
   ];
 
-  # Already enabled earliet, this is just extra config
   programs.git = {
     userName = config.hostSpec.handle;
     userEmail = config.hostSpec.email.git;
@@ -123,11 +121,19 @@ in
         difftastic.cmd = "difft \"$LOCAL\" \"$REMOTE\"";
       };
       commit.gpgsign = "true";
-      gpg.format = "ssh";
-      # Signing key for non-yubikey hosts
+
       user.signingkey = "${publicKey}";
-      # Taken from https://github.com/clemak27/homecfg/blob/16b86b04bac539a7c9eaf83e9fef4c813c7dce63/modules/git/ssh_signing.nix#L14
-      gpg.ssh.allowedSignersFile = "${config.home.homeDirectory}/.ssh/allowed_signers";
+      gpg = {
+        format = "ssh";
+        # FIXME: git doesn't support parsing sk-ssh keys, see https://github.com/maxgoedjen/secretive/issues/262
+        # See alias creation in zshrc for how I get around that, while still using signing.key later on
+        # sshKeyCommand = "ssh-add -L";
+
+        # Taken from
+        # https://github.com/clemak27/homecfg/blob/16b86b04bac539a7c9eaf83e9fef4c813c7dce63/modules/git/ssh_signing.nix#L14
+        allowedSignersFile = "${config.home.homeDirectory}/.ssh/allowed_signers";
+      };
+
     };
     signing = {
       signByDefault = true;
