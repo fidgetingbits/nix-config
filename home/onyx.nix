@@ -35,12 +35,11 @@
     common/optional/reversing
     common/optional/wine.nix
 
-    common/optional/fcitx5.nix
   ];
 
   talon = {
-    enable = false;
-    autostart = true;
+    enable = true;
+    autostart = false;
     pynvim = true;
     #  gaze-ocr = true;
   };
