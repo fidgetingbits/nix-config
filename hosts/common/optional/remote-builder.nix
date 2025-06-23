@@ -5,7 +5,7 @@
     createHome = false;
     group = "builder";
 
-    openssh.authorizedKeys.keyFiles = [
+    openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJeSBvE5m1RYwCxrlfj/oeYZVcbmKTC0zeSotQepwurl onyx"
     ];
   };
