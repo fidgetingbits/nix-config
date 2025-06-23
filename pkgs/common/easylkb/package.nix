@@ -18,7 +18,7 @@ let
   };
 
   # This is only for use by the make scripts, which has unpatchable FHS path expectations
-  fhsEnv = pkgs.buildFHSUserEnv {
+  fhsEnv = pkgs.buildFHSEnv {
     name = "kernel-build-env";
     targetPkgs =
       pkgs:
