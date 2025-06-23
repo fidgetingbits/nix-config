@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
 
 GIT_STASH_MESSAGE="git-smart-rebase.sh: $RANDOM"
 git stash push -m "$GIT_STASH_MESSAGE"
