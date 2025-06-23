@@ -10,12 +10,9 @@ if [[ -n $SSH_CONNECTION ]]; then
 
 	# git can't handle ssh-add -L output with a yubikey sk-ssh entry, so we alias git
 	# here to force it to use the ssh-agent output
-	$KEY="$(ssh-add -L | head -n 1)"
 	TEMP_KEY=$(mktemp)
-	if [[ -n $KEY ]]; then
-		echo "$KEY" >"$TEMP_KEY"
-		alias git="git -c user.signingKey=$TEMP_KEY"
-	fi
+	ssh-add -L | head -n 1 >"$TEMP_KEY"
+	alias git="git -c user.signingKey=$TEMP_KEY"
 fi
 
 unsetopt correct # autocorrect commands
