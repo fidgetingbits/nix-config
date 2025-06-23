@@ -16,39 +16,16 @@
 
 { pkgs, ... }:
 let
-  # cynthion is marked broken for newer amaranth and there is also a dependency conflict between cynthion and luna-usb
-  customAmaranth = pkgs.unstable.python3Packages.amaranth.overridePythonAttrs (old: {
-    version = "0.4.1";
-    src = pkgs.fetchFromGitHub {
-      owner = "amaranth-lang";
-      repo = "amaranth";
-      rev = "v0.4.1";
-      hash = "sha256-XL5S7/Utfg83DLIBGBDWYoQnRZaFE11Wy+XXbimu3Q8=";
-    };
-    pyproject = true;
-    nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.python3Packages.setuptools ];
-    postPatch = "";
-  });
-
   prebuiltCynthion =
     (pkgs.unstable.cynthion.override {
-      python3 = pkgs.unstable.python3.override {
-        packageOverrides = self: super: {
-          amaranth = customAmaranth;
-          luna-usb = super.luna-usb.overridePythonAttrs (old: {
-            propagatedBuildInputs =
-              builtins.filter (dep: (dep.pname or "") != "amaranth") (old.propagatedBuildInputs or [ ])
-              ++ [ self.amaranth ];
-          });
-        };
-      };
+      python3 = pkgs.unstable.python312;
     }).overridePythonAttrs
       (old: {
         # Dependencies for running 'make bitstreams' to install all assets/ are pre-built into the pypi package
         src = pkgs.fetchPypi {
           pname = "cynthion";
-          version = "0.1.8";
-          hash = "sha256-eFPyoSs1NxzyBBV/7MAuEbo+cPL3jBg4DPVwift6dPw=";
+          version = "0.2.2";
+          hash = "sha256-Nq+gg6dxKFEYU6fQIZPGUIOsZNtj51oy07CKpwomfSM=";
         };
         sourceRoot = null;
       });
@@ -89,14 +66,13 @@ in
   ];
   environment.systemPackages =
     builtins.attrValues {
-      inherit (pkgs.unstable.python3Packages)
+      inherit (pkgs.unstable.python312Packages)
         facedancer
         greatfet
         kicad
         ;
     }
     ++ [
-      #customCynthion
       prebuiltCynthion
       (pkgs.packetry.overrideAttrs (old: {
         extraInstallCommands = ''
