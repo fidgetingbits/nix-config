@@ -9,7 +9,7 @@
 let
   sopsFolder = (builtins.toString inputs.nix-secrets) + "/sops";
 
-  wifiNames = inputs.nix-secrets.networking.wifiNetworks pkgs;
+  wifiNames = (inputs.nix-secrets.networking.wifiNetworks);
   wifiEntries = lib.optionalAttrs config.hostSpec.wifi (
     lib.attrsets.mergeAttrsList (
       lib.lists.map (name: {
