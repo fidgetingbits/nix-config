@@ -246,3 +246,15 @@ git_smart_rebase() {
 	git fetch && git rebase
 	git stash list | (grep "${GIT_STASH_MESSAGE}" && git stash pop) || true
 }
+
+# Fuzzy find file and jump to it's directory
+cdf() {
+	local file=$(fd "$1" | fzf --height=40% --border --preview 'bat --color=always {}' --preview-window=right:60%)
+	[ -n "$file" ] && cd "$(dirname "$file")"
+}
+
+# Fuzzy find directory and jump to it
+cdd() {
+	local dir=$(fd -t d "$1" | fzf --height=40% --border --preview 'tree -C {}' --preview-window=right:60%)
+	[ -n "$dir" ] && cd "$dir"
+}
