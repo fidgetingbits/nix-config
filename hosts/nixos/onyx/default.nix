@@ -123,7 +123,7 @@
       ;
   };
   services.fwupd.enable = true;
-  voiceCoding.enable = true;
+  voiceCoding.enable = false;
   services.backup = {
     enable = true;
     borgBackupStartTime = "09:00:00";
