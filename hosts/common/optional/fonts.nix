@@ -1,6 +1,13 @@
 { pkgs, ... }:
+# To add:
+# https://fonts.google.com/specimen/Liu+Jian+Mao+Cao
+# Bopomofo fonts: https://www.mamababymandarin.com/free-chinese-fonts-with-pinyin-and-zhuyin/
+# ButTaiwan fonts: https://github.com/ButTaiwan?tab=repositories
+# Traditional fonts from: https://www.freechinesefont.com/category/traditional-chinese/
+# shadowrz fonts:https://github.com/nix-community/nur-combined/blob/main/repos/shadowrz/pkgs/maoken-assorted-sans/default.nix#L28
+# https://github.com/mimvoid/nur-pkgs/blob/7a93f0e9615ae291320185eae04e30ca0b1cbc18/pkgs/fonts/ma-shan-zheng/default.nix#L34
+# See if there is some way to set the default font at start time to see if you could randomize chinese subtitles from some subset to practice
 {
-
   # Mostly taken from ryan4yin
   fonts = {
     # WARNING: Disabling the below will mess up fonts on sites like
@@ -27,6 +34,9 @@
           source-serif # 衬线字体，不含汉字。字族名叫 Source Code Pro，以及带字重的变体
           source-han-sans # 思源黑体
           source-han-serif # 思源宋体
+
+          eduli # TW MOE Clerical font
+          ttf-tw-moe # TW MOE Song/Kai fonts
 
           meslo-lgs-nf
           julia-mono
