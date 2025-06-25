@@ -6,13 +6,11 @@ set -eo pipefail
 #
 # An optional argument is used which may cause the extension building to use the light version
 
-VOICE_CODING_HOSTS=("onyx" "orby" "oedo")
-hostname=$(hostname)
+# Build the extensions only on hosts that have 'voiceCoding.enable = true' in
+# their config.
 
-for host in "${VOICE_CODING_HOSTS[@]}"; do
-	if [ "$host" = "$hostname" ]; then
-		echo "Building voice coding extensions for host: $host"
-		build-cursorless-pr-bundle "$1" || true
-		build-command-server-pr-bundle "$1" || true
-	fi
-done
+root_path=$(git rev-parse --show-toplevel)
+if grep 'voiceCoding.enable = true' "$root_path/hosts/nixos/$(hostname)/default.nix"; then
+	build-cursorless-pr-bundle "$1" || true
+	build-command-server-pr-bundle "$1" || true
+fi
