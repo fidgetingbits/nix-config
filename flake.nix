@@ -159,11 +159,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    unblob = {
-      url = "github:onekey-sec/unblob";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     #################### Personal Repositories ####################
     nix-secrets = {
       url = "git+ssh://git@gitlab.com/fidgetingbits/nix-secrets.git?shallow=1";
