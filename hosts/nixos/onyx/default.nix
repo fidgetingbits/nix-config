@@ -54,6 +54,7 @@
 
       "hosts/common/optional/distributed-builds.nix"
       "hosts/common/optional/fcitx5.nix"
+      "hosts/common/optional/fonts.nix"
 
     ])
   ];
