@@ -1,8 +1,13 @@
-{ inputs, pkgs, ... }:
+{
+  inputs,
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
-  # for a more exhaustive example look at example package in flake.nix
   sddm-theme = inputs.silentSDDM.packages.${pkgs.system}.default.override {
-    theme = "rei"; # select the config of your choice
+    theme = "rei";
   };
 in
 {
@@ -13,15 +18,25 @@ in
     package = pkgs.kdePackages.sddm; # use qt6 version of sddm
     enable = true;
     theme = sddm-theme.pname;
-    # the following changes will require sddm to be restarted to take
-    # effect correctly. It is recomend to reboot after this
     extraPackages = sddm-theme.propagatedBuildInputs;
     settings = {
-      # required for styling the virtual keyboard
-      General = {
-        GreeterEnvironment = "QML2_IMPORT_PATH=${sddm-theme}/share/sddm/themes/${sddm-theme.pname}/components/,QT_IM_MODULE=qtvirtualkeyboard";
-        InputMethod = "qtvirtualkeyboard";
-      };
+      General =
+        let
+          greeterEnvVars = lib.flatten (
+            [
+              "QML2_IMPORT_PATH=${sddm-theme}/share/sddm/themes/${sddm-theme.pname}/components/"
+              "QT_IM_MODULE=qtvirtualkeyboard"
+            ]
+            ++ lib.optional (config.hostSpec.hdr) [
+              "QT_SCREEN_SCALE_FACTORS=${config.hostSpec.scaling}"
+              "QT_FONT_DPI=192"
+            ]
+          );
+        in
+        {
+          GreeterEnvironment = lib.concatStringsSep "," greeterEnvVars;
+          InputMethod = "qtvirtualkeyboard";
+        };
     };
   };
 }
