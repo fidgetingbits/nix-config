@@ -24,7 +24,8 @@
       "hosts/common/optional/sound.nix"
 
       # Desktop environment and login manager
-      "hosts/common/optional/gdm.nix"
+      #"hosts/common/optional/gdm.nix"
+      "hosts/common/optional/sddm.nix"
       "hosts/common/optional/gnome.nix"
       "hosts/common/optional/i3wm.nix"
 
