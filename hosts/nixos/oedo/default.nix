@@ -179,12 +179,6 @@
 
   services.gnome.gnome-keyring.enable = true;
 
-  # Automatically try to unlock gnome-keyring on login
-  # gdm is the gnome display manager
-  security.pam.services.gdm.enableGnomeKeyring = true;
-  # sddm is the simple desktop display manager (used by kde)
-  security.pam.services.sddm.enableGnomeKeyring = true;
-
   voiceCoding.enable = true;
 
   # ooze checks for all other hosts, so we just check ooze
