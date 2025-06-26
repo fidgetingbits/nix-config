@@ -25,7 +25,9 @@
 
       # Desktop environment and login manager
       "hosts/common/optional/x11.nix"
-      "hosts/common/optional/gdm.nix"
+      # "hosts/common/optional/gdm.nix"
+      "hosts/common/optional/sddm.nix"
+
       #"hosts/common/optional/greetd.nix"
       #"hosts/common/optional/hyprland.nix"
       "hosts/common/optional/gnome.nix"
@@ -47,6 +49,9 @@
       "hosts/common/optional/gaming.nix"
 
       "hosts/common/optional/remote-builder.nix"
+
+      "hosts/common/optional/fcitx5.nix"
+      "hosts/common/optional/fonts.nix"
 
     ])
     # Impermanence
