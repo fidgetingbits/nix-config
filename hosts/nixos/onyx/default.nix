@@ -73,7 +73,7 @@
     isProduction = lib.mkForce true;
     #useAtticCache = lib.mkForce false;
     isDevelopment = lib.mkForce true;
-
+    wallpaper = lib.custom.relativeToRoot "assets/wallpapers/forest_temple.png";
   };
 
   boot.kernelPackages = pkgs.linuxPackages_latest;

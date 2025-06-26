@@ -37,7 +37,7 @@ in
           name = "Noto Color Emoji";
         };
       };
-      image = lib.custom.relativeToRoot "assets/wallpapers/jigglypuff.jpg";
+      image = config.hostSpec.wallpaper;
     };
   };
 }

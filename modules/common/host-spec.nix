@@ -129,6 +129,11 @@
       default = "1";
       description = "Indicate what scaling to use. Floating point number";
     };
+    wallpaper = lib.mkOption {
+      type = lib.types.path;
+      default = lib.custom.relativeToRoot "assets/wallpapers/jigglypuff.jpg";
+      description = "Path to wallpaper to use for system";
+    };
   };
 
   config = {
