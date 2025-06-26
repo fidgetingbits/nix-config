@@ -13,6 +13,8 @@
 # shadowrz fonts:https://github.com/nix-community/nur-combined/blob/main/repos/shadowrz/pkgs/maoken-assorted-sans/default.nix#L28
 # https://github.com/mimvoid/nur-pkgs/blob/7a93f0e9615ae291320185eae04e30ca0b1cbc18/pkgs/fonts/ma-shan-zheng/default.nix#L34
 # See if there is some way to set the default font at start time to see if you could randomize chinese subtitles from some subset to practice
+# TODO:
+# Setup https://github.com/hugolpz/Add-Zhuyin for on the fly font conversion on open tab (netflix subtitles, etc)
 let
   chineseSansDefaults = [
     "Source Han Sans TC"
@@ -37,12 +39,12 @@ let
       runHook postInstall
     '';
 
-    meta = with lib; {
+    meta = {
       description = "A traditional Chinese font from Wordshub";
       homepage = "https://wordshub.github.io/free-font/font.html?WangHanZongZhongKaiTiZhuYin_Regular";
-      license = licenses.ofl;
-      platforms = platforms.all;
-      maintainers = [ maintainers.fidgetingbits ];
+      license = lib.licenses.ofl;
+      platforms = lib.platforms.all;
+      maintainers = [ lib.maintainers.fidgetingbits ];
     };
   };
 
@@ -61,12 +63,12 @@ let
       runHook postInstall
     '';
 
-    meta = with lib; {
+    meta = {
       description = "A traditional Chinese font from Wordshub";
       homepage = "https://wordshub.github.io/free-font/font.html?WangHanZongZhongMingTiZhuYin_Regular";
-      license = licenses.ofl;
-      platforms = platforms.all;
-      maintainers = [ maintainers.fidgetingbits ];
+      license = lib.licenses.ofl;
+      platforms = lib.platforms.all;
+      maintainers = [ lib.maintainers.fidgetingbits ];
     };
   };
 
@@ -86,12 +88,12 @@ let
       runHook postInstall
     '';
 
-    meta = with lib; {
+    meta = {
       description = "A traditional Chinese font from Wordshub";
       homepage = "https://wordshub.github.io/free-font/font.html?WangHanZongZhongMingTiFan_Regular";
-      license = licenses.ofl;
-      platforms = platforms.all;
-      maintainers = [ maintainers.fidgetingbits ];
+      license = lib.licenses.ofl;
+      platforms = lib.platforms.all;
+      maintainers = [ lib.maintainers.fidgetingbits ];
     };
   };
 
@@ -110,12 +112,12 @@ let
       runHook postInstall
     '';
 
-    meta = with lib; {
+    meta = {
       description = "A handwriting-style Chinese font from Google Fonts";
       homepage = "https://fonts.google.com/specimen/Liu+Jian+Mao+Cao";
-      license = licenses.ofl;
-      platforms = platforms.all;
-      maintainers = [ maintainers.fidgetingbits ];
+      license = lib.licenses.ofl;
+      platforms = lib.platforms.all;
+      maintainers = [ lib.maintainers.fidgetingbits ];
     };
   };
 
