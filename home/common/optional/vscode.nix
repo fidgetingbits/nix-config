@@ -9,29 +9,29 @@ let
   exts = inputs.nix-vscode-extensions.extensions.${pkgs.system}.vscode-marketplace;
   marketplace-extensions = builtins.attrValues {
     # Git
-    inherit (exts.eamodio) gitlens; # Fancy git
-    inherit (exts.mhutchie) git-graph; # Git graph
-    inherit (exts.github) vscode-github-actions; # Github actions
-    inherit (exts.github) vscode-pull-request-github; # Github PRs
-    inherit (exts.gitlab) gitlab-workflow; # Gitlab workflow
+    #inherit (exts.eamodio) gitlens; # Fancy git
+    #inherit (exts.mhutchie) git-graph; # Git graph
+    #    inherit (exts.github) vscode-github-actions; # Github actions
+    #    inherit (exts.github) vscode-pull-request-github; # Github PRs
+    #    inherit (exts.gitlab) gitlab-workflow; # Gitlab workflow
 
     # Misc Linting
     inherit (exts.esbenp) prettier-vscode;
     inherit (exts.joshbolduc) commitlint;
     inherit (exts.usernamehw) errorlens; # Highlight errors inline
-    inherit (exts.streetsidesoftware) code-spell-checker; # Spell checking
+    #    inherit (exts.streetsidesoftware) code-spell-checker; # Spell checking
 
     # Themes
-    inherit (exts.jdinhlife) gruvbox;
+    #    inherit (exts.jdinhlife) gruvbox;
     inherit (exts.pkief) material-product-icons;
     inherit (exts.pkief) material-icon-theme;
-    inherit (exts.qufiwefefwoyn) kanagawa;
-    inherit (exts.catppuccin) catppuccin-vsc;
+    #    inherit (exts.qufiwefefwoyn) kanagawa;
+    #    inherit (exts.catppuccin) catppuccin-vsc;
     inherit (exts.dracula-theme) theme-dracula;
     # sndst00m.markdown-github-dark-pack
 
     # UI Changes
-    inherit (exts.visbydev) folder-path-color; # color folder names
+    #    inherit (exts.visbydev) folder-path-color; # color folder names
 
     # C
     inherit (exts.xaver) clang-format; # C/C++ formatter
@@ -47,16 +47,16 @@ let
     inherit (exts.johnnymorganz) stylua; # lua linting
 
     # Talon
-    inherit (exts.pokey) parse-tree; # cursorless tree-sitter dependency
-    inherit (exts.pokey) command-server; # talon -> vscode IPC
+    # inherit (exts.pokey) parse-tree; # cursorless tree-sitter dependency
+    # inherit (exts.pokey) command-server; # talon -> vscode IPC
     # NOTE: We use our own copy of this atm, see justfile
     # inherit (exts.pokey) cursorless; # core cursorless
-    inherit (exts.andreasarvidsson) andreas-talon; # talon helpers
-    inherit (exts.wenkokke) talonfmt-vscode; # talon formatter
-    inherit (exts.paulschaaf) talon-filetree; # dictate files sidebar
-    inherit (exts.rioj7) select-by; # used for grow/shrink commands
-    inherit (exts.mrob95) vscode-talonscript; # syntax highlighting
-    inherit (exts.sleistner) vscode-fileutils; # fileutils.renameFile
+    #    inherit (exts.andreasarvidsson) andreas-talon; # talon helpers
+    #    inherit (exts.wenkokke) talonfmt-vscode; # talon formatter
+    #    inherit (exts.paulschaaf) talon-filetree; # dictate files sidebar
+    #    inherit (exts.rioj7) select-by; # used for grow/shrink commands
+    #    inherit (exts.mrob95) vscode-talonscript; # syntax highlighting
+    #    inherit (exts.sleistner) vscode-fileutils; # fileutils.renameFile
 
     # Cursorless Development
     inherit (exts.editorconfig) editorconfig; # Allows vscode setting overrides
@@ -72,7 +72,7 @@ let
     inherit (exts.skellock) just;
 
     # CMake
-    inherit (exts.twxs) cmake;
+    #    inherit (exts.twxs) cmake;
 
     # GDB
 
@@ -101,20 +101,20 @@ let
     inherit (exts.davidanson) vscode-markdownlint; # Markdown linter
 
     # ReStructuredText (rst)
-    inherit (exts.lextudio) restructuredtext;
+    #    inherit (exts.lextudio) restructuredtext;
 
     # CSV
-    inherit (exts.mechatroner) rainbow-csv; # CSV linter, syntax highlighting
+    #    inherit (exts.mechatroner) rainbow-csv; # CSV linter, syntax highlighting
 
     # Javascript / Typescript
     inherit (exts.rvest) vs-code-prettier-eslint; # javascript/typescript
     #dbaeumer.vscode-eslint
 
     # Apache
-    inherit (exts.mrmlnc) vscode-apache; # Apache syntax highlighting
+    #    inherit (exts.mrmlnc) vscode-apache; # Apache syntax highlighting
 
     # PDF
-    inherit (exts.tomoki1207) pdf;
+    #    inherit (exts.tomoki1207) pdf;
 
     # gitconfig
     inherit (exts.yy0931) gitconfig-lsp;
@@ -125,31 +125,31 @@ let
     inherit (exts.will-wow) vscode-alternate-file; # Toggle between header/source files using .projection.json files
     inherit (exts.arturodent) jump-and-select; # Navigation like vim f-key
     inherit (exts.ms-vscode) hexeditor; # Hex editor
-    inherit (exts.yechunan) json-color-token; # Colorize json tokens (or any language)
+    #    inherit (exts.yechunan) json-color-token; # Colorize json tokens (or any language)
 
     # neovim
-    inherit (exts.asvetliakov) vscode-neovim; # neovim integration (not vscodevim so we can use lua plugins)
+    #    inherit (exts.asvetliakov) vscode-neovim; # neovim integration (not vscodevim so we can use lua plugins)
 
-    inherit (exts.mkhl) direnv; # Auto environment entry
-    inherit (exts.stkb) rewrap; # Auto wrap and custom cursorless actions
-    inherit (exts.attilathedud) data-converter; # Convert between data formats (dec, hex, binary, etc)
+    #    inherit (exts.mkhl) direnv; # Auto environment entry
+    # inherit (exts.stkb) rewrap; # Auto wrap and custom cursorless actions
+    # inherit (exts.attilathedud) data-converter; # Convert between data formats (dec, hex, binary, etc)
 
     # Documentation
-    inherit (exts.meronz) manpages; # man page opening
+    # inherit (exts.meronz) manpages; # man page opening
 
     # UX
     inherit (exts.alefragnani) bookmarks; # Bookmark jumping
     # WARNING: This conflicts with cursorless hats too much
     # wayou.vscode-todo-highlight # Highlight TODOs
-    inherit (exts.johnpapa) vscode-peacock; # per-workspace color themes
+    #    inherit (exts.johnpapa) vscode-peacock; # per-workspace color themes
     # WARNING: These cause quite weird cursorless interactions
     # asvetliakov.vscode-neovim
     # vscodevim.vim # Vim-style
     inherit (exts.koalamer) workspace-in-status-bar;
-    inherit (exts.tonybaloney) vscode-pets; # essentials
-    inherit (exts.joshmu) periscope; # neovim telescope-style picker
-    inherit (exts.jpcrs) binocular; # neovim telescope-style picker
-    inherit (exts.tomrijndorp) find-it-faster; # Find files faster (telescope-style but in terminal view)
+    #    inherit (exts.tonybaloney) vscode-pets; # essentials
+    #    inherit (exts.joshmu) periscope; # neovim telescope-style picker
+    #    inherit (exts.jpcrs) binocular; # neovim telescope-style picker
+    #    inherit (exts.tomrijndorp) find-it-faster; # Find files faster (telescope-style but in terminal view)
     inherit (exts.ms-vscode-remote) vscode-remote-extensionpack; # Remote development (ssh, etc)
 
     # Syntax and File Detection
@@ -166,8 +166,8 @@ let
 
     # Assembly
     # pkgs.vscode-extensions."64kramsystem".markdown-code-blocks-asm-syntax-highlighting
-    inherit (exts.dan-c-underwood) arm;
-    inherit (exts."13xforever") language-x86-64-assembly;
+    #    inherit (exts.dan-c-underwood) arm;
+    #    inherit (exts."13xforever") language-x86-64-assembly;
 
   };
 in
@@ -778,6 +778,50 @@ in
             };
           };
 
+          # Performance: Exclude directories from file watching, search, and the explorer
+          # to reduce CPU and memory usage
+          "files.exclude" = {
+            "**/.git" = true;
+            "**/node_modules" = true;
+            "**/dist" = true;
+            "**/build" = true;
+            "**/tmp" = true;
+            "**/.direnv" = true;
+            "**/result" = true; # Nix build results
+            "**/result-*" = true; # Nix build results
+            "**/.venv" = true; # Python virtual environments
+            "**/venv" = true;
+            "**/__pycache__" = true;
+          };
+          "files.watcherExclude" = {
+            "**/.git/objects/**" = true;
+            "**/.git/subtree-cache/**" = true;
+            "**/node_modules/**" = true;
+            "**/dist/**" = true;
+            "**/build/**" = true;
+            "**/tmp/**" = true;
+            "**/.direnv/**" = true;
+            "**/result" = true;
+            "**/result-*" = true;
+            "**/.venv/**" = true;
+            "**/venv/**" = true;
+            "**/__pycache__/**" = true;
+          };
+          "search.exclude" = {
+            "**/.git" = true;
+            "**/node_modules" = true;
+            "**/dist" = true;
+            "**/build" = true;
+            "**/tmp" = true;
+            "**/.direnv" = true;
+            "**/result" = true;
+            "**/result-*" = true;
+            "**/.venv" = true;
+            "**/venv" = true;
+            "**/__pycache__" = true;
+          };
+
+          "search.followSymlinks" = false;
         };
     };
   };
