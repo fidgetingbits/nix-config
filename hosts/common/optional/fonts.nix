@@ -22,6 +22,29 @@ let
     "Source Han Serif TC"
     "Source Han Serif SC"
   ];
+  wang-han-zong-zhong-kai-ti-zhu-yin-regular = pkgs.stdenv.mkDerivation {
+    pname = "wang-han-zong-zhong-kai-ti-zhu-yin-regular";
+    version = "0-unstable-2025-06-26";
+
+    src = pkgs.fetchurl {
+      url = "https://github.com/wordshub/free-font/raw/master/assets/font/%E4%B8%AD%E6%96%87/%E7%8E%8B%E6%B1%89%E5%AE%97%E5%AD%97%E4%BD%93%E7%B3%BB%E5%88%97/%E7%8E%8B%E6%BC%A2%E5%AE%97%E4%B8%AD%E6%A5%B7%E9%AB%94%E6%B3%A8%E9%9F%B3.ttf";
+      hash = "sha256-mTLXn9LB/vCM3tHqjz+LMiBuyuV3jWf6wPowwhKXXFA=";
+    };
+    dontUnpack = true;
+    installPhase = ''
+      runHook preInstall
+      install -Dm644 $src -t $out/share/fonts/truetype
+      runHook postInstall
+    '';
+
+    meta = with lib; {
+      description = "A traditional Chinese font from Wordshub";
+      homepage = "https://wordshub.github.io/free-font/font.html?WangHanZongZhongKaiTiZhuYin_Regular";
+      license = licenses.ofl;
+      platforms = platforms.all;
+      maintainers = [ maintainers.fidgetingbits ];
+    };
+  };
 
   wang-han-zong-zhong-ming-ti-zhu-yin-regular = pkgs.stdenv.mkDerivation {
     pname = "wang-han-zong-zhong-ming-ti-zhu-yin-regular";
@@ -97,22 +120,26 @@ let
   };
 
   # Fonts with Bopomofo (Zhuyin) support
-  bopomofoFonts = builtins.attrValues {
-    inherit wang-han-zong-zhong-ming-ti-zhu-yin-regular;
-  };
+  bopomofoFonts = [
+    wang-han-zong-zhong-ming-ti-zhu-yin-regular
+    wang-han-zong-zhong-kai-ti-zhu-yin-regular
+  ];
 
-  chineseFonts = builtins.attrValues {
-    inherit (pkgs)
-      noto-fonts-cjk-sans
-      source-han-sans
-      source-han-serif
+  chineseFonts =
+    builtins.attrValues {
+      inherit (pkgs)
+        noto-fonts-cjk-sans
+        source-han-sans
+        source-han-serif
 
-      eduli # TW MOE Clerical font
-      ttf-tw-moe # TW MOE Song/Kai fonts
-      ;
-    inherit liu-jian-mao-cao;
-    inherit wang-han-zong-zhong-ming-ti-fan;
-  };
+        eduli # TW MOE Clerical font
+        ttf-tw-moe # TW MOE Song/Kai fonts
+        ;
+    }
+    ++ [
+      liu-jian-mao-cao
+      wang-han-zong-zhong-ming-ti-fan
+    ];
 in
 {
   fonts = {
