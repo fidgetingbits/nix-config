@@ -165,5 +165,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixvim-flake.url = "git+ssh://git@gitlab.com/fidgetingbits/nixvim-flake.git?shallow=1";
+    nix-assets.url = "github:fidgetingbits/nix-assets";
   };
 }

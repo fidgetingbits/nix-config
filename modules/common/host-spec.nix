@@ -131,7 +131,7 @@
     };
     wallpaper = lib.mkOption {
       type = lib.types.path;
-      default = lib.custom.relativeToRoot "assets/wallpapers/jigglypuff.jpg";
+      default = "${inputs.nix-assets}/images/wallpapers/jigglypuff.webp";
       description = "Path to wallpaper to use for system";
     };
   };
