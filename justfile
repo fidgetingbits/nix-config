@@ -17,9 +17,11 @@ git-dance-post:
     @git rm --cached flake.lock || true
 
 # Update commonly changing flakes and prep for a rebuild
-rebuild-pre HOST=`hostname`: git-dance-pre update-nix-secrets
-	nix flake update nixvim-flake --timeout 5 --reference-lock-file locks/{{HOST}}.lock
-	@git add --intent-to-add .
+rebuild-pre HOST=`hostname`: git-dance-pre
+    just update-nix-secrets {{HOST}} && \
+    just update-nix-assets {{HOST}} && \
+    nix flake update nixvim-flake --timeout 5 --reference-lock-file locks/{{HOST}}.lock
+    @git add --intent-to-add .
 
 # Run post-rebuild checks, like if sops is running properly afterwards
 rebuild-post: git-dance-post check-sops
@@ -68,6 +70,11 @@ check-sops:
 update-nix-secrets HOST=`hostname`:
 	@(cd ../nix-secrets && git fetch && git rebase > /dev/null) || true
 	nix flake update nix-secrets --timeout 5 --reference-lock-file locks/{{HOST}}.lock
+
+
+# Update nix-assets
+update-nix-assets HOST=`hostname`:
+    nix flake update nix-assets --timeout 5 --reference-lock-file locks/{{HOST}}.lock
 
 # Rebuild vscode extensions that update regularly
 rebuild-extensions:
