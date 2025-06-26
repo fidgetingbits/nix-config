@@ -157,7 +157,6 @@ in
       ldt = "eza -TD"; # list directory tree
       tree = "eza -T";
       gdb = "gdb -q";
-      biggest = "find . -printf '%s %p\n'|sort -nr|head";
       rg = "rg -M300";
       du = "dust";
       df = "duf";
@@ -173,8 +172,11 @@ in
       unzip = "7z x";
       genpasswd = "bw generate --words 5 --includeNumber --ambiguous --separator '-' -p -c";
 
-      # I find a lot of the built-in oh-my-zsh ones not useful, sob I disable them and define my own
-      cdr = "cd-gitroot";
+      # file searching
+      fdi = "fd -I"; # fd with --no-ignore
+      biggest = "find . -printf '%s %p\n'|sort -nr|head";
+
+      # git
       gcm = "git commit -m";
       gcmcf = "git commit -m 'chore: update flake.lock'";
       gca = "git commit --amend";
@@ -225,6 +227,7 @@ in
       nswp = "nix shell nixpkgs#"; # nsw: nix shell with package
       nlg = "sudo nix profile history --profile /nix/var/nix/profiles/system";
       ncs = "REPO_PATH=$PWD nh os switch --no-nom . -- --impure"; # ncs = nix config switch
+      nrepl = "nix repl --expr 'import <nixpkgs>{}'";
 
       # finding
       t = "tree";
@@ -234,10 +237,14 @@ in
       pg = "ps -ef | rg -i";
       k = "kill";
       k9 = "kill -9";
-      fk = "ps -e | fzf | awk '{print $1}' | xargs kill";
+      kf = "ps -e | fzf | awk '{print $1}' | xargs kill";
 
       # folders
-      cgr = "cd-gitroot";
+      # Directory convenience
+      cdr = "cd-gitroot";
+      cdpr = "..; cd-gitroot";
+      zf = "cdf"; # Fuzzy jump to folder of file under tree
+      zd = "cdd"; # Fuzzy jump to directory under tree
 
       ## talon
       ctc = "cd ${devTalon}/fidgetingbits-talon";
