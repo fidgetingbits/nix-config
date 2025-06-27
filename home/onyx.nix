@@ -34,6 +34,7 @@
     common/optional/chat.nix
     common/optional/reversing
     common/optional/wine.nix
+    common/optional/llm.nix
 
   ];
 

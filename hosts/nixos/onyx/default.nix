@@ -163,4 +163,20 @@
   networking.granularFirewall.enable = true;
 
   system.stateVersion = "23.05";
+
+  # For explanations of these options, see
+  # https://github.com/CryoByte33/steam-deck-utilities/blob/main/docs/tweak-explanation.md
+  boot.kernel.sysctl = {
+    # Was getting crazy cpu stuttering from kcompactd0 which this seems to  largely fix
+    "vm.compaction_proactiveness" = 0;
+    # This is to stop kswapd0 which noticably stuttered after kcompactd0 lag went away
+    "vm.swappiness" = 1;
+    "vm.page_lock_unfairness" = 1;
+    "mm.transparent_hugepage.enabled" = "always";
+  };
+  # Others noted khugepaged causes issues after the above was disabled, so also disabling that.
+  system.activationScripts.sysfs.text = ''
+    echo advise > /sys/kernel/mm/transparent_hugepage/shmem_enabled
+    echo 0 > /sys/kernel/mm/transparent_hugepage/khugepaged/defrag
+  '';
 }
