@@ -4,7 +4,14 @@ let
 in
 {
   home.packages = lib.flatten [
-    (lib.attrValues { inherit (pkgs) spotify ffmpeg; })
+    (lib.attrValues {
+      inherit (pkgs)
+        spotify
+        ffmpeg
+        spicetify-cli
+        spotify-player
+        ;
+    })
 
     videoPlayers
   ];
