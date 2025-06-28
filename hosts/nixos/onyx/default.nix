@@ -83,6 +83,7 @@
     enable = true;
     # When using plymouth, initrd can expand by a lot each time, so limit how many we keep around
     configurationLimit = lib.mkDefault 10;
+    consoleMode = "1";
   };
   boot.loader.efi.canTouchEfiVariables = true;
 
