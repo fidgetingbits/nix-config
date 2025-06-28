@@ -43,6 +43,8 @@
         import ./shell.nix {
           pkgs = nixpkgs.legacyPackages.${system};
           checks = self.checks.${system};
+          inherit inputs;
+          inherit system;
         }
       );
       checks = forAllSystems (
@@ -150,6 +152,10 @@
     nixpkgs-firefox-darwin.url = "github:bandithedoge/nixpkgs-firefox-darwin";
     firefox-addons = {
       url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    firefox2nix = {
+      url = "git+https://git.sr.ht/~rycee/mozilla-addons-to-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
