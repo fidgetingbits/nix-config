@@ -9,10 +9,11 @@
 # shellcheck disable=SC1091
 source "$(dirname "${BASH_SOURCE[0]}")/helpers.sh"
 
-function cleanup() {
-	git rm --cached flake.lock 2>/dev/null || true
-}
-trap cleanup EXIT SIGINT
+# NOTE: No longer used now that we use --reference-lock-file
+#function cleanup() {
+#	git rm --cached flake.lock 2>/dev/null || true
+#}
+#trap cleanup EXIT SIGINT
 
 export NIXPKGS_ALLOW_UNFREE=1
 
@@ -71,7 +72,7 @@ else
 		export REPO_PATH
 		NIXPKGS_ALLOW_BROKEN=1
 		export NIXPKGS_ALLOW_BROKEN
-		nh os switch . -- --impure --show-trace
+		nh os switch . -- --impure --show-trace --reference-lock-file locks/$HOST.lock
 	else
 		nixos-rebuild $switch_args
 	fi

@@ -40,13 +40,13 @@ check HOST=`hostname` ARGS="":
 rebuild HOST=`hostname`: && rebuild-post
     @just rebuild-pre {{HOST}}
     @# NOTE: Add --option eval-cache false if you end up caching a failure you cant get around
-    @scripts/rebuild.sh
+    @scripts/rebuild.sh {{HOST}}
     just rebuild-extensions-lite
 
 # Rebuild the system and run a flake check
 rebuild-full HOST=`hostname`: && rebuild-post
     @just rebuild-pre {{HOST}}
-    scripts/rebuild.sh
+    scripts/rebuild.sh {{HOST}}
     just check {{HOST}}
     just rebuild-extensions
 
