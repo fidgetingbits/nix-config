@@ -155,7 +155,7 @@
           message = "config.system.impermanence.enable is true but no persistFolder path is provided";
         }
         {
-          assertion = config.hostSpec.voiceCoding && config.hostSpect.voiceCoding;
+          assertion = !(config.hostSpec.voiceCoding && config.hostSpec.useWayland);
           message = "Talon, which is used for voice coding, does not support Wayland. See https://github.com/splondike/wayland-accessibility-notes";
         }
       ];

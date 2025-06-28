@@ -1,0 +1,161 @@
+{
+  lib,
+  config,
+  inputs,
+  pkgs,
+  ...
+}:
+let
+  inherit (lib)
+    mkOption
+    mkEnableOption
+    types
+    mapAttrs'
+    mapAttrsToList
+    filterAttrs
+    foldl
+    recursiveUpdate
+    ;
+
+  cfg = config.programs.firefox.extensions;
+
+  # Type for a single extension definition
+  extensionType = types.submodule {
+    options = {
+      enable = mkEnableOption "this extension";
+      shortId = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = "The short ID of the addon on addons.mozilla.org";
+      };
+      uuid = mkOption {
+        type = types.str;
+        description = "The UUID of the extension, e.g., 'uBlock0@raymondhill.net'.";
+      };
+      package = mkOption {
+        type = types.nullOr types.package;
+        default = null;
+        description = "A direct Nix package for the extension. Overrides shortId.";
+      };
+      settings = mkOption {
+        type = types.attrs;
+        default = { };
+        description = "Managed settings for this extension.";
+      };
+      description = mkOption {
+        type = types.str;
+        default = "";
+        description = "Extension description";
+      };
+    };
+  };
+
+  # Type for a category of extensions
+  categoryType = types.submodule {
+    options = {
+      enable = mkEnableOption "this extension category";
+      extensions = mkOption {
+        type = types.attrsOf extensionType;
+        default = { };
+      };
+    };
+  };
+
+  # Helper to get the final package derivation for an extension
+  getExtPackage =
+    ext:
+    if ext.package != null then
+      ext.package
+    else if ext.shortId != null then
+      inputs.firefox-addons.packages.${pkgs.system}.${ext.shortId}
+    else
+      throw "Extension must have either 'package' or 'shortId' defined.";
+
+in
+{
+  # 1. DEFINE THE OPTIONS AND THEIR DEFAULTS
+  options.programs.firefox.extensions = mkOption {
+    type = types.attrsOf categoryType;
+    description = "A structured way to manage Firefox extensions by category.";
+    # This is where your default extension definitions should live.
+    default = {
+      privacy = {
+        enable = true;
+        extensions = {
+          uBlockOrigin = {
+            enable = true;
+            shortId = "ublock-origin";
+            uuid = "uBlock0@raymondhill.net";
+            description = "Ad and tracker blocker";
+          };
+          noScript = {
+            enable = false;
+            shortId = "noscript";
+            uuid = "{73a6fe31-595d-460b-a920-fcc0f8843232}";
+            description = "JavaScript blocker";
+          };
+          protonPass = {
+            enable = true;
+            shortId = "proton-pass";
+            uuid = "78272b6fa58f4a1abaac99321d503a20@proton.me";
+            description = "Proton password manager";
+          };
+        };
+      };
+      ui = {
+        enable = true;
+        extensions = {
+          treeStyleTab = {
+            enable = true;
+            shortId = "tree-style-tab";
+            uuid = "treestyletab@piro.sakura.ne.jp";
+            description = "Vertical tab tree";
+          };
+          darkReader = {
+            enable = true;
+            shortId = "darkreader";
+            uuid = "addon@darkreader.org";
+            description = "Dark mode for websites";
+          };
+        };
+      };
+      convenience = {
+        enable = true;
+        extensions = {
+          redirector = {
+            enable = true;
+            shortId = "redirector";
+            uuid = "redirector@einaregilsson.com";
+            description = "URL redirector";
+          };
+        };
+      };
+      # Add other categories like 'development', 'language', etc. here
+    };
+  };
+
+  # 2. GENERATE THE CONFIGURATION
+  config = lib.mkIf (config.programs.firefox.enable && cfg != { }) (
+    let
+      # This `let` block is now correctly placed before the `in` that returns the config.
+      enabledExtensions =
+        let
+          enabledCategories = filterAttrs (name: cat: cat.enable) cfg;
+          extensionsFromEnabledCategories = mapAttrsToList (name: cat: cat.extensions) enabledCategories;
+          allPotentialExtensions = foldl recursiveUpdate { } extensionsFromEnabledCategories;
+        in
+        filterAttrs (name: ext: ext.enable) allPotentialExtensions;
+    in
+    {
+      programs.firefox.profiles.default.extensions = {
+        # Generate the list of packages to install
+        packages = mapAttrsToList (name: ext: getExtPackage ext) enabledExtensions;
+
+        # Generate the settings for each extension
+        settings = mapAttrs' (name: ext: lib.nameValuePair ext.uuid ext.settings) (
+          filterAttrs (name: ext: ext.settings != { }) enabledExtensions
+        );
+      };
+    }
+  );
+}
