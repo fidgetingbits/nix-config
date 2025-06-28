@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 {
 
   home.file = {
@@ -18,14 +18,17 @@
     type = "fcitx5";
     enable = true;
 
-    fcitx5.addons = with pkgs; [
-      fcitx5-chinese-addons
-      fcitx5-table-extra
-      fcitx5-chewing # Adds zhuyin https://fcitx-im.org/wiki/Chewing
-      fcitx5-rime
-      fcitx5-configtool # Might need to enable rime using configtool after installed
-      fcitx5-gtk
-      libsForQt5.fcitx5-qt
-    ];
+    fcitx5 = {
+      addons = with pkgs; [
+        fcitx5-chinese-addons
+        fcitx5-table-extra
+        fcitx5-chewing # Adds zhuyin https://fcitx-im.org/wiki/Chewing
+        fcitx5-rime
+        fcitx5-configtool # Might need to enable rime using configtool after installed
+        fcitx5-gtk
+        libsForQt5.fcitx5-qt
+      ];
+      waylandFrontend = config.hostSpec.useWayland;
+    };
   };
 }

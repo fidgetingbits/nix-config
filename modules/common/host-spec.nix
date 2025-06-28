@@ -135,6 +135,11 @@
       default = "${inputs.nix-assets}/images/wallpapers/jigglypuff.webp";
       description = "Path to wallpaper to use for system";
     };
+    useWayland = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Indicate a host that uses Wayland";
+    };
   };
 
   config = {
