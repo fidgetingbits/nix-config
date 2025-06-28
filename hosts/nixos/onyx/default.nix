@@ -65,6 +65,7 @@
     isWork = lib.mkForce true;
     voiceCoding = lib.mkForce false;
     useYubikey = lib.mkForce true;
+    useWayland = lib.mkForce true;
     isAutoStyled = lib.mkForce true;
     wifi = lib.mkForce true;
     useNeovimTerminal = lib.mkForce true;
