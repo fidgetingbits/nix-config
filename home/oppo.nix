@@ -24,6 +24,7 @@
 
     common/optional/gnome
     common/optional/gnome-terminal.nix
+    common/optional/fcitx5
 
     # Maybe more role-specific stuff
     common/optional/document.nix # document editing

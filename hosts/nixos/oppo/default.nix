@@ -50,7 +50,6 @@
 
       "hosts/common/optional/remote-builder.nix"
 
-      "hosts/common/optional/fcitx5.nix"
       "hosts/common/optional/fonts.nix"
 
     ])

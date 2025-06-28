@@ -426,7 +426,7 @@ in
             largeFileOptimizations = false;
             lineNumbers = "on";
             linkedEditing = true;
-            lineHeight = 1.8;
+            lineHeight = if config.hostSpec.voiceCoding then 1.8 else 0;
             maxTokenizationLineLength = 60000;
             minimap.enabled = false;
             overviewRulerBorder = false;

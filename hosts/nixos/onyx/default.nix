@@ -54,7 +54,6 @@
       "hosts/common/optional/gaming.nix"
 
       "hosts/common/optional/distributed-builds.nix"
-      "hosts/common/optional/fcitx5.nix"
       "hosts/common/optional/fonts.nix"
 
     ])
@@ -64,7 +63,7 @@
   hostSpec = {
     hostName = "onyx";
     isWork = lib.mkForce true;
-    voiceCoding = lib.mkForce true;
+    voiceCoding = lib.mkForce false;
     useYubikey = lib.mkForce true;
     isAutoStyled = lib.mkForce true;
     wifi = lib.mkForce true;

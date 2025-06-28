@@ -27,6 +27,7 @@
     common/optional/atuin.nix
     common/optional/i3
     common/optional/gnome
+    common/optional/fcitx5
 
     # Maybe more role-specific stuff
     common/optional/document.nix # document editing
