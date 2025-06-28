@@ -27,8 +27,5 @@
       fcitx5-gtk
       libsForQt5.fcitx5-qt
     ];
-    # FIXME: maybe change this, see ryan4yin
-    # https://github.com/ryan4yin/nix-config/blob/4ec26c5e5f8fb4e1928f3cb62c1fba857df3f5b0/home/linux/gui/base/fcitx5/default.nix
-    fcitx5.ignoreUserConfig = true;
   };
 }
