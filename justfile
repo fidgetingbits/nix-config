@@ -3,20 +3,23 @@ SOPS_FILE := "../nix-secrets/.sops.yaml"
 # Define path to helpers
 export HELPERS_PATH := justfile_directory() + "/scripts/helpers.sh"
 
-# List available commands
+[private]
 default:
   @just --list
 
 # Temporarily track the flake.lock with git to satisfy nix commands
+[private]
 git-dance-pre:
     @git add --intent-to-add -f flake.lock
     @git update-index --assume-unchanged flake.lock
 
 # Remove the flake.lock from git tracking
+[private]
 git-dance-post:
     @git rm --cached flake.lock || true
 
 # Update commonly changing flakes and prep for a rebuild
+[private]
 rebuild-pre HOST=`hostname`: git-dance-pre
     just update-nix-secrets {{HOST}} && \
     just update-nix-assets {{HOST}} && \
@@ -24,6 +27,7 @@ rebuild-pre HOST=`hostname`: git-dance-pre
     @git add --intent-to-add .
 
 # Run post-rebuild checks, like if sops is running properly afterwards
+[private]
 rebuild-post: git-dance-post check-sops
 
 
@@ -59,6 +63,7 @@ update HOST=`hostname`:
 rebuild-update: update rebuild
 
 # Generate a new age key
+[group("secrets")]
 age-key:
 	nix-shell -p age --run "age-keygen"
 
@@ -105,9 +110,6 @@ disko DRIVE PASSWORD:
 		--arg password '"{{PASSWORD}}"'
 	rm /tmp/disko-password
 
-# Copy all the config files to the remote host
-sync USER HOST PATH:
-	rsync -av --filter=':- .gitignore' -e "ssh -l {{USER}} -oport=10022" . {{USER}}@{{HOST}}:{{PATH}}/nix-config
 
 # Run nixos-rebuild on the remote host
 build-host HOST:
@@ -118,44 +120,52 @@ build-host HOST:
 #
 
 # Update sops keys in nix-secrets repo
+[group("secrets")]
 sops-rekey:
   cd ../nix-secrets && for file in $(ls sops/*.yaml); do \
     sops updatekeys -y $file; \
   done
 
 # Update all keys in sops/*.yaml files in nix-secrets to match the creation rules keys
+[group("secrets")]
 rekey: sops-rekey
   cd ../nix-secrets && \
     (pre-commit run --all-files || true) && \
     git add -u && (git commit -nm "chore: rekey" || true) && git push
 
 # Update an age key anchor or add a new one
+[group("secrets")]
 sops-update-age-key FIELD KEYNAME KEY:
     #!/usr/bin/env bash
     source {{HELPERS_PATH}}
     sops_update_age_key {{FIELD}} {{KEYNAME}} {{KEY}}
 
 # Update an existing user age key anchor or add a new one
+[group("secrets")]
 sops-update-user-age-key USER HOST KEY:
   just sops-update-age-key users {{USER}}_{{HOST}} {{KEY}}
 
 # Update an existing host age key anchor or add a new one
+[group("secrets")]
 sops-update-host-age-key HOST KEY:
   just sops-update-age-key hosts {{HOST}} {{KEY}}
 
 # Automatically create creation rules entries for a <host>.yaml file for host-specific secrets
+[group("secrets")]
 sops-add-host-creation-rules USER HOST:
     #!/usr/bin/env bash
     source {{HELPERS_PATH}}
     sops_add_host_creation_rules "{{USER}}" "{{HOST}}"
 
 # Automatically create creation rules entries for a shared.yaml file for shared secrets
+[group("secrets")]
 sops-add-shared-creation-rules USER HOST:
     #!/usr/bin/env bash
     source {{HELPERS_PATH}}
     sops_add_shared_creation_rules "{{USER}}" "{{HOST}}"
 
 # Automatically add the host and user keys to creation rules for shared.yaml and <host>.yaml
+[group("secrets")]
 sops-add-creation-rules USER HOST:
     just sops-add-host-creation-rules {{USER}} {{HOST}} && \
     just sops-add-shared-creation-rules {{USER}} {{HOST}}
@@ -165,14 +175,17 @@ sops-add-creation-rules USER HOST:
 #
 
 # Add a talon beta linux URL hash to talon-versions.json
+[group("talon")]
 talon-linux URL:
   just talon linux {{URL}}
 
 # Add a talon beta darwin URL hash to talon-versions.json
+[group("talon")]
 talon-darwin URL:
   just talon darwin {{URL}}
 
 # Automatically add a new talon version to the talon-versions.json file
+[group("talon")]
 talon OS URL:
   cd ../nix-secrets && \
   if grep {{URL}} talon-versions.json; then \
@@ -193,7 +206,18 @@ talon OS URL:
 # ========= Admin Recipes ==========
 #
 
+# Copy all the config files to the remote host
+[group("admin")]
+sync USER HOST PATH:
+	rsync -av --filter=':- .gitignore' -e "ssh -l {{USER}} -oport=10022" . {{USER}}@{{HOST}}:{{PATH}}/nix-config
+
 # Create a new user with a password hash for dovecot, to be placed in ooze.yaml secrets
+[group("admin")]
 dovecot-hash:
     touch /tmp/empty-dovecot.conf
     DOVECONF=/dev/null nix shell nixpkgs#dovecot.out -c doveadm -c /tmp/empty-dovecot.conf pw -s SHA512-CRYPT
+
+# Updates the firefox extension list
+[group("admin")]
+firefox-addons:
+    mozilla-addons-to-nix overlays/firefox/addons.json overlays/firefox/generated.nix
