@@ -822,6 +822,7 @@ in
           };
 
           "search.followSymlinks" = false;
+          "typescript.tsserver.log" = "off";
           "git.autofetch" = false;
         };
     };
