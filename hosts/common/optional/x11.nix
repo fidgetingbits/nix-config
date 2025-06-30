@@ -14,10 +14,6 @@
     };
   };
 
-  # Enable automatic login for the user.
-  services.displayManager.autoLogin.enable = true;
-  services.displayManager.autoLogin.user = config.hostSpec.username;
-
   environment.systemPackages = [
     pkgs.xorg.xf86inputevdev # for gilrs used by talon. need evdev
   ];
