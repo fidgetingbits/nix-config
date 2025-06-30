@@ -170,14 +170,18 @@
   boot.kernel.sysctl = {
     # Was getting crazy cpu stuttering from kcompactd0 which this seems to  largely fix
     "vm.compaction_proactiveness" = 0;
+    "vm.extfrag_threshold" = 1000;
     # This is to stop kswapd0 which noticably stuttered after kcompactd0 lag went away
     "vm.swappiness" = 1;
     "vm.page_lock_unfairness" = 1;
     "mm.transparent_hugepage.enabled" = "always";
+    # See https://wiki.archlinux.org/title/Intel_graphics
+    "dev.i915.perf_stream_paranoid" = 0; # Allow non-root users to access i915 perf streams
   };
   # Others noted khugepaged causes issues after the above was disabled, so also disabling that.
   system.activationScripts.sysfs.text = ''
     echo advise > /sys/kernel/mm/transparent_hugepage/shmem_enabled
+    echo never > /sys/kernel/mm/transparent_hugepage/defrag
     echo 0 > /sys/kernel/mm/transparent_hugepage/khugepaged/defrag
   '';
 }
