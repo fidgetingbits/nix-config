@@ -155,4 +155,12 @@
     # Whether to use 3D hardware acceleration to render the console.
     hwRender = true;
   };
+
+  # Enable automatic login for the user.
+  # FIXME: we will want to tweak the user on multi-user systems
+  services.displayManager = lib.optionalAttrs config.hostSpec.useWindowManager {
+    autoLogin.enable = true;
+    autoLogin.user = config.hostSpec.username;
+  };
+
 }
