@@ -80,7 +80,7 @@
     useAtticCache = lib.mkForce false;
     isDevelopment = lib.mkForce true;
     persistFolder = lib.mkForce "/persist";
-
+    useWayland = lib.mkForce true;
   };
   system.impermanence.enable = true;
 
