@@ -2,7 +2,6 @@
   lib,
   fetchurl,
   buildNpmPackage,
-  yarn,
 }:
 buildNpmPackage (finalAttrs: {
   pname = "lgtv-ip-control-cli";
@@ -18,22 +17,20 @@ buildNpmPackage (finalAttrs: {
     ln -s ${./package-lock.json} package-lock.json
   '';
 
-  nativeBuildInputs = [ yarn ];
   dontNpmBuild = true;
 
   installPhase = ''
     runHook preInstall
     mkdir -p $out/bin
-    cp -r bin/lgtv-ip-control.cjs $out/bin/lgtv
+    install -Dm755 bin/lgtv-ip-control.cjs $out/bin/lgtv
     cp -r dist $out/dist
     cp -r node_modules $out/node_modules
-    chmod +x $out/bin/*
     runHook postInstall
   '';
 
   meta = {
     changelog = "https://github.com/WesSouza/lgtv-ip-control/blob/main/CHANGELOG.md";
-    description = "Tool and library to provide network control for LG TVs manufactured since 2018";
+    description = "Tool to provide network control for LG TVs manufactured since 2018";
     homepage = "https://github.com/WesSouza/lgtv-ip-control";
     license = with lib.licenses; [
       mit
