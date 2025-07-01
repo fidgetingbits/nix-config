@@ -195,5 +195,14 @@
 
   #networking.granularFirewall.enable = true;
 
+  powerManagement = {
+    enable = true;
+    cpuFreqGovernor = "ondemand";
+    # Prevent USB devices from waking up the system
+    powerUpCommands = ''
+      echo XHCI > /proc/acpi/wakeup
+    '';
+  };
+
   system.stateVersion = "23.05";
 }
