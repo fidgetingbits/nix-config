@@ -37,6 +37,7 @@
       ffmpeg # mp4 -> gif conversion, etc
       # FIXME: Switch to service and setup config (may need impermanence tweaks)
       jellyfin # media server
+      lgtv-ip-control-cli
       ;
   };
 

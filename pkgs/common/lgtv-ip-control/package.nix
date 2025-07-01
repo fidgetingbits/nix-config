@@ -22,7 +22,7 @@ buildNpmPackage (finalAttrs: {
   installPhase = ''
     runHook preInstall
     mkdir -p $out/bin
-    install -Dm755 bin/lgtv-ip-control.cjs $out/bin/lgtv
+    install -Dm755 bin/lgtv-ip-control.cjs $out/bin/lgtv-ip-control
     cp -r dist $out/dist
     cp -r node_modules $out/node_modules
     runHook postInstall
@@ -35,7 +35,7 @@ buildNpmPackage (finalAttrs: {
     license = with lib.licenses; [
       mit
     ];
-    mainProgram = "lgtv";
+    mainProgram = "lgtv-ip-control";
     maintainers = with lib.maintainers; [ fidgetingbits ];
   };
 })
