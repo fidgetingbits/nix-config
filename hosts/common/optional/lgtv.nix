@@ -11,7 +11,7 @@ let
   lgtv-off = pkgs.writeShellScript "lgtv-off" ''
     KEY=$(cat ${config.sops.secrets."keys/lgtv".path})
     MAC=${config.hostSpec.networking.subnets.tv.hosts.ogle.mac}
-    ${pkgs.lgtv-ip-control}/bin/lgtv-ip-control --host ${config.hostSpec.networking.subnets.tv.hosts.ogle.ip} --mac $MAC --keycode ''$KEY power on
+    ${pkgs.lgtv-ip-control}/bin/lgtv-ip-control --host ${config.hostSpec.networking.subnets.tv.hosts.ogle.ip} --mac $MAC --keycode ''$KEY power off
   '';
 in
 {
