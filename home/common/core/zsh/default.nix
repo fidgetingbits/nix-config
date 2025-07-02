@@ -312,6 +312,10 @@ in
 
       # ssh
       sshnc = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o GlobalKnownHostsFile=/dev/null";
+
+      # Force alias use with xargs
+      # https://unix.stackexchange.com/questions/141367/have-xargs-use-alias-instead-of-binary/244516#244516
+      xargs = "xargs ";
     };
   };
   programs.zoxide = {
