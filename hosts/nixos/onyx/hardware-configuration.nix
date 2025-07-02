@@ -28,6 +28,7 @@
     fsType = "vfat";
   };
 
+  # FIXME: Trying to prevent stuttering, but hopefully bring back
   #swapDevices = [ { device = "/dev/disk/by-uuid/eabbf1b6-0c66-45fb-b064-c6ac88443a45"; } ];
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
