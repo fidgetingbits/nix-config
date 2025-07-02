@@ -34,7 +34,7 @@ in
   systemd.services.lgtv-resume = {
     description = "Turn on LG TV after resume";
     wantedBy = [ "post-resume.target" ];
-    after = [ "suspend.target" ];
+    after = [ "post-resume.target" ];
     serviceConfig = {
       Type = "oneshot";
       ExecStart = lgtv-on;
