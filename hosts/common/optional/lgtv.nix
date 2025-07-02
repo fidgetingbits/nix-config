@@ -11,18 +11,13 @@ let
     for attempt in {1..5}; do
       echo "WoL attempt $attempt/5 for TV at $IP"
       ${pkgs.wakeonlan}/bin/wakeonlan $MAC -i $IP
-
+      for i in {1..3}; do
+        ${pkgs.wakeonlan}/bin/wakeonlan $MAC -i $IP
+        sleep 1
+      done
       sleep $((attempt * 2))
-
-      # Optional: Test if TV is responding (ping with short timeout)
-      if ${pkgs.iputils}/bin/ping -c 1 -W 2 $IP > /dev/null 2>&1; then
-        echo "TV is responding after $attempt attempts"
-        exit 0
-      fi
     done
-
-    echo "TV did not respond after 5 WoL attempts"
-    exit 1
+    exit 0
   '';
   lgtv-off = pkgs.writeShellScript "lgtv-off" ''
     KEY=$(cat ${config.sops.secrets."keys/lgtv".path})
@@ -56,6 +51,8 @@ in
       Type = "oneshot";
       ExecStart = lgtv-on;
     };
+    TimeoutStartSec = "30s";
+    RemainAfterExit = false;
   };
 
   sops.secrets = {
