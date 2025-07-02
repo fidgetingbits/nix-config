@@ -27,7 +27,7 @@ in
     ];
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${lgtv-off}/bin/lgtv-off";
+      ExecStart = lgtv-off;
     };
   };
 
@@ -37,7 +37,7 @@ in
     after = [ "suspend.target" ];
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${lgtv-on}/bin/lgtv-on";
+      ExecStart = lgtv-on;
     };
   };
 
