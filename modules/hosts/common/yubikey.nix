@@ -14,7 +14,7 @@ in
       enable = lib.mkEnableOption "Enable yubikey support";
       identifiers = lib.mkOption {
         default = { };
-        type = lib.types.attrsOf lib.types.int;
+        type = lib.types.attrsOf (lib.types.either lib.types.int lib.types.str);
         description = "Attrset of Yubikey IDs";
         example = lib.literalExample ''
           {
