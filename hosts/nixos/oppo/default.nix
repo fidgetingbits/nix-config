@@ -52,6 +52,8 @@
 
       "hosts/common/optional/fonts.nix"
 
+      "hosts/common/optional/lgtv.nix"
+
     ])
     # Impermanence
     (lib.custom.relativeToRoot "hosts/common/disks/btrfs-luks-impermanence-disko.nix")
