@@ -129,7 +129,7 @@
       ethernet = { };
       ipv4 = {
         method = "manual";
-        addresses = config.hostSpec.networking.subnets.tv.oppo.ip + "/24";
+        addresses = config.hostSpec.networking.subnets.tv.hosts.oppo.ip + "/24";
       };
       ipv6 = {
         method = "disabled";
