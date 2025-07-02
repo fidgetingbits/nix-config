@@ -117,6 +117,24 @@
   networking.networkmanager.enable = true;
   networking.useDHCP = lib.mkDefault true;
 
+  networking.networkmanager.ensureProfiles.profiles = {
+    usb-eth = {
+      connection = {
+        id = "usb-eth";
+        type = "ethernet";
+        interface-name = "usb-eth";
+      };
+      ethernet = { };
+      ipv4 = {
+        method = "manual";
+        addresses = config.hostSpec.networking.subnets.tv.oppo.ip + "/24";
+      };
+      ipv6 = {
+        method = "disabled";
+      };
+    };
+  };
+
   # Keyring, required for auth even without gnome
   security.pam.services.sddm.enableGnomeKeyring = true;
 
@@ -191,7 +209,10 @@
     };
   };
 
-  services.udev.extraRules = "${builtins.readFile "${pkgs.liquidctl}/lib/udev/rules.d/71-liquidctl.rules"}";
+  services.udev.extraRules = ''
+    SUBSYSTEM=="net", ACTION=="add", ATTRS{idVendor}=="0b95", ATTRS{idProduct}=="7720", NAME="usb-eth"
+    ${builtins.readFile "${pkgs.liquidctl}/lib/udev/rules.d/71-liquidctl.rules"}
+  '';
 
   #networking.granularFirewall.enable = true;
 
@@ -200,7 +221,9 @@
     cpuFreqGovernor = "ondemand";
     # Prevent USB devices from waking up the system
     powerUpCommands = ''
-      echo XHCI > /proc/acpi/wakeup
+      echo XHC0 > /proc/acpi/wakeup
+      echo XHC1 > /proc/acpi/wakeup
+      echo XHC2 > /proc/acpi/wakeup
     '';
   };
 

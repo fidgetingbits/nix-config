@@ -5,7 +5,6 @@
       owner = config.users.users.${config.hostSpec.username}.name;
       inherit (config.users.users.${config.hostSpec.username}) group;
     };
-
   };
 
   # FIXME: Likely need this on darwin: https://github.com/NixOS/nixpkgs/issues/195532
