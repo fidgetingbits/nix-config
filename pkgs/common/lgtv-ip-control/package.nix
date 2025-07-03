@@ -11,6 +11,7 @@ buildNpmPackage (finalAttrs: {
     url = "https://registry.npmjs.org/lgtv-ip-control-cli/-/lgtv-ip-control-cli-${finalAttrs.version}.tgz";
     hash = "sha256-4+yJ54q/vSNCCLxVYcPAtLsdtyeZ2x4ncxNkul81vfM=";
   };
+
   npmDepsHash = "sha256-7QL1LxZgzdyqs5BuWidEJQNVJh6t3BG8KMYDXY/iBfw=";
 
   postPatch = ''
