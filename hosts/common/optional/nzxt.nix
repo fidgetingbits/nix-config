@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 let
-  # FIXME(nzxt): use nix-assetes for this
+  # FIXME(nzxt): use nix-assets for this
   nzxt-kraken-image = "${config.hostSpec.home}/images/nzxt/main.gif";
 in
 {
