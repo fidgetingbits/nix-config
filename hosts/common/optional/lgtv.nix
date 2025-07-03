@@ -51,8 +51,6 @@ in
       Type = "oneshot";
       ExecStart = lgtv-on;
     };
-    TimeoutStartSec = "30s";
-    RemainAfterExit = false;
   };
 
   sops.secrets = {

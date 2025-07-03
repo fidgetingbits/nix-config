@@ -29,8 +29,6 @@
     # Maybe more role-specific stuff
     common/optional/document.nix # document editing
     common/optional/gui-utilities.nix # core for any desktop
-
-    common/optional/nzxt.nix
   ];
 
   home.packages = builtins.attrValues {

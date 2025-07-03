@@ -1,5 +1,3 @@
-# This file is for controlling NZXT Kraken using liquidctl.
-# NOTE: liquidctl should also be installed via nixos due to udev rules
 { config, pkgs, ... }:
 let
   # FIXME(nzxt): use nix-assetes for this

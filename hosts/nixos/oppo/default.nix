@@ -53,6 +53,7 @@
       "hosts/common/optional/fonts.nix"
 
       "hosts/common/optional/lgtv.nix"
+      "hosts/common/optional/nzxt.nix"
 
     ])
     # Impermanence
