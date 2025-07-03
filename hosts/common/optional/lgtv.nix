@@ -7,15 +7,10 @@ let
   lgtv-on = pkgs.writeShellScript "lgtv-on" ''
     MAC=${config.hostSpec.networking.subnets.tv.hosts.ogle.mac}
     IP=${config.hostSpec.networking.subnets.tv.hosts.ogle.ip}
-    # Retry WoL up to 5 times with increasing delays
-    for attempt in {1..5}; do
-      echo "WoL attempt $attempt/5 for TV at $IP"
+    # Typically takes a long time for TV to wake up, so try multiple times
+    for i in {1..5}; do
       ${pkgs.wakeonlan}/bin/wakeonlan $MAC -i $IP
-      for i in {1..3}; do
-        ${pkgs.wakeonlan}/bin/wakeonlan $MAC -i $IP
-        sleep 1
-      done
-      sleep $((attempt * 2))
+      sleep 5
     done
     exit 0
   '';
@@ -46,7 +41,12 @@ in
   systemd.services.lgtv-resume = {
     description = "Turn on LG TV after resume";
     wantedBy = [ "post-resume.target" ];
-    after = [ "network-online.target" ];
+    after = [
+      "suspend.target"
+      "hibernate.target"
+      "hybrid-sleep.target"
+      "network-online.target"
+    ];
     serviceConfig = {
       Type = "oneshot";
       ExecStart = lgtv-on;
