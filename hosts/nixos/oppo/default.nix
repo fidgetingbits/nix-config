@@ -88,6 +88,13 @@
   system.impermanence.enable = true;
 
   boot = {
+    # Cooling / RGB
+    extraModulePackages = with config.boot.kernelPackages; [ liquidtux ];
+    kernelModules = [
+      "liquidtux"
+      "i2c-dev"
+    ];
+
     kernelPackages = pkgs.linuxPackages_latest;
     # Bootloader.
     loader.systemd-boot = {
