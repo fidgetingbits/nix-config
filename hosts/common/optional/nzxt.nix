@@ -4,6 +4,9 @@ let
   nzxt-kraken-image = "${config.hostSpec.home}/images/nzxt/main.gif";
 in
 {
+  imports = [
+    ./liquidctl.nix
+  ];
   systemd.services.nzxt-set-image = {
     description = "Set NZXT Kraken image on resume";
     wantedBy = [

@@ -89,10 +89,12 @@
 
   boot = {
     # Cooling / RGB
+    # FIXME: probably remove liquidtux since it's for different models
     extraModulePackages = with config.boot.kernelPackages; [ liquidtux ];
     kernelModules = [
       "liquidtux"
       "i2c-dev"
+      "i2c-piix4"
     ];
 
     kernelPackages = pkgs.linuxPackages_latest;
@@ -170,7 +172,6 @@
   # openrgb
   # FIXME: Move all this
   services.udev.packages = [ pkgs.openrgb-with-all-plugins ];
-  boot.kernelModules = [ "i2c-dev" ];
   hardware.i2c.enable = true;
   services.hardware.openrgb = {
     enable = true;
@@ -229,11 +230,15 @@
   powerManagement = {
     enable = true;
     cpuFreqGovernor = "ondemand";
-    # Prevent USB devices from waking up the system
+    # Power up and resume
     powerUpCommands = ''
-      echo XHC0 > /proc/acpi/wakeup
-      echo XHC1 > /proc/acpi/wakeup
-      echo XHC2 > /proc/acpi/wakeup
+      # Prevent USB devices from waking up the system
+      if grep XHC0 /proc/acpi/wakeup | grep enabled; then
+        echo "Disabling USB wakeup devices"
+        echo XHC0 > /proc/acpi/wakeup
+        echo XHC1 > /proc/acpi/wakeup
+        echo XHC2 > /proc/acpi/wakeup
+      fi
     '';
   };
 
