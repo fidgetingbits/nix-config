@@ -5,6 +5,7 @@
       gimp # image editor
       drawio # vector diagram editor
       drawio-export-all # helper for mass image extraction
+      img-cat # image to ansi
       ;
   };
 }
