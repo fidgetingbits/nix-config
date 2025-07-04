@@ -110,6 +110,7 @@ in
         source "${pkgs.fzf-git-sh}/share/fzf-git-sh/fzf-git.sh"
         source ${pkgs.fzf}/share/fzf/key-bindings.zsh
 
+        bindkey '^[k' kyd # Bind kyd alias to Alt+k
       '')
       (lib.mkAfter (lib.readFile ./zshrc))
     ];
@@ -163,6 +164,7 @@ in
     shellAliases = {
       whichreal = ''function _whichreal(){ (alias "$1" >/dev/null 2>&1 && (alias "$1" | sed "s/.*=.\(.*\).../\1/" | xargs which)) || which "$1"; }; _whichreal'';
       edit = "code -w";
+      less = "bat --style=plain";
       cat = "bat --paging=never";
       ldt = "eza -TD"; # list directory tree
       tree = "eza -T";
@@ -181,7 +183,6 @@ in
       journactl = "journalctl --no-pager";
       unzip = "7z x";
       genpasswd = "bw generate --words 5 --includeNumber --ambiguous --separator '-' -p -c";
-
       # file searching
       fdi = "fd -I"; # fd with --no-ignore
       biggest = "find . -printf '%s %p\n'|sort -nr|head";
@@ -191,6 +192,7 @@ in
       gcmcf = "git commit -m 'chore: update flake.lock'";
       gca = "git commit --amend";
       gcan = "git commit --amend --no-edit";
+      gcam = "git commit --amend -m";
 
       # We use source because we want it to use other aliases, which allow yubikey signing over ssh
       gsr = "git_smart_rebase";
@@ -316,6 +318,10 @@ in
       # Force alias use with xargs
       # https://unix.stackexchange.com/questions/141367/have-xargs-use-alias-instead-of-binary/244516#244516
       xargs = "xargs ";
+
+      # quick execution of any alias I forget
+      kyd = "alias | fzf --height=50% --layout=reverse --info=inline --border --preview 'echo {}' --preview-window=up:3:hidden:wrap --bind '?:toggle-preview' | cut -d'=' -f1 | xargs -I {} zsh -c '{}'";
+
     };
   };
   programs.zoxide = {
