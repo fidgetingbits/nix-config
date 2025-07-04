@@ -23,6 +23,12 @@
     "org/gnome/mutter" = {
       dynamic-workspaces = false;
     };
+    "org/gnome/desktop/interface" = {
+      enable-hot-corners = false;
+    };
+    "org/gnome/desktop/privacy" = {
+      report-technical-problems = "false";
+    };
   };
 
   home.packages =
