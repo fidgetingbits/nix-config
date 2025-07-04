@@ -94,7 +94,7 @@
           hexyl # hexdump replacement
           grc # colorize output
           # toybox # decode uuencoded files (conflicts with llvm binutils wrapper)
-
+          fastfetch
           jq # json
           gnupg
           yq-go # yaml

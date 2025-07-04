@@ -29,7 +29,8 @@ in
           echo "NZXT Kraken image not found: ${nzxt-kraken-image}";
           exit 1;
         fi
-        ${pkgs.liquidctl}/bin/liquidctl -m kraken set lcd screen gif ${nzxt-kraken-image}
+        # This fails sometimes on rebuild, so just ignore if it fails for now
+        ${pkgs.liquidctl}/bin/liquidctl -m kraken set lcd screen gif ${nzxt-kraken-image} || true
       '';
     };
   };

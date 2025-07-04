@@ -27,9 +27,6 @@
   # FIXME: Move this once I get a darwinModules output for nixvim-flake and end up with this option
   neovim.voice-coding = config.hostSpec.voiceCoding;
 
-  # This is because we use nix-index-database, see https://github.com/nix-community/home-manager/issues/1995
-  programs.command-not-found.enable = false;
-
   # Database for aiding terminal-based programs
   environment.enableAllTerminfo = true;
   # enable firmware with a license allowing redistribution

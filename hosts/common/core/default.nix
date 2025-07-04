@@ -20,6 +20,7 @@ in
     inputs.sops-nix.${platformModules}.sops
     inputs.disko.${platformModules}.disko
     inputs.nix-index-database.${platformModules}.nix-index
+    { programs.nix-index-database.comma.enable = true; }
 
     (map lib.custom.relativeToRoot [
       "modules/common/"
