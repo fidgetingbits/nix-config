@@ -244,7 +244,7 @@ in
         }
       '';
       shellScriptCheckLock = ''
-        borg-backup-list > /dev/null 2>$LOGFILE
+        ${lib.getBin borg-backup-list}/bin/borg-backup-list > /dev/null 2>$LOGFILE
         if grep -q "Failed to create/acquire the lock" $LOGFILE; then
           # For now we don't auto-break the lock, but notify the user to do so
           #borg-backup-break-lock
@@ -541,8 +541,12 @@ in
                 wants = [ "network-online.target" ];
                 restartIfChanged = false;
                 serviceConfig = {
-                  Type = "oneshot";
-                  ExecStart = "${lib.getBin backupTool}/bin/${backupToolName}";
+                  Type = "forking";
+                  ExecStart = pkgs.writeShellScript "borg-backup-forking" ''
+                    ${lib.getBin backupTool}/bin/${backupToolName} &
+                    echo $! > /run/borg-backup.pid
+                  '';
+                  PIDFile = "/run/borg-backup.pid";
                   RemainAfterExit = false;
                 };
 
