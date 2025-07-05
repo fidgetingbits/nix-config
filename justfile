@@ -3,6 +3,7 @@ SOPS_FILE := "../nix-secrets/.sops.yaml"
 # Define path to helpers
 export HELPERS_PATH := justfile_directory() + "/scripts/helpers.sh"
 
+
 [private]
 default:
   @just --list
@@ -18,48 +19,75 @@ git-dance-pre:
 git-dance-post:
     @git rm --cached flake.lock || true
 
+[private]
+copy-lock-in HOST=`hostname`:
+    @# Copy the lock file to the locks directory
+    @mkdir -p locks
+    @cp locks/{{HOST}}.lock flake.lock || true
+    @git add --intent-to-add -f flake.lock
+    @git update-index --assume-unchanged flake.lock
+
+[private]
+copy-lock-out HOST=`hostname`:
+    @# Copy the lock file from the locks directory
+    @mkdir -p locks
+    @cp flake.lock locks/{{HOST}}.lock
+    @git rm --cached -f flake.lock || true
+
 # Update commonly changing flakes and prep for a rebuild
 [private]
-rebuild-pre HOST=`hostname`: git-dance-pre
+rebuild-pre HOST=`hostname`:
     just update-nix-secrets {{HOST}} && \
     just update-nix-assets {{HOST}} && \
-    nix flake update nixvim-flake --timeout 5 --reference-lock-file locks/{{HOST}}.lock
+    just update-nixvim-flake {{HOST}}
     @git add --intent-to-add .
+
 
 # Run post-rebuild checks, like if sops is running properly afterwards
 [private]
 rebuild-post: git-dance-post check-sops
 
-
 # Run a flake check on the config and installer
+[group("checks")]
 check HOST=`hostname` ARGS="":
-	NIXPKGS_ALLOW_UNFREE=1 REPO_PATH=$(pwd) nix flake check --impure --keep-going --show-trace --reference-lock-file 	locks/{{HOST}}.lock {{ARGS}}
-	cd nixos-installer && NIXPKGS_ALLOW_UNFREE=1 REPO_PATH=$(pwd) nix flake check --impure --keep-going --show-trace {{ARGS}}
+    NIXPKGS_ALLOW_UNFREE=1 REPO_PATH=$(pwd) nix flake check --impure --keep-going --show-trace{{ARGS}}
+    cd nixos-installer && NIXPKGS_ALLOW_UNFREE=1 REPO_PATH=$(pwd) nix flake check --impure --keep-going --show-trace {{ARGS}}
 
-# Rebuild the system
-rebuild HOST=`hostname`: && rebuild-post
+[private]
+_rebuild HOST=`hostname`:
     @just rebuild-pre {{HOST}}
     @# NOTE: Add --option eval-cache false if you end up caching a failure you cant get around
+    @just copy-lock-in {{HOST}}
     @scripts/rebuild.sh {{HOST}}
+    @just copy-lock-out {{HOST}}
+
+# Rebuild the system
+[group("building")]
+rebuild HOST=`hostname`: && rebuild-post
+    @just _rebuild {{HOST}}
     just rebuild-extensions-lite
 
 # Rebuild the system and run a flake check
+[group("building")]
 rebuild-full HOST=`hostname`: && rebuild-post
-    @just rebuild-pre {{HOST}}
-    scripts/rebuild.sh {{HOST}}
+    @just _rebuild {{HOST}}
     just check {{HOST}}
     just rebuild-extensions
 
 # Rebuild the system with tshow trace
-rebuild-trace: rebuild-pre && rebuild-post
-	scripts/rebuild.sh trace
-	just rebuild-extensions-lite
+#ebuild-trace: rebuild-pre && rebuild-post
+#scripts/rebuild.sh trace
+#	just rebuild-extensions-lite
 
 # Update all flake inputs for the specified host or the current host if none specified
-update HOST=`hostname`:
-	nix flake update --reference-lock-file locks/{{HOST}}.lock
+[group("update")]
+update HOST=`hostname` *INPUT:
+    @just copy-lock-in {{HOST}}
+    nix flake update {{INPUT}} --timeout 5
+    @just copy-lock-out {{HOST}}
 
 # Update and then rebuild
+[group("building")]
 rebuild-update: update rebuild
 
 # Generate a new age key
@@ -68,39 +96,51 @@ age-key:
 	nix-shell -p age --run "age-keygen"
 
 # Check if sops-nix activated successfully
+[group("checks")]
 check-sops:
 	scripts/check-sops.sh
 
 # Update nix-secrets flake
+[group("update")]
 update-nix-secrets HOST=`hostname`:
 	@(cd ../nix-secrets && git fetch && git rebase > /dev/null) || true
-	nix flake update nix-secrets --timeout 5 --reference-lock-file locks/{{HOST}}.lock
-
+	@just update HOST={{HOST}} nix-secrets
 
 # Update nix-assets
+[group("update")]
 update-nix-assets HOST=`hostname`:
-    nix flake update nix-assets --timeout 5 --reference-lock-file locks/{{HOST}}.lock
+    @just update {{HOST}} nix-assets
+
+# Update nixvim flake
+[group("update")]
+update-nixvim-flake HOST=`hostname`:
+    @just update {{HOST}} nixvim-flake
 
 # Rebuild vscode extensions that update regularly
+[group("building")]
 rebuild-extensions:
 	scripts/build-vscode-extensions.sh || true
 
 # Install vscode extensions, but don't rebuild
+[group("building")]
 rebuild-extensions-lite:
 	scripts/build-vscode-extensions.sh lite || true
 
 # Build an iso image for installing new systems and create a symlink for qemu usage
+[group("building")]
 iso HOST:
 	# If we dont remove this folder, libvirtd VM doesnt run with the new iso
 	rm -rf result
 	nix build --impure .#nixosConfigurations.iso.config.system.build.isoImage --reference-lock-file locks/{{HOST}}.lock && ln -sf result/iso/*.iso latest_{{HOST}}.iso
 
 # Install the latest iso to a flash drive
+[group("building")]
 iso-install DRIVE HOST=`hostname`:
     just iso {{HOST}}
     sudo dd if=$(eza --sort changed result/iso/*.iso | tail -n1) of={{DRIVE}} bs=4M status=progress oflag=sync
 
 # Configure a drive password using disko
+[group("misc")]
 disko DRIVE PASSWORD:
 	echo "{{PASSWORD}}" > /tmp/disko-password
 	sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko -- \
@@ -112,6 +152,7 @@ disko DRIVE PASSWORD:
 
 
 # Run nixos-rebuild on the remote host
+[group("building")]
 build-host HOST:
 	NIX_SSHOPTS="-p10022" nixos-rebuild --target-host {{HOST}} --use-remote-sudo --show-trace --impure --flake .#"{{HOST}}" switch
 
