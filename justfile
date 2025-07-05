@@ -32,7 +32,7 @@ copy-lock-out HOST=`hostname`:
     @# Copy the lock file from the locks directory
     @mkdir -p locks
     @cp flake.lock locks/{{HOST}}.lock
-    @git rm --cached -f flake.lock || true
+    @git rm --cached -f flake.lock > /dev/null || true
 
 # Update commonly changing flakes and prep for a rebuild
 [private]
@@ -104,7 +104,7 @@ check-sops:
 [group("update")]
 update-nix-secrets HOST=`hostname`:
 	@(cd ../nix-secrets && git fetch && git rebase > /dev/null) || true
-	@just update HOST={{HOST}} nix-secrets
+	@just update {{HOST}} nix-secrets
 
 # Update nix-assets
 [group("update")]
