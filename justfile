@@ -33,6 +33,7 @@ copy-lock-out HOST=`hostname`:
     @mkdir -p locks
     @cp flake.lock locks/{{HOST}}.lock
     @git rm --cached -f flake.lock > /dev/null || true
+    @rm flake.lock || true
 
 # Update commonly changing flakes and prep for a rebuild
 [private]
