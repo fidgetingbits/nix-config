@@ -5,15 +5,8 @@
 #
 # SC2086 is ignored because we purposefully pass some values as a set of arguments, so we want the splitting to happen
 
-# Helpers library
 # shellcheck disable=SC1091
 source "$(dirname "${BASH_SOURCE[0]}")/helpers.sh"
-
-# NOTE: No longer used now that we use --reference-lock-file
-#function cleanup() {
-#	git rm --cached flake.lock 2>/dev/null || true
-#}
-#trap cleanup EXIT SIGINT
 
 export NIXPKGS_ALLOW_UNFREE=1
 
