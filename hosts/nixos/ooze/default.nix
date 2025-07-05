@@ -37,6 +37,8 @@
       "hosts/common/optional/msmtp.nix"
 
       "hosts/common/optional/acme.nix"
+      "hosts/common/optional/remote-builder.nix"
+
     ]);
 
   hostSpec = {

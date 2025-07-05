@@ -27,6 +27,19 @@
       speedFactor = 2;
       maxJobs = 32;
     }
+    {
+      hostName = "ooze";
+      sshUser = "builder";
+      sshKey = "/root/.ssh/id_builder";
+      system = pkgs.stdenv.hostPlatform.system;
+      supportedFeatures = [
+        "nixos-test"
+        "big-parallel"
+        "kvm"
+      ];
+      speedFactor = 1;
+      maxJobs = 8;
+    }
   ];
 
   sops.secrets = {
