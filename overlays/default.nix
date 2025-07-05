@@ -11,15 +11,6 @@ let
       # Any nixpkgs PRs that aren't upstream yet
       # https://github.com/NixOS/nixpkgs/pull/355232
     )
-    // (
-      let
-        nixpkgs-bindiff = (import inputs.nixpkgs-bindiff { system = prev.system; });
-      in
-      {
-        bindiff = nixpkgs-bindiff.bindiff;
-        binexport = nixpkgs-bindiff.binexport;
-      }
-    )
     # Other external inputs
     // {
       neovim = inputs.nixvim-flake.packages.${final.system}.default;

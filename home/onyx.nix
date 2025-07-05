@@ -17,7 +17,8 @@
     common/optional/sops.nix
     common/optional/xdg.nix
     common/optional/gpg.nix
-    common/optional/kitty.nix
+    #common/optional/kitty.nix
+    common/optional/ghostty.nix
     #common/optional/wezterm.nix
     common/optional/gnome-terminal.nix
     common/optional/media.nix

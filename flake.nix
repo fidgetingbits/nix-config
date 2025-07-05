@@ -74,11 +74,9 @@
 
   inputs = {
     #################### Official NixOS / Nix-Darwin / HM Package Sources ####################
-    # nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.05";
-    nixpkgs-bindiff.url = "github:pluiedev/nixpkgs/ff07c69d5490428597cc4ff30553fdb88d6bf6be";
+    #nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.05";
 
     nixpkgs-darwin.url = "github:nixos/nixpkgs/nixpkgs-25.05-darwin";
     nix-darwin = {
@@ -109,7 +107,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nixos-hardware.url = "github:nixos/nixos-hardware";
+    nixos-hardware = {
+      url = "github:nixos/nixos-hardware";
+    };
 
     nixos-hardware-oedo = {
       url = "github:fidgetingbits/nixos-hardware?ref=dell-precision-5570";
@@ -146,10 +146,16 @@
     };
 
     # Allows most third-party vscode extensions
-    nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
+    nix-vscode-extensions = {
+      url = "github:nix-community/nix-vscode-extensions";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # firefox is broken on darwin
-    nixpkgs-firefox-darwin.url = "github:bandithedoge/nixpkgs-firefox-darwin";
+    nixpkgs-firefox-darwin = {
+      url = "github:bandithedoge/nixpkgs-firefox-darwin";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     firefox-addons = {
       url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -174,7 +180,12 @@
       url = "git+ssh://git@gitlab.com/fidgetingbits/nix-secrets.git?shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixvim-flake.url = "git+ssh://git@gitlab.com/fidgetingbits/nixvim-flake.git?shallow=1";
-    nix-assets.url = "github:fidgetingbits/nix-assets";
+    nixvim-flake = {
+      url = "git+ssh://git@gitlab.com/fidgetingbits/nixvim-flake.git?shallow=1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nix-assets = {
+      url = "github:fidgetingbits/nix-assets";
+    };
   };
 }

@@ -16,8 +16,9 @@
     common/optional/helper-scripts
     common/optional/xdg.nix
     common/optional/gpg.nix
-    common/optional/kitty.nix
+    #common/optional/kitty.nix
     #common/optional/wezterm.nix
+    common/optional/ghostty.nix
     common/optional/media.nix
     common/optional/networking/protonvpn.nix
     common/optional/atuin.nix
