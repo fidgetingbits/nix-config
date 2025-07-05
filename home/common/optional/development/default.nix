@@ -77,8 +77,8 @@ in
           gef
           #bata24-gef
           pe-bear
-          binexport
-          bindiff
+          #binexport
+          #bindiff
 
           # windows
           clippy
