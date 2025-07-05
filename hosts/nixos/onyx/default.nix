@@ -206,5 +206,29 @@
   nix.daemonCPUSchedPolicy = lib.mkDefault "batch";
   nix.daemonIOSchedClass = lib.mkDefault "idle";
   nix.daemonIOSchedPriority = lib.mkDefault 7;
-  services.swapspace.enable = true;
+  #services.swapspace.enable = true;
+  services.earlyoom = {
+    enable = true;
+    enableNotifications = true;
+    extraArgs =
+      let
+        catPatterns = patterns: builtins.concatStringsSep "|" patterns;
+        preferPatterns = [
+          ".firefox-wrappe"
+          "java" # If it's written in java it's uninmportant enough it's ok to kill it
+        ];
+        avoidPatterns = [
+          "bash"
+          "zsh"
+          "sshd"
+          "systemd"
+          "systemd-logind"
+          "systemd-udevd"
+        ];
+      in
+      [
+        "--prefer '^(${catPatterns preferPatterns})$'"
+        "--avoid '^(${catPatterns avoidPatterns})$'"
+      ];
+  };
 }
