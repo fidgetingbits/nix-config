@@ -14,6 +14,17 @@
   };
 
   nix.buildMachines = [
+    #    {
+    #      hostName = "localhost";
+    #      system = pkgs.stdenv.hostPlatform.system;
+    #      maxJobs = 4;
+    #      speedFactor = 1;
+    #      supportedFeatures = [
+    #        "nixos-test"
+    #        "big-parallel"
+    #        "kvm"
+    #      ];
+    #    }
     {
       hostName = "oppo";
       sshUser = "builder";
@@ -24,7 +35,7 @@
         "big-parallel"
         "kvm"
       ];
-      speedFactor = 2;
+      speedFactor = 5;
       maxJobs = 32;
     }
     {
@@ -37,7 +48,7 @@
         "big-parallel"
         "kvm"
       ];
-      speedFactor = 1;
+      speedFactor = 2;
       maxJobs = 8;
     }
   ];
@@ -51,9 +62,15 @@
 }
 // lib.optionalAttrs (inputs ? "home-manager") {
 
-  home-manager.users.root.home.file.".ssh/config".text = ''
-    Host oppo
-      HostName oppo.${config.hostSpec.domain}
-      Port ${builtins.toString config.hostSpec.networking.ports.tcp.ssh}
-  '';
+  home-manager.users.root.home.file.".ssh/config".text =
+    let
+      genHostEntry = hostName: ''
+        Host ${hostName}
+          HostName ${hostName}.${config.hostSpec.domain}
+          Port ${builtins.toString config.hostSpec.networking.ports.tcp.ssh}
+      '';
+      remoteMachines = lib.filter (m: m.hostName != "localhost") config.nix.buildMachines;
+      hostNameList = map (machine: machine.hostName) remoteMachines;
+    in
+    builtins.concatStringsSep "\n" (map genHostEntry hostNameList);
 }
