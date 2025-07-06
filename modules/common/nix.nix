@@ -27,21 +27,12 @@
         trusted-users = [ "@wheel" ];
         builders-use-substitutes = true;
         fallback = true; # Don't hard fail if a binary cache isn't available, since some systems roam
-        extra-substituters =
-          [
-            "https://nix-community.cachix.org" # Nix community Cachix server
-          ]
-          ++ lib.optionals config.hostSpec.useAtticCache [
-            "https://atticd.ooze.${config.hostSpec.domain}" # My attic server
-          ];
-        extra-trusted-public-keys =
-          [
-            "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-          ]
-          # Following key comes from: attic cache info <cache>
-          ++ lib.optionals config.hostSpec.useAtticCache [
-            "o-cache:QmWhhTR4AjTmgg8bXpOqR15hec/JZOsyZ4le+Ey6IQc="
-          ];
+        extra-substituters = [
+          "https://nix-community.cachix.org" # Nix community Cachix server
+        ];
+        extra-trusted-public-keys = [
+          "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+        ];
         netrc-file = if config ? "sops" then "${config.sops.secrets."passwords/netrc".path}" else null;
       };
 

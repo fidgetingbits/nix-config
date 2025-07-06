@@ -55,7 +55,6 @@
 
       "hosts/common/optional/distributed-builds.nix"
       "hosts/common/optional/fonts.nix"
-
     ])
   ];
 
@@ -72,7 +71,7 @@
     hdr = lib.mkForce true;
     scaling = lib.mkForce "2";
     isProduction = lib.mkForce true;
-    #useAtticCache = lib.mkForce false;
+    useAtticCache = lib.mkForce true;
     isDevelopment = lib.mkForce true;
     wallpaper = "${inputs.nix-assets}/images/wallpapers/forest_temple.webp";
   };
