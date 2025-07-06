@@ -166,12 +166,21 @@ in
           };
       };
     }
-    // (lib.optionalAttrs pkgs.stdenv.isLinux {
-      xdg.mimeApps.defaultApplications = {
-        "text/html" = [ "firefox.desktop" ];
-        "text/xml" = [ "firefox.desktop" ];
-        "x-scheme-handler/http" = [ "firefox.desktop" ];
-        "x-scheme-handler/https" = [ "firefox.desktop" ];
-      };
-    });
+    // (
+      lib.optionalAttrs pkgs.stdenv.isLinux {
+        xdg.mimeApps.defaultApplications = {
+          "text/html" = [ "firefox.desktop" ];
+          "text/xml" = [ "firefox.desktop" ];
+          "x-scheme-handler/http" = [ "firefox.desktop" ];
+          "x-scheme-handler/https" = [ "firefox.desktop" ];
+        };
+      }
+      // (lib.mkIf config.hostSpec.isAutoStyled {
+        # FIXME(firefox): Combine this with the profile name above automatically
+        stylix.targets.firefox.profileNames = [
+          "default"
+        ];
+      })
+    );
+
 }
