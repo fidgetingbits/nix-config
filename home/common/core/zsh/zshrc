@@ -171,11 +171,6 @@ escape() {
 #    source $XDG_RUNTIME_DIR/secrets/ida_teams_vault
 #fi
 
-# Fix a bug where nixvim sets BAT_THEME to whatever colorscheme is used, which doesn't often exist
-# shellcheck disable=SC2034
-# There's a bug in stylix where it adds lower case
-BAT_THEME="Dracula"
-
 # We shouldn't need this with programs.zoxide.enableZshIntegration but I seem to anyway :/
 eval "$(zoxide init zsh)"
 
