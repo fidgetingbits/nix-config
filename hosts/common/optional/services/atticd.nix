@@ -1,4 +1,9 @@
-{ inputs, config, ... }:
+{
+  inputs,
+  config,
+  lib,
+  ...
+}:
 {
   imports = [ ./nginx.nix ];
   config =
@@ -53,6 +58,12 @@
             # The preferred maximum size of a chunk, in bytes
             max-size = 256 * 1024; # 256 KiB
           };
+        };
+      };
+
+      environment = lib.optionalAttrs config.system.impermanence.enable {
+        persistence = {
+          "${config.hostSpec.persistFolder}".directories = [ "/var/lib/atticd" ];
         };
       };
 
