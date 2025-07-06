@@ -8,7 +8,6 @@
     config = {
       # Show Git modifications and file header (but no grid)
       style = "changes,header";
-      # bat --list-themes
     };
     extraPackages = builtins.attrValues {
       inherit (pkgs.bat-extras)
