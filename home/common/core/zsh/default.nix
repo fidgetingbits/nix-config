@@ -149,9 +149,6 @@ in
     sessionVariables =
       {
         EDITOR = if config.hostSpec.isServer then "nvim" else "code -w";
-      }
-      // lib.optionalAttrs (config.hostSpec.isProduction && (!config.hostSpec.isServer)) {
-        OPENAI_API_KEY = "$(cat ${homeDirectory}/.config/openai/token)";
 
         #
         # FZF key-binding.zsh tweaks
@@ -160,6 +157,9 @@ in
         #FZF_CTRL_T_COMMAND = "fd --type f --hidden --follow --exclude .git";
         FZF_CTRL_T_COMMAND = "fd --type f --exclude .git";
         FZF_CTRL_T_OPTS = "--preview '(highlight -O ansi -l {} 2> /dev/null || cat {} || tree -C {}) 2> /dev/null | head -200'";
+      }
+      // lib.optionalAttrs (config.hostSpec.isProduction && (!config.hostSpec.isServer)) {
+        OPENAI_API_KEY = "$(cat ${homeDirectory}/.config/openai/token)";
       };
 
     shellAliases = {
