@@ -8,6 +8,14 @@
 # shellcheck disable=SC1091
 source "$(dirname "${BASH_SOURCE[0]}")/helpers.sh"
 
+# Need this to avoid some wacky pre-commit hook issues related to if rebuild fails and
+# flake.lock stays staged, which ends up wiping out all changes due to stashing bug
+cleanup() {
+	git rm --cached -f flake.lock 2>/dev/null || true
+	rm flake.lock 2>/dev/null || true
+}
+trap cleanup EXIT
+
 export NIXPKGS_ALLOW_UNFREE=1
 
 switch_args="--show-trace --impure --flake "
@@ -59,20 +67,17 @@ if [ "$os" == "Darwin" ]; then
 		darwin-rebuild $switch_args
 	fi
 else
+	extra_args=""
 	if [[ $HOST != "$(hostname)" ]]; then
+		extra_args="--target-host $HOST --use-remote-sudo"
 		nixos-rebuild --target-host "$HOST" --use-remote-sudo $switch_args
-	else
-		green "====== REBUILD ======"
-		if command -v nh &>/dev/null; then
-			REPO_PATH=$(pwd)
-			export REPO_PATH
-			NIXPKGS_ALLOW_BROKEN=1
-			export NIXPKGS_ALLOW_BROKEN
-			nh os switch . -- --impure --show-trace --reference-lock-file locks/$HOST.lock
-		else
-			nixos-rebuild $switch_args
-		fi
 	fi
+	green "====== REBUILD ======"
+	REPO_PATH=$(pwd)
+	export REPO_PATH
+	NIXPKGS_ALLOW_BROKEN=1
+	export NIXPKGS_ALLOW_BROKEN
+	nh os switch . -- --impure --show-trace --reference-lock-file locks/$HOST.lock $extra_args
 fi
 
 # shellcheck disable=SC2181
