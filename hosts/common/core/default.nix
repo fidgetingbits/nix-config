@@ -50,9 +50,6 @@ in
   # System-wide packages, in case we log in as root
   environment.systemPackages = [ pkgs.openssh ];
 
-  # Force home-manager to use global packages
-  # FIXME: This is broken when using home-manager overlays, so need to remove above overlays?
-  home-manager.useGlobalPkgs = true;
   # If there is a conflict file that is backed up, use this extension
   home-manager.backupFileExtension = "bk";
   # home-manager.useUserPackages = true;
