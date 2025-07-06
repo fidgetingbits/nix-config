@@ -24,7 +24,8 @@ in
       #        name = "frappeDark";
       #      };
       opacity.terminal = 0.97;
-      base16Scheme = "${pkgs.base16-schemes}/share/themes/dracula.yaml";
+      base16Scheme = "${pkgs.base16-schemes}/share/themes/${config.hostSpec.theme}.yaml";
+      # FIXME: This needs to be synchronized with fonts.nix
       fonts = rec {
         monospace = {
           name = "FiraCode Nerd Font";

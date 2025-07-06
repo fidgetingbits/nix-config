@@ -109,6 +109,11 @@
           default = false;
           description = "Indicate a host that wants auto styling like stylix";
         };
+        theme = lib.mkOption {
+          type = lib.types.str;
+          default = "dracula";
+          description = "The theme to use for the host (stylix, vscode, neovim, etc)";
+        };
         useNeovimTerminal = lib.mkOption {
           type = lib.types.bool;
           default = false;
