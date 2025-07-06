@@ -1,0 +1,242 @@
+# To copy extensions from an existing profile you can do something like this:
+# cat ~/.mozilla/firefox/fb8sickr.default/extensions.json | jq '.addons[] | [.defaultLocale.name, .id]'
+#
+# To add additional extensions, find it on addons.mozilla.org, find
+# the short ID in the url (like https://addons.mozilla.org/en-US/firefox/addon/!SHORT_ID!/)
+# Then, download the XPI by filling it in to the install_url template, unzip it,
+# run `jq .browser_specific_settings.gecko.id manifest.json` or
+# `jq .applications.gecko.id manifest.json` to get the UUID
+{
+  lib,
+  config,
+  inputs,
+  pkgs,
+  profile_name,
+  ...
+}:
+let
+  inherit (lib)
+    mkOption
+    mkEnableOption
+    types
+    mapAttrsToList
+    ;
+
+  cfg = config.programs.firefox.extensions;
+
+  extensionType = types.submodule {
+    options = {
+      enable = mkEnableOption "this extension";
+      # Use firefox-addons via its attribute name (e.g., "ublock-origin")
+      shortId = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = "The short ID of the addon on addons.mozilla.org";
+      };
+      # The extension's UUID, required for settings and policies
+      uuid = mkOption {
+        type = types.str;
+        description = "The UUID of the extension, e.g., 'uBlock0@raymondhill.net'.";
+      };
+      # For extensions not in firefox-addons
+      package = mkOption {
+        type = types.nullOr types.package;
+        default = null;
+        description = "A direct Nix package for the extension. Overrides shortId.";
+      };
+      # To configure the extension
+      settings = mkOption {
+        type = types.attrs;
+        default = { };
+        description = "Managed settings for this extension.";
+      };
+      description = mkOption {
+        type = types.str;
+        default = "";
+        description = "Extension description";
+      };
+    };
+  };
+
+  categoryType = types.submodule {
+    options = {
+      enable = mkEnableOption "this extension category";
+      extensions = mkOption {
+        type = types.attrsOf extensionType;
+        default = { };
+      };
+    };
+  };
+
+  getExtPackage =
+    ext:
+    if ext.package != null then
+      ext.package
+    else if ext.shortId != null then
+      inputs.firefox-addons.packages.${pkgs.system}.${ext.shortId}
+    else
+      throw "Extension must have either 'package' or 'shortId' defined.";
+
+in
+{
+  options.programs.firefox.extensions = lib.mkOption {
+    type = lib.types.attrsOf categoryType;
+    default = { };
+    description = "Firefox extension categories";
+  };
+
+    config = lib.mkIf (config.programs.firefox.enable && cfg != {}) {
+    # Get a flat list of all enabled extensions from all enabled categories
+    enabledExtensions =
+      let
+        enabledCategories = lib.filterAttrs (name: cat: cat.enable) cfg;
+        extensionsFromEnabledCategories = mapAttrsToList (name: cat: cat.extensions) enabledCategories;
+        allPotentialExtensions = lib.foldl lib.recursiveUpdate {} extensionsFromEnabledCategories;
+      in
+      lib.filterAttrs (name: ext: ext.enable) allPotentialExtensions;
+
+    # Let's use the internal _module.args to avoid re-calculating this list
+    let
+      enabledExtensions = config._module.args.enabledExtensions;
+    in
+    {
+      programs.firefox = {
+        # Generate the list of packages to install
+        profiles.default.extensions.packages = mapAttrsToList (name: ext: getExtPackage ext) enabledExtensions;
+
+        # Generate the settings for each extension
+        profiles.default.extensions.settings = mapAttrs' (name: ext: lib.nameValuePair ext.uuid ext.settings) (filterAttrs (name: ext: ext.settings != {}) enabledExtensions);
+
+        # Generate the policies to force-install the extensions
+        policies.ExtensionSettings =
+          mapAttrs' (name: ext:
+            let
+              pkg = getExtPackage ext;
+            in
+            lib.nameValuePair ext.uuid {
+              installation_mode = "force_installed";
+              install_url = "${pkg}/share/mozilla/extensions/{ec8030f7-c20a-464f-9b0e-13a3a9e97384}/${ext.uuid}.xpi";
+            }) enabledExtensions;
+      extensions = {
+      privacy = {
+        enable = lib.mkDefault true;
+        extensions = {
+          uBlockOrigin = {
+            enable = lib.mkDefault true;
+            shortId = "ublock-origin";
+            uuid = "uBlock0@raymondhill.net";
+            description = "Ad and tracker blocker";
+          };
+          noScript = {
+            enable = lib.mkDefault false;
+            shortId = "noscript";
+            uuid = "{73a6fe31-595d-460b-a920-fcc0f8843232}";
+            description = "JavaScript blocker";
+          };
+          ignoreCookies = {
+            enable = lib.mkDefault false;
+            shortId = "ignore-cookies";
+            uuid = "jid1-KKzOGWgsW3Ao4Q@jetpack";
+            description = "Ignore cookie setting pop-ups";
+          };
+          protonPass = {
+            enable = lib.mkDefault true;
+            shortId = "proton-pass";
+            uuid = "78272b6fa58f4a1abaac99321d503a20@proton.me";
+            description = "Proton password manager";
+          };
+          protonVpn = {
+            enable = lib.mkDefault true;
+            shortId = "proton-vpn";
+            uuid = "vpn@proton.ch";
+            description = "Proton VPN";
+          };
+          foxyProxy = {
+            enable = lib.mkDefault true;
+            shortId = "foxyproxy";
+            uuid = "gcknhkkoolaabfmlnjonogaaifnjlfnp";
+            description = "Proxy management";
+          };
+        };
+      };
+
+      ui = {
+        enable = lib.mkDefault true;
+        extensions = {
+          treeStyleTab = {
+            enable = lib.mkDefault true;
+            shortId = "tree-style-tab";
+            uuid = "treestyletab@piro.sakura.ne.jp";
+            description = "Vertical tab tree";
+          };
+          darkReader = {
+            enable = lib.mkDefault true;
+            shortId = "darkreader";
+            uuid = "addon@darkreader.org";
+            description = "Dark mode for websites";
+          };
+        };
+      };
+
+      development = {
+        enable = lib.mkDefault false;
+        extensions = {
+          userAgentSwitcher = {
+            enable = lib.mkDefault true;
+            shortId = "user-agent-switcher";
+            uuid = "{a6c4a591-f1b2-4f03-b3ff-767e5bedf4e7}";
+            description = "Change browser user agent";
+          };
+        };
+      };
+
+      language = {
+        enable = lib.mkDefault false;
+        extensions = {
+          newTongwentag = {
+            enable = lib.mkDefault true;
+            shortId = "new-tongwentag";
+            uuid = "tongwen@softcup";
+            description = "Simplified to Traditional Chinese converter";
+          };
+          zhongwen = {
+            enable = lib.mkDefault true;
+            shortId = "zhongwen";
+            uuid = "{dedb3663-6f13-4c6c-bf0f-5bd111cb2c79}";
+            description = "Chinese pop-up dictionary";
+          };
+        };
+      };
+
+      voiceCoding = {
+        enable = lib.mkDefault false;
+        extensions = {
+          domainInTitle = {
+            enable = lib.mkDefault true;
+            shortId = "domain-in-title";
+            uuid = "{966515fa-4c81-4afe-9879-9bbaf8576390}";
+            description = "Show domain in window title";
+          };
+          rango = {
+            enable = lib.mkDefault true;
+            shortId = "rango";
+            uuid = "rango@david-tejada";
+            description = "Voice coding navigation";
+          };
+        };
+      };
+
+      convenience = {
+        enable = lib.mkDefault true;
+        extensions = {
+          redirector = {
+            enable = lib.mkDefault true;
+            shortId = "redirector";
+            uuid = "redirector@einaregilsson.com";
+            description = "URL redirector";
+          };
+        };
+      };
+      };
+    };
+}

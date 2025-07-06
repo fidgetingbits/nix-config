@@ -38,8 +38,9 @@
           [
             "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
           ]
+          # Following key comes from: attic cache info <cache>
           ++ lib.optionals config.hostSpec.useAtticCache [
-            "o-cache:TA5fD0hG38GHJo1z3rSoPnrBgZalPddmEh5DSn0DipA="
+            "o-cache:QmWhhTR4AjTmgg8bXpOqR15hec/JZOsyZ4le+Ey6IQc="
           ];
         netrc-file = if config ? "sops" then "${config.sops.secrets."passwords/netrc".path}" else null;
       };
