@@ -8,20 +8,8 @@ export HELPERS_PATH := justfile_directory() + "/scripts/helpers.sh"
 default:
   @just --list
 
-# Temporarily track the flake.lock with git to satisfy nix commands
-[private]
-git-dance-pre:
-    @git add --intent-to-add -f flake.lock
-    @git update-index --assume-unchanged flake.lock
-
-# Remove the flake.lock from git tracking
-[private]
-git-dance-post:
-    @git rm --cached flake.lock || true
-
 [private]
 copy-lock-in HOST=`hostname`:
-    @# Copy the lock file to the locks directory
     @mkdir -p locks
     @cp locks/{{HOST}}.lock flake.lock || true
     @git add --intent-to-add -f flake.lock
@@ -29,7 +17,6 @@ copy-lock-in HOST=`hostname`:
 
 [private]
 copy-lock-out HOST=`hostname`:
-    @# Copy the lock file from the locks directory
     @mkdir -p locks
     @cp flake.lock locks/{{HOST}}.lock
     @git rm --cached -f flake.lock > /dev/null || true
@@ -46,7 +33,7 @@ rebuild-pre HOST=`hostname`:
 
 # Run post-rebuild checks, like if sops is running properly afterwards
 [private]
-rebuild-post: git-dance-post check-sops
+rebuild-post: check-sops
 
 # Run a flake check on the config and installer
 [group("checks")]
