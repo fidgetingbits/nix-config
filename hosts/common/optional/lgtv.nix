@@ -7,8 +7,8 @@ let
   lgtv-on = pkgs.writeShellScript "lgtv-on" ''
     MAC=${config.hostSpec.networking.subnets.tv.hosts.ogle.mac}
     IP=${config.hostSpec.networking.subnets.tv.hosts.ogle.ip}
-    # Typically takes a long time for TV to wake up, so try multiple times
-    for i in {1..5}; do
+    # Sometimes takes a really long time for TV to wake up, so try many times
+    for i in {1..10}; do
       ${pkgs.wakeonlan}/bin/wakeonlan $MAC -i $IP
       sleep 5
     done
