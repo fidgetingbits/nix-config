@@ -11,7 +11,7 @@
     builtins.attrValues {
       inherit (pkgs)
         #ida-free
-        ida-pro
+        #ida-pro
         diaphora
         #  binaryninja
         ;
