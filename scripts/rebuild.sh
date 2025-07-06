@@ -59,15 +59,19 @@ if [ "$os" == "Darwin" ]; then
 		darwin-rebuild $switch_args
 	fi
 else
-	green "====== REBUILD ======"
-	if command -v nh &>/dev/null; then
-		REPO_PATH=$(pwd)
-		export REPO_PATH
-		NIXPKGS_ALLOW_BROKEN=1
-		export NIXPKGS_ALLOW_BROKEN
-		nh os switch . -- --impure --show-trace --reference-lock-file locks/$HOST.lock
+	if [[ $HOST != "$(hostname)" ]]; then
+		nixos-rebuild --target-host "$HOST" --use-remote-sudo $switch_args
 	else
-		nixos-rebuild $switch_args
+		green "====== REBUILD ======"
+		if command -v nh &>/dev/null; then
+			REPO_PATH=$(pwd)
+			export REPO_PATH
+			NIXPKGS_ALLOW_BROKEN=1
+			export NIXPKGS_ALLOW_BROKEN
+			nh os switch . -- --impure --show-trace --reference-lock-file locks/$HOST.lock
+		else
+			nixos-rebuild $switch_args
+		fi
 	fi
 fi
 
@@ -82,7 +86,7 @@ if [ $? -eq 0 ]; then
 		if git tag --points-at HEAD | grep -q buildable; then
 			yellow "Current commit is already tagged as buildable"
 		else
-			git tag buildable-"$(date +%Y%m%d%H%M%S)" -m ''
+			git tag "$HOST"-buildable-"$(date +%Y%m%d%H%M%S)" -m ''
 			green "Tagged current commit as buildable"
 		fi
 	else
