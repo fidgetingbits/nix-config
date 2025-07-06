@@ -24,7 +24,7 @@ in
 
   config = lib.mkIf config.hostSpec.useAtticCache {
     nix.settings = {
-      extra-substituters = [ "${attic_server}//${config.attic-client.cache-name}" ];
+      extra-substituters = [ "${attic_server}/${config.attic-client.cache-name}" ];
       extra-trusted-public-keys = [
         # Following key comes from: attic cache info <cache>
         "o-cache:GRHaMHaWAzG3B6oTridUh8hA1GeCPuAlkRFAmICR7sw="
