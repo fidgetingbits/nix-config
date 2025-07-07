@@ -61,20 +61,6 @@ in
     promptInit = "source ''${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
   };
 
-  # Probably use knownHostsFiles to add some extra secrets rather than spell them all out
-  # Modern entries are hashed:
-  # https://security.stackexchange.com/questions/56268/ssh-benefits-of-using-hashed-known-hosts
-  # https://serverfault.com/questions/331080/what-do-the-different-parts-of-known-hosts-entries-mean
-  # We should hash them ourselves as part of this
-  # Format:
-  # |1|F1E1KeoE/eEWhi10WpGv4OdiO6Y=|3988QV0VE8wmZL7suNrYQLITLCg= ssh-rsa ...
-  # |1| - Means it's hashed
-  # F1E1KeoE/eEWhi10WpGv4OdiO6Y= - Salt
-  # 3988QV0VE8wmZL7suNrYQLITLCg= - Hash
-  # ssh-rsa ... - The rest of the line
-  # builtins.hashString
-  # This is Linux only?
-
   hostSpec = {
     username = "aa";
     handle = "fidgetingbits";
