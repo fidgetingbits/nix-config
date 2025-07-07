@@ -1,36 +1,44 @@
 {
   pkgs,
+  lib,
   ...
 }:
 {
-  imports = [
-    common/core
-    common/core/nixos.nix
+  imports = (
+    map lib.custom.relativeToRoot (
+      [
+        "home/common/core"
+        "home/common/core/nixos.nix"
+      ]
+      ++
+        # Optional common modules
+        (map (f: "home/common/optional/${f}") [
+          "sops.nix"
+          "ssh.nix"
 
-    common/optional/sops.nix
-    common/optional/ssh.nix
+          "audio-tools.nix"
+          #"vscode.nix"
+          "development"
+          "helper-scripts"
+          "xdg.nix"
+          "gpg.nix"
+          #"kitty.nix"
+          #"wezterm.nix"
+          "ghostty.nix"
+          "media.nix"
+          "networking/protonvpn.nix"
+          "atuin.nix"
 
-    common/optional/audio-tools.nix
-    #ommon/optional/vscode.nix
-    common/optional/development
-    common/optional/helper-scripts
-    common/optional/xdg.nix
-    common/optional/gpg.nix
-    #common/optional/kitty.nix
-    #common/optional/wezterm.nix
-    common/optional/ghostty.nix
-    common/optional/media.nix
-    common/optional/networking/protonvpn.nix
-    common/optional/atuin.nix
+          "gnome"
+          "gnome-terminal.nix"
+          "fcitx5"
 
-    common/optional/gnome
-    common/optional/gnome-terminal.nix
-    common/optional/fcitx5
-
-    # Maybe more role-specific stuff
-    common/optional/document.nix # document editing
-    common/optional/gui-utilities.nix # core for any desktop
-  ];
+          # Maybe more role-specific stuff
+          "document.nix" # document editing
+          "gui-utilities.nix" # core for any desktop
+        ])
+    )
+  );
 
   home.packages = builtins.attrValues {
     inherit (pkgs)

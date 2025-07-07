@@ -1,9 +1,19 @@
-{ ... }:
+{ lib, ... }:
 {
-  imports = [
-    common/core
-    common/core/nixos.nix
-    common/optional/gnome-terminal.nix
-  ];
+  imports = (
+    map lib.custom.relativeToRoot (
+      [
+        "home/common/core"
+        "home/common/core/nixos.nix"
+      ]
+      ++
+        # Optional common modules
+        (map (f: "home/common/optional/${f}") [
+
+          "ssh.nix"
+          "gnome-terminal.nix"
+        ])
+    )
+  );
 
 }

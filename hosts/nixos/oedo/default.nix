@@ -7,8 +7,8 @@
 }:
 {
   imports = lib.flatten [
-    (
-      map lib.custom.relativeToRoot [
+    (map lib.custom.relativeToRoot (
+      [
         ##
         # Core
         ##
@@ -56,7 +56,7 @@
           "services/gns3.nix"
 
         ])
-    )
+    ))
     # Impermanence
     (lib.custom.relativeToRoot "hosts/common/disks/btrfs-luks-impermanence-disko.nix")
     {
@@ -195,5 +195,5 @@
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
-  system.stateVersion = "23.05"; # Did you read the comment?
+  system.stateVersion = "23.05";
 }

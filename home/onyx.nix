@@ -1,44 +1,52 @@
 {
   config,
   pkgs,
+  lib,
   ...
 }:
 {
-  imports = [
-    common/core
-    common/core/nixos.nix
 
-    common/optional/ssh.nix
-    common/optional/audio-tools.nix
-    common/optional/vscode.nix
-    common/optional/development
-    common/optional/aws.nix
-    common/optional/helper-scripts
-    common/optional/sops.nix
-    common/optional/xdg.nix
-    common/optional/gpg.nix
-    #common/optional/kitty.nix
-    common/optional/ghostty.nix
-    #common/optional/wezterm.nix
-    common/optional/gnome-terminal.nix
-    common/optional/media.nix
-    common/optional/graphics.nix
-    common/optional/ebooks.nix
-    common/optional/networking/protonvpn.nix
-    common/optional/atuin.nix
-    common/optional/i3
-    common/optional/gnome
-    common/optional/fcitx5
+  imports = (
+    map lib.custom.relativeToRoot (
+      [
+        "home/common/core"
+        "home/common/core/nixos.nix"
+      ]
+      ++
+        # Optional common modules
+        (map (f: "home/common/optional/${f}") [
+          "ssh.nix"
+          "audio-tools.nix"
+          "vscode.nix"
+          "development"
+          "aws.nix"
+          "helper-scripts"
+          "sops.nix"
+          "xdg.nix"
+          "gpg.nix"
+          #common/optional/kitty.nix
+          "ghostty.nix"
+          #common/optional/wezterm.nix
+          "gnome-terminal.nix"
+          "media.nix"
+          "graphics.nix"
+          "ebooks.nix"
+          "networking/protonvpn.nix"
+          "atuin.nix"
+          "i3"
+          "gnome"
+          "fcitx5"
 
-    # Maybe more role-specific stuff
-    common/optional/document.nix # document editing
-    common/optional/gui-utilities.nix # core for any desktop
-    common/optional/chat.nix
-    common/optional/reversing
-    common/optional/wine.nix
-    common/optional/llm.nix
-
-  ];
+          # Maybe more role-specific stuff
+          "document.nix" # document editing
+          "gui-utilities.nix" # core for any desktop
+          "chat.nix"
+          "reversing"
+          "wine.nix"
+          "llm.nix"
+        ])
+    )
+  );
 
   talon = {
     enable = false;

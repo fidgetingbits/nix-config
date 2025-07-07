@@ -17,8 +17,8 @@
         };
       }
     ]
-    ++ (
-      map lib.custom.relativeToRoot [
+    ++ (map lib.custom.relativeToRoot (
+      [
         ##
         # Core
         ##
@@ -41,7 +41,7 @@
           "remote-builder.nix"
 
         ])
-    );
+    ));
 
   hostSpec = {
     hostName = "ooze";

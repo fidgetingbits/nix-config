@@ -5,40 +5,48 @@
   ...
 }:
 {
-  imports = [
-    common/core
-    common/core/nixos.nix
+  imports = (
+    map lib.custom.relativeToRoot (
+      [
+        "home/common/core"
+        "home/common/core/nixos.nix"
+      ]
+      ++
+        # Optional common modules
+        (map (f: "home/common/optional/${f}") [
 
-    common/optional/ssh.nix
-    common/optional/audio-tools.nix
-    common/optional/vscode.nix
-    common/optional/xdg.nix
-    common/optional/helper-scripts
-    common/optional/development
-    common/optional/aws.nix
-    common/optional/gpg.nix
-    common/optional/sops.nix
-    common/optional/media.nix
-    common/optional/gnome-terminal.nix
+          "ssh.nix"
+          "audio-tools.nix"
+          "vscode.nix"
+          "xdg.nix"
+          "helper-scripts"
+          "development"
+          "aws.nix"
+          "gpg.nix"
+          "sops.nix"
+          "media.nix"
+          "gnome-terminal.nix"
 
-    common/optional/wezterm.nix
-    common/optional/kitty.nix
-    common/optional/graphics.nix
+          "wezterm.nix"
+          "kitty.nix"
+          "graphics.nix"
 
-    common/optional/atuin.nix
+          "atuin.nix"
 
-    common/optional/remmina.nix
+          "remmina.nix"
 
-    common/optional/chat.nix
-    common/optional/work.nix
-    common/optional/gnome
+          "chat.nix"
+          "work.nix"
+          "gnome"
 
-    common/optional/reversing
+          "reversing"
 
-    common/optional/wine.nix
+          "wine.nix"
 
-    # common/optional/i3
-  ];
+          # "i3"
+        ])
+    )
+  );
 
   # modules.desktop.i3.enable = true;
   services.yubikey-touch-detector.enable = true;

@@ -1,15 +1,22 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 {
-  imports = [
-    common/core
-    common/core/nixos.nix
-
-    common/optional/helper-scripts
-    common/optional/sops.nix
-    common/optional/xdg.nix
-    common/optional/gpg.nix
-    common/optional/atuin.nix
-  ];
+  imports = (
+    map lib.custom.relativeToRoot (
+      [
+        "home/common/core"
+        "home/common/core/nixos.nix"
+      ]
+      ++
+        # Optional common modules
+        (map (f: "home/common/optional/${f}") [
+          "helper-scripts"
+          "sops.nix"
+          "xdg.nix"
+          "gpg.nix"
+          "atuin.nix"
+        ])
+    )
+  );
 
   home.packages = builtins.attrValues {
     inherit (pkgs)

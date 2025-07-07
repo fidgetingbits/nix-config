@@ -17,8 +17,8 @@
         withSwap = false;
       };
     }
-    (
-      map lib.custom.relativeToRoot [
+    (map lib.custom.relativeToRoot (
+      [
 
         "hosts/common/core"
         "hosts/common/core/nixos.nix"
@@ -35,7 +35,7 @@
           "yubikey.nix"
           "services/openssh.nix"
         ])
-    )
+    ))
   ];
 
   hostSpec = {
