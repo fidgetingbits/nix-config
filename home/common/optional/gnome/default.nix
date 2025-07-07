@@ -3,6 +3,7 @@
   imports = lib.custom.scanPaths ./.;
   # Probably move this eventually
   # see Martins3/My-Linux-Config and rxyhn/yuki for more
+  # dconf2nix seems neat: https://github.com/Sly-Harvey/NixOS/blob/1acf7d8f3b785f7643f5601695a7f79a5bf9c261/modules/desktop/gnome/dconf.nix
   dconf.settings = {
     "org/gnome/shell" = {
       disable-user-extensions = false;
@@ -28,6 +29,12 @@
     };
     "org/gnome/desktop/privacy" = {
       report-technical-problems = "false";
+    };
+    "org/gnome/desktop/peripherals/mouse" = {
+      left-handed = false;
+      speed = 2;
+      accel-profile = "default";
+      natural-scroll = false;
     };
   };
 
