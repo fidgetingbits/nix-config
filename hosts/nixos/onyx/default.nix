@@ -208,8 +208,8 @@
     services."nix-daemon".serviceConfig.OOMScoreAdjust = 1000;
   };
   # Use 50% of cores to try to reduce memory pressure
-  nix.settings.cores = lib.mkDefault 4; # FIXME: Can we use nixos-hardware to know the core count?
-  nix.settings.max-jobs = lib.mkDefault 4;
+  nix.settings.cores = lib.mkDefault 2; # FIXME: Can we use nixos-hardware to know the core count?
+  nix.settings.max-jobs = lib.mkDefault 2;
   nix.daemonCPUSchedPolicy = lib.mkDefault "batch";
   nix.daemonIOSchedClass = lib.mkDefault "idle";
   nix.daemonIOSchedPriority = lib.mkDefault 7;
