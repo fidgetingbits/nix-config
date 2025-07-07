@@ -17,7 +17,7 @@ cleanup() {
 		rm flake.lock 2>/dev/null || true
 	fi
 }
-trap cleanup EXIT
+trap cleanup EXIT HUP INT QUIT TERM
 
 export NIXPKGS_ALLOW_UNFREE=1
 
