@@ -91,7 +91,7 @@ check-sops:
 # Update nix-secrets flake
 [group("update")]
 update-nix-secrets HOST=`hostname`:
-	@(cd ../nix-secrets 2>/dev/null && git fetch && git rebase > /dev/null) || true
+	@(cd ../nix-secrets 2>/dev/null && git fetch && git rebase > /dev/null || echo "Push your nix-secrets changes") || true
 	@just update {{HOST}} nix-secrets
 
 # Update nix-assets
