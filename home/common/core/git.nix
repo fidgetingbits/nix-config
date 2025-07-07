@@ -6,7 +6,7 @@
   ...
 }:
 {
-  # All users get git no matter, what but additional settings may be added by eg: development.nix
+  # All users get git no matterwhat but additional settings may be added by eg: development.nix
   home.packages = [
     pkgs.git-crypt # Needs to be global so talon dynamic lists work in repos with filters
     pkgs.delta # git diff tool
