@@ -11,51 +11,47 @@
     inputs.nixos-hardware.nixosModules.common-cpu-amd
     inputs.nixos-hardware.nixosModules.common-gpu-amd
 
-    (map lib.custom.relativeToRoot [
-      "hosts/common/core"
-      "hosts/common/core/nixos.nix"
+    (map lib.custom.relativeToRoot (
+      [
+        "hosts/common/core"
+        "hosts/common/core/nixos.nix"
+      ]
+      ++ (map (f: "hosts/common/optional/${f}") [
 
-      # Host-specific stuff
-      "hosts/common/optional/msmtp.nix"
-      # WARNING: Blocks on boot on both gpus atm (Granite Ridge and 9070XT)
-      #"hosts/common/optional/plymouth.nix"
-      "hosts/common/optional/locale.nix"
-      #"hosts/common/optional/wayland.nix"
-      "hosts/common/optional/sound.nix"
+        # Host-specific stuff
+        "msmtp.nix"
+        # WARNING: Blocks on boot on both gpus atm (Granite Ridge and 9070XT)
+        #"plymouth.nix"
+        "locale.nix"
+        "sound.nix"
 
-      # Desktop environment and login manager
-      "hosts/common/optional/x11.nix"
-      # "hosts/common/optional/gdm.nix"
-      "hosts/common/optional/sddm.nix"
+        # Desktop environment and login manager
+        "x11.nix"
+        "sddm.nix"
 
-      #"hosts/common/optional/greetd.nix"
-      #"hosts/common/optional/hyprland.nix"
-      "hosts/common/optional/gnome.nix"
+        #"hyprland.nix"
+        "gnome.nix"
 
-      #"hosts/common/optional/podman.nix"
-      "hosts/common/optional/libvirt.nix"
-      "hosts/common/optional/cli.nix"
-      "hosts/common/optional/yubikey.nix"
-      "hosts/common/optional/services/openssh.nix"
+        "libvirt.nix"
+        "cli.nix"
+        "yubikey.nix"
+        "services/openssh.nix"
 
-      # Network management
-      "hosts/common/optional/systemd-resolved.nix"
+        # Network management
+        "systemd-resolved.nix"
 
-      # Remote network mounts and syncing
-      #"hosts/common/optional/mounts/oath-cifs.nix"
-      #"hosts/common/optional/services/syncthing.nix"
+        # Gaming
+        "gaming.nix"
 
-      # Gaming
-      "hosts/common/optional/gaming.nix"
+        "remote-builder.nix"
 
-      "hosts/common/optional/remote-builder.nix"
+        "fonts.nix"
 
-      "hosts/common/optional/fonts.nix"
+        "lgtv.nix"
+        "nzxt.nix"
 
-      "hosts/common/optional/lgtv.nix"
-      "hosts/common/optional/nzxt.nix"
-
-    ])
+      ])
+    ))
     # Impermanence
     (lib.custom.relativeToRoot "hosts/common/disks/btrfs-luks-impermanence-disko.nix")
     {
@@ -64,7 +60,6 @@
         withSwap = true;
       };
     }
-
   ];
 
   # Host Specification

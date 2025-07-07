@@ -17,20 +17,25 @@
         withSwap = false;
       };
     }
-    (map lib.custom.relativeToRoot [
+    (
+      map lib.custom.relativeToRoot [
 
-      "hosts/common/core"
-      "hosts/common/core/nixos.nix"
-
-      # Host-specific stuff
-      "hosts/common/optional/locale.nix"
-      "hosts/common/optional/x11.nix"
-      "hosts/common/optional/sound.nix"
-      "hosts/common/optional/gnome.nix"
-      "hosts/common/optional/cli.nix"
-      "hosts/common/optional/yubikey.nix"
-      "hosts/common/optional/services/openssh.nix"
-    ])
+        "hosts/common/core"
+        "hosts/common/core/nixos.nix"
+      ]
+      ++
+        # Optional common modules
+        (map (f: "hosts/common/optional/${f}") [
+          # Host-specific stuff
+          "locale.nix"
+          "x11.nix"
+          "sound.nix"
+          "gnome.nix"
+          "cli.nix"
+          "yubikey.nix"
+          "services/openssh.nix"
+        ])
+    )
   ];
 
   hostSpec = {

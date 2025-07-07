@@ -17,29 +17,31 @@
         };
       }
     ]
-    ++ (map lib.custom.relativeToRoot [
-      ##
-      # Core
-      ##
-      "hosts/common/core"
-      "hosts/common/core/nixos.nix"
+    ++ (
+      map lib.custom.relativeToRoot [
+        ##
+        # Core
+        ##
+        "hosts/common/core"
+        "hosts/common/core/nixos.nix"
+      ]
+      ++
+        # Optional common modules
+        (map (f: "hosts/common/optional/${f}") [
+          "cli.nix"
+          "services/openssh.nix"
+          "services/atuin.nix"
+          "services/atticd.nix"
+          "services/postfix-proton-relay.nix"
+          "services/unifi.nix" # Unifi Controller
+          # For sending mail via backup scripts. Not sure if should just use postfix locally in this case
+          "msmtp.nix"
 
-      ##
-      # Optional
-      ##
-      "hosts/common/optional/cli.nix"
-      "hosts/common/optional/services/openssh.nix"
-      "hosts/common/optional/services/atuin.nix"
-      "hosts/common/optional/services/atticd.nix"
-      "hosts/common/optional/services/postfix-proton-relay.nix"
-      "hosts/common/optional/services/unifi.nix" # Unifi Controller
-      # For sending mail via backup scripts. Not sure if should just use postfix locally in this case
-      "hosts/common/optional/msmtp.nix"
+          "acme.nix"
+          "remote-builder.nix"
 
-      "hosts/common/optional/acme.nix"
-      "hosts/common/optional/remote-builder.nix"
-
-    ]);
+        ])
+    );
 
   hostSpec = {
     hostName = "ooze";

@@ -11,51 +11,58 @@
     inputs.nixos-hardware.nixosModules.asus-zenbook-ux371
     ./hardware-configuration.nix
 
-    (map lib.custom.relativeToRoot [
-      "hosts/common/core"
-      "hosts/common/core/nixos.nix"
+    (map lib.custom.relativeToRoot (
+      [
+        "hosts/common/core"
+        "hosts/common/core/nixos.nix"
+      ]
+      ++
+        # Optional common modules
+        (map (f: "hosts/common/optional/${f}") [
+          # Host-specific stuff
+          "msmtp.nix"
+          "plymouth.nix"
+          "printing.nix"
+          "locale.nix"
+          "x11.nix"
+          "sound.nix"
 
-      # Host-specific stuff
-      "hosts/common/optional/msmtp.nix"
-      "hosts/common/optional/plymouth.nix"
-      "hosts/common/optional/printing.nix"
-      "hosts/common/optional/locale.nix"
-      "hosts/common/optional/x11.nix"
-      "hosts/common/optional/sound.nix"
+          # Desktop environment and login manager
+          # "gdm.nix"
+          "sddm.nix"
+          "gnome.nix"
+          "i3wm.nix"
 
-      # Desktop environment and login manager
-      #"hosts/common/optional/gdm.nix"
-      "hosts/common/optional/sddm.nix"
-      "hosts/common/optional/gnome.nix"
-      "hosts/common/optional/i3wm.nix"
+          # Miscellaneous
+          "podman.nix"
+          "libvirt.nix"
+          "wireshark.nix"
+          "cli.nix"
+          "yubikey.nix"
+          "tobii.nix"
+          "services/openssh.nix"
+          "iphone-backup.nix"
 
-      "hosts/common/optional/podman.nix"
-      "hosts/common/optional/libvirt.nix"
-      "hosts/common/optional/wireshark.nix"
-      "hosts/common/optional/cli.nix"
-      "hosts/common/optional/yubikey.nix"
-      "hosts/common/optional/tobii.nix"
-      "hosts/common/optional/services/openssh.nix"
-      "hosts/common/optional/iphone-backup.nix"
+          # Binary analysis tools
+          "binaryninja.nix"
+          "cynthion.nix"
+          "saleae.nix"
 
-      "hosts/common/optional/binaryninja.nix"
-      "hosts/common/optional/cynthion.nix"
-      "hosts/common/optional/saleae.nix"
+          # Network management
+          "systemd-resolved.nix"
 
-      # Network management
-      "hosts/common/optional/systemd-resolved.nix"
+          # Remote network mounts and syncing
+          "mounts/oath-cifs.nix"
+          "mounts/onus-cifs.nix"
+          "services/syncthing.nix"
 
-      # Remote network mounts and syncing
-      "hosts/common/optional/mounts/oath-cifs.nix"
-      "hosts/common/optional/mounts/onus-cifs.nix"
-      "hosts/common/optional/services/syncthing.nix"
+          # Gaming
+          "gaming.nix"
 
-      # Gaming
-      "hosts/common/optional/gaming.nix"
-
-      "hosts/common/optional/distributed-builds.nix"
-      "hosts/common/optional/fonts.nix"
-    ])
+          "distributed-builds.nix"
+          "fonts.nix"
+        ])
+    ))
   ];
 
   # Host Specification
@@ -65,6 +72,7 @@
     voiceCoding = lib.mkForce false;
     useYubikey = lib.mkForce true;
     useWayland = lib.mkForce true;
+    useWindowManager = lib.mkForce true;
     isAutoStyled = lib.mkForce true;
     wifi = lib.mkForce true;
     useNeovimTerminal = lib.mkForce true;

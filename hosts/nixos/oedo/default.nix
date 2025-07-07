@@ -7,51 +7,56 @@
 }:
 {
   imports = lib.flatten [
-    (map lib.custom.relativeToRoot [
-      ##
-      # Core
-      ##
-      "hosts/common/core"
-      "hosts/common/core/nixos.nix"
+    (
+      map lib.custom.relativeToRoot [
+        ##
+        # Core
+        ##
+        "hosts/common/core"
+        "hosts/common/core/nixos.nix"
+      ]
+      ++
+        # Optional common modules
+        (map (f: "hosts/common/optional/${f}") [
+          ##
+          # Optional
+          ##
 
-      ##
-      # Optional
-      ##
+          # Host-specific stuff
+          "msmtp.nix"
+          "plymouth.nix"
+          "printing.nix"
+          "locale.nix"
+          "x11.nix"
+          "sound.nix"
+          "podman.nix"
+          "cli.nix"
+          "yubikey.nix"
+          "tobii.nix"
+          "libvirt.nix"
 
-      # Host-specific stuff
-      "hosts/common/optional/msmtp.nix"
-      "hosts/common/optional/plymouth.nix"
-      "hosts/common/optional/printing.nix"
-      "hosts/common/optional/locale.nix"
-      "hosts/common/optional/x11.nix"
-      "hosts/common/optional/sound.nix"
-      "hosts/common/optional/podman.nix"
-      "hosts/common/optional/cli.nix"
-      "hosts/common/optional/yubikey.nix"
-      "hosts/common/optional/tobii.nix"
-      "hosts/common/optional/libvirt.nix"
+          "wireshark.nix"
 
-      "hosts/common/optional/wireshark.nix"
+          "systemd-resolved.nix"
+          "vpn.nix"
 
-      "hosts/common/optional/systemd-resolved.nix"
-      "hosts/common/optional/vpn.nix"
+          # Window Manager
+          "gnome.nix"
 
-      # Window Manager
-      "hosts/common/optional/gnome.nix"
+          "binaryninja.nix"
+          "cynthion.nix"
+          "saleae.nix"
 
-      "hosts/common/optional/binaryninja.nix"
-      "hosts/common/optional/cynthion.nix"
-      "hosts/common/optional/saleae.nix"
+          # Services
+          "mounts/oath-cifs.nix"
+          "mounts/onus-cifs.nix"
+          "mounts/s3fs.nix"
+          "services/openssh.nix"
+          "services/syncthing.nix"
+          "services/gns3.nix"
 
-      # Services
-      "hosts/common/optional/mounts/oath-cifs.nix"
-      "hosts/common/optional/mounts/onus-cifs.nix"
-      "hosts/common/optional/mounts/s3fs.nix"
-      "hosts/common/optional/services/openssh.nix"
-      "hosts/common/optional/services/syncthing.nix"
-      "hosts/common/optional/services/gns3.nix"
-
-    ])
+        ])
+    )
     # Impermanence
     (lib.custom.relativeToRoot "hosts/common/disks/btrfs-luks-impermanence-disko.nix")
     {
