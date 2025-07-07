@@ -149,7 +149,7 @@ in
     sessionVariables =
       {
         EDITOR = if config.hostSpec.isServer then "nvim" else "code -w";
-
+        BAT_THEME = "Dracula"; # Stylix bug, they use "dracula" instead of "Dracula"
         #
         # FZF key-binding.zsh tweaks
         #
