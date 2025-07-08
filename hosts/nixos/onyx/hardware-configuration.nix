@@ -25,7 +25,7 @@
     fsType = "vfat";
   };
 
-  swapDevices = [ { device = "/dev/disk/by-uuid/eabbf1b6-0c66-45fb-b064-c6ac88443a45"; } ];
+  #swapDevices = [ { device = "/dev/disk/by-uuid/eabbf1b6-0c66-45fb-b064-c6ac88443a45"; } ];
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
