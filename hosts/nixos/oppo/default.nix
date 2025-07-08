@@ -94,6 +94,7 @@
       "liquidtux"
       "i2c-dev"
       "i2c-piix4"
+      "amdgpu-i2c"
     ];
 
     kernelPackages = pkgs.linuxPackages_latest;

@@ -82,6 +82,10 @@
     useAtticCache = lib.mkForce true;
     isDevelopment = lib.mkForce true;
     wallpaper = "${inputs.nix-assets}/images/wallpapers/forest_temple.webp";
+    users = lib.mkForce [
+      "aa"
+      "media"
+    ];
   };
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
