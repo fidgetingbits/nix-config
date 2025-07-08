@@ -1,26 +1,16 @@
 # Core home functionality that will only work on Linux
 {
   config,
-  inputs,
   pkgs,
   lib,
   ...
 }:
 {
   imports = [
+    # FIXME: Move this to trash module that we enable for users instead
     ./timers/trash-empty.nix
   ];
-  home = rec {
-    homeDirectory = config.hostSpec.home;
-    username = config.hostSpec.username;
-    sessionPath = lib.flatten (
-      [
-        "${homeDirectory}/scripts/"
-      ]
-      ++ lib.optional config.hostSpec.voiceCoding [ "${homeDirectory}/scripts/talon/" ]
-      ++ lib.optional config.hostSpec.isWork inputs.nix-secrets.work.extraPaths
-    );
-
+  home = {
     packages = lib.optionals (config.hostSpec.isProduction) (
       builtins.attrValues {
         inherit (pkgs)

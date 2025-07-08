@@ -1,4 +1,5 @@
 {
+  #config,
   pkgs,
   lib,
   ...
@@ -8,8 +9,7 @@
     ../modules/common
 
     ../hosts/common/core/ssh.nix
-    ../hosts/common/users/primary
-    ../hosts/common/users/primary/nixos.nix
+    ../hosts/common/users
     ../hosts/common/optional/minimal-user.nix
   ];
 

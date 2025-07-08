@@ -13,6 +13,7 @@
 
       options = {
         # Data variables that don't dictate configuration settings
+        # FIXME: This should become primaryUsername for multi-user systems
         username = lib.mkOption {
           type = lib.types.str;
           description = "The username of the host";
@@ -53,6 +54,7 @@
           type = lib.types.str;
           description = "The handle of the user (eg: github user)";
         };
+        # FIXME: This isn't great for multi-user systems
         home = lib.mkOption {
           type = lib.types.str;
           description = "The home directory of the user";

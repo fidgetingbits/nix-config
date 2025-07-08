@@ -111,10 +111,13 @@
     extraModprobeConfig = ''options bluetooth disable_ertm=1 '';
   };
 
-  # xbox series s/x controller support
   hardware = {
+    # xbox series s/x controller support
     xpadneo.enable = true;
     steam-hardware.enable = true;
+
+    # Testing
+    graphics.extraPackages = [ pkgs.unstable.mesa ];
   };
 
   # Just set the console font, don't mess with the font settings

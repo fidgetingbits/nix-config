@@ -6,9 +6,12 @@
 {
   imports = (
     map lib.custom.relativeToRoot (
+      # FIXME: after fixing user/home values in HM
       [
         "home/common/core"
         "home/common/core/nixos.nix"
+        # FIXME: Make this automatic in hosts/common/users/default.nix eventually
+        "home/aa/common/nixos.nix"
       ]
       ++
         # Optional common modules

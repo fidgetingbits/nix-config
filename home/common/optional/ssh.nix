@@ -43,7 +43,9 @@ let
   yubikeys =
     lib.lists.forEach
       (builtins.attrNames (
-        builtins.readDir (lib.custom.relativeToRoot "hosts/common/users/primary/keys/yubikeys/")
+        builtins.readDir (
+          lib.custom.relativeToRoot "hosts/common/users/${config.hostSpec.username}/keys/yubikeys/"
+        )
       ))
       # id_drzt.pub -> id_drzt
       (key: lib.substring 0 (lib.stringLength key - lib.stringLength ".pub") key);
@@ -63,7 +65,7 @@ let
   yubikeyPublicKeyEntries = lib.attrsets.mergeAttrsList (
     lib.lists.map (key: {
       ".ssh/yubikeys/${key}.pub".source =
-        lib.custom.relativeToRoot "hosts/common/users/primary/keys/yubikeys/${key}.pub";
+        lib.custom.relativeToRoot "hosts/common/users/${config.hostSpec.username}/keys/yubikeys/${key}.pub";
     }) yubikeys
   );
 

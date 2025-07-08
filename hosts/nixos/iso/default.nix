@@ -12,7 +12,8 @@
     "${inputs.nixpkgs}/nixos/modules/installer/cd-dvd/channel.nix"
     inputs.home-manager.nixosModules.home-manager
     (map lib.custom.relativeToRoot [
-      "hosts/common/users/primary/"
+      # FIXME: Switch this to just import hosts/common/core (though have to be careful to purposefully not add platform file..
+      "hosts/common/users/${config.hostSpec.username}/"
       "hosts/common/optional/minimal-user.nix"
       "modules/common/host-spec.nix"
     ])

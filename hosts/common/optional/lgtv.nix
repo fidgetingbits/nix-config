@@ -40,7 +40,10 @@ in
 
   systemd.services.lgtv-resume = {
     description = "Turn on LG TV after resume";
-    wantedBy = [ "post-resume.target" ];
+    wantedBy = [
+      "post-resume.target"
+      "network-online.target"
+    ];
     after = [
       "suspend.target"
       "hibernate.target"
