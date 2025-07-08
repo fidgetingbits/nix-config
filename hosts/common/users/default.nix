@@ -97,20 +97,28 @@ in
       lib.flatten [
         (map (user: {
           "${user}".imports = lib.flatten (
-            lib.optional (!hostSpec.isMinimal) [
-              (
-                { config, ... }:
-                import (lib.custom.relativeToRoot "home/${user}/${hostSpec.hostName}.nix") {
-                  inherit
-                    pkgs
-                    inputs
-                    config
-                    lib
-                    hostSpec
-                    ;
-                }
-              )
-            ]
+            lib.optional (!hostSpec.isMinimal) (
+              map
+                (
+                  path:
+                  (import (lib.custom.relativeToRoot "${path}") {
+                    inherit
+                      pkgs
+                      inputs
+                      config
+                      lib
+                      # FIXME: We should modify hostSpec here to change the username and home to match whatever
+                      # user we are injecting, this way we don't need to set it in the individual files
+                      hostSpec
+                      ;
+                  })
+                )
+                [
+                  "home/${user}/${hostSpec.hostName}.nix"
+                  "home/${user}/common/${platform}.nix"
+                ]
+            )
+
           );
         }) config.hostSpec.users)
         # Add root user (FIXME: Probably move this into nixos.nix together with above one)

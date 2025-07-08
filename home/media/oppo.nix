@@ -6,7 +6,7 @@
 {
   imports = (
     map lib.custom.relativeToRoot (
-      # FIXME: after fixing user/home values in HM
+      # FIXME: remove after fixing user/home values in HM
       [
         "home/common/core"
         "home/common/core/nixos.nix"
