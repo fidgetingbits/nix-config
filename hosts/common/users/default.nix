@@ -8,10 +8,10 @@
 }:
 
 let
-  pubKeys = lib.filesystem.listFilesRecursive (
-    lib.custom.relativeToRoot "hosts/common/users/aa/keys/yubikeys/"
-  );
   hostSpec = config.hostSpec;
+  pubKeys = lib.filesystem.listFilesRecursive (
+    lib.custom.relativeToRoot "hosts/common/users/${hostSpec.primaryUsername}/keys/yubikeys/"
+  );
   platform = if isDarwin then "darwin" else "nixos";
 in
 {
@@ -23,11 +23,18 @@ in
             # Import all non-root users
             (map (user: {
               "${user}" =
+                let
+                  sopsHashedPasswordFile = lib.optionalString (
+                    !config.hostSpec.isMinimal
+                  ) config.sops.secrets."passwords/${user}".path;
+                in
                 {
                   name = user;
                   shell = pkgs.zsh; # Default Shell
                   openssh.authorizedKeys.keys = lib.lists.forEach pubKeys (key: builtins.readFile key);
                   home = if isDarwin then "/Users/${user}" else "/home/${user}";
+                  # Decrypt password to /run/secrets-for-users/ so it can be used to create the user
+                  hashedPasswordFile = sopsHashedPasswordFile; # Blank if sops isn't working
                 }
                 # Add in platform-specific user values
                 // (import (lib.custom.relativeToRoot "hosts/common/users/${user}/${platform}.nix") {
@@ -121,10 +128,10 @@ in
 
           );
         }) config.hostSpec.users)
-        # Add root user (FIXME: Probably move this into nixos.nix together with above one)
-        (lib.optionalAttrs (!isDarwin) {
-          # FIXME: This check can be combined with the above later
-          root = lib.optionalAttrs (!hostSpec.isMinimal) {
+        # Add root user
+        # FIXME: Probably move this into nixos.nix together with above one
+        (lib.optionalAttrs (!isDarwin && !hostSpec.isMinimal) {
+          root = {
             home.stateVersion = "23.05"; # Avoid error
             programs.zsh = {
               enable = true;

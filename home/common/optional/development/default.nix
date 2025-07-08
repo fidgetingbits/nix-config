@@ -147,7 +147,8 @@ in
 
   home.file.".ssh/allowed_signers".text =
     let
-      keypath = "hosts/common/users/${config.hostSpec.username}/keys/yubikeys/";
+      # FIXME: This would need to change if we ever have multiple developer accounts on the same box
+      keypath = "hosts/common/users/${config.hostSpec.primaryUsername}/keys/yubikeys/";
       genEmailKeys =
         email: keys:
         lib.concatMapStringsSep "\n" (

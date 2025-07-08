@@ -39,14 +39,12 @@ let
     forwardAgentHosts ++ (genDomains forwardAgentHosts)
   );
 
+  yubikeyPath = "hosts/common/users/${config.hostSpec.primaryUsername}/keys/yubikeys";
+
   # There is a list of yubikey pubkeys in keys/yubikey. Build a list of corresponding private key files in .ssh
   yubikeys =
     lib.lists.forEach
-      (builtins.attrNames (
-        builtins.readDir (
-          lib.custom.relativeToRoot "hosts/common/users/${config.hostSpec.username}/keys/yubikeys/"
-        )
-      ))
+      (builtins.attrNames (builtins.readDir (lib.custom.relativeToRoot "${yubikeyPath}/")))
       # id_drzt.pub -> id_drzt
       (key: lib.substring 0 (lib.stringLength key - lib.stringLength ".pub") key);
   # FIXME(ssh): Only works if the system supports yubikey (ie: not remote only systems)
@@ -64,8 +62,7 @@ let
   # of authentication attempts
   yubikeyPublicKeyEntries = lib.attrsets.mergeAttrsList (
     lib.lists.map (key: {
-      ".ssh/yubikeys/${key}.pub".source =
-        lib.custom.relativeToRoot "hosts/common/users/${config.hostSpec.username}/keys/yubikeys/${key}.pub";
+      ".ssh/yubikeys/${key}.pub".source = lib.custom.relativeToRoot "${yubikeyPath}/${key}.pub";
     }) yubikeys
   );
 

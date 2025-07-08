@@ -5,6 +5,6 @@
 
   home = {
     username = config.hostSpec.username;
-    homeDirectory = "/Users/${config.hostSpec.username}";
+    homeDirectory = config.hostSpec.home;
   };
 }

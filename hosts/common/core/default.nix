@@ -62,6 +62,7 @@ in
   };
 
   hostSpec = {
+    primaryUsername = "aa";
     username = "aa";
     handle = "fidgetingbits";
     inherit (inputs.nix-secrets)

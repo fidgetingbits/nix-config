@@ -79,6 +79,10 @@
     isDevelopment = lib.mkForce true;
     persistFolder = lib.mkForce "/persist";
     useWayland = lib.mkForce true;
+    user = lib.mkForce [
+      "aa"
+      "media"
+    ];
   };
   system.impermanence.enable = true;
 

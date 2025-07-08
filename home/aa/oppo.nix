@@ -10,8 +10,6 @@
       [
         "home/common/core"
         "home/common/core/nixos.nix"
-        # FIXME: Make this automatic in hosts/common/users/default.nix eventually
-        #"home/aa/common/nixos.nix"
       ]
       ++
         # Optional common modules
@@ -47,6 +45,7 @@
     inherit (pkgs)
       openrgb-with-all-plugins # for controlling RGB devices
       ffmpeg # mp4 -> gif conversion, etc
+      amdgpu_top # AMD GPU monitoring
       ;
   };
 

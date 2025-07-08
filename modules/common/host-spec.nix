@@ -13,7 +13,10 @@
 
       options = {
         # Data variables that don't dictate configuration settings
-        # FIXME: This should become primaryUsername for multi-user systems
+        primaryUsername = lib.mkOption {
+          type = lib.types.str;
+          description = "The primary username of the host";
+        };
         username = lib.mkOption {
           type = lib.types.str;
           description = "The username of the host";
