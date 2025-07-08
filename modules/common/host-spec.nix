@@ -69,6 +69,11 @@
         };
 
         # Configuration Settings
+        users = lib.mkOption {
+          type = lib.types.listOf lib.types.str;
+          description = "An attribute set of all users on the host";
+          default = [ config.hostSpec.username ];
+        };
         isMinimal = lib.mkOption {
           type = lib.types.bool;
           default = false;

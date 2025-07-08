@@ -39,7 +39,7 @@ in
       lib.optional (!hostSpec.isMinimal) [
         (
           { config, ... }:
-          import (lib.custom.relativeToRoot "home/${hostSpec.hostName}.nix") {
+          import (lib.custom.relativeToRoot "home/${hostSpec.username}/${hostSpec.hostName}.nix") {
             inherit
               pkgs
               inputs
