@@ -79,7 +79,7 @@
     isDevelopment = lib.mkForce true;
     persistFolder = lib.mkForce "/persist";
     useWayland = lib.mkForce true;
-    user = lib.mkForce [
+    users = lib.mkForce [
       "aa"
       "media"
     ];
@@ -110,11 +110,6 @@
     kernelParams = [
       "amdgpu.ppfeaturemask=0xfffd3fff" # https://kernel.org/doc/html/latest/gpu/amdgpu/module-parameters.html#ppfeaturemask-hexint
       "amdgpu.dcdebugmask=0x400" # Allegedly might help with some crashes
-
-      "amdgpu.aspm=0" # Temp attempt to fix crashes
-      "amdgpu.bapm=0" # Disable BAPM, might help with crashes
-      "amdgpu.runpm=0" # Disable runpm, might help with crashes
-
       "split_lock_detect=off" # Alleged gaming perf increase
     ];
     # Fix for XBox controller disconnects
@@ -126,7 +121,7 @@
     xpadneo.enable = true;
     steam-hardware.enable = true;
 
-    # Testing
+    # Prevent crashes in steam
     graphics.extraPackages = [ pkgs.unstable.mesa ];
   };
 

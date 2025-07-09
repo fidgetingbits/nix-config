@@ -73,15 +73,16 @@ else
 	extra_args=""
 	if [[ $HOST != "$(hostname)" ]]; then
 		extra_args="--target-host $HOST --use-remote-sudo"
-		#nixos-rebuild --target-host "$HOST" --use-remote-sudo $switch_args
-	fi
-	green "====== REBUILD ======"
-	REPO_PATH=$(pwd)
-	export REPO_PATH
-	NIXPKGS_ALLOW_BROKEN=1
-	export NIXPKGS_ALLOW_BROKEN
-	nh os switch . -- --impure --show-trace --reference-lock-file locks/$HOST.lock $extra_args
+		nixos-rebuild --target-host "$HOST" --use-remote-sudo $switch_args
+	else
+		green "====== REBUILD ======"
+		REPO_PATH=$(pwd)
+		export REPO_PATH
+		NIXPKGS_ALLOW_BROKEN=1
+		export NIXPKGS_ALLOW_BROKEN
+		nh os switch . -- --impure --show-trace --reference-lock-file locks/$HOST.lock $extra_args
 	#nixos-rebuild $switch_args $extra_args switch
+	fi
 fi
 
 # shellcheck disable=SC2181
