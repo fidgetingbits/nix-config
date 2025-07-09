@@ -110,6 +110,11 @@
     kernelParams = [
       "amdgpu.ppfeaturemask=0xfffd3fff" # https://kernel.org/doc/html/latest/gpu/amdgpu/module-parameters.html#ppfeaturemask-hexint
       "amdgpu.dcdebugmask=0x400" # Allegedly might help with some crashes
+
+      "amdgpu.aspm=0" # Temp attempt to fix crashes
+      "amdgpu.bapm=0" # Disable BAPM, might help with crashes
+      "amdgpu.runpm=0" # Disable runpm, might help with crashes
+
       "split_lock_detect=off" # Alleged gaming perf increase
     ];
     # Fix for XBox controller disconnects
