@@ -23,6 +23,4 @@
       screen # Needed for serial console attached to server
       ;
   };
-
-  systemd.user.startServices = "sd-switch";
 }

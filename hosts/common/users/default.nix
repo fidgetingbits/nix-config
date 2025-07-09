@@ -27,6 +27,7 @@ in
                   sopsHashedPasswordFile = lib.optionalString (
                     !config.hostSpec.isMinimal
                   ) config.sops.secrets."passwords/${user}".path;
+                  platformPath = lib.custom.relativeToRoot "hosts/common/users/${user}/${platform}.nix";
                 in
                 {
                   name = user;
@@ -36,10 +37,12 @@ in
                   # Decrypt password to /run/secrets-for-users/ so it can be used to create the user
                   hashedPasswordFile = sopsHashedPasswordFile; # Blank if sops isn't working
                 }
-                # Add in platform-specific user values
-                // (import (lib.custom.relativeToRoot "hosts/common/users/${user}/${platform}.nix") {
-                  inherit config lib;
-                });
+                # Add in platform-specific user values if they exist
+                // lib.optionalAttrs (lib.pathExists platformPath) (
+                  import platformPath {
+                    inherit config lib;
+                  }
+                );
             }) config.hostSpec.users)
             # Define root user (FIXME: Maybe conditionally import this and do it in nixos.nix?
             (lib.optionalAttrs (!isDarwin) {
@@ -83,7 +86,6 @@ in
         }) config.hostSpec.users;
       };
     };
-
 }
 // lib.optionalAttrs (inputs ? "home-manager") {
   home-manager = {
@@ -104,28 +106,39 @@ in
       lib.flatten [
         (map (user: {
           "${user}".imports = lib.flatten (
-            lib.optional (!hostSpec.isMinimal) (
+            (lib.optional (!hostSpec.isMinimal) (
               map
                 (
                   path:
-                  (import (lib.custom.relativeToRoot "${path}") {
-                    inherit
-                      pkgs
-                      inputs
-                      config
-                      lib
-                      # FIXME: We should modify hostSpec here to change the username and home to match whatever
-                      # user we are injecting, this way we don't need to set it in the individual files
-                      hostSpec
-                      ;
-                  })
+                  lib.optionalAttrs (lib.pathExists (lib.custom.relativeToRoot path)) (
+                    import (lib.custom.relativeToRoot "${path}") {
+                      inherit
+                        pkgs
+                        inputs
+                        config
+                        lib
+                        hostSpec
+                        ;
+                    }
+                  )
                 )
                 [
                   "home/${user}/${hostSpec.hostName}.nix"
                   "home/${user}/common/${platform}.nix"
                 ]
-            )
-
+            ))
+            # Add in some common values so we don't have to have a file per user
+            ++ [
+              (
+                { ... }:
+                {
+                  home = {
+                    homeDirectory = if isDarwin then "/Users/${user}" else "/home/${user}";
+                    username = "${user}";
+                  };
+                }
+              )
+            ]
           );
         }) config.hostSpec.users)
         # Add root user

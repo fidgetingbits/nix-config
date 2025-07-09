@@ -68,19 +68,7 @@
   services.snixembed.enable = true;
   services.yubikey-touch-detector.enable = true;
   services.yubikey-touch-detector.notificationSound = true;
-  # Nicely reload system units when changing configs
-  systemd.user.startServices = "sd-switch";
 
-  # Scaling for HiDPI, specifically for GDM
-  # https://discourse.nixos.org/t/need-help-for-nixos-gnome-scaling-settings/24590/5
-  # https://github.com/NixOS/nixpkgs/issues/54150
-  # home-manager.users.gdm = { lib, ... }: {
-  #   dconf.settings = {
-  #     "org/gnome/desktop/interface" = {
-  #       scaling-factor = lib.hm.gvariant.mkUint32 2;
-  #     };
-  #   };
-  # };
   sops = {
     secrets = {
       "tokens/fly" = {

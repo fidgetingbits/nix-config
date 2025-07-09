@@ -6,12 +6,11 @@
   lib,
   ...
 }:
+let
+  homeDirectory = config.hostSpec.home;
+in
 {
-  home = rec {
-    # FIXME: These need to be per the user being added to HM for multi-user systems
-    # Needs to mvoe to per-user common files
-    homeDirectory = config.hostSpec.home;
-    username = "aa";
+  home = {
     sessionPath = lib.flatten (
       [
         "${homeDirectory}/scripts/"

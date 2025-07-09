@@ -12,6 +12,8 @@
         "home/common/core/nixos.nix"
       ]
       ++ (map (f: "home/common/optional/${f}") [
+        "atuin.nix"
+        "ghostty.nix"
       ])
     )
   );
@@ -22,8 +24,4 @@
 
   #services.yubikey-touch-detector.enable = true;
   #services.yubikey-touch-detector.notificationSound = true;
-
-  # Nicely reload system units when changing configs
-  systemd.user.startServices = "sd-switch";
-
 }
