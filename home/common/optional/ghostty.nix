@@ -11,5 +11,14 @@
         shopt -u globstar
       '';
     });
+    settings = {
+      keybind = [
+        # This conflicts with GTK Inspector (needed if ghostty crashes to find gtk info)
+        # gsettings set org.gtk.Settings.Debug enable-inspector-keybinding true
+        "ctrl+shift+i=unbind"
+        # Remap to avoid conflict with GTK Inspector
+        "ctrl+shift+d=inspector:toggle"
+      ];
+    };
   };
 }

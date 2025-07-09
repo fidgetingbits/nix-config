@@ -121,7 +121,7 @@
     xpadneo.enable = true;
     steam-hardware.enable = true;
 
-    # Prevent crashes in steam
+    # Prevent crashes in steam on the Radeon 9070 XT
     graphics.extraPackages = [ pkgs.unstable.mesa ];
   };
 

@@ -324,6 +324,8 @@ in
       # quick execution of any alias I forget
       kyd = "alias | fzf --height=50% --layout=reverse --info=inline --border --preview 'echo {}' --preview-window=up:3:hidden:wrap --bind '?:toggle-preview' | cut -d'=' -f1 | xargs -I {} zsh -c '{}'";
 
+      # Sometimes touchpad stops working and it seems like cycling this option fixes it
+      kb-reset = "sudo modprobe -r hid_multitouch && sudo modprobe hid_multitouch";
     };
   };
   programs.zoxide = {
