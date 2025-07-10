@@ -20,6 +20,16 @@
       default = 14;
       description = "Number of days to keep old btrfs_tmp files";
     };
+    autoPersistHomes = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = ''
+        Automatically persist all user's home directories
+
+        This currently assumes you want permission "u=rwx,g=,o=" and
+        your user is in "users" group.
+      '';
+    };
   };
 
   options.environment = {

@@ -83,6 +83,7 @@
       "aa"
       "media"
     ];
+    wallpaper = "${inputs.nix-assets}/images/wallpapers/spirited_away_reflection.webp";
   };
   system.impermanence.enable = true;
 
@@ -122,7 +123,7 @@
     steam-hardware.enable = true;
 
     # Prevent crashes in steam on the Radeon 9070 XT
-    graphics.extraPackages = [ pkgs.unstable.mesa ];
+    graphics.package = pkgs.unstable.mesa;
   };
 
   # Just set the console font, don't mess with the font settings

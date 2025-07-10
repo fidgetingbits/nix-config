@@ -42,6 +42,8 @@ in
     description = "Turn on LG TV after resume";
     wantedBy = [
       "post-resume.target"
+    ];
+    requires = [
       "network-online.target"
     ];
     after = [

@@ -74,16 +74,22 @@ in
         pkgs.rsync
       ];
     }
+    # FIXME: This should move to impermanence module
+    # Maybe also want an option, since maybe some people's users need special
+    # mode/groups. autoPersistHomes or something
     // lib.optionalAttrs config.system.impermanence.enable {
-      # Persist entire /home for now
       persistence = {
-        "${config.hostSpec.persistFolder}".directories = map (user: {
-          # This should iterate over users.users and use their home/user/group instead
-          directory = config.users.users."${user}".home;
-          inherit user;
-          group = config.users.users."${user}".group;
-          mode = "u=rwx,g=,o=";
-        }) config.hostSpec.users;
+        "${hostSpec.persistFolder}".directories = (
+          map (user: {
+            directory = "${if isDarwin then "/Users" else "/home"}/${user}";
+            inherit user;
+            # FIXME: Can't use config.users.users here due to recursion, despite
+            # old code using it okay?
+            #group = config.users.users.${user}.group;
+            group = if isDarwin then "staff" else "users";
+            mode = "u=rwx,g=,o=";
+          }) config.hostSpec.users
+        );
       };
     };
 }

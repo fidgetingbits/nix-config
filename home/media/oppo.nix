@@ -12,7 +12,8 @@
         "home/common/core/nixos.nix"
       ]
       ++ (map (f: "home/common/optional/${f}") [
-        "atuin.nix"
+        # FIXME: need to setup a key first
+        # "atuin.nix"
         "ghostty.nix"
       ])
     )
