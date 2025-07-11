@@ -175,6 +175,7 @@ in
       du = "dust";
       df = "duf";
       calc = "eva";
+      c = "clear";
       hd = "hexyl --border none";
       hexdump = "hexyl --border none";
       # Path to real rm and rmdir in coreutils. This is so we can not use rmtrash for big files
@@ -283,6 +284,7 @@ in
       cf = "cargo fmt";
 
       # justfiles
+      j = "just";
       jr = "just rebuild";
       jrt = "just rebuild-trace";
       jl = "just --list";

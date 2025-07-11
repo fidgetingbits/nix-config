@@ -14,6 +14,9 @@
 
   nix =
     {
+      # We want at least 2.30 to get the memory management improvements
+      # https://discourse.nixos.org/t/nix-2-30-0-released/66449/4
+      package = lib.mkForce pkgs.unstable.nixVersions.git;
       settings = {
         # See https://jackson.dev/post/nix-reasonable-defaults/
         connect-timeout = 5;
