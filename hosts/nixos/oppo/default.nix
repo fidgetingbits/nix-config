@@ -85,8 +85,11 @@
     ];
     wallpaper = "${inputs.nix-assets}/images/wallpapers/spirited_away_reflection.webp";
   };
-  system.impermanence.enable = true;
 
+  system.impermanence = {
+    enable = true;
+    autoPersistHomes = true;
+  };
   boot = {
     # Cooling / RGB
     # FIXME: probably remove liquidtux since it's for different models

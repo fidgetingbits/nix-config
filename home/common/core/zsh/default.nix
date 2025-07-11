@@ -244,6 +244,7 @@ in
       ncs = "REPO_PATH=$PWD nh os switch --no-nom . -- --impure"; # ncs = nix config switch
       nrepl = "nix repl --expr 'import <nixpkgs>{}'";
 
+      dmesg = "sudo dmesg -H";
       # finding
       t = "tree";
 

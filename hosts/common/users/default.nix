@@ -15,9 +15,11 @@ let
   platform = if isDarwin then "darwin" else "nixos";
 in
 {
+  imports = lib.optional isDarwin [ "root.nix" ];
   users =
     {
       users = (
+        # FIXME: This likely no longer needs flatten or mergeAttrsList
         lib.mergeAttrsList (
           lib.flatten [
             # Import all non-root users
@@ -44,16 +46,6 @@ in
                   }
                 );
             }) config.hostSpec.users)
-            # Define root user (FIXME: Maybe conditionally import this and do it in nixos.nix?
-            (lib.optionalAttrs (!isDarwin) {
-              root = {
-                shell = pkgs.zsh;
-                hashedPasswordFile = config.users.users.${hostSpec.username}.hashedPasswordFile;
-                hashedPassword = lib.mkForce config.users.users.${hostSpec.username}.hashedPassword;
-                # root's ssh key are mainly used for remote deployment
-                openssh.authorizedKeys.keys = config.users.users.${hostSpec.username}.openssh.authorizedKeys.keys;
-              };
-            })
           ]
         )
       );
@@ -67,31 +59,12 @@ in
   # No matter what environment we are in we want these tools for root, and the user(s)
   programs.zsh.enable = true;
   programs.git.enable = true;
-  environment =
-    {
-      systemPackages = [
-        pkgs.just
-        pkgs.rsync
-      ];
-    }
-    # FIXME: This should move to impermanence module
-    # Maybe also want an option, since maybe some people's users need special
-    # mode/groups. autoPersistHomes or something
-    // lib.optionalAttrs config.system.impermanence.enable {
-      persistence = {
-        "${hostSpec.persistFolder}".directories = (
-          map (user: {
-            directory = "${if isDarwin then "/Users" else "/home"}/${user}";
-            inherit user;
-            # FIXME: Can't use config.users.users here due to recursion, despite
-            # old code using it okay?
-            #group = config.users.users.${user}.group;
-            group = if isDarwin then "staff" else "users";
-            mode = "u=rwx,g=,o=";
-          }) config.hostSpec.users
-        );
-      };
-    };
+  environment = {
+    systemPackages = [
+      pkgs.just
+      pkgs.rsync
+    ];
+  };
 }
 // lib.optionalAttrs (inputs ? "home-manager") {
   home-manager = {
@@ -108,6 +81,7 @@ in
     #);
     # FIXME: Add sharedModules with all the common cross-user stuff
     # Add all non-root users to home-manager
+    # FIXME: Can likely remove merge and flatten now
     users = lib.mergeAttrsList (
       lib.flatten [
         (map (user: {
@@ -147,23 +121,6 @@ in
             ]
           );
         }) config.hostSpec.users)
-        # Add root user
-        # FIXME: Probably move this into nixos.nix together with above one
-        (lib.optionalAttrs (!isDarwin && !hostSpec.isMinimal) {
-          root = {
-            home.stateVersion = "23.05"; # Avoid error
-            programs.zsh = {
-              enable = true;
-              plugins = [
-                {
-                  name = "powerlevel10k-config";
-                  src = lib.custom.relativeToRoot "home/common/core/zsh/p10k";
-                  file = "p10k.zsh";
-                }
-              ];
-            };
-          };
-        })
       ]
     );
   };
