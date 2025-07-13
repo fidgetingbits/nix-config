@@ -39,17 +39,15 @@ in
           InputMethod = "qtvirtualkeyboard";
         };
       # FIXME: Ideally we don't need this if UID is < 1000, but was too late so hacking it in for now
-      Users.HideUsers = lib.concatStringSep "," [ "builder" ];
+      Users.HideUsers = lib.concatStringsSep "," [ "builder" ];
       Users.HideShells = "/run/current-system/sw/bin/nologin";
     };
   };
 
   system.activationScripts.script.text = ''
     for user in /home/*; do
-
-      username=$(basename "$user")
       icon_source="$user/.face.icon"
-      icon_dest="/var/lib/AccountsService/icons/$username"
+      icon_dest="/var/lib/AccountsService/icons/$(basename user)"
 
       if [ -f "$icon_source" ]; then
         # Compare first bytes of the image to see if it's different
@@ -57,7 +55,6 @@ in
           cp -L "$icon_source" "$icon_dest"
         fi
       fi
-
     done
   '';
 }
