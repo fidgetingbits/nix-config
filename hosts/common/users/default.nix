@@ -20,8 +20,6 @@ let
   primaryUserPubKeys = lib.lists.forEach pubKeys (key: builtins.readFile key);
 in
 {
-  imports = lib.optional isDarwin [ "root.nix" ];
-
   # No matter what environment we are in we want these tools for root, and the user(s)
   programs.zsh.enable = true;
   programs.git.enable = true;
@@ -35,8 +33,8 @@ in
   # Import all non-root users
   users =
     {
-      users = (
-        lib.mergeAttrsList
+      users =
+        (lib.mergeAttrsList
           # FIXME: For isMinimal we can likely just filter out primaryUsername only?
           (
             map (user: {
@@ -64,7 +62,17 @@ in
                 );
             }) config.hostSpec.users
           )
-      );
+        )
+        // {
+          root = {
+            shell = pkgs.zsh;
+            hashedPasswordFile = config.users.users.${config.hostSpec.primaryUsername}.hashedPasswordFile;
+            hashedPassword = lib.mkForce config.users.users.${config.hostSpec.primaryUsername}.hashedPassword;
+            # root's ssh key are mainly used for remote deployment
+            openssh.authorizedKeys.keys =
+              config.users.users.${config.hostSpec.primaryUsername}.openssh.authorizedKeys.keys;
+          };
+        };
     }
     //
     # Extra platform-specific options
@@ -75,19 +83,12 @@ in
 // lib.optionalAttrs (inputs ? "home-manager") {
   home-manager =
     let
-      importFileIfPresent =
+      fullPathIfExists =
         path:
-        lib.optionalAttrs (lib.pathExists (lib.custom.relativeToRoot path)) (
-          import (lib.custom.relativeToRoot "${path}") {
-            inherit
-              pkgs
-              inputs
-              config
-              lib
-              hostSpec
-              ;
-          }
-        );
+        let
+          fullPath = lib.custom.relativeToRoot path;
+        in
+        lib.optional (lib.pathExists fullPath) fullPath;
     in
     {
       extraSpecialArgs = {
@@ -102,27 +103,44 @@ in
       #  ])
       #);
       # Add all non-root users to home-manager
-      users = lib.mergeAttrsList (
-        map (user: {
-          "${user}".imports = lib.flatten [
-            (lib.optional (!hostSpec.isMinimal) (
-              map (importFileIfPresent) [
-                "home/${user}/${hostSpec.hostName}.nix"
-                "home/${user}/common/${platform}.nix"
-              ]
-            ))
-            # Static module with common values avoids duplicate file per user
-            (
-              { ... }:
-              {
-                home = {
-                  homeDirectory = if isDarwin then "/Users/${user}" else "/home/${user}";
-                  username = "${user}";
-                };
-              }
-            )
-          ];
-        }) config.hostSpec.users
-      );
+      users =
+        (lib.mergeAttrsList (
+          map (user: {
+            "${user}".imports = lib.flatten [
+              (lib.optional (!hostSpec.isMinimal) (
+                map (fullPathIfExists) [
+                  "home/${user}/${hostSpec.hostName}.nix"
+                  "home/${user}/common"
+                  "home/${user}/common/${platform}.nix"
+                ]
+              ))
+              # Static module with common values avoids duplicate file per user
+              (
+                { ... }:
+                {
+                  home = {
+                    homeDirectory = if isDarwin then "/Users/${user}" else "/home/${user}";
+                    username = "${user}";
+                  };
+                }
+              )
+            ];
+          }) config.hostSpec.users
+        ))
+        // {
+          root = {
+            home.stateVersion = "23.05"; # Avoid error
+            programs.zsh = {
+              enable = true;
+              plugins = [
+                {
+                  name = "powerlevel10k-config";
+                  src = lib.custom.relativeToRoot "home/common/core/zsh/p10k";
+                  file = "p10k.zsh";
+                }
+              ];
+            };
+          };
+        };
     };
 }

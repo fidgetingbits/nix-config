@@ -17,6 +17,7 @@
           type = lib.types.str;
           description = "The primary username of the host";
         };
+        # FIXME: deprecated. Use either primaryUsername or map over users
         username = lib.mkOption {
           type = lib.types.str;
           description = "The username of the host";
@@ -63,7 +64,7 @@
           description = "The home directory of the user";
           default =
             let
-              user = config.hostSpec.username;
+              user = config.hostSpec.primaryUsername;
             in
             if pkgs.stdenv.isLinux then "/home/${user}" else "/Users/${user}";
         };

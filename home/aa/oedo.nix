@@ -74,7 +74,7 @@
     secrets = {
       # for systems that don't support yubikey
       "keys/ssh/ed25519" = {
-        path = "${config.hostSpec.home}/.ssh/id_ed25519";
+        path = "${config.home.homeDirectory}/.ssh/id_ed25519";
       };
     };
   };

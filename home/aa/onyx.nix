@@ -72,7 +72,7 @@
   sops = {
     secrets = {
       "tokens/fly" = {
-        path = "${config.hostSpec.home}/.config/fly.io/token";
+        path = "${config.home.homeDirectory}/.config/fly.io/token";
       };
     };
   };

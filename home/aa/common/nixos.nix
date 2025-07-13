@@ -2,12 +2,11 @@
 {
   config,
   inputs,
-  #pkgs,
   lib,
   ...
 }:
 let
-  homeDirectory = config.hostSpec.home;
+  homeDirectory = config.home.homeDirectory;
 in
 {
   home = {

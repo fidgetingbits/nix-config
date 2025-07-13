@@ -15,6 +15,7 @@ in
   environment.systemPackages = [ sddm-theme ];
   qt.enable = true;
   services.displayManager.sddm = {
+    wayland.enable = config.hostSpec.useWayland;
     package = pkgs.kdePackages.sddm; # use qt6 version of sddm
     enable = true;
     theme = sddm-theme.pname;
@@ -37,6 +38,26 @@ in
           GreeterEnvironment = lib.concatStringsSep "," greeterEnvVars;
           InputMethod = "qtvirtualkeyboard";
         };
+      # FIXME: Ideally we don't need this if UID is < 1000, but was too late so hacking it in for now
+      Users.HideUsers = lib.concatStringSep "," [ "builder" ];
+      Users.HideShells = "/run/current-system/sw/bin/nologin";
     };
   };
+
+  system.activationScripts.script.text = ''
+    for user in /home/*; do
+
+      username=$(basename "$user")
+      icon_source="$user/.face.icon"
+      icon_dest="/var/lib/AccountsService/icons/$username"
+
+      if [ -f "$icon_source" ]; then
+        # Compare first bytes of the image to see if it's different
+        if [ ! -f "$icon_dest" ] || ! cmp -s -n 256 "$icon_source" "$icon_dest"; then
+          cp -L "$icon_source" "$icon_dest"
+        fi
+      fi
+
+    done
+  '';
 }
