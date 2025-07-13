@@ -5,6 +5,7 @@ in
 {
   users.users.${builderName} = {
     isSystemUser = true; # Forces < 1000 UID, which is ignored by sddm
+    uid = 800; # Try to force it below 1000 since isSystemUser isn't working
     useDefaultShell = true;
     group = builderName;
     description = "Remote Nix Build User";

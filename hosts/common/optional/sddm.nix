@@ -15,7 +15,7 @@ in
   environment.systemPackages = [ sddm-theme ];
   qt.enable = true;
   services.displayManager.sddm = {
-    wayland.enable = config.hostSpec.useWayland;
+    #wayland.enable = config.hostSpec.useWayland;
     package = pkgs.kdePackages.sddm; # use qt6 version of sddm
     enable = true;
     theme = sddm-theme.pname;
@@ -39,8 +39,8 @@ in
           InputMethod = "qtvirtualkeyboard";
         };
       # FIXME: Ideally we don't need this if UID is < 1000, but was too late so hacking it in for now
-      Users.HideUsers = lib.concatStringsSep "," [ "builder" ];
-      Users.HideShells = "/run/current-system/sw/bin/nologin";
+      #Users.HideUsers = lib.concatStringsSep "," [ "builder" ];
+      #Users.HideShells = "/run/current-system/sw/bin/nologin";
     };
   };
 
@@ -52,7 +52,7 @@ in
 
       if [ -e "$src" ]; then
         if [ ! -e "$dst" ] || [ ! "$src" -ef "$dst" ]; then
-          ln -sf "$src" "$dst"
+          cp -L "$src" "$dst"
         fi
       fi
     done
