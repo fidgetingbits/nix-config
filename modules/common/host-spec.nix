@@ -160,6 +160,11 @@
           default = false;
           description = "Indicate a host that uses Wayland";
         };
+        defaultBrowser = lib.mkOption {
+          type = lib.types.str;
+          default = "firefox";
+          description = "The default browser to use on the host";
+        };
       };
     };
   };

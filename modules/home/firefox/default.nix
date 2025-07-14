@@ -167,6 +167,7 @@ in
       };
     }
     // (lib.optionalAttrs pkgs.stdenv.isLinux {
+      # FIXME: This should become config.hostSpec.defaultBrowser and not just if you import firefox
       xdg.mimeApps.defaultApplications = {
         "text/html" = [ "firefox.desktop" ];
         "text/xml" = [ "firefox.desktop" ];

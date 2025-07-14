@@ -18,7 +18,7 @@
         (map (f: "home/common/optional/${f}") [
           "ssh.nix"
           "audio-tools.nix"
-          "vscode.nix"
+          "vscode"
           "development"
           "aws.nix"
           "helper-scripts"

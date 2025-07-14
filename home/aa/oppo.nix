@@ -18,7 +18,6 @@
           "ssh.nix"
 
           "audio-tools.nix"
-          #"vscode.nix"
           "development"
           "helper-scripts"
           "xdg.nix"

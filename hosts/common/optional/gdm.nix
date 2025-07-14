@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 {
   # Automatically try to unlock gnome-keyring on login
   security.pam.services.gdm.enableGnomeKeyring = true;
@@ -12,6 +12,6 @@
   '';
 
   services.xserver.displayManager.gdm.enable = true;
-  services.xserver.displayManager.gdm.wayland = false;
+  services.xserver.displayManager.gdm.wayland = config.hostSpec.useWayland;
 
 }

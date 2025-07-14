@@ -2,7 +2,7 @@
 # Dunst
 # Notifcation Daemon
 #
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 {
   home.packages = builtins.attrValues {
     inherit (pkgs) libnotify; # required by dunst
@@ -145,7 +145,7 @@
         origin = "top-right";
 
         # Browser for opening urls in context menu.
-        browser = "firefox";
+        browser = config.hostSpec.defaultBrowser;
       };
 
       frame = {

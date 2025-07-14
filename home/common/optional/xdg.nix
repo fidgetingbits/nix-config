@@ -1,7 +1,7 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 let
+  browser = [ "${config.hostSpec.defaultBrowser}.desktop" ];
   # FIXME: That should use config options and just reference whatever is configured as the default
-  browser = [ "firefox.desktop" ];
   editor = [ "code.desktop" ];
   media = [ "vlc.desktop" ];
   # Extensive list of assocations here:

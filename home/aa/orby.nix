@@ -18,7 +18,7 @@
         # Optional common modules
         (map (f: "home/common/optional/${f}") [
           "ssh.nix"
-          "vscode.nix"
+          "vscode"
           "sops.nix"
           "development"
           "helper-scripts"
