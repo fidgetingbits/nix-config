@@ -103,18 +103,60 @@ FZF_CMD="fzf --preview 'ls | head -n 10' --height=10 --reverse +m"
 # --preview 'awk -v n={1} -v l=1 "{print l==n ? 0 \" \" \$0 : l \" \" \$0; l++}"'
 #         -o -type d -print 2>/dev/null | fzf --preview 'ls -l {} | head -n 10' --height=10 --reverse +m) &&
 
-# Fuzzy find file and jump to it's directory
+# Auto select fzf result if only one match
+# https://github.com/junegunn/fzf/issues/27
+function fzf_auto_select() {
+	local lines
+	lines=$(fzf --filter="$1" --no-sort)
+	if [ -z "$lines" ]; then
+		return 1
+	elif [ $(wc -l <<<"$lines") -eq 1 ]; then
+		echo "$lines"
+	else
+		echo "$lines" | fzf --query="$1"
+	fi
+}
+
+# Select the closest match from fzf
+function fzf_closest() {
+	fzf --filter="$1" | head -n 1
+}
+
+# Fuzzy find file and jump to it's directory. Automatically select fzf result if only one match.
 cdf() {
-	local file=$(fd "$1" | fzf --height=40% --border --preview 'bat --color=always {}' --preview-window=right:60%)
-	[ -n "$file" ] && cd "$(dirname "$file")"
+	local files
+	# NOTE: uses fd rather than fzf --filter to get built-in gitignore support
+	files=$(fd $1)
+	if [ -z "$files" ]; then
+		return 1
+	elif [ $(wc -l <<<"$files") -eq 1 ]; then
+		cd "$(dirname "$files")"
+	else
+		local selection=$(echo "$files" | fzf --height=40% --border --preview 'bat --color=always {}' --preview-window=right:60%)
+		if [ -n "$selection" ]; then
+			cd "$(dirname "$selection")"
+		fi
+	fi
 }
 
 # Fuzzy find directory and jump to it
 cdd() {
-	local dir=$(fd -t d "$1" | fzf --height=40% --border --preview 'tree -C {}' --preview-window=right:60%)
-	[ -n "$dir" ] && cd "$dir"
+	local dirs
+	# NOTE: uses fd rather than fzf --filter to get built-in gitignore support
+	dirs=$(fd -t d "$1")
+	if [ -z "$dirs" ]; then
+		return 1
+	elif [ $(wc -l <<<"$dirs") -eq 1 ]; then
+		cd "$dirs"
+	else
+		local selection=$(echo "$dirs" | fzf --height=40% --border --preview 'tree -C {}' --preview-window=right:60%)
+		if [ -n "$selection" ]; then
+			cd "$selection"
+		fi
+	fi
 }
 
+# FIXME: Integrate cdd above, but add the depth option
 # fuzzy directory with some depth
 function cdds() {
 	local dir=$(fd -d 4 -t d "$1" | fzf --height=40% --border --preview 'tree -C {}' --preview-window=right:60%)
