@@ -126,7 +126,7 @@ in
       gpg = {
         format = "ssh";
         # FIXME: git doesn't support parsing sk-ssh keys, see https://github.com/maxgoedjen/secretive/issues/262
-        # See alias creation in zshrc for how I get around that, while still using signing.key later on
+        # See 'alias git' creation in zshrc for how I get around that, while still using signing.key later on
         # sshKeyCommand = "ssh-add -L";
 
         # Taken from

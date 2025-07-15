@@ -296,16 +296,18 @@ in
     editor.enableAutoCompletions = true;
   };
   "github.copilot.advanced" = { };
-  "github.copilot.config.codeGeneration.instructions" = [
-    {
-      "file" = "${config.home.homeDirectory}/.config/vscode/copilot_prompt";
-    }
-  ];
-  "github.chat.config.codeGeneration.instructions" = [
-    {
-      "file" = "${config.home.homeDirectory}/.config/vscode/copilot_prompt";
-    }
-  ];
+  "github.copilot.chat.codeGeneration.useInstructionFiles" = true;
+
+  #  "github.copilot.config.codeGeneration.instructions" = [
+  #    {
+  #      "file" = "${config.home.homeDirectory}/.config/vscode/copilot_prompt";
+  #    }
+  #  ];
+  #  "github.chat.config.codeGeneration.instructions" = [
+  #    {
+  #      "file" = "${config.home.homeDirectory}/.config/vscode/copilot_prompt";
+  #    }
+  #  ];
 
   # gitlab
   "gitlab.duoCodeSuggestions.enabled" = false;
