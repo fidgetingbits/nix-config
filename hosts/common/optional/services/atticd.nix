@@ -63,7 +63,7 @@
 
       environment = lib.optionalAttrs config.system.impermanence.enable {
         persistence = {
-          "${config.hostSpec.persistFolder}".directories = [ "/var/lib/atticd" ];
+          "${config.hostSpec.persistFolder}".directories = [ "/var/lib/private/atticd" ];
         };
       };
 
