@@ -53,6 +53,10 @@ in
           name = "zhooks";
           src = "${pkgs.zsh-zhooks}/share/zsh/zhooks";
         }
+        {
+          name = "you-should-use";
+          src = "${pkgs.zsh-you-should-use}/share/zsh/plugins/you-should-use";
+        }
       ]
       # Some hosts don't use overlays, so don't add custom packages unless they are there
       ++ lib.optionals (pkgs ? "zsh-term-title") [
