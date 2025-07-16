@@ -91,7 +91,7 @@ in
 
               if [ ! -e "$socket" ]; then
                   printf '{"text": "Waiting for YubiKey socket"}\n'
-                  while [ ! -e "$socket" ]; do sleep 1; done
+                  while [ ! -e "$socket" ]; do ${lib.getBin pkgs.coreutils}/bin/sleep 1; done
               fi
               printf '{"text": ""}\n'
 
