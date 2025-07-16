@@ -91,7 +91,6 @@ in
       serviceConfig = {
         ExecStart = "${pkgs.writeShellScript "watch-store" ''
           #!/run/current-system/sw/bin/bash
-          set -x
           ATTIC_TOKEN=$(cat ${attic_token})
           ${attic}/bin/attic login ${config.attic-client.cache-name} ${attic_server} $ATTIC_TOKEN
           ${attic}/bin/attic watch-store ${config.attic-client.cache-name}
