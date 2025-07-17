@@ -11,7 +11,19 @@ let
         serviceName = "nginx";
         protocol = "tcp";
         ports = [ nginxPort ];
-        hosts = config.hostSpec.networking.rules.${config.hostSpec.hostName}.nginxAllowedHosts;
+        hosts =
+          let
+            rules = config.hostSpec.networking.rules.${config.hostSpec.hostName};
+          in
+          if (rules ? "nginxAllowedHosts") then
+            rules.nginxAllowedHosts
+          else
+            [
+              {
+                name = "localhost";
+                ip = "127.0.0.1";
+              }
+            ];
       }
     ];
   };
