@@ -80,7 +80,8 @@ else
 		export REPO_PATH
 		NIXPKGS_ALLOW_BROKEN=1
 		export NIXPKGS_ALLOW_BROKEN
-		nh os switch . -- --impure --show-trace --reference-lock-file locks/$HOST.lock $extra_args
+		# NH_NO_CHECKS=1 because of https://github.com/nix-community/nh/issues/353
+		NH_NO_CHECKS=1 nh os switch . -- --impure --show-trace --reference-lock-file locks/$HOST.lock $extra_args
 	#nixos-rebuild $switch_args $extra_args switch
 	fi
 fi
