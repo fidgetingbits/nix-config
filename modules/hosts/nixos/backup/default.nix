@@ -1,4 +1,3 @@
-# FIXME(backup): Figure out how to evaluate on darwin
 # FIXME(backup): Backups can silently fail if the exclusive.lock is not removed from a failed backup
 #                probably need a script to verify from a list if the lock is held, because backup itself
 #                will not return an error code if it fails to acquire the lock. Probably shouldn't auto

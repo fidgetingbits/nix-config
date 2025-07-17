@@ -63,7 +63,14 @@
 
       environment = lib.optionalAttrs config.system.impermanence.enable {
         persistence = {
-          "${config.hostSpec.persistFolder}".directories = [ "/var/lib/private/atticd" ];
+          "${config.hostSpec.persistFolder}".directories = [
+            {
+              # NOTE: systemd Dynamic User requires /var/lib/private to be 0700. See impermanence module
+              directory = "/var/lib/private/atticd";
+              user = "nobody";
+              group = "nogroup";
+            }
+          ];
         };
       };
 

@@ -94,6 +94,12 @@
               "/var/lib/nixos"
               "/var/lib/systemd/coredump"
               "/etc/NetworkManager/system-connections"
+
+              # systemd DynamicUser requires /var/lib/private to exist and be 0700
+              {
+                directory = "/var/lib/private";
+                mode = "0700";
+              }
             ]
             ++ lib.optional config.system.impermanence.autoPersistHomes (
               map (user: {
