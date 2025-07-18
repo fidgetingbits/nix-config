@@ -38,6 +38,10 @@ lib.mkMerge [
       recommendedOptimisation = true;
       recommendedGzipSettings = true;
       recommendedTlsSettings = true;
+
+      appendHttpConfig = "
+        sendfile_max_chunk 1m;
+      ";
     };
 
     # Grant nginx access to certificates

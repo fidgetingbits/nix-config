@@ -56,6 +56,8 @@
           "mounts/onus-cifs.nix"
           "services/syncthing.nix"
 
+          "startpage.nix"
+
           # Gaming
           "gaming.nix"
 

@@ -14,6 +14,7 @@
       "modules/home/"
     ])
     ./tmux.nix
+    ./zellij.nix
     ./zsh
     ./neovim.nix
     ./direnv.nix
@@ -85,7 +86,6 @@
           duf # df replacement
           ripgrep # grep replacement
           du-dust # du replacement
-          pre-commit # git hooks
           p7zip # archive
           pstree # tree-style ps
           lsof # list open files
@@ -104,13 +104,15 @@
           nix-tree # show nix store contents
           openssh
 
-          # for notify-send
-          libnotify
+          libnotify # for notify-send
 
           # network utilities
-          inetutils
+          inetutils # ping, traceroute, etc
 
           magic-wormhole # Convenient file transfer
+
+          # FIXME: This likely isn't needed as core, since we can use dev flake for it
+          pre-commit # git hooks
           ;
 
       }
