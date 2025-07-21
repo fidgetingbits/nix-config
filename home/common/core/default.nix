@@ -146,6 +146,12 @@
 
   programs.bash.enable = true;
   programs.home-manager.enable = true;
+  # even better top
+  programs.btop = {
+    enable = true;
+    settings = {
+    };
+  };
 
   home.stateVersion = "23.05";
 }

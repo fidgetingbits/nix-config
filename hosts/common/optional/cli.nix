@@ -10,7 +10,6 @@
       findutils # find, xargs, locate, etc
       eza # better cat
       htop # better top
-      btop # even better top
       cyme # better lsusb
       pciutils
       usbutils
@@ -36,6 +35,7 @@
       bat # better cat
       ;
   };
+
   services.locate = {
     enable = true;
     package = pkgs.mlocate;
