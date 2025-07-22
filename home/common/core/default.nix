@@ -13,8 +13,9 @@
       "modules/common/"
       "modules/home/"
     ])
+    # FIXME: This should just use scanPath ? Just need to filter nixos/darwin
     ./tmux.nix
-    ./zellij.nix
+    ./zellij
     ./zsh
     ./neovim.nix
     ./direnv.nix
@@ -26,6 +27,7 @@
 
   home.packages =
     let
+      # FIXME: This should move to packages
       json5-jq = pkgs.stdenv.mkDerivation {
         name = "json5-jq";
 

@@ -1,4 +1,5 @@
-[./home/common/core/zsh/p10k/]
+# shellfmt can't handle a lot of actual zsh syntax
+[*.zsh]
 ignore = true
 
 [justfile]

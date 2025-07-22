@@ -52,6 +52,7 @@ in
         source ${pkgs.fzf}/share/fzf/key-bindings.zsh
 
         bindkey '^[k' kyd # Bind kyd alias to Alt+k
+
       '')
       (lib.mkAfter (lib.readFile ./zshrc))
     ];

@@ -1,0 +1,36 @@
+#  FIXME: rename this after pre-commit shfmt can be made to ignore it
+# Session tab completion from: https://github.com/zellij-org/zellij/issues/1933
+# shellcheck disable=SC2148
+_zellij_sessions() {
+    local line sessions desc
+    # Get list of sessions without formatting (zellij ls -n)
+    # shellcheck disable=SC2296
+    sessions=("${(@f)$(zellij ls -n)}")
+    local -a session_names_with_desc
+
+    # Parse each session line to extract name and description
+    for line in "${sessions[@]}"; do
+        session_name=${line%% *}    # Everything before first space (session name)
+        desc=${line#* }             # Everything after first space (description)
+        session_names_with_desc+=("$session_name:$desc")
+    done
+
+    # Provide completion options with descriptions
+    _describe -t sessions 'active session' session_names_with_desc
+}
+# ----------------------------------------------------------------------------
+# Tab Completion Setup
+# ----------------------------------------------------------------------------
+# Set up enhanced completion with command aliases and smart session completion
+# The sed script below modifies the generated completion to:
+# 1. Add single-letter aliases: (attach) -> (attach|a), (kill-session) -> (kill-session|k), etc.
+# 2. Replace default session completion with our custom _zellij_sessions function
+# shellcheck disable=SC1090
+. <(zellij setup --generate-completion zsh | sed -E '
+    s/^\((attach)\)/(\1|a)/
+    s/^\((kill-session)\)/(\1|k)/
+    s/^\((delete-session)\)/(\1|d)/
+    s/::session-name -- Name of the session to attach to:/::session-name:_zellij_sessions/
+    s/::target-session -- Name of target session:/::target-session:_zellij_sessions/
+    s/^(_(zellij) ).*/compdef \1\2/
+')

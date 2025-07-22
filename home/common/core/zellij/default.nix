@@ -1,4 +1,4 @@
-{ ... }:
+{ lib, ... }:
 {
   programs.zellij = {
     enable = true;
@@ -10,9 +10,12 @@
     };
   };
 
-  programs.zsh.shellAliases = {
-    zl = "zellij";
-    zls = "zellij list-sessions";
+  programs.zsh = {
+    shellAliases = {
+      zl = "zellij";
+      zls = "zellij list-sessions";
+    };
+    initContent = lib.readFile ./zellij_session_completions;
   };
   stylix.targets.zellij.enable = true;
 }
