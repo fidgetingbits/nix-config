@@ -1,5 +1,5 @@
 { lib, ... }:
-{
+rec {
   # use path relative to the root of the project
   relativeToRoot = lib.path.append ../.;
   scanPaths =
@@ -16,4 +16,7 @@
         ) (builtins.readDir path)
       )
     );
+  scanPathsFilterPlatform =
+    path:
+    lib.filter (path: builtins.match "nixos|darwin" (builtins.toString path) == null) (scanPaths path);
 }

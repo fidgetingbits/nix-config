@@ -643,4 +643,9 @@ in
   "search.followSymlinks" = false;
   "typescript.tsserver.log" = "off";
   "git.autofetch" = false;
+
+  # Allow vscode quick open to work if vscodevim is enabled
+  "vim.handleKeys" = {
+    "<C-p>" = false;
+  };
 }

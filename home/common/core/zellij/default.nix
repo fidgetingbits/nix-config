@@ -1,14 +1,23 @@
-{ lib, ... }:
 {
-  programs.zellij = {
-    enable = true;
-    # enableZshIntegration = true; # NOTE: This forces zellij upon opening zsh
-    settings = {
-      show_startup_tips = false;
-      pane_frames = false;
-      #default_layout = "compact"; # NOTE: compact removes the keybindings hint
-    };
-  };
+  lib,
+  pkgs,
+  ...
+}:
+{
+  home.packages = [
+    # For some reason enabling it doesn't actually install it (at least in my PATH)
+    pkgs.unstable.zellij
+  ];
+  #  programs.zellij = {
+  #    enable = true;
+  #    #package = pkgs.unstable.zellij;
+  #    enableZshIntegration = false; # NOTE: true forces zellij upon opening zsh
+  #    settings = {
+  #      show_startup_tips = false;
+  #      pane_frames = false;
+  #      #default_layout = "compact"; # NOTE: compact removes the keybindings hint
+  #    };
+  #  };
 
   programs.zsh = {
     shellAliases = {
@@ -17,5 +26,4 @@
     };
     initContent = lib.readFile ./zellij_session_completions;
   };
-  stylix.targets.zellij.enable = true;
 }

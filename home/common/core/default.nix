@@ -13,14 +13,7 @@
       "modules/common/"
       "modules/home/"
     ])
-    # FIXME: This should just use scanPath ? Just need to filter nixos/darwin
-    ./tmux.nix
-    ./zellij
-    ./zsh
-    ./neovim.nix
-    ./direnv.nix
-    ./git.nix
-    ./bat.nix
+    (lib.custom.scanPathsFilterPlatform ./.)
   ];
 
   inherit hostSpec;
