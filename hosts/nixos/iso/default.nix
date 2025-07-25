@@ -5,7 +5,7 @@
   config,
   ...
 }:
-{
+rec {
   imports = lib.flatten [
     #"${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
     "${inputs.nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-gnome.nix"
@@ -13,10 +13,15 @@
     inputs.home-manager.nixosModules.home-manager
     (map lib.custom.relativeToRoot [
       # FIXME: Switch this to just import hosts/common/core (though have to be careful to purposefully not add platform file..
-      "hosts/common/users/${config.hostSpec.username}/"
       "hosts/common/optional/minimal-user.nix"
       "modules/common/host-spec.nix"
     ])
+    (
+      let
+        path = lib.custom.relativeToRoot "hosts/common/users/${hostSpec.username}/default.nix";
+      in
+      lib.optional (lib.pathExists path) path
+    )
   ];
 
   hostSpec = {

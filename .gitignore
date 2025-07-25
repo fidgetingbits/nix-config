@@ -3,7 +3,7 @@
 tmp
 # From build command testing
 result
-latest.iso
+*.iso
 
 # prettier?
 node_modules
