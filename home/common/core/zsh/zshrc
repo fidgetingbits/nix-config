@@ -39,7 +39,9 @@ setopt pushd_minus
 
 ##
 # zle key remapping
+# NOTE: These are mostly used for voice mappings. Better to just use vi mode when outside voice.
 ##
+
 # ^[3~ is sent by many terminals for the delete key
 bindkey '^[[3~' delete-char
 # ^[3;5~ is sent by some terminals for ctrl+delete key
@@ -54,6 +56,9 @@ bindkey '^[[m' set-mark-command
 bindkey '^[%' vi-match-bracket
 bindkey '^X^P' vi-find-prev-char
 bindkey '^[^K' kill-whole-line
+
+# Default is ctrl-x ctrl-v
+bindkey '^]' vi-cmd-mode
 
 # FIXME(zsh): Figure out how todo the indenting for junk for zle
 # function indent-line {

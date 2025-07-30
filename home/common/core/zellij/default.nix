@@ -23,6 +23,7 @@
     shellAliases = {
       zl = "zellij";
       zls = "zellij list-sessions";
+      zla = "zellij attach";
     };
     initContent = lib.readFile ./zellij_session_completions;
   };

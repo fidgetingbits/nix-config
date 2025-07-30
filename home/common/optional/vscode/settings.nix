@@ -644,8 +644,8 @@ in
   "typescript.tsserver.log" = "off";
   "git.autofetch" = false;
 
-  # Allow vscode quick open to work if vscodevim is enabled
   "vim.handleKeys" = {
-    "<C-p>" = false;
+    "<C-p>" = false; # quick open
+    "<C-r>" = false; # quick session
   };
 }

@@ -17,6 +17,8 @@
         "ctrl+shift+i=unbind"
         # Remap to avoid conflict with GTK Inspector
         "ctrl+shift+d=inspector:toggle"
+        # Fix fixterm conflict with zsh ^[ character https://github.com/ghostty-org/ghostty/discussions/5071
+        "ctrl+left_bracket=text:\\x1b"
       ];
     };
   };

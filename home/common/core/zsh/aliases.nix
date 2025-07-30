@@ -95,6 +95,8 @@ in
   k9 = "kill -9";
   kf = "ps -e | fzf | awk '{print $1}' | xargs kill";
 
+  h = "history";
+
   # folders
   # Directory convenience
   cdr = "cd-gitroot";
