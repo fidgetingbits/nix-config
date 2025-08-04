@@ -14,6 +14,14 @@ let
     # Other external inputs
     // {
       neovim = inputs.nixvim-flake.packages.${final.system}.default;
+      proton-authenticator = final.callPackage "${
+        prev.fetchFromGitHub {
+          owner = "felschr";
+          repo = "nixpkgs";
+          rev = "proton-authenticator";
+          sha256 = "sha256-VJFUV1Z4WGj1/WbNqb6I/QUJWh9X0WL+ENibhLUc8ys=";
+        }
+      }/pkgs/by-name/pr/proton-authenticator/package.nix" { };
     };
 
   linuxModifications =

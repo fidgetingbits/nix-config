@@ -61,6 +61,7 @@
       cyberpower-pdu
       easylkb
       ntfs3g
+      proton-authenticator
       ;
   };
 
