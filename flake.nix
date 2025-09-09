@@ -111,10 +111,6 @@
       url = "github:nixos/nixos-hardware";
     };
 
-    nixos-hardware-oedo = {
-      url = "github:fidgetingbits/nixos-hardware?ref=dell-precision-5570";
-    };
-
     pre-commit-hooks = {
       url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -182,6 +178,10 @@
     };
     nixvim-flake = {
       url = "git+ssh://git@gitlab.com/fidgetingbits/nixvim-flake.git?shallow=1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nixcats-flake = {
+      url = "github:fidgetingbits/neovim?shallow=1?ref=main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-assets = {
