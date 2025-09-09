@@ -1,20 +1,25 @@
 # Backup
 
-This module provides a service and options for automating the backup of host data using borg. It assumes that a borg server has been configured, either locally or remotely.
+This module provides a service and options for automating the backup of host
+data using `borg`. It assumes that a borg server has been configured, either
+locally or remotely.
 
 ## Requirements
 
-- msmtp for email notifications
-- A borg server. In the following example, we'll be using a borg server installed on a remote host but a local borg server can also be used.
+- `msmtp` for email notifications
+- A borg server. In the following example, we'll be using a borg server
+  installed on a remote host but a local borg server can also be used.
 
 ## Server SSH Setup
 
-The following assumes there is ssh access configured for some user to a remote ssh server. We define a
-private key in our sops files, which gets placed into the root users `~/.ssh/` folder. This is then used to authenticate
-to the remote backup server, which will need the associated `~/.ssh/authorized_key` entry to be edited.
+The following assumes there is ssh access configured for some user to a remote
+ssh server. We define a private key in our sops files, which gets placed into
+the root users `~/.ssh/` folder. This is then used to authenticate to the
+remote backup server, which will need the associated `~/.ssh/authorized_key`
+entry to be edited.
 
-To generate a new private key run `ssh-keygen -t ed25519 -f id_borg`. Place the contents of `id_borg` into your hosts
-sops file, in the following location:
+To generate a new private key run `ssh-keygen -t ed25519 -f id_borg`. Place the
+contents of `id_borg` into your hosts sops file, in the following location:
 
 ```yaml
 keys:
@@ -32,9 +37,17 @@ Finally, delete the local `id_borg` and `id_borg.pub` copies once you've confirm
 
 ## Setup
 
-1. First we'll need to create a passphrase that will secure the BORG_KEY that gets generated for our borg repo in  later steps. To do so, create and save a passphrase in your preferred password vault such as Proton Pass.
-2. Now we'll need a way for our backup module on the host to provide the passphrase to the borg server when it runs. To do this we'll add the pasphrase to our `nix-secrets/secrets.yaml` using sops and extract it on to the host at the location the module expects to find it.
-3. Add the passphrase to `nix-secrets/secrets.yaml` using sops. For example, run `sops path/to/nix-secrets/secrets.yaml`
+1. First we'll need to create a passphrase that will secure the BORG_KEY that
+   gets generated for our borg repo in  later steps. To do so, create and save
+   a passphrase in your preferred password vault such as Proton Pass.
+
+2. Now we'll need a way for our backup module on the host to provide the
+   passphrase to the borg server when it runs. To do this we'll add the
+   pasphrase to our `nix-secrets/secrets.yaml` using sops and extract it on to
+   the host at the location the module expects to find it.
+
+3. Add the passphrase to `nix-secrets/secrets.yaml` using sops. For example,
+   run `sops path/to/nix-secrets/secrets.yaml`
 
 ```diff
 
@@ -77,11 +90,16 @@ hosts/common/core/sops.nix
   ...
 
 ```
-In the example above, we provide the path to the BORG_KEY passphrase in our nix-secrets and specify that it should be extracted to "/etc/borg/passphrase", which is where the backup module will look for it.
 
-4. With our passphrase set up , we'll do some prep work on the borg server. Depending on how you set up the borg server, this step may not be necessary.
+In the example above, we provide the path to the BORG_KEY passphrase in our
+nix-secrets and specify that it should be extracted to "/etc/borg/passphrase",
+which is where the backup module will look for it.
 
-Depending how you configure the borg server, user's home locations may not be in the typical `/home/<user>` or `/Users/<user>` location.
+4. With our passphrase set up , we'll do some prep work on the borg server.
+   Depending on how you set up the borg server, this step may not be necessary.
+
+Depending how you configure the borg server, user's home locations may not be
+in the typical `/home/<user>` or `/Users/<user>` location.
 
     1. Log in to the server and run `pwd` to print the working directory of the user's home.
 
