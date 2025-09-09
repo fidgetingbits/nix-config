@@ -47,6 +47,8 @@ in
   grsa = "git restore --staged :/";
 
   ga = "git add";
+  # "git add again" - Re-add changes for anything that was already staged. Useful for pre-commit changes, etc
+  gaa = "git update-index --again";
   gau = "git add --update";
   # Only add updates to files that are already staged
   gas = "git add --update $(git diff --name-only --cached)";
