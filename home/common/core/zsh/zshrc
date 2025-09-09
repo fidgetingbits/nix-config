@@ -161,6 +161,24 @@ cdd() {
 	fi
 }
 
+# Fuzzy jump backwards up the current directory tree
+cdup() {
+  local parent_dir
+  parent_dir=$( (
+    current_dir=$(pwd)
+    while [ "$current_dir" != "/" ]; do
+      echo "$current_dir"
+      current_dir=$(dirname "$current_dir")
+    done
+    echo /
+  ) | fzf --tac) # --tac reverses the list to show closest parents first
+
+  # If a directory was selected (and not cancelled), cd into it
+  if [ -n "$parent_dir" ]; then
+    cd "$parent_dir" || return
+  fi
+}
+
 # FIXME: Integrate cdd above, but add the depth option
 # fuzzy directory with some depth
 function cdds() {
