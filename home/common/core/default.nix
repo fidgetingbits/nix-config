@@ -84,7 +84,7 @@
           p7zip # archive
           pstree # tree-style ps
           lsof # list open files
-          tldr # smaller man pages
+          tealdeer # smaller man pages
           eva # cli calculator
           hexyl # hexdump replacement
           grc # colorize output
