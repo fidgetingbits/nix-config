@@ -14,6 +14,7 @@ rec {
     (map lib.custom.relativeToRoot [
       # FIXME: Switch this to just import hosts/common/core (though have to be careful to purposefully not add platform file..
       "hosts/common/optional/minimal-user.nix"
+      "hosts/common/core/keyd.nix" # FIXME: Remove if we move to hosts/common/core above
       "modules/common/host-spec.nix"
     ])
     (
