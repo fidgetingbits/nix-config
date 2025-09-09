@@ -61,8 +61,17 @@
       cyberpower-pdu
       easylkb
       ntfs3g
+      ;
+    inherit (pkgs.unstable)
       proton-authenticator
       ;
+  };
+
+  home.sessionVariables = {
+    # This variable prevents the following from being spammed to the console constantly:
+    # "MESA: warning: Support for this platform is experimental with Xe KMD, bug reports may be ignored."
+    # See https://docs.mesa3d.org/envvars.html for details
+    MESA_LOG_FILE = "/dev/null";
   };
 
   # Allows to show talon icon in system tray
