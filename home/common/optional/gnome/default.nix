@@ -52,6 +52,6 @@
     ++ [
       pkgs.gnomeExtensions.x11-gestures
       pkgs.gnomeExtensions.appindicator
-      (pkgs.chromium.override { enableWideVine = true; }) # to allow gui-based extension management
+      #(pkgs.chromium.override { enableWideVine = true; }) # to allow gui-based extension management
     ];
 }
