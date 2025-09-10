@@ -3,6 +3,7 @@ stdenv.mkDerivation {
   name = "drawio-export-all";
   buildInputs = [
     pkgs.drawio
+    pkgs.imagemagick
     (pkgs.python3.withPackages (pythonPackages: [ ]))
   ];
   dontUnpack = true;

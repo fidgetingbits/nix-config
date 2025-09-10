@@ -1,88 +1,97 @@
 #!/usr/bin/env python
-
 import os
-import subprocess
 import sys
 import pathlib
+import shutil
+import shlex
+from multiprocessing import Process
 import xml.etree.ElementTree as ET
 
+def export(cmd, file, name, index, total):
+    """Export the specified tab from the file"""
+    print(f"Trying {index}/{total}: {name}")
+    export_cmd = f"{cmd} --export"
+    export_cmd += " --transparent"
+    export_cmd += f" --page-index {index}"
+    output_name = shlex.quote(f'{file.stem}-{name}.drawio.png')
+    export_cmd += f" --output {output_name}"
+    export_cmd += f" {file}"
+    # FIXME: Switch with subprocess
+    os.system(export_cmd)
 
 def get_diagram_names(xmlfile):
     """Return a list of all of the diagram names"""
-    # create element tree object
-    tree = ET.parse(xmlfile)
-
-    # get root element
-    root = tree.getroot()
-
-    # create empty list for diagrams
     diagrams = []
 
-    # iterate diagrams items
+    tree = ET.parse(xmlfile)
+    root = tree.getroot()
+
     for item in root.findall("./diagram"):
         diagrams.append(item.attrib["name"])
+
     return diagrams
 
+def find_drawio_binary():
+    """Tests which drawio binary is accessible"""
 
-def usage():
-    print("Usage: drawio-export-all.py <diagram> [output_folder]")
+    binary_names = [ "draw.io", "drawio" ]
+    for name in binary_names:
+        if shutil.which(name):
+            return name
+    return None
+
+def remove_alpha(file):
+    """Replace the transparent background with white"""
+    os.system("magick convert {file} -background white -alpha remove -alpha off {file}.white")
+    # FIXME: Rename file to use the white version
+
+def die(msg):
+    """Print error and exit with error"""
+    print(f"ERROR: {msg}")
     sys.exit(1)
 
-
+# FIXME: Add proper cmd line handling and add option to force white background with remove_alpha
 def main():
-    if len(sys.argv) < 2:
-        print("ERROR: Please supply diagram argument.")
-        usage()
 
-    try:
-        subprocess.run(["which", "drawio"], stdout=subprocess.DEVNULL, check=True)
-    except subprocess.CalledProcessError:
-        print("ERROR: drawio is not installed.")
-        sys.exit(1)
+    # Avoid https://github.com/NixOS/nixpkgs/issues/250986
+    os.environ.pop("WAYLAND_DISPLAY")
+
+    if len(sys.argv) < 2:
+        die("Please supply diagram argument")
 
     diagram_file = pathlib.Path(sys.argv[1])
     if not diagram_file.exists():
-        print("ERROR: Please supply of valid diagram file.")
-        usage()
-    subprocess.Popen(
-        [
-            f"drawio --export --format xml --uncompressed {diagram_file}  2>&1 | grep -v ERROR:g"
-        ],
-        shell=True,
-        # stdout=subprocess.DEVNULL,
-        # stderr=subprocess.DEVNULL,
+        die("Please supply of valid diagram argument.")
+
+    drawio = find_drawio_binary()
+    if not drawio:
+        die("Can't find drawio binary. Make sure it's installed")
+
+    print("Exporting drawio file as xml")
+    os.system(
+        f"{drawio} --export --format xml --uncompressed {diagram_file}"
     )
-    if not os.path.exists(f"{diagram_file.stem}.xml"):
-        print("ERROR: Failed to export diagram to xml.")
-        sys.exit(1)
-    diagrams = get_diagram_names(f"{diagram_file.stem}.xml")
+    xml = f"{diagram_file.stem}.xml"
+    if not pathlib.Path(xml).exists():
+        die(f"Failed to generate {xml}")
+    diagrams = get_diagram_names(xml)
+    # FIXME: Add option to keep files
+    pathlib.Path(xml).unlink()
+    if not len(diagrams):
+        die("No diagrams found in file")
+    print(f"Found {len(diagrams)} diagrams")
 
-    output_folder = "." if len(sys.argv) < 3 else sys.argv[2]
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
-
+    processes = []
     index = 0
-    print(f"Exporting {len(diagrams)} diagrams...")
     for name in diagrams:
-        output_name = f"{output_folder}/{diagram_file.stem}-{name}.drawio.png"
-        export_cmd = "drawio --export"
-        export_cmd += " --transparent"
-        export_cmd += f" --page-index {index}"
-        export_cmd += f" --output {output_name}"
-        export_cmd += f" {diagram_file}"
-        # NOTE: below is because of some gl bug in chromium on linux that spams
-        export_cmd += " 2>&1 | grep -v ERROR:g"
-        subprocess.Popen(
-            [export_cmd],
-            shell=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
-        # os.system(export_cmd)
-        print(f"{index+1}/{len(diagrams)}: {output_name}")
-
+        processes.append(Process(target=export, args=(drawio, diagram_file, name, index, len(diagrams))))
         index = index + 1
 
+    for process in processes:
+        process.start()
+
+    for process in processes:
+        process.join()
 
 if __name__ == "__main__":
     main()
