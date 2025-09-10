@@ -7,7 +7,10 @@
   ...
 }:
 {
-  imports = [ inputs.nixvim-flake.nixosModules.nixvim ];
+  imports = [
+    inputs.nixvim-flake.nixosModules.nixvim
+    inputs.nixcats-flake.nixosModules.default
+  ];
 
   time.timeZone = "Asia/Taipei";
 
