@@ -7,14 +7,14 @@
 
 {
   home.packages = [
-    pkgs.neovim # overridden with nixvim
+    pkgs.nixcats
   ];
 
   programs.zsh = {
     # This is so we don't spawn embedded neovim if already in a neovim terminal
     shellAliases = lib.optionalAttrs config.hostSpec.useNeovimTerminal {
-      vim = "nvim";
-      vi = "nvim";
+      vim = "nixCats";
+      vi = "nixCats";
       # FIXME: Anything with -<command> is broken because ultimately it goes through neovim-openfile, which won't
       # handle the cmdline arguments properly
       ex = "nvim -e";
