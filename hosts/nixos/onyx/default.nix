@@ -6,7 +6,7 @@
   config,
   ...
 }:
-{
+rec {
   imports = lib.flatten [
     inputs.nixos-hardware.nixosModules.asus-zenbook-ux371
     ./hardware-configuration.nix
@@ -244,4 +244,9 @@
         "--avoid '^(${catPatterns avoidPatterns})$'"
       ];
   };
+
+  #  virtualisation.appvm = {
+  #    enable = true;
+  #    user = config.hostSpec.primaryUsername;
+  #  };
 }
