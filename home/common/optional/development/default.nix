@@ -176,4 +176,25 @@ in
       name = "${config.hostSpec.userFullName}"
       email = "${workEmail}"
   '';
+
+  home.file.".editorconfig".text = ''
+    root = true;
+
+    [*]
+    end_of_line = lf
+    insert_final_newline = true
+    indent_style = space
+    indent_size = 4
+
+    [*.nix]
+    indent_style = space
+    indent_size = 4
+
+    [*.lua]
+    indent_style = space
+    indent_size = 2
+
+    [Makefile]
+    indent_style = tab
+  '';
 }
