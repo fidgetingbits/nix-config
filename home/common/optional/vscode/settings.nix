@@ -240,7 +240,7 @@ in
     inlayHints.enabled = "off";
     inlineSuggest.enabled = true;
     largeFileOptimizations = false;
-    lineNumbers = "on";
+    lineNumbers = "relative";
     linkedEditing = true;
     lineHeight = if config.hostSpec.voiceCoding then 1.8 else 0;
     maxTokenizationLineLength = 60000;
