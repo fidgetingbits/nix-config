@@ -317,7 +317,7 @@ bump_lock() {
     if [ ! -e "locks" ]; then
         echo "WARN: Not in your nix-config folder"
     fi
-    host="${1:$(hostname)}"
+    host="${1-$(hostname)}"
     git add "locks/${host}.lock"
     gcm "chore: bump ${host}lock"
 }
