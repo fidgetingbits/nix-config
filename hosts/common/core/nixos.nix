@@ -8,10 +8,11 @@
 }:
 {
   imports = [
-    inputs.nixvim-flake.nixosModules.nixvim
+    #inputs.nixvim-flake.nixosModules.nixvim
     inputs.nixcats-flake.nixosModules.default
   ];
 
+  # FIXME: Make this host region dependent
   time.timeZone = "Asia/Taipei";
 
   # Core packages not available on darwin

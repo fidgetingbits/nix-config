@@ -13,7 +13,8 @@ let
     )
     # Other external inputs
     // {
-      neovim = inputs.nixvim-flake.packages.${final.system}.default;
+      #neovim = inputs.nixvim-flake.packages.${final.system}.default;
+      neovim = inputs.nixcats-flake.packages.${final.system}.default;
       nixcats = inputs.nixcats-flake.packages.${final.system}.default;
     };
 
