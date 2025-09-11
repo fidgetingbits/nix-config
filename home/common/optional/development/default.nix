@@ -178,7 +178,7 @@ in
   '';
 
   home.file.".editorconfig".text = ''
-    root = true;
+    root = true
 
     [*]
     end_of_line = lf
