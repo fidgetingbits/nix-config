@@ -75,6 +75,11 @@ in
       ;
   };
 
+  nix.optimise = {
+    automatic = true;
+    dates = [ "03:45" ]; # Periodically optimize the store
+  };
+
   # FIXME(darwin): I'm not sure this works on darwin...
   security.pki.certificates = lib.flatten (
     lib.optional config.hostSpec.isWork inputs.nix-secrets.work.certificates
