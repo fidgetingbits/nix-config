@@ -312,12 +312,21 @@ git_smart_rebase() {
 }
 
 # Add and commit an updated flake lock file for the current or given host
+# Uses a subshell () to allow `set -ex`
 bump_lock() {
-    cd-gitroot
-    if [ ! -e "locks" ]; then
-        echo "WARN: Not in your nix-config folder"
-    fi
-    host="${1-$(hostname)}"
-    git add "locks/${host}.lock"
-    gcm "chore: bump ${host}lock"
+    (
+        cd-gitroot > /dev/null
+        if [ ! -e "locks" ]; then
+            echo "WARN: Not in your nix-config folder"
+            exit 1
+        fi
+        host="${1-$(hostname)}"
+        if ! git status --porcelain | grep "locks/${host}.lock"; then
+            echo "WARN: No lock change"
+            exit 1
+        fi
+        set -ex
+        git add "locks/${host}.lock"
+        gcm "chore: bump ${host}lock"
+    )
 }
