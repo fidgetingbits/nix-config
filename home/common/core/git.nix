@@ -136,6 +136,7 @@
             "commit-decoration"
           ];
         };
+        alias.edit = "!$EDITOR $(git status --porcelain | awk '{print $2}')";
       };
   };
 
