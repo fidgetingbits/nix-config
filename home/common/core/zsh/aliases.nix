@@ -70,6 +70,8 @@ in
   gl = "git log";
   gc = "git clone";
 
+  bump = "bump_lock";
+
   # lsusb
   lsusb = "cyme --tree";
 

@@ -310,3 +310,14 @@ git_smart_rebase() {
 	git fetch && git rebase
 	git stash list | (grep "${GIT_STASH_MESSAGE}" && git stash pop) || true
 }
+
+# Add and commit an updated flake lock file for the current or given host
+bump_lock() {
+    cd-gitroot
+    if [ ! -e "locks" ]; then
+        echo "WARN: Not in your nix-config folder"
+    fi
+    host="${1:$(hostname)}"
+    git add "locks/${host}.lock"
+    gcm "chore: bump ${host}lock"
+}
