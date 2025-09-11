@@ -27,7 +27,7 @@ copy-lock-out HOST=`hostname`:
 rebuild-pre HOST=`hostname`:
     just update-nix-secrets {{HOST}} && \
     just update-nix-assets {{HOST}} && \
-    just update-nixvim-flake {{HOST}}
+    just update-neovim-flake {{HOST}}
     @git add --intent-to-add .
 
 
@@ -99,10 +99,10 @@ update-nix-secrets HOST=`hostname`:
 update-nix-assets HOST=`hostname`:
     @just update {{HOST}} nix-assets
 
-# Update nixvim flake
+# Update neovim flake
 [group("update")]
-update-nixvim-flake HOST=`hostname`:
-    @just update {{HOST}} nixvim-flake
+update-neovim-flake HOST=`hostname`:
+    @just update {{HOST}} nixcats-flake
 
 # Rebuild vscode extensions that update regularly
 [group("building")]
