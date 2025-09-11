@@ -78,11 +78,12 @@
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     #nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.05";
 
-    nixpkgs-darwin.url = "github:nixos/nixpkgs/nixpkgs-25.05-darwin";
-    nix-darwin = {
-      url = "github:lnl7/nix-darwin";
-      inputs.nixpkgs.follows = "nixpkgs-darwin";
-    };
+    # orby is gone
+    #nixpkgs-darwin.url = "github:nixos/nixpkgs/nixpkgs-25.05-darwin";
+    #nix-darwin = {
+    #  url = "github:lnl7/nix-darwin";
+    #  inputs.nixpkgs.follows = "nixpkgs-darwin";
+    #};
 
     home-manager = {
       url = "github:nix-community/home-manager/release-25.05";
@@ -102,10 +103,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    lanzaboote = {
-      url = "github:nix-community/lanzaboote/v0.3.0";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    #lanzaboote = {
+    #  url = "github:nix-community/lanzaboote/v0.3.0";
+    #  inputs.nixpkgs.follows = "nixpkgs";
+    #};
 
     nixos-hardware = {
       url = "github:nixos/nixos-hardware";
@@ -133,7 +134,7 @@
 
     #################### Utilities ####################
     # HM module to fix up launchers for nix apps on darwin
-    mac-app-util.url = "github:hraban/mac-app-util";
+    #mac-app-util.url = "github:hraban/mac-app-util";
 
     # Secret management
     sops-nix = {
@@ -148,10 +149,10 @@
     };
 
     # firefox is broken on darwin
-    nixpkgs-firefox-darwin = {
-      url = "github:bandithedoge/nixpkgs-firefox-darwin";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    #nixpkgs-firefox-darwin = {
+    #  url = "github:bandithedoge/nixpkgs-firefox-darwin";
+    #  inputs.nixpkgs.follows = "nixpkgs";
+    #};
     firefox-addons = {
       url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -176,10 +177,10 @@
       url = "git+ssh://git@gitlab.com/fidgetingbits/nix-secrets.git?shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixvim-flake = {
-      url = "git+ssh://git@gitlab.com/fidgetingbits/nixvim-flake.git?shallow=1";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    #nixvim-flake = {
+    #  url = "git+ssh://git@gitlab.com/fidgetingbits/nixvim-flake.git?shallow=1";
+    #  inputs.nixpkgs.follows = "nixpkgs";
+    #};
     nixcats-flake = {
       url = "github:fidgetingbits/neovim?shallow=1?ref=main";
       inputs.nixpkgs.follows = "nixpkgs";
