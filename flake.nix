@@ -183,7 +183,7 @@
     #};
     nixcats-flake = {
       url = "github:fidgetingbits/neovim?shallow=1?ref=main";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     nix-assets = {
       url = "github:fidgetingbits/nix-assets";
