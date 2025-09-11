@@ -28,9 +28,16 @@
       trusted-users = [ "@wheel" ];
       builders-use-substitutes = true;
       fallback = true; # Don't hard fail if a binary cache isn't available, since some systems roam
-      extra-substituters = [
-        "https://nix-community.cachix.org" # Nix community Cachix server
+      # FIXME: Make the asian ones dependent on host region
+      substituters = [
+        "https://mirror.sjtu.edu.cn/nix-channels/store" # Shanghai Jiao Tong University - best for Asia
+        "https://mirrors.ustc.edu.cn/nix-channels/store" # USTC backup mirror
+        "https://cache.nixos.org" # Official global cache
+        "https://nix-community.cachix.org" # Community packages
       ];
+      #      extra-substituters = [
+      #        "https://nix-community.cachix.org" # Nix community Cachix server
+      #      ];
       extra-trusted-public-keys = [
         "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
       ];

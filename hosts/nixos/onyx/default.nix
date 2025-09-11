@@ -219,6 +219,8 @@ rec {
   nix.daemonCPUSchedPolicy = lib.mkDefault "batch";
   nix.daemonIOSchedClass = lib.mkDefault "idle";
   nix.daemonIOSchedPriority = lib.mkDefault 7;
+  # https://wiki.nixos.org/wiki/Maintainers:Fastly#Cache_v2_plans
+  nix.binaryCaches = [ "https://aseipp-nix-cache.global.ssl.fastly.net" ];
   #services.swapspace.enable = true;
   services.earlyoom = {
     enable = true;
