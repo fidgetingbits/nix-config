@@ -3,7 +3,7 @@
   home.packages = builtins.attrValues {
     inherit (pkgs)
       # required by https://github.com/adi1090x/polybar-themes
-      rofi # application launcher, the same as dmenu
+      #rofi # application launcher, the same as dmenu
       polybar # status bar
       pywal # generate color scheme from wallpaper
       calc

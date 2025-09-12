@@ -105,6 +105,11 @@
           default = false;
           description = "Indicate a host used for development";
         };
+        isMobile = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = "Used to indicate a mobile host";
+        };
         useYubikey = lib.mkOption {
           type = lib.types.bool;
           default = false;

@@ -15,6 +15,8 @@ rec {
       [
         "hosts/common/core"
         "hosts/common/core/nixos.nix"
+        # FIXME: Make this an enable
+        "modules/hosts/common/hyprland.nix"
       ]
       ++
         # Optional common modules
@@ -83,6 +85,7 @@ rec {
     isProduction = lib.mkForce true;
     useAtticCache = lib.mkForce true;
     isDevelopment = lib.mkForce true;
+    isMobile = lib.mkForce true;
     wallpaper = "${inputs.nix-assets}/images/wallpapers/forest_temple.webp";
     users = lib.mkForce [
       "aa"
