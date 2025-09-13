@@ -4,10 +4,24 @@
   ...
 }:
 {
-  home.packages = [
-    # For some reason enabling it doesn't actually install it (at least in my PATH)
-    pkgs.unstable.zellij
-  ];
+  programs.zellij = {
+    enable = true;
+    package = pkgs.unstable.zellij;
+    #    enableZshIntegration = false; # NOTE: true forces zellij upon opening zsh
+    #    settings = {
+    #      default_mode = "locked";
+    #      ui.pane_frames = {
+    #        rounded_corners = true;
+    #        hide_session_name = true;
+    #      };
+    #      #keybinds = import ./keybinds.nix;
+    #    };
+    #    extraConfig = ''
+    #      // Test
+    #    '';
+  };
+  home.file.".config/zellij/config.kdl".source = ./config.kdl;
+
   #  programs.zellij = {
   #    enable = true;
   #    #package = pkgs.unstable.zellij;
