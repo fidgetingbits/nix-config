@@ -37,10 +37,11 @@
 
           # === Window Managers ===
           # FIXME: This should only be if not wayland
-          "i3"
-          "gnome"
+          "desktop/i3"
+          "desktop/gnome"
           # FIXME: This should only be if wayland
-          "hyprland"
+          "desktop/wayland"
+          "desktop/hyprland"
           "waybar.nix"
 
           "fcitx5"
@@ -92,4 +93,43 @@
       };
     };
   };
+
+  #
+  # ========== Host-specific Monitor Spec ==========
+  #
+  # This uses the nix-config/modules/home/monitors.nix module
+  # Your nix-config/home/<user>/common/optional/desktops/foo.nix WM config should parse and apply these values to it's monitor settings
+  # If on hyprland, use `hyprctl monitors` to get monitor info.
+  # https://wiki.hyprland.org/Configuring/Monitors/
+  #    ------       ------
+  # | HDMI-A-1 | | HDMI-B-1 |
+  #    ------       ------
+  #           ------
+  #          | EDP-1 |
+  #           ------
+  # FIXME: HDMI-A-1 and HDMI-B-1 are "common" monitors possibly used by other systems, so
+  # place them in some common folder
+  monitors = [
+    {
+      name = "HDMI-A-1";
+      width = 2560;
+      height = 2880;
+      refreshRate = 120;
+      #transform = 2;
+    }
+    {
+      name = "HDMI-B-1";
+      width = 2560;
+      height = 2880;
+      refreshRate = 120;
+      #transform = 2;
+    }
+    # {
+    #   name = "HDMI-A-1";
+    #   width = 2560;
+    #   height = 2880;
+    #   refreshRate = 240;
+    #   transform = 2;
+    # }
+  ];
 }
