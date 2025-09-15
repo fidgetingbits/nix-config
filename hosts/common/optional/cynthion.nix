@@ -30,18 +30,18 @@ let
         sourceRoot = null;
       });
 
-  desktopItem = pkgs.makeDesktopItem {
-    name = "Packetry";
-    desktopName = "Packetry";
-    comment = "Cynthion packet capture tool";
-    exec = "${pkgs.packetry}/bin/packetry";
-    icon = pkgs.fetchurl {
-      url = "https://avatars.githubusercontent.com/u/5904722?s=48&v=4";
-      sha256 = "sha256-G6TPHVedJaYBi4dgUmyUWE1wRyHSX6bE4/8GTjrZlf8=";
-    };
-    terminal = false;
-    categories = [ "Network" ];
-  };
+  # desktopItem = pkgs.makeDesktopItem {
+  #   name = "Packetry";
+  #   desktopName = "Packetry";
+  #   comment = "Cynthion packet capture tool";
+  #   exec = "${pkgs.packetry}/bin/packetry";
+  #   icon = pkgs.fetchurl {
+  #     url = "https://avatars.githubusercontent.com/u/5904722?s=48&v=4";
+  #     sha256 = "sha256-G6TPHVedJaYBi4dgUmyUWE1wRyHSX6bE4/8GTjrZlf8=";
+  #   };
+  #   terminal = false;
+  #   categories = [ "Network" ];
+  # };
 in
 {
   users.extraGroups.plugdev = { };
@@ -74,13 +74,13 @@ in
     }
     ++ [
       prebuiltCynthion
-      (pkgs.packetry.overrideAttrs (old: {
-        extraInstallCommands = ''
-          install -Dm644 ${desktopItem}/share/applications/packetry.desktop $out/share/applications/packetry.desktop
-          substituteInPlace $out/share/applications/packetry.desktop \
-            --replace "@out@" ${placeholder "out"}
-        '';
-      }))
+      #      (pkgs.packetry.overrideAttrs (old: {
+      #        extraInstallCommands = ''
+      #          install -Dm644 ${desktopItem}/share/applications/packetry.desktop $out/share/applications/packetry.desktop
+      #          substituteInPlace $out/share/applications/packetry.desktop \
+      #            --replace "@out@" ${placeholder "out"}
+      #        '';
+      #      }))
     ];
 
 }
