@@ -29,6 +29,7 @@
 
   };
 
+  # FIXME: Why does this get clobbered?
   programs.zsh.shellAliases = {
     hc = "hyprctl";
     hcm = "hyprctl monitors";

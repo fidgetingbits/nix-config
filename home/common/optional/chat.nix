@@ -4,5 +4,8 @@
 }:
 
 {
-  home.packages = builtins.attrValues { inherit (pkgs) signal-desktop; };
+  home.packages = [
+    #(pkgs.signal-desktop.override { commandLineArgs = "--password-store='gnome-libsecret'"; })
+    pkgs.signal-desktop
+  ];
 }

@@ -58,26 +58,19 @@ in
             [
               "gamemode"
               "pulseaudio"
-              #"mpd"
-              "tray"
-              # TODO: preferring applets for network and bluetooth instead of these
-              # modules. consider removing in future.
-              #"network"
-              #"bluetooth"
               "battery"
               "backlight"
               "clock#time"
               "clock#date"
+              "tray"
             ]
           else
             [
               "gamemode"
               "pulseaudio"
-              #"mpd"
-              "tray"
-              #"network"
               "clock#time"
               "clock#date"
+              "tray"
             ];
 
         # ========= Modules =========
