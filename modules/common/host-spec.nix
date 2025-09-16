@@ -170,6 +170,11 @@
           default = "firefox";
           description = "The default browser to use on the host";
         };
+        defaultEditor = lib.mkOption {
+          type = lib.types.str;
+          default = "nvim";
+          description = "The default editor command to use on the host";
+        };
       };
     };
   };

@@ -1,6 +1,9 @@
 { config, pkgs, ... }:
 {
-  imports = [ ./binds.nix ];
+  imports = [
+    ./binds.nix
+    ./hyprlock.nix
+  ];
   wayland.windowManager.hyprland = {
     enable = true;
     plugins = [
@@ -12,9 +15,23 @@
       };
       input = {
         follow_mouse = 2;
+        # Invert touchpad scrolling
+        natural_scroll = true;
+
+        # FIXME: Maybe only bother setting these on laptops? Not sure it matters
         touchpad = {
           disable_while_typing = true;
+          # Allows two-finger right click
+          clickfinger_behavior = true;
+
         };
+      };
+
+      gestures = {
+        workspace_swipe = true;
+        workspace_swipe_fingers = 3;
+        workspace_swipe_distance = 100;
+        workspace_swipe_create_new = true;
       };
       exec-once = [
         ''${pkgs.networkmanagerapplet}/bin/nm-applet --indicator''
@@ -27,6 +44,8 @@
       };
     };
 
+    # FIXME: Implement a smarter window focus for single monitor where moving right/left will swap worksapces if already on the edge. There is something similar ish here:
+    # https://github.com/DoMondo/dotfiles/blob/2b32ce2290ba28c809c099dc1934c361c4dfb63a/.hyprland_functions/move_focus.sh#L38
   };
 
   # FIXME: Why does this get clobbered?

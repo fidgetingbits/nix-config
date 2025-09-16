@@ -6,6 +6,10 @@
   ...
 }:
 {
+  programs.wlogout = {
+    enable = true;
+  };
+
   wayland.windowManager.hyprland.settings =
     let
       mainMod = "SUPER";
@@ -22,6 +26,29 @@
         # hold alt + rightclick to resize active window
         "${mainMod},mouse:273,resizewindow"
       ];
+
+      #
+      # ========== Repeat Binds ==========
+      #
+      binde =
+        let
+          pactl = lib.getExe' pkgs.pulseaudio "pactl"; # installed via /hosts/common/optional/audio.nix
+        in
+        [
+          # Resize active window 5 pixels in direction
+          "Control_L&Shift_L&Alt_L, h, resizeactive, -5 0"
+          "Control_L&Shift_L&Alt_L, j, resizeactive, 0 5"
+          "Control_L&Shift_L&Alt_L, k, resizeactive, 0 -5"
+          "Control_L&Shift_L&Alt_L, l, resizeactive, 5 0"
+
+          #FIXME: repeat is not working for these
+          # Volume - Output
+          ", XF86AudioRaiseVolume, exec, ${pactl} set-sink-volume @DEFAULT_SINK@ +5%"
+          ", XF86AudioLowerVolume, exec, ${pactl} set-sink-volume @DEFAULT_SINK@ -5%"
+          # Volume - Input
+          ", XF86AudioRaiseVolume, exec, ${pactl} set-source-volume @DEFAULT_SOURCE@ +5%"
+          ", XF86AudioLowerVolume, exec, ${pactl} set-source-volume @DEFAULT_SOURCE@ -5%"
+        ];
 
       #
       # ========== One-shot Binds ==========

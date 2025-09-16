@@ -1,0 +1,4 @@
+" This is more consistent with vim bindings when using vertical tabs.
+" The default is backwards
+bind --mode=normal J tabnext
+bind --mode=normal K tabprev

@@ -140,5 +140,5 @@
       };
   };
 
-  home.sessionVariables.GIT_EDITOR = if config.hostSpec.isServer then "nvim" else "code -w";
+  home.sessionVariables.GIT_EDITOR = config.hostSpec.defaultEditor;
 }

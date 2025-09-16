@@ -81,6 +81,14 @@
     MESA_LOG_FILE = "/dev/null";
   };
 
+  # FIXME: Move this to tridactyl location
+  xdg.configFile."tridactyl/tridactylrc" = {
+    enable = true;
+    source = (lib.custom.relativeToRoot "modules/home/firefox/tridactylrc");
+    recursive = true;
+  };
+  programs.firefox.nativeMessagingHosts = [ pkgs.tridactyl-native ];
+
   # Allows to show talon icon in system tray
   services.snixembed.enable = true;
   services.yubikey-touch-detector.enable = true;
