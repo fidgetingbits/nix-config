@@ -4,6 +4,8 @@
     ./binds.nix
     ./hyprlock.nix
   ];
+  # Trying to figure out why no tray appears
+  services.status-notifier-watcher.enable = true;
   wayland.windowManager.hyprland = {
     enable = true;
     plugins = [
@@ -15,11 +17,12 @@
       };
       input = {
         follow_mouse = 2;
-        # Invert touchpad scrolling
-        natural_scroll = true;
-
         # FIXME: Maybe only bother setting these on laptops? Not sure it matters
         touchpad = {
+
+          # Invert touchpad scrolling
+          natural_scroll = true;
+
           disable_while_typing = true;
           # Allows two-finger right click
           clickfinger_behavior = true;
@@ -34,6 +37,7 @@
         workspace_swipe_create_new = true;
       };
       exec-once = [
+        ''${pkgs.waybar}/bin/waybar''
         ''${pkgs.networkmanagerapplet}/bin/nm-applet --indicator''
         ''${pkgs.blueman}/bin/blueman-applet''
       ];
