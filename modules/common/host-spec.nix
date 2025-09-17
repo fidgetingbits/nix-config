@@ -175,6 +175,11 @@
           default = "nvim";
           description = "The default editor command to use on the host";
         };
+        defaultDesktop = lib.mkOption {
+          type = lib.types.str;
+          default = "gnome";
+          description = "The default desktop environment to use on the host";
+        };
       };
     };
   };
