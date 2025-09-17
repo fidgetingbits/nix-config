@@ -1,7 +1,6 @@
 { pkgs, ... }:
 {
   services.xserver.desktopManager.gnome.enable = true;
-  services.displayManager.defaultSession = "gnome";
   services.gnome.gnome-keyring.enable = true;
 
   environment.gnome.excludePackages = builtins.attrValues {
