@@ -15,6 +15,7 @@
       mainMod = "SUPER";
       pactl = lib.getExe' pkgs.pulseaudio "pactl";
       playerctl = lib.getExe' pkgs.playerctl "playerctl";
+      brightnessctl = lib.getExe' pkgs.brightnessctl "brightnessctl";
       #terminal = config.home.sessionVariables.TERM;
       #editor = config.home.sessionVariables.EDITOR;
     in
@@ -168,7 +169,7 @@
           ) directions)
 
           # Move workspace to monitor in specified direction
-          # FIXME: Revisit this keybinding
+          # FIXME: Revisit this keybinding. We should just make movewindow call a script that handdles moving to`the monitor if it hits the edge instead?
           (lib.mapAttrsToList (
             key: direction: "CTRLSHIFT, ${key}, movecurrentworkspacetomonitor, ${direction}"
           ) directions)
@@ -178,6 +179,8 @@
           #
           "${mainMod}, m, exec, toggleMonitors"
           "${mainMod}, n, exec, toggleMonitorsNonPrimary"
+          ", code:232, exec, ${brightnessctl} set 10%-"
+          ", code:233, exec, ${brightnessctl} set 10%+"
 
           #
           # ========== Misc ==========
@@ -185,6 +188,7 @@
           "${mainMod} SHIFT, r, exec, hyprctl reload" # reload the configuration file
           "${mainMod}, l, exec, hyprlock" # lock the wm
           "${mainMod}, e, exec, wlogout" # lock the wm
+
         ];
     };
 }
