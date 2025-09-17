@@ -32,19 +32,20 @@
       fi
     '';
 
-    sessionVariables =
-      {
+    sessionVariables = {
 
-      }
-      // lib.optionalAttrs config.hostSpec.useWayland {
-        QT_QPA_PLATFORM = "wayland";
-        GDK_BACKEND = "wayland";
-        CLUTTER_BACKEND = "wayland"; # for gnome-shell
-        SDL_VIDEODRIVER = "wayland"; # for SDL apps
-        NIXOS_OZONE_WL = "1"; # for chromium, vscode, electron, etc
-        # Set by firefox wrapper in nixpkgs, but just in case it's used outside the wrapper?
-        MOZ_ENABLE_WAYLAND = "1";
-      };
+    }
+    // lib.optionalAttrs config.hostSpec.useWayland {
+      QT_QPA_PLATFORM = "wayland";
+      GDK_BACKEND = "wayland";
+      CLUTTER_BACKEND = "wayland"; # for gnome-shell
+      SDL_VIDEODRIVER = "wayland"; # for SDL apps
+      NIXOS_OZONE_WL = "1"; # for chromium, vscode, electron, etc
+      XDG_SESSION_TYPE = "wayland";
+      # Set by firefox wrapper in nixpkgs, but just in case it's used outside the wrapper?
+      MOZ_ENABLE_WAYLAND = "1";
+
+    };
   };
 
   services.ssh-agent.enable = true;
