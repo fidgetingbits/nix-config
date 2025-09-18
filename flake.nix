@@ -188,5 +188,7 @@
     nix-assets = {
       url = "github:fidgetingbits/nix-assets";
     };
+    # Modern nixos-hardware alternative
+    nixos-facter-modules.url = "github:nix-community/nixos-facter-modules";
   };
 }

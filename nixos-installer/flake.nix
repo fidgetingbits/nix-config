@@ -18,7 +18,8 @@
 
       # This mkHost is way better: https://github.com/linyinfeng/dotfiles/blob/8785bdb188504cfda3daae9c3f70a6935e35c4df/flake/hosts.nix#L358
       newConfig =
-        name: disk: swapSize: impermanence:
+        opts:
+        #name: disk: swapSize: impermanence: luks:
         (nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
 
@@ -27,34 +28,86 @@
             lib = nixpkgs.lib.extend (self: super: { custom = import ../lib { inherit (nixpkgs) lib; }; });
 
           };
-          modules = [
-            inputs.disko.nixosModules.disko
-            ../hosts/common/disks/btrfs-luks-impermanence-disko.nix
-            {
-              _module.args = {
-                inherit disk;
-                withSwap = swapSize > 0;
-                swapSize = builtins.toString swapSize;
-              };
-            }
-            ./minimal-configuration.nix
-            ../hosts/nixos/${name}/hardware-configuration.nix
-            ../modules/hosts/nixos/impermanence
-            {
-              networking.hostName = name;
-              system.impermanence.enable = impermanence;
-            }
-          ];
+          modules =
+            let
+            in
+            [
+              (
+                if opts.luks then
+                  ../hosts/common/disks/btrfs-luks-impermanence-disko.nix
+                else
+                  ../hosts/common/disks/btrfs-impermanence-disko.nix
+              )
+              inputs.disko.nixosModules.disko
+              {
+                _module.args = {
+                  inherit (opts.disk) ;
+                  withSwap = opts.swapSize > 0;
+                  swapSize = builtins.toString opts.swapSize;
+                };
+              }
+              ./minimal-configuration.nix
+              ../hosts/nixos/${opts.name}/hardware-configuration.nix
+              ../modules/hosts/nixos/impermanence
+              {
+                networking.hostName = opts.name;
+                system.impermanence.enable = opts.impermanence;
+              }
+            ];
         });
     in
     {
       nixosConfigurations = {
-        # name disk swapSize impermanence
-        oedo = newConfig "oedo" "/dev/nvme0n1" 64 true;
-        ooze = newConfig "ooze" "/dev/nvme0n1" 64 true;
-        #onyx = newConfig "onyx" "/dev/nvme0n1" 64 false;
-        okra = newConfig "okra" "/dev/vda" 0 true;
-        oppo = newConfig "oppo" "/dev/nvme0n1" 64 true;
+        #
+        # Local network
+        #
+
+        # physical machines
+        oedo = newConfig {
+          name = "oedo";
+          disk = "/dev/nvme0n1";
+          swapSize = 64;
+          impermanence = true;
+          luks = true;
+        };
+        ooze = newConfig {
+          name = "ooze";
+          disk = "/dev/nvme0n1";
+          swapSize = 64;
+          impermanence = true;
+          luks = true;
+        };
+        oppo = newConfig {
+          name = "oppo";
+          disk = "/dev/nvme0n1";
+          swapSize = 64;
+          impermanence = true;
+          luks = true;
+        };
+        # FIXME: Double check this when framework arrives
+        #onyx = newConfig { name = "onyx"; disk = "/dev/nvme0n1"; swapSize = 98; impermanence = true; luks = true; };
+
+        # virtual machines
+        okra = newConfig {
+          name = "okra";
+          disk = "/dev/vda";
+          swapSize = 0;
+          impermanence = true;
+          luks = true;
+        };
+
+        #
+        # Remotely managed
+        #
+
+        # physical machines
+        moon = newConfig {
+          name = "moon";
+          disk = "/dev/nvme0n1";
+          swapSize = 16;
+          impermanence = true;
+          luks = false;
+        };
       };
     };
 }
