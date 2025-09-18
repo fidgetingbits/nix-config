@@ -30,12 +30,19 @@ in
   systemd.user.services.waybar = {
     Unit.StartLimitBurst = 30;
   };
+
+  # FIXME: Testing getting waybar tray to work (check again after uwsm)
+  # home.packages = [
+  #   pkgs.libappindicator
+  #   pkgs.libappindicator-gtk3
+  # ];
+
   programs.waybar = {
     enable = true;
+    # FIXME: Re-enable service ideally if doesn't conflict with uwsm and tray icons
     #    systemd = {
     #      enable = true;
-    #target = "hyprland-session.target"; # NOTE = hyprland/default.nix stops graphical-session.target and starts hyprland-sessionl.target
-    #    };
+    #target = "hyprland-session.target"; # NOTE = hyprland/default.nix stops graphical-session.target and starts hyprland-sessionl.target };
     settings = {
       #
       # ========== Main Bar ==========
@@ -81,7 +88,7 @@ in
         "hyprland/workspaces" = {
           all-outputs = false;
           disable-scroll = true;
-          on-click = "actviate";
+          on-click = "activate";
           show-special = true; # display special workspaces along side regular ones (scratch for example)
         };
         "clock#time" = {
@@ -212,5 +219,14 @@ in
         };
       };
     };
+    #   style = ''
+    #     * {
+    #     	border: none;
+    #     	border-radius: 0;
+    #     	font-family: Font Awesome;
+    #     	font-size: 14px;
+    #     	min-height: 24px;
+    #     }
+    #   '';
   };
 }

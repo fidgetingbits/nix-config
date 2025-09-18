@@ -110,12 +110,12 @@
   # Your nix-config/home/<user>/common/optional/desktops/foo.nix WM config should parse and apply these values to it's monitor settings
   # If on hyprland, use `hyprctl monitors` to get monitor info.
   # https://wiki.hyprland.org/Configuring/Monitors/
-  #    ------       ------
-  # | HDMI-A-1 | | HDMI-B-1 |
-  #    ------       ------
-  #           ------
-  #          | EDP-1 |
-  #           ------
+  #           -------
+  #         | HDMI-A-1 |
+  #           -------
+  #           -------
+  #          | eDP-1 | (disabled by default)
+  #           -------
   # FIXME: HDMI-A-1 and HDMI-B-1 are "common" monitors possibly used by other systems, so
   # place them in some common folder
   monitors = [
@@ -125,20 +125,15 @@
       height = 2880;
       refreshRate = 120;
       #transform = 2;
+      scale = 1;
     }
     {
-      name = "HDMI-B-1";
-      width = 2560;
-      height = 2880;
-      refreshRate = 120;
+      name = "eDP-1";
+      width = 3840;
+      height = 2160;
+      refreshRate = 60;
       #transform = 2;
+      scale = 2;
     }
-    # {
-    #   name = "HDMI-A-1";
-    #   width = 2560;
-    #   height = 2880;
-    #   refreshRate = 240;
-    #   transform = 2;
-    # }
   ];
 }

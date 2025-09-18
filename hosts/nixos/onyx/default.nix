@@ -91,7 +91,7 @@ rec {
       "aa"
       "media"
     ];
-    defaultDesktop = "hyprland";
+    defaultDesktop = "hyprland-uwsm";
   };
 
   boot.kernelPackages = pkgs.linuxPackages_latest;

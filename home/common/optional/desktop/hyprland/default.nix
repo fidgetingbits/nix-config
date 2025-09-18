@@ -8,13 +8,39 @@
   services.status-notifier-watcher.enable = true;
   wayland.windowManager.hyprland = {
     enable = true;
+    # FIXME: Make sure if this is needed despite uswm
+    systemd.variables = [ "--all" ];
     plugins = [
       pkgs.hyprlandPlugins.hy3
     ];
     settings = {
+
       debug = {
         disable_logs = false;
       };
+      env = [
+      ];
+
+      #
+      # ========== Monitor ==========
+      #
+      # parse the monitor spec defined in nix-config/home/<user>/<host>.nix
+      monitor = (
+        map (
+          m:
+          "${m.name},${
+            if m.enabled then
+              "${toString m.width}x${toString m.height}@${toString m.refreshRate}"
+              + ",${toString m.x}x${toString m.y}"
+              + ",${toString m.scale}"
+              + ",transform,${toString m.transform}"
+              + ",vrr,${toString m.vrr}"
+            else
+              "disable"
+          }"
+        ) (config.monitors)
+      );
+
       input = {
         follow_mouse = 2;
         # FIXME: Maybe only bother setting these on laptops? Not sure it matters
