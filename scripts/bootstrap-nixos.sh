@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Helpers library
-# shellcheck disable=SC1091
+# shellcheck disable=SC1091 source=./helpers.sh
 source "$(dirname "${BASH_SOURCE[0]}")/helpers.sh"
 
 # User variables
@@ -16,6 +16,7 @@ luks_passphrase="passphrase"
 luks_secondary_drive_labels=""
 git_root=$(git rev-parse --show-toplevel)
 nix_secrets_dir=${NIX_SECRETS_DIR:-"${git_root}"/../nix-secrets/}
+shared_secrets=1 # Does host have access to shared.yaml
 
 # Create a temp directory for generated host keys
 temp=$(mktemp -d)
@@ -53,6 +54,7 @@ function help_and_exit() {
     echo '  --luks-secondary-drive-labels <drives>  specify the luks device names (as declared with "disko.devices.disk.*.content.luks.name" in host/common/disks/*.nix) separated by commas.'
     echo '                                          Example: --luks-secondary-drive-labels "cryptprimary,cryptextra"'
     echo "  --impermanence                          Use this flag if the target machine has impermanence enabled. WARNING: Assumes /persist path."
+    echo "  --no-shared-secrets                     Use this flag if the target isn't trusted to access shared.yaml in nix-secrets"
     echo "  --debug                                 Enable debug mode."
     echo "  -h | --help                             Print this help."
     exit 0
@@ -92,6 +94,9 @@ while [[ $# -gt 0 ]]; do
     --impermanence)
         persist_dir="/persist"
         ;;
+    --no-shared-secrets)
+        shared_secrets=0
+        ;;
     --debug)
         set -x
         ;;
@@ -119,8 +124,10 @@ ssh_cmd="ssh \
 	-oUserKnownHostsFile=/dev/null \
 	-i $ssh_key \
 	-t $target_user@$target_destination"
+
 # shellcheck disable=SC2001
 ssh_root_cmd=$(echo "$ssh_cmd" | sed "s|${target_user}@|root@|") # uses @ in the sed switch to avoid it triggering on the $ssh_key value
+
 scp_cmd="scp -oControlPath=none -oport=${ssh_port} -oStrictHostKeyChecking=no -i $ssh_key"
 
 # Setup minimal environment for nixos-anywhere and run it
@@ -272,7 +279,7 @@ fi
 if [[ $updated_age_keys == 1 ]]; then
     # If the age generation commands added previously unseen keys (and associated anchors) we want to add those
     # to some creation rules, namely <host>.yaml and shared.yaml
-    sops_add_creation_rules "${target_user}" "${target_hostname}"
+    sops_add_creation_rules "${target_user}" "${target_hostname}" "${shared_secrets}"
     # Since we may update the sops.yaml file twice above, only rekey once at the end
     just rekey
     green "Updating flake input to pick up new .sops.yaml"
