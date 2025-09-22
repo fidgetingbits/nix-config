@@ -33,6 +33,21 @@
         "type": "github"
       }
     },
+    "nixos-facter-modules": {
+      "locked": {
+        "lastModified": 1756491981,
+        "narHash": "sha256-lXyDAWPw/UngVtQfgQ8/nrubs2r+waGEYIba5UX62+k=",
+        "owner": "nix-community",
+        "repo": "nixos-facter-modules",
+        "rev": "c1b29520945d3e148cd96618c8a0d1f850965d8c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "nixos-facter-modules",
+        "type": "github"
+      }
+    },
     "nixos-hardware": {
       "locked": {
         "lastModified": 1737751639,
@@ -44,22 +59,6 @@
       },
       "original": {
         "owner": "nixos",
-        "repo": "nixos-hardware",
-        "type": "github"
-      }
-    },
-    "nixos-hardware-oedo": {
-      "locked": {
-        "lastModified": 1733479043,
-        "narHash": "sha256-blvO1CtHha5fhjhggIRgJG14RIwBlvi53tPh4J33IKQ=",
-        "owner": "fidgetingbits",
-        "repo": "nixos-hardware",
-        "rev": "de37c4c0406a420479f54eb7bc0d0acd7be9f125",
-        "type": "github"
-      },
-      "original": {
-        "owner": "fidgetingbits",
-        "ref": "dell-precision-5570",
         "repo": "nixos-hardware",
         "type": "github"
       }
@@ -76,6 +75,22 @@
       "original": {
         "owner": "NixOS",
         "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs-unstable": {
+      "locked": {
+        "lastModified": 1758035966,
+        "narHash": "sha256-qqIJ3yxPiB0ZQTT9//nFGQYn8X/PBoJbofA7hRKZnmE=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "8d4ddb19d03c65a36ad8d189d001dc32ffb0306b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-unstable",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -100,9 +115,10 @@
       "inputs": {
         "disko": "disko",
         "impermanence": "impermanence",
+        "nixos-facter-modules": "nixos-facter-modules",
         "nixos-hardware": "nixos-hardware",
-        "nixos-hardware-oedo": "nixos-hardware-oedo",
-        "nixpkgs": "nixpkgs_2"
+        "nixpkgs": "nixpkgs_2",
+        "nixpkgs-unstable": "nixpkgs-unstable"
       }
     }
   },

@@ -29,7 +29,7 @@ The configuration of the main flake, [/flake.nix](/flake.nix), is heavy, and it 
 
 ## Brand new host
 
-- Add `hosts/nixos/<hostname>/` files
+- Add `hosts/nixos/<hostname>/default.nix`
 - Find disk name from livecd with `lsblk`
 - Find RAM amount form livcd with `free -m`
 - Add `nixos-installer/flake.nix` entry, and pass disk name and swap

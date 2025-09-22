@@ -3,60 +3,96 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     disko.url = "github:nix-community/disko";
     impermanence.url = "github:nix-community/impermanence";
     nixos-hardware.url = "github:nixos/nixos-hardware";
-    nixos-hardware-oedo = {
-      url = "github:fidgetingbits/nixos-hardware?ref=dell-precision-5570";
-    };
+    nixos-facter-modules.url = "github:nix-community/nixos-facter-modules";
   };
 
   outputs =
-    { self, nixpkgs, ... }@inputs:
+    {
+      self,
+      nixpkgs,
+      ...
+    }@inputs:
     let
       inherit (self) outputs;
 
       # This mkHost is way better: https://github.com/linyinfeng/dotfiles/blob/8785bdb188504cfda3daae9c3f70a6935e35c4df/flake/hosts.nix#L358
       newConfig =
         opts:
-        #name: disk: swapSize: impermanence: luks:
         (nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
 
           specialArgs = {
             inherit inputs outputs;
+            isDarwin = false;
             lib = nixpkgs.lib.extend (self: super: { custom = import ../lib { inherit (nixpkgs) lib; }; });
-
           };
           modules =
+            # FIXME: The default user should come from an external source once we make this a lib
             let
+              user = if opts ? user then opts.user else "aa";
             in
             [
+              # Needed because we use unstable nix sometimes
+              {
+                nixpkgs.overlays = [
+                  (final: prev: {
+                    unstable = import inputs.nixpkgs-unstable {
+                      inherit (final) system;
+                      config.allowUnfree = true;
+                    };
+                  })
+                ];
+              }
+
+              inputs.disko.nixosModules.disko
+              {
+                _module.args = {
+                  inherit (opts) disk;
+                  withSwap = opts.swapSize > 0;
+                  swapSize = builtins.toString opts.swapSize;
+                };
+              }
+              # FIXME: This should be passed args based on opts eventually and use a single disk file
               (
                 if opts.luks then
                   ../hosts/common/disks/btrfs-luks-impermanence-disko.nix
                 else
                   ../hosts/common/disks/btrfs-impermanence-disko.nix
               )
-              inputs.disko.nixosModules.disko
-              {
-                _module.args = {
-                  inherit (opts.disk) ;
-                  withSwap = opts.swapSize > 0;
-                  swapSize = builtins.toString opts.swapSize;
-                };
-              }
+
               ./minimal-configuration.nix
-              ../hosts/nixos/${opts.name}/hardware-configuration.nix
+              {
+                hostSpec.username = user;
+                hostSpec.primaryUsername = user;
+              }
               ../modules/hosts/nixos/impermanence
               {
                 networking.hostName = opts.name;
                 system.impermanence.enable = opts.impermanence;
               }
-            ];
+
+            ]
+            ++ (
+              if opts.facter then
+                [
+                  inputs.nixos-facter-modules.nixosModules.facter
+                  {
+                    config.facter.reportPath = ../hosts/nixos/${opts.name}/facter.json;
+                  }
+                ]
+              else
+                [
+                  ../hosts/nixos/${opts.name}/hardware-configuration.nix
+                ]
+            );
         });
     in
     {
+      # FIXME: This should become a function or something that just generates it and is passed remotely
       nixosConfigurations = {
         #
         # Local network
@@ -69,6 +105,7 @@
           swapSize = 64;
           impermanence = true;
           luks = true;
+          facter = false;
         };
         ooze = newConfig {
           name = "ooze";
@@ -76,6 +113,7 @@
           swapSize = 64;
           impermanence = true;
           luks = true;
+          facter = false;
         };
         oppo = newConfig {
           name = "oppo";
@@ -83,6 +121,7 @@
           swapSize = 64;
           impermanence = true;
           luks = true;
+          facter = false;
         };
         # FIXME: Double check this when framework arrives
         #onyx = newConfig { name = "onyx"; disk = "/dev/nvme0n1"; swapSize = 98; impermanence = true; luks = true; };
@@ -94,6 +133,7 @@
           swapSize = 0;
           impermanence = true;
           luks = true;
+          facter = false;
         };
 
         #
@@ -107,6 +147,8 @@
           swapSize = 16;
           impermanence = true;
           luks = false;
+          facter = true;
+          user = "admin";
         };
       };
     };
