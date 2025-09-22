@@ -6,8 +6,9 @@ in
   home.packages = lib.flatten [
     (lib.attrValues {
       inherit (pkgs)
-        spotify
         ffmpeg
+        # FIXME: Move this
+        spotify
         spicetify-cli
         spotify-player
         ;
