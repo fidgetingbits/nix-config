@@ -97,7 +97,8 @@ in
 
     # Enforce SSH to leverage yubikey
     extraConfig = {
-      log.showSignature = "true";
+      # NOTE: This is way too spammy when looking at repo logs with untrusted keys
+      # log.showSignature = "true";
       init.defaultBranch = "main";
       pull.rebase = "true";
 
@@ -131,7 +132,7 @@ in
 
         # Taken from
         # https://github.com/clemak27/homecfg/blob/16b86b04bac539a7c9eaf83e9fef4c813c7dce63/modules/git/ssh_signing.nix#L14
-        allowedSignersFile = "${config.home.homeDirectory}/.ssh/allowed_signers";
+        ssh.allowedSignersFile = "${config.home.homeDirectory}/.ssh/allowed_signers";
       };
 
     };
