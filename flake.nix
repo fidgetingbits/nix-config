@@ -45,6 +45,7 @@
           checks = self.checks.${system};
           inherit inputs;
           inherit system;
+          unstable = inputs.nixpkgs-unstable.legacyPackages.${system};
         }
       );
       checks = forAllSystems (
