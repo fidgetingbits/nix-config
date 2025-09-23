@@ -180,6 +180,11 @@
           default = "gnome";
           description = "The default desktop environment to use on the host";
         };
+        region = lib.mkOption {
+          type = lib.types.str;
+          default = "asia";
+          description = "The geographic region the system is in, to dicate things like cache use";
+        };
       };
     };
   };
