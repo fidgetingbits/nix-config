@@ -327,6 +327,6 @@ bump_lock() {
         fi
         set -ex
         git add "locks/${host}.lock"
-        gcm "chore: bump ${host}lock"
+        gcm "chore: bump ${host} lock"
     )
 }
