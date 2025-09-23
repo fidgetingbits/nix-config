@@ -126,15 +126,11 @@ in
       user.signingkey = "${publicKey}";
       gpg = {
         format = "ssh";
-        # FIXME: git doesn't support parsing sk-ssh keys, see https://github.com/maxgoedjen/secretive/issues/262
+        # NOTE: git doesn't support parsing sk-ssh keys, see https://github.com/maxgoedjen/secretive/issues/262
         # See 'alias git' creation in zshrc for how I get around that, while still using signing.key later on
         # sshKeyCommand = "ssh-add -L";
-
-        # Taken from
-        # https://github.com/clemak27/homecfg/blob/16b86b04bac539a7c9eaf83e9fef4c813c7dce63/modules/git/ssh_signing.nix#L14
         ssh.allowedSignersFile = "${config.home.homeDirectory}/.ssh/allowed_signers";
       };
-
     };
     signing = {
       signByDefault = true;
@@ -148,8 +144,8 @@ in
 
   home.file.".ssh/allowed_signers".text =
     let
-      # FIXME: This would need to change if we ever have multiple developer accounts on the same box
-      keypath = "hosts/common/users/${config.hostSpec.primaryUsername}/keys/yubikeys/";
+      # FIXME: This would need to change if we ever have multiple developer accounts on the same box or we have work keys that aren't our own yubikeys, etc
+      keypath = "hosts/common/users/super/keys/yubikeys/";
       genEmailKeys =
         email: keys:
         lib.concatMapStringsSep "\n" (

@@ -20,11 +20,13 @@ let
     "oxid"
     "ooze"
     "oppo"
-  ] ++ inputs.nix-secrets.networking.ssh.yubikeyHostsWithDomain;
+  ]
+  ++ inputs.nix-secrets.networking.ssh.yubikeyHostsWithDomain;
   yubikeyHostsWithoutDomain = [
     "oath_gitlab" # FIXME(ssh): Would be nice to do per-port match on this, but HM doesn't support
     config.hostSpec.networking.subnets.ogre.wildcard
-  ] ++ inputs.nix-secrets.networking.ssh.yubikeyHosts;
+  ]
+  ++ inputs.nix-secrets.networking.ssh.yubikeyHosts;
   # Add domain to each host name
   genDomains = lib.map (h: "${h}.${config.hostSpec.domain}");
   yubikeyHostAll =
@@ -39,7 +41,9 @@ let
     forwardAgentHosts ++ (genDomains forwardAgentHosts)
   );
 
-  yubikeyPath = "hosts/common/users/${config.hostSpec.primaryUsername}/keys/yubikeys";
+  # FIXME: Not sure how I want to do this, but for now using "super
+  #yubikeyPath = "hosts/common/users/${config.hostSpec.primaryUsername}/keys/yubikeys";
+  yubikeyPath = "hosts/common/users/super/keys/yubikeys";
 
   # There is a list of yubikey pubkeys in keys/yubikey. Build a list of corresponding private key files in .ssh
   yubikeys =
@@ -238,6 +242,7 @@ in
   home.file = {
     ".ssh/config.d/.keep".text = "# Managed by Home Manager";
     ".ssh/sockets/.keep".text = "# Managed by Home Manager";
-  } // yubikeyPublicKeyEntries;
+  }
+  // yubikeyPublicKeyEntries;
 
 }
