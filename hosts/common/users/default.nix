@@ -102,12 +102,12 @@ in
         hostSpec = config.hostSpec;
       };
       # FIXME: Common for all users (will include root too!)
-      #sharedModules = map (module: (import module)) (
-      #  map lib.custom.relativeToRoot ([
-      #    "home/common/core"
-      #    (if isDarwin then "home/common/core/darwin.nix" else "home/common/core/nixos.nix")
-      #  ])
-      #);
+      # sharedModules = map (module: (import module)) (
+      #   map lib.custom.relativeToRoot ([
+      #     "home/common/core"
+      #     (if isDarwin then "home/common/core/darwin.nix" else "home/common/core/nixos.nix")
+      #   ])
+      # );
       # Add all non-root users to home-manager
       users =
         (lib.mergeAttrsList (
@@ -125,11 +125,13 @@ in
                 { ... }:
                 {
                   home = {
+                    stateVersion = "23.05";
                     homeDirectory = if isDarwin then "/Users/${user}" else "/home/${user}";
                     username = "${user}";
                   };
                 }
               )
+              #sharedModules
             ];
           }) config.hostSpec.users
         ))

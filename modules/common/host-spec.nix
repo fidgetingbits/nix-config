@@ -69,9 +69,9 @@
             if pkgs.stdenv.isLinux then "/home/${user}" else "/Users/${user}";
         };
         persistFolder = lib.mkOption {
-          type = lib.types.str;
+          type = lib.types.nullOr lib.types.str;
           description = "The folder to persist data if impermenance is enabled";
-          default = "";
+          default = null;
         };
 
         # Configuration Settings
@@ -180,11 +180,13 @@
           default = "gnome";
           description = "The default desktop environment to use on the host";
         };
-        region = lib.mkOption {
+        # This is needed because nix.nix uses timeZone in both nixos and home context, the latter of which doesnt' have access to time.timeZone
+        timeZone = lib.mkOption {
           type = lib.types.str;
-          default = "asia";
-          description = "The geographic region the system is in, to dicate things like cache use";
+          default = "Asia/Taipei";
+          description = "Timezone the system is in";
         };
+
       };
     };
   };
@@ -209,6 +211,10 @@
         {
           assertion = !(config.hostSpec.voiceCoding && config.hostSpec.useWayland);
           message = "Talon, which is used for voice coding, does not support Wayland. See https://github.com/splondike/wayland-accessibility-notes";
+        }
+        {
+          assertion = builtins.elem config.hostSpec.primaryUsername config.hostSpec.users;
+          message = "primaryUsername doesn't exist in list of users";
         }
       ];
   };

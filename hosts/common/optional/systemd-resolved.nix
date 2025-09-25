@@ -8,7 +8,7 @@
     # dnssec breaks on ogre
     # dnssec = "true";
     domains = [ "~." ];
-    # FIXME: Wverify this goes to ogre first when on ogre-net, and to the fallbacks when not
+    # FIXME: Verify this goes to ogre first when on ogre-net, and to the fallbacks when not
     fallbackDns = [
       # LibreDNS
       "116.202.176.26#dot.libredns.gr"

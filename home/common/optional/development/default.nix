@@ -185,7 +185,7 @@ in
 
     [*.nix]
     indent_style = space
-    indent_size = 4
+    indent_size = 2
 
     [*.lua]
     indent_style = space

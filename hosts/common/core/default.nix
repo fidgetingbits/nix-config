@@ -62,9 +62,13 @@ in
     promptInit = "source ''${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
   };
 
+  # FIXME: This doesn't all apply if system is remotely managed, so need to
+  # rework it. Ideally want to check something like isRemotelyManaged, but
+  # will have to be like isDarwin outside of host-spec
   hostSpec = {
     primaryUsername = "aa";
-    username = "aa";
+    username = "aa"; # FIXME: deprecate
+    users = [ "aa" ];
     handle = "fidgetingbits";
     inherit (inputs.nix-secrets)
       domain

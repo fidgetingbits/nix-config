@@ -92,6 +92,7 @@ rec {
       "media"
     ];
     defaultDesktop = "hyprland-uwsm";
+    persistFolder = lib.mkForce "";
   };
 
   boot.kernelPackages = pkgs.linuxPackages_latest;

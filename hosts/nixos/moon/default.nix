@@ -9,6 +9,12 @@
   imports = lib.flatten [
     inputs.nixos-facter-modules.nixosModules.facter
     { config.facter.reportPath = ./facter.json; }
+    (lib.custom.relativeToRoot "hosts/common/disks/btrfs-impermanence-disko.nix")
+    {
+      _module.args = {
+        withSwap = true;
+      };
+    }
 
     (map lib.custom.relativeToRoot (
       [
@@ -21,12 +27,6 @@
           # Host-specific stuff
           "msmtp.nix"
           "plymouth.nix"
-          # FIXME: Unneeded
-          "printing.nix"
-          # FIXME: Unneeded
-          "locale.nix"
-          # FIXME: Uneeded on moon
-          "x11.nix"
           "sound.nix"
 
           # Desktop environment and login manager
@@ -41,7 +41,6 @@
           # Network management
           "systemd-resolved.nix"
 
-          "distributed-builds.nix"
           "fonts.nix"
         ])
     ))
@@ -54,6 +53,9 @@
       "admin"
       "ca"
     ];
+    primaryUsername = lib.mkForce "admin";
+    # FIXME: deprecate this
+    username = lib.mkForce "admin";
 
     isWork = lib.mkForce false;
     isProduction = lib.mkForce true;
@@ -69,9 +71,11 @@
     hdr = lib.mkForce true;
     scaling = lib.mkForce "2";
     isAutoStyled = lib.mkForce true;
-    # FIXME: Update for moon
-    wallpaper = "${inputs.nix-assets}/images/wallpapers/forest_temple.webp";
+    wallpaper = "${inputs.nix-assets}/images/wallpapers/botanical_garden.webp";
+    persistFolder = lib.mkForce "/persist";
+    timeZone = lib.mkForce "America/Edmonton";
   };
+
   system.impermanence.enable = true;
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
@@ -91,10 +95,15 @@
   networking.dhcpcd.wait = "background";
   systemd.network.wait-online.enable = false;
   services.gnome.gnome-keyring.enable = true;
-  #networking.enableIPv6 = true;
 
   # Keyring, required for auth even without gnome
   security.pam.services.sddm.enableGnomeKeyring = true;
+
+  # Auto-login as regular user
+  services.displayManager.sddm.autoLogin = {
+    user = lib.mkForce "ca";
+    relogin = true;
+  };
 
   # FIXME:
   # services.backup = {
@@ -104,5 +113,4 @@
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   system.stateVersion = "23.05";
-
 }

@@ -12,8 +12,7 @@
     inputs.nixcats-flake.nixosModules.default
   ];
 
-  # FIXME: Make this host region dependent
-  time.timeZone = "Asia/Taipei";
+  time.timeZone = lib.mkDefault config.hostSpec.timeZone;
 
   # Core packages not available on darwin
   environment.systemPackages = builtins.attrValues {
@@ -43,6 +42,8 @@
       "oxid-external.${config.hostSpec.domain}" = [
         network.subnets.ogre.hosts.oxid.ip
       ];
+      # FIXME(networking): not sure why this is failing to add on ogre
+      "moon.${config.hostSpec.domain}" = [ network.subnets.ogre.hosts.moon.ip ];
     }
     // lib.optionalAttrs config.hostSpec.isWork network.work.hosts;
 

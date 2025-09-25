@@ -29,7 +29,7 @@
       builders-use-substitutes = true;
       fallback = true; # Don't hard fail if a binary cache isn't available, since some systems roam
       substituters = lib.flatten [
-        (lib.optional (config.hostSpec.region == "asia") [
+        (lib.optional (builtins.substring 0 4 config.hostSpec.timeZone == "Asia") [
           # Getting 200 errors resulting in it being disabled
           "https://mirror.sjtu.edu.cn/nix-channels/store" # Shanghai Jiao Tong University - best for Asia
           "https://mirrors.ustc.edu.cn/nix-channels/store" # USTC backup mirror

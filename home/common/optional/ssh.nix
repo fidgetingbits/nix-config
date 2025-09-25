@@ -20,6 +20,8 @@ let
     "oxid"
     "ooze"
     "oppo"
+    "moon"
+    "myth"
   ]
   ++ inputs.nix-secrets.networking.ssh.yubikeyHostsWithDomain;
   yubikeyHostsWithoutDomain = [
@@ -79,6 +81,7 @@ let
     "oedo"
     "onyx"
     "oppo"
+    "orby"
   ];
   vanillaHostsConfig = lib.attrsets.mergeAttrsList (
     lib.lists.map (host: {
@@ -141,10 +144,17 @@ in
             identityFile = lib.lists.forEach identityFiles (file: "${config.home.homeDirectory}/.ssh/${file}");
           };
 
-          # FIXME: Why isn't this setup via vanilla?
-          "orby" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            host = "orby";
-            hostname = "orby.${config.hostSpec.domain}";
+          # NOTE: If these are in vanillaHosts then with an extra user entry it doesn't get added
+          "moon" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
+            host = "moon";
+            hostname = "moon.${config.hostSpec.domain}";
+            user = "admin";
+          };
+
+          "myth" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
+            host = "myth";
+            hostname = "myth.${config.hostSpec.domain}";
+            user = "admin";
           };
 
           # FIXME(ssh): Use https://superuser.com/questions/838898/ssh-config-host-match-port
