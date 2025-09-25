@@ -305,9 +305,11 @@ else
     echo "Post-install config build instructions:"
     echo "To copy nix-config from this machine to the $target_hostname, run the following command"
     echo "just sync $target_user $target_destination"
-    echo "To rebuild, sign into $target_hostname and run the following command"
+    echo "To rebuild on the target, sign into $target_hostname and run the following command"
     echo "cd nix-config"
     echo "sudo nixos-rebuild --show-trace --flake .#$target_hostname switch"
+    echo "To rebuild remotely run the following command"
+    echo "just build-host $target_hostname"
     echo
 fi
 

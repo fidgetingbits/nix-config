@@ -57,10 +57,14 @@ in
     in
     lib.mkMerge [
       {
+        # FIXME: We may need an age key per user technically?
         "keys/age" = {
-          owner = config.users.users.${config.hostSpec.username}.name;
+          owner = config.users.users.${config.hostSpec.primaryUsername}.name;
           group =
-            if pkgs.stdenv.isLinux then config.users.users.${config.hostSpec.username}.group else "staff";
+            if pkgs.stdenv.isLinux then
+              config.users.users.${config.hostSpec.primaryUsername}.group
+            else
+              "staff";
           # See later activation script for folder permission sanitization
           path = "${config.hostSpec.home}/.config/sops/age/keys.txt";
         };

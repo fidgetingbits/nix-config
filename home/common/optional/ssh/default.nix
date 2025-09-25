@@ -149,12 +149,14 @@ in
             host = "moon";
             hostname = "moon.${config.hostSpec.domain}";
             user = "admin";
+            port = config.hostSpec.networking.ports.tcp.ssh;
           };
 
           "myth" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
             host = "myth";
             hostname = "myth.${config.hostSpec.domain}";
             user = "admin";
+            port = config.hostSpec.networking.ports.tcp.ssh;
           };
 
           # FIXME(ssh): Use https://superuser.com/questions/838898/ssh-config-host-match-port
@@ -254,5 +256,4 @@ in
     ".ssh/sockets/.keep".text = "# Managed by Home Manager";
   }
   // yubikeyPublicKeyEntries;
-
 }

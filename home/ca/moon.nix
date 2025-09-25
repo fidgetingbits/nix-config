@@ -1,5 +1,4 @@
 {
-  pkgs,
   lib,
   ...
 }:
@@ -14,20 +13,11 @@
       ++
         # Optional common modules
         (map (f: "home/common/optional/${f}") [
-          "sops.nix"
-          "ssh.nix"
-
-          "audio-tools.nix"
-          "development"
-          "helper-scripts"
           "xdg.nix"
           "gpg.nix"
-          #"kitty.nix"
-          #"wezterm.nix"
           "ghostty.nix"
           "media.nix"
           "networking/protonvpn.nix"
-          "atuin.nix"
 
           "desktop/gnome"
           "gnome-terminal.nix"
@@ -41,14 +31,6 @@
   );
 
   home.packages = builtins.attrValues {
-    inherit (pkgs)
-      openrgb-with-all-plugins # for controlling RGB devices
-      ffmpeg # mp4 -> gif conversion, etc
-      amdgpu_top # AMD GPU monitoring
-      ;
   };
-
-  services.yubikey-touch-detector.enable = true;
-  services.yubikey-touch-detector.notificationSound = true;
 
 }

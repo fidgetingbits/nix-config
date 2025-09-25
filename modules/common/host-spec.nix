@@ -110,6 +110,11 @@
           default = false;
           description = "Used to indicate a mobile host";
         };
+        isRemote = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = "Used to indicate a host that is remotely managed";
+        };
         useYubikey = lib.mkOption {
           type = lib.types.bool;
           default = false;

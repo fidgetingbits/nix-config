@@ -41,6 +41,7 @@
           bats # for testing
           age # bootstrap script
           ssh-to-age # bootstrap script
+          gum # shell script ricing
           ;
 
       }

@@ -141,6 +141,7 @@ disko DRIVE PASSWORD:
 # Run nixos-rebuild on the remote host
 [group("building")]
 build-host HOST:
+    @just rebuild-pre {{ HOST }}
     @just copy-lock-in {{ HOST }}
     NIX_SSHOPTS="-p10022" nixos-rebuild --target-host {{ HOST }} --use-remote-sudo --show-trace --impure --flake .#"{{ HOST }}" switch
     @just copy-lock-out {{ HOST }}

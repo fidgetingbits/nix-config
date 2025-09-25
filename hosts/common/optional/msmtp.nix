@@ -12,7 +12,6 @@
     enable = true;
     setSendmail = true; # set the system sendmail to msmtp's
 
-    # FIXME(msmtp): Switch this to per-host auth to ooze
     accounts =
       let
         commonAttrs = {
@@ -26,10 +25,12 @@
       in
       {
         "default" = {
+          # FIXME(msmtp): Make this configurable for remotely managed systems
           host = "mail.${config.hostSpec.domain}";
           user = config.networking.hostName;
           passwordeval = "cat ${config.sops.secrets."passwords/postfix-relay".path}";
-        } // commonAttrs;
+        }
+        // commonAttrs;
         # For cases where postfix relay might be down, like heartbeat-check
         #"direct" = {
         #  host = "localhost";

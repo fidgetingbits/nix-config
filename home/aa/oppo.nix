@@ -15,7 +15,7 @@
         # Optional common modules
         (map (f: "home/common/optional/${f}") [
           "sops.nix"
-          "ssh.nix"
+          "ssh/"
 
           "audio-tools.nix"
           "development"

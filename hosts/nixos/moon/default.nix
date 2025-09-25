@@ -24,23 +24,23 @@
       ++
         # Optional common modules
         (map (f: "hosts/common/optional/${f}") [
-          # Host-specific stuff
-          "msmtp.nix"
-          "plymouth.nix"
-          "sound.nix"
-
           # Desktop environment and login manager
-          # FIXME: Tweak this for moon
           "sddm.nix"
           "gnome.nix"
 
-          "cli.nix"
-          "yubikey.nix"
+          # Services
           "services/openssh.nix"
+          "services/ddclient.nix"
 
           # Network management
           "systemd-resolved.nix"
 
+          # Misc
+          "msmtp.nix"
+          "plymouth.nix"
+          "sound.nix"
+          "cli.nix"
+          # "yubikey.nix"
           "fonts.nix"
         ])
     ))
@@ -57,13 +57,20 @@
     # FIXME: deprecate this
     username = lib.mkForce "admin";
 
+    # System type flags
     isWork = lib.mkForce false;
     isProduction = lib.mkForce true;
+    isRemote = lib.mkForce true;
 
+    # Functionality
     voiceCoding = lib.mkForce false;
-    useYubikey = lib.mkForce true;
-    wifi = lib.mkForce true;
+    # FIXME: Separate this out to allow yubikey for incoming auth but not physical yubikey plugged in
+    useYubikey = lib.mkForce false;
     useNeovimTerminal = lib.mkForce true;
+    useAtticCache = lib.mkForce false;
+
+    # Networking
+    wifi = lib.mkForce true;
 
     # Graphical
     defaultDesktop = "gnome";
@@ -100,8 +107,10 @@
   security.pam.services.sddm.enableGnomeKeyring = true;
 
   # Auto-login as regular user
-  services.displayManager.sddm.autoLogin = {
+  services.displayManager.autoLogin = {
     user = lib.mkForce "ca";
+  };
+  services.displayManager.sddm.autoLogin = {
     relogin = true;
   };
 
