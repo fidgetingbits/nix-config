@@ -1,4 +1,5 @@
 {
+  pkgs,
   lib,
   ...
 }:
@@ -31,6 +32,14 @@
   );
 
   home.packages = builtins.attrValues {
+  };
+
+  xdg.autostart = {
+    enable = true;
+    #readOnly = true;
+    entries = [
+      "${pkgs.firefox}/share/applications/firefox.desktop"
+    ];
   };
 
 }

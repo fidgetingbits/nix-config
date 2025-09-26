@@ -102,9 +102,13 @@ in
   h = "history";
 
   # folders
+
   # Directory convenience
   cdr = "cd-gitroot";
+  ".r" = "cd-gitroot";
   cdpr = "..; cd-gitroot";
+  "..r" = "..; cd-gitroot";
+
   zf = "cdf"; # Fuzzy jump to folder of file under tree
   zd = "cdd"; # Fuzzy jump to directory under tree
 

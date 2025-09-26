@@ -4,15 +4,15 @@
 
 # Override some GUI entries if inside ssh session
 if [[ -n $SSH_CONNECTION ]]; then
-	export GIT_EDITOR="vim"
-	export EDITOR="vim"
-	export VISUAL="vim"
+    export GIT_EDITOR="vim"
+    export EDITOR="vim"
+    export VISUAL="vim"
 
-	# git can't handle ssh-add -L output with a yubikey sk-ssh entry, so we alias git
-	# here to force it to use the ssh-agent output
-	TEMP_KEY=$(mktemp)
-	ssh-add -L | head -n 1 >"$TEMP_KEY"
-	alias git="git -c user.signingKey=$TEMP_KEY"
+    # git can't handle ssh-add -L output with a yubikey sk-ssh entry, so we alias git
+    # here to force it to use the ssh-agent output
+    TEMP_KEY=$(mktemp)
+    ssh-add -L | head -n 1 >"$TEMP_KEY"
+    alias git="git -c user.signingKey=$TEMP_KEY"
 fi
 
 unsetopt correct # autocorrect commands
@@ -92,7 +92,7 @@ bindkey '^[<' unindent-line
 
 # This is for debugging only...
 function zle-show-mark {
-	zle -M "Cursor at $CURSOR, Mark at $MARK"
+    zle -M "Cursor at $CURSOR, Mark at $MARK"
 }
 zle -N zle-show-mark
 bindkey '^[[[m' zle-show-mark
@@ -111,116 +111,116 @@ FZF_CMD="fzf --preview 'ls | head -n 10' --height=10 --reverse +m"
 # Auto select fzf result if only one match
 # https://github.com/junegunn/fzf/issues/27
 function fzf_auto_select() {
-	local lines
-	lines=$(fzf --filter="$1" --no-sort)
-	if [ -z "$lines" ]; then
-		return 1
-	elif [ $(wc -l <<<"$lines") -eq 1 ]; then
-		echo "$lines"
-	else
-		echo "$lines" | fzf --query="$1"
-	fi
+    local lines
+    lines=$(fzf --filter="$1" --no-sort)
+    if [ -z "$lines" ]; then
+        return 1
+    elif [ $(wc -l <<<"$lines") -eq 1 ]; then
+        echo "$lines"
+    else
+        echo "$lines" | fzf --query="$1"
+    fi
 }
 
 # Select the closest match from fzf
 function fzf_closest() {
-	fzf --filter="$1" | head -n 1
+    fzf --filter="$1" | head -n 1
 }
 
 # Fuzzy find file and jump to it's directory. Automatically select fzf result if only one match.
 cdf() {
-	local files
-	# NOTE: uses fd rather than fzf --filter to get built-in gitignore support
-	files=$(fd $1)
-	if [ -z "$files" ]; then
-		return 1
-	elif [ $(wc -l <<<"$files") -eq 1 ]; then
-		cd "$(dirname "$files")"
-	else
-		local selection=$(echo "$files" | fzf --height=40% --border --preview 'bat --color=always {}' --preview-window=right:60%)
-		if [ -n "$selection" ]; then
-			cd "$(dirname "$selection")"
-		fi
-	fi
+    local files
+    # NOTE: uses fd rather than fzf --filter to get built-in gitignore support
+    files=$(fd $1)
+    if [ -z "$files" ]; then
+        return 1
+    elif [ $(wc -l <<<"$files") -eq 1 ]; then
+        cd "$(dirname "$files")"
+    else
+        local selection=$(echo "$files" | fzf --height=40% --border --preview 'bat --color=always {}' --preview-window=right:60%)
+        if [ -n "$selection" ]; then
+            cd "$(dirname "$selection")"
+        fi
+    fi
 }
 
 # Fuzzy find directory and jump to it
 cdd() {
-	local dirs
-	# NOTE: uses fd rather than fzf --filter to get built-in gitignore support
-	dirs=$(fd -t d "$1")
-	if [ -z "$dirs" ]; then
-		return 1
-	elif [ $(wc -l <<<"$dirs") -eq 1 ]; then
-		cd "$dirs"
-	else
-		local selection=$(echo "$dirs" | fzf --height=40% --border --preview 'tree -C {}' --preview-window=right:60%)
-		if [ -n "$selection" ]; then
-			cd "$selection"
-		fi
-	fi
+    local dirs
+    # NOTE: uses fd rather than fzf --filter to get built-in gitignore support
+    dirs=$(fd -t d "$1")
+    if [ -z "$dirs" ]; then
+        return 1
+    elif [ $(wc -l <<<"$dirs") -eq 1 ]; then
+        cd "$dirs"
+    else
+        local selection=$(echo "$dirs" | fzf --height=40% --border --preview 'tree -C {}' --preview-window=right:60%)
+        if [ -n "$selection" ]; then
+            cd "$selection"
+        fi
+    fi
 }
 
 # Fuzzy jump backwards up the current directory tree
 cdup() {
-  local parent_dir
-  parent_dir=$( (
-    current_dir=$(pwd)
-    while [ "$current_dir" != "/" ]; do
-      echo "$current_dir"
-      current_dir=$(dirname "$current_dir")
-    done
-    echo /
-  ) | fzf --tac) # --tac reverses the list to show closest parents first
+    local parent_dir
+    parent_dir=$( (
+        current_dir=$(pwd)
+        while [ "$current_dir" != "/" ]; do
+            echo "$current_dir"
+            current_dir=$(dirname "$current_dir")
+        done
+        echo /
+    ) | fzf --tac) # --tac reverses the list to show closest parents first
 
-  # If a directory was selected (and not cancelled), cd into it
-  if [ -n "$parent_dir" ]; then
-    cd "$parent_dir" || return
-  fi
+    # If a directory was selected (and not cancelled), cd into it
+    if [ -n "$parent_dir" ]; then
+        cd "$parent_dir" || return
+    fi
 }
 
 # FIXME: Integrate cdd above, but add the depth option
 # fuzzy directory with some depth
 function cdds() {
-	local dir=$(fd -d 4 -t d "$1" | fzf --height=40% --border --preview 'tree -C {}' --preview-window=right:60%)
-	[ -n "$dir" ] && cd "$dir"
+    local dir=$(fd -d 4 -t d "$1" | fzf --height=40% --border --preview 'tree -C {}' --preview-window=right:60%)
+    [ -n "$dir" ] && cd "$dir"
 }
 
 # fdr - cd to selected parent directory
 function fdr() {
-	local dirs=()
-	get_parent_dirs() {
-		if [[ -d ${1} ]]; then dirs+=("$1"); else return; fi
-		if [[ ${1} == '/' ]]; then
-			for _dir in "${dirs[@]}"; do echo "$_dir"; done
-		else
-			get_parent_dirs "$(dirname "$1")"
-		fi
-	}
+    local dirs=()
+    get_parent_dirs() {
+        if [[ -d ${1} ]]; then dirs+=("$1"); else return; fi
+        if [[ ${1} == '/' ]]; then
+            for _dir in "${dirs[@]}"; do echo "$_dir"; done
+        else
+            get_parent_dirs "$(dirname "$1")"
+        fi
+    }
 
-	local DIR=""
-	DIR=$(get_parent_dirs "$(realpath "${1:-$PWD}")" | fzf-tmux --tac)
-	cd "$DIR" || exit
+    local DIR=""
+    DIR=$(get_parent_dirs "$(realpath "${1:-$PWD}")" | fzf-tmux --tac)
+    cd "$DIR" || exit
 }
 
 ##
 # Misc functions
 ##
 nameshell() {
-	echo -ne "\033]0;$*\007"
+    echo -ne "\033]0;$*\007"
 }
 
 reload() {
-	exec "${SHELL}" "$@"
+    exec "${SHELL}" "$@"
 }
 
 escape() {
-	# useful when you need to translate weird paths into single-argument string.
-	local escape_string_input
-	echo -n "String to escape: "
-	# shellcheck disable=SC2162
-	read escape_string_input
-	printf '%q\n' "$escape_string_input"
+    # useful when you need to translate weird paths into single-argument string.
+    local escape_string_input
+    echo -n "String to escape: "
+    # shellcheck disable=SC2162
+    read escape_string_input
+    printf '%q\n' "$escape_string_input"
 }
 
 # Talon plugins
@@ -240,28 +240,28 @@ escape() {
 eval "$(zoxide init zsh)"
 
 nix_wrapper() {
-	if [[ $1 == "build" ]]; then
-		shift
-		nix_log_extract build "$@"
-	else
-		command nix "$@"
-	fi
+    if [[ $1 == "build" ]]; then
+        shift
+        nix_log_extract build "$@"
+    else
+        command nix "$@"
+    fi
 }
 
 nix_log_extract() {
-	# Run the original nix command and capture its output
-	temp_file=$(mktemp)
-	script -q -f "$temp_file" -c "command nix $*"
-	drv_line=$(grep "For full logs, run" "$temp_file")
+    # Run the original nix command and capture its output
+    temp_file=$(mktemp)
+    script -q -f "$temp_file" -c "command nix $*"
+    drv_line=$(grep "For full logs, run" "$temp_file")
 
-	if [ -n "$drv_line" ]; then
-		# NOTE: The hard coding use of .drv is to prevent color sequences being tacked on the end
-		# shellcheck disable=SC2001
-		NIX_LAST_DERIVATION=$(echo "$drv_line" | sed "s/.*nix log \(.*\.drv\).*/\1/")
-		export NIX_LAST_DERIVATION
-		echo "Run nix-log-last to view log from $NIX_LAST_DERIVATION"
-	fi
-	rm "$temp_file"
+    if [ -n "$drv_line" ]; then
+        # NOTE: The hard coding use of .drv is to prevent color sequences being tacked on the end
+        # shellcheck disable=SC2001
+        NIX_LAST_DERIVATION=$(echo "$drv_line" | sed "s/.*nix log \(.*\.drv\).*/\1/")
+        export NIX_LAST_DERIVATION
+        echo "Run nix-log-last to view log from $NIX_LAST_DERIVATION"
+    fi
+    rm "$temp_file"
 }
 
 # Helper to disable tab completion in some slow folders
@@ -301,21 +301,22 @@ nix_log_extract() {
 # zle -N restricted-expand-or-complete
 # bindkey "^I" restricted-expand-or-complete
 
+# FIXME: These should be in aliases.nix
 alias nix='nix_wrapper'
 alias nix-log-last='NIX_PAGER=cat nix log $NIX_LAST_DERIVATION'
 
 git_smart_rebase() {
-	GIT_STASH_MESSAGE="git_smart_rebase: $RANDOM"
-	git stash push -m "$GIT_STASH_MESSAGE"
-	git fetch && git rebase
-	git stash list | (grep "${GIT_STASH_MESSAGE}" && git stash pop) || true
+    GIT_STASH_MESSAGE="git_smart_rebase: $RANDOM"
+    git stash push -m "$GIT_STASH_MESSAGE"
+    git fetch && git rebase
+    git stash list | (grep "${GIT_STASH_MESSAGE}" && git stash pop) || true
 }
 
 # Add and commit an updated flake lock file for the current or given host
 # Uses a subshell () to allow `set -ex`
 bump_lock() {
     (
-        cd-gitroot > /dev/null
+        cd-gitroot >/dev/null
         if [ ! -e "locks" ]; then
             echo "WARN: Not in your nix-config folder"
             exit 1
