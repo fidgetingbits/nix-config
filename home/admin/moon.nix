@@ -1,5 +1,4 @@
 {
-  config,
   lib,
   ...
 }:
@@ -20,20 +19,6 @@
 
   home.packages = builtins.attrValues {
 
-  };
-
-  #services.yubikey-touch-detector.enable = true;
-  #services.yubikey-touch-detector.notificationSound = true;
-  sops = {
-    secrets = {
-      # for systems that don't support yubikey
-      "keys/ssh/ed25519" = {
-        path = "${config.home.homeDirectory}/.ssh/id_ed25519";
-      };
-      "keys/ssh/ed25519_pub" = {
-        path = "${config.home.homeDirectory}/.ssh/id_ed25519.pub";
-      };
-    };
   };
 
 }
