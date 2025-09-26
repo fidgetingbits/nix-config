@@ -10,11 +10,16 @@ in
 {
   services.ddclient = {
     enable = true;
+    protocol = "gandi";
     zone = config.hostSpec.domain;
+    # NOTE: This record must already exist on gandi in order to update it, otherwise will 404
     domains = [ "${config.hostSpec.hostName}.${config.hostSpec.domain}" ];
     passwordFile = config.sops.secrets."tokens/gandi".path;
+    username = "token";
     extraConfig = ''
       use-personal-access-token=yes
+      usev4=webv4
+      usev6=disabled
     '';
 
   };
