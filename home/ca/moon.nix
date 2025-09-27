@@ -32,6 +32,35 @@
   );
 
   home.packages = builtins.attrValues {
+    inherit (pkgs)
+      google-chrome
+      ;
+  };
+
+  programs.firefox = {
+    policies.OfferToSaveLogins = lib.mkForce true;
+    profiles.default = {
+      settings."signon.rememberSignons" = lib.mkForce true;
+      bookmarks = {
+        force = true;
+        settings = [
+          {
+            name = "Bookmarks Toolbar";
+            toolbar = true;
+            bookmarks = [
+              {
+                name = "Jellyfin";
+                url = "http://localhost:8096";
+              }
+              {
+                name = "Netflix";
+                url = "https://www.netflix.com";
+              }
+            ];
+          }
+        ];
+      };
+    };
   };
 
   xdg.autostart = {

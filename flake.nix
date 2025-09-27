@@ -149,6 +149,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Ad-blocking host list
+    adblock-hosts = {
+      url = "github:StevenBlack/hosts";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # firefox is broken on darwin
     #nixpkgs-firefox-darwin = {
     #  url = "github:bandithedoge/nixpkgs-firefox-darwin";

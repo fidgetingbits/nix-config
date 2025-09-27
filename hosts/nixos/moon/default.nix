@@ -8,6 +8,7 @@
 }:
 {
   imports = lib.flatten [
+    inputs.adblock-hosts.nixosModule
     inputs.nixos-facter-modules.nixosModules.facter
     { config.facter.reportPath = ./facter.json; }
     (lib.custom.relativeToRoot "hosts/common/disks/btrfs-impermanence-disko.nix")
@@ -151,6 +152,9 @@
       ];
     };
   };
+
+  # Add ad-blocking to hosts file
+  networking.stevenBlackHosts.enable = true;
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   system.stateVersion = "23.05";

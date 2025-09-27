@@ -41,6 +41,7 @@
   home.packages =
     builtins.attrValues {
       inherit (pkgs)
+        chromium
         chrome-gnome-shell # Allow gnome extension installation from chrome
         # FIXME: See if we can get settings described here https://itsfoss.com/three-finger-swipe-gnome/ declaratively
         # https://discourse.nixos.org/t/need-help-for-nixos-gnome-scaling-settings/24590/5
@@ -52,6 +53,7 @@
     ++ [
       pkgs.gnomeExtensions.x11-gestures
       pkgs.gnomeExtensions.appindicator
+      pkgs.gnomeExtensions.dash-to-dock # Allow you to permanently show the dash (icon bar)
       #(pkgs.chromium.override { enableWideVine = true; }) # to allow gui-based extension management
     ];
 }

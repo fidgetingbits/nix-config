@@ -74,6 +74,7 @@ in
               "browser.uidensity" = 1; # enable compact mode
               "browser.aboutConfig.showWarning" = false;
               "browser.download.dir" = "${homeDir}/downloads";
+              "browser.startup.page" = 3; # restore previous session
 
               "browser.tabs.firefox-view" = true; # Sync tabs across devices
               "ui.systemUsesDarkTheme" = 1; # force dark theme
