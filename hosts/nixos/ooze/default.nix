@@ -4,44 +4,43 @@
   ...
 }:
 {
-  imports =
+  imports = [
+    #inputs.nixos-hardware.nixosModules.common-gpu-nvidia-sync
+    ./hardware-configuration.nix
+
+    # Impermanence
+    (lib.custom.relativeToRoot "hosts/common/disks/btrfs-luks-impermanence-disko.nix")
+    {
+      _module.args = {
+        withSwap = true;
+      };
+    }
+  ]
+  ++ (map lib.custom.relativeToRoot (
     [
-      #inputs.nixos-hardware.nixosModules.common-gpu-nvidia-sync
-      ./hardware-configuration.nix
-
-      # Impermanence
-      (lib.custom.relativeToRoot "hosts/common/disks/btrfs-luks-impermanence-disko.nix")
-      {
-        _module.args = {
-          withSwap = true;
-        };
-      }
+      ##
+      # Core
+      ##
+      "hosts/common/core"
+      "hosts/common/core/nixos.nix"
     ]
-    ++ (map lib.custom.relativeToRoot (
-      [
-        ##
-        # Core
-        ##
-        "hosts/common/core"
-        "hosts/common/core/nixos.nix"
-      ]
-      ++
-        # Optional common modules
-        (map (f: "hosts/common/optional/${f}") [
-          "cli.nix"
-          "services/openssh.nix"
-          "services/atuin.nix"
-          "services/atticd.nix"
-          "services/postfix-proton-relay.nix"
-          "services/unifi.nix" # Unifi Controller
-          # For sending mail via backup scripts. Not sure if should just use postfix locally in this case
-          "msmtp.nix"
+    ++
+      # Optional common modules
+      (map (f: "hosts/common/optional/${f}") [
+        "cli.nix"
+        "services/openssh.nix"
+        "services/atuin.nix"
+        "services/atticd.nix"
+        "services/postfix-proton-relay.nix"
+        "services/unifi.nix" # Unifi Controller
+        # For sending mail via backup scripts. Not sure if should just use postfix locally in this case
+        "msmtp.nix"
 
-          "acme.nix"
-          "remote-builder.nix"
+        "acme.nix"
+        "remote-builder.nix"
 
-        ])
-    ));
+      ])
+  ));
 
   hostSpec = {
     hostName = "ooze";
@@ -92,6 +91,7 @@
   };
 
   # Override this because we do remote builds
+  # FIXME: Double chec this is actually needed anymore
   services.openssh.settings.PermitRootLogin = lib.mkForce "yes";
 
   # We need IPv6 in order to access hetzner cloud
