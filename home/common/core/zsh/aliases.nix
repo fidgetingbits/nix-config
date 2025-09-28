@@ -29,6 +29,7 @@ in
   # file searching
   fdi = "fd -I"; # fd with --no-ignore
   biggest = "find . -printf '%s %p\n'|sort -nr|head";
+  myip = "dig +short myip.opendns.com @resolver1.opendns.com";
 
   # git
   gcm = "git commit -m";

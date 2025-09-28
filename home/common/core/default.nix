@@ -93,6 +93,7 @@
           jq # json
           gnupg
           yq-go # yaml
+          dig
 
           findutils # find
           file # file type analysis
