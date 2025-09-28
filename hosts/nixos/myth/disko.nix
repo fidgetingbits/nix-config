@@ -13,13 +13,13 @@ let
   ];
 in
 {
+
   # FIXME: This may be better as part of a module or just in the host-specific file
   # triggered auto scan of raid5 drives during nixos-anywhere install
   systemd.services."mdmonitor".environment = {
     MDADM_MONITOR_ARGS = "--scan --syslog";
   };
 
-  # Shut up the silly warning, idgaf if mdadm can't email me
   boot.swraid.mdadmConf = "PROGRAM ${pkgs.coreutils}/bin/true";
 
   disko.devices = {
@@ -149,35 +149,35 @@ in
         };
       };
     };
-  };
 
-  mdadm = {
-    raid5 = {
-      type = "mdadm";
-      level = 5;
-      content = {
-        type = "luks";
-        name = "encrypted-storage";
-        passwordFile = "/tmp/disko-password";
-        settings = {
-          allowDiscards = true;
-        };
-        # Whether to add a boot.initrd.luks.devices entry for this disk.
-        # We only want to unlock cryptroot interactively.
-        # You must have a /etc/crypttab entry set up to auto unlock the drive using a key on cryptroot
-        # (see ./default.nix)
-        initrdUnlock = if config.hostSpec.isMinimal then true else false;
-
+    mdadm = {
+      raid5 = {
+        type = "mdadm";
+        level = 5;
         content = {
-          type = "btrfs";
-          extraArgs = [ "-f" ]; # force overwrite
-          subvolumes = {
-            "@storage" = {
-              mountpoint = "/mnt/storage";
-              mountOptions = [
-                "compress=zstd"
-                "noatime"
-              ];
+          type = "luks";
+          name = "encrypted-storage";
+          passwordFile = "/tmp/disko-password";
+          settings = {
+            allowDiscards = true;
+          };
+          # Whether to add a boot.initrd.luks.devices entry for this disk.
+          # We only want to unlock cryptroot interactively.
+          # You must have a /etc/crypttab entry set up to auto unlock the drive using a key on cryptroot
+          # (see ./default.nix)
+          initrdUnlock = if config.hostSpec.isMinimal then true else false;
+
+          content = {
+            type = "btrfs";
+            extraArgs = [ "-f" ]; # force overwrite
+            subvolumes = {
+              "@storage" = {
+                mountpoint = "/mnt/storage";
+                mountOptions = [
+                  "compress=zstd"
+                  "noatime"
+                ];
+              };
             };
           };
         };
