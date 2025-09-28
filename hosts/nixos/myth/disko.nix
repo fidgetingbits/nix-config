@@ -1,15 +1,32 @@
-# NOTE: ... is needed because dikso passes diskoFile
+# mdadm and raid5 reference:
+# https://github.com/mitchty/nix/blob/shenanigans/nix/nixosConfigurations/gw0/diskconfig.nix
 {
   pkgs,
   config,
   ...
 }:
+let
+  raidDisks = [
+    "/dev/disk/by-id/nvme-CT2000P3PSSD8_2504E9A1BF6E"
+    "/dev/disk/by-id/nvme-CT2000P3PSSD8_2504E9A1BF62"
+    "/dev/disk/by-id/nvme-CT2000P3PSSD8_2504E9A1BF79"
+  ];
+in
 {
+  systemd.services."mdmonitor".environment = {
+    MDADM_MONITOR_ARGS = "--scan --syslog";
+  };
+
+  # Shut up the silly warning, idgaf if mdadm can't email me
+  boot.swraid.mdadmConf = "PROGRAM ${pkgs.coreutils}/bin/true";
+
   disko.devices = {
     disk = {
+      # EMMC 64GB
       primary = {
         type = "disk";
-        device = "/dev/nvme0n1"; # 1TB
+        #device = "/dev/mmcblk0"; # 64GB
+        device = "/dev/disk/by-id/mmc-DV4064_0x6101b932";
         content = {
           type = "gpt";
           partitions = {
@@ -29,15 +46,10 @@
               size = "100%";
               content = {
                 type = "luks";
-                name = "cryptprimary";
-                passwordFile = "/tmp/disko-password"; # this is populated by bootstrap-nixos.sh
+                name = "encrypted-nixos";
+                passwordFile = "/tmp/disko-password"; # populated by bootstrap-nixos.sh
                 settings = {
                   allowDiscards = true;
-                  # https://github.com/hmajid2301/dotfiles/blob/a0b511c79b11d9b4afe2a5e2b7eedb2af23e288f/systems/x86_64-linux/framework/disks.nix#L36
-                  crypttabExtraOpts = [
-                    "fido2-device=auto"
-                    "token-timeout=10"
-                  ];
                 };
                 # Subvolumes must set a mountpoint in order to be mounted,
                 # unless their parent is mounted
@@ -66,50 +78,10 @@
                         "noatime"
                       ];
                     };
-                  };
-                };
-              };
-            };
-          };
-        };
-      };
-      extra = {
-        type = "disk";
-        device = "/dev/nvme1n1"; # 250GB
-        content = {
-          type = "gpt";
-          partitions = {
-            luks = {
-              size = "100%";
-              content = {
-                type = "luks";
-                name = "cryptextra";
-                passwordFile = "/tmp/disko-password"; # this is populated by bootstrap-nixos.sh
-                settings = {
-                  allowDiscards = true;
-                  # https://github.com/hmajid2301/dotfiles/blob/a0b511c79b11d9b4afe2a5e2b7eedb2af23e288f/systems/x86_64-linux/framework/disks.nix#l36
-                  crypttabExtraOpts = [
-                    "fido2-device=auto"
-                    "token-timeout=10"
-                  ];
-                };
-                # Whether to add a boot.initrd.luks.devices entry for the this disk.
-                # We only want to unlock cryptroot interactively.
-                # You must have a /etc/crypttab entry set up to auto unlock the drive using a key on cryptroot (see /hosts/nixos/ghost/default.nix)
-                initrdUnlock = if config.hostSpec.isMinimal then true else false;
-
-                # subvolumes must set a mountpoint in order to be mounted,
-                # unless their parent is mounted
-                content = {
-                  type = "btrfs";
-                  extraArgs = [ "-f" ]; # force overwrite
-                  subvolumes = {
-                    "@extra" = {
-                      mountpoint = "/mnt/extra";
-                      mountOptions = [
-                        "compress=zstd"
-                        "noatime"
-                      ];
+                    "@swap" = {
+                      mountpoint = "/.swapvol";
+                      # 2G is somewhat arbitrary, but EMMC is small and we shouldn't need much
+                      swap.swapfile.size = "2G";
                     };
                   };
                 };
@@ -118,46 +90,57 @@
           };
         };
       };
-      vms = {
+
+      # FIXME: Use a mkRaidDisk func?
+      # RAID5 three 2TB drives
+      # Disk 1
+      d1 = {
         type = "disk";
-        device = "/dev/sda"; # 500GB
+        device = builtins.elemAt raidDisks 0;
         content = {
           type = "gpt";
           partitions = {
-            luks = {
+            mdadm = {
               size = "100%";
               content = {
-                type = "luks";
-                name = "cryptvms";
-                passwordFile = "/tmp/disko-password"; # this is populated by bootstrap-nixos.sh
-                # Whether to add a boot.initrd.luks.devices entry for the this disk.
-                # We only want to unlock cryptroot interactively.
-                # You must have a /etc/crypttab entry set up to auto unlock the drive using a key on cryptroot (see /hosts/linux/ghost/default.nix)
-                initrdUnlock = if config.hostSpec.isMinimal then true else false;
+                type = "mdraid";
+                name = "raid5";
+              };
+            };
+          };
+        };
+      };
 
-                settings = {
-                  allowDiscards = true;
-                  # https://github.com/hmajid2301/dotfiles/blob/a0b511c79b11d9b4afe2a5e2b7eedb2af23e288f/systems/x86_64-linux/framework/disks.nix#l36
-                  crypttabExtraOpts = [
-                    "fido2-device=auto"
-                    "token-timeout=10"
-                  ];
-                };
-                # subvolumes must set a mountpoint in order to be mounted,
-                # unless their parent is mounted
-                content = {
-                  type = "btrfs";
-                  extraArgs = [ "-f" ]; # force overwrite
-                  subvolumes = {
-                    "@vms" = {
-                      mountpoint = "/mnt/vms";
-                      mountOptions = [
-                        "compress=zstd"
-                        "noatime"
-                      ];
-                    };
-                  };
-                };
+      # Disk 2
+      d2 = {
+        type = "disk";
+        device = builtins.elemAt raidDisks 1;
+        content = {
+          type = "gpt";
+          partitions = {
+            mdadm = {
+              size = "100%";
+              content = {
+                type = "mdraid";
+                name = "raid5";
+              };
+            };
+          };
+        };
+      };
+
+      # Disk 3
+      d3 = {
+        type = "disk";
+        device = builtins.elemAt raidDisks 2;
+        content = {
+          type = "gpt";
+          partitions = {
+            mdadm = {
+              size = "100%";
+              content = {
+                type = "mdraid";
+                name = "raid5";
               };
             };
           };
@@ -166,7 +149,37 @@
     };
   };
 
-  environment.systemPackages = [
-    pkgs.yubikey-manager # For luks fido2 enrollment before full install
-  ];
+  mdadm = {
+    raid5 = {
+      type = "mdadm";
+      level = 5;
+      content = {
+        type = "luks";
+        name = "encrypted-storage";
+        passwordFile = "/tmp/disko-password";
+        settings = {
+          allowDiscards = true;
+        };
+        # Whether to add a boot.initrd.luks.devices entry for this disk.
+        # We only want to unlock cryptroot interactively.
+        # You must have a /etc/crypttab entry set up to auto unlock the drive using a key on cryptroot
+        # (see ./default.nix)
+        initrdUnlock = if config.hostSpec.isMinimal then true else false;
+
+        content = {
+          type = "btrfs";
+          extraArgs = [ "-f" ]; # force overwrite
+          subvolumes = {
+            "@storage" = {
+              mountpoint = "/mnt/storage";
+              mountOptions = [
+                "compress=zstd"
+                "noatime"
+              ];
+            };
+          };
+        };
+      };
+    };
+  };
 }

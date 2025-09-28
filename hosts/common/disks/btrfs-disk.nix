@@ -1,4 +1,3 @@
-# NOTE: ... is needed because dikso passes diskoFile
 {
   lib,
   disk ? "/dev/vda",

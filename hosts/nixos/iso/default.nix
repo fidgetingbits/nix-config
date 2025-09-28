@@ -96,6 +96,19 @@ rec {
     };
   };
 
+  # FIXME: Seems like suspend disable in iso isn't always working
+  # home-manager.users.${hostSpec.username}.dconf.settings = {
+  #   "org/gnome/settings-daemon/plugins/power" = {
+  #     ambient-enabled = false;
+  #     idle-dim = true;
+  #     power-button-action = "interactive";
+  #     sleep-inactive-ac-type = "nothing";
+  #     sleep-inactive-ac-timeout = 0;
+  #     sleep-inactive-battery-type = "nothing";
+  #     sleep-inactive-battery-timeout = 0;
+  #   };
+  # };
+
   # root's ssh key are mainly used for remote deployment
   users.extraUsers.root = {
     inherit (config.users.users.${config.hostSpec.username}) hashedPassword;

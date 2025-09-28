@@ -11,11 +11,6 @@
     inputs.nixos-facter-modules.nixosModules.facter
     { config.facter.reportPath = ./facter.json; }
     ./disko.nix
-    {
-      _module.args = {
-        withSwap = true;
-      };
-    }
 
     (map lib.custom.relativeToRoot (
       [
@@ -107,6 +102,13 @@
       };
     };
   };
+
+  # needed to unlock LUKS on raid drives
+  # use partition UUID
+  # https://wiki.nixos.org/wiki/Full_Disk_Encryption#Unlocking_secondary_drives
+  environment.etc.crypttab.text = lib.optionalString (!config.hostSpec.isMinimal) ''
+    encrypted-backup UUID=TBD /luks-secondary-unlock.key
+  '';
 
   # FIXME:
   # services.backup = {

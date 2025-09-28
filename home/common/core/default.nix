@@ -148,5 +148,6 @@
     };
   };
 
+  # FIXME: This is duplicated with the users generate code
   home.stateVersion = "23.05";
 }
