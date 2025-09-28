@@ -53,6 +53,8 @@
     isProduction = lib.mkForce true;
     isRemote = lib.mkForce true;
     isServer = lib.mkForce true;
+    # FIXME: Disable this, but breaks builds otherwise fo rnow
+    isAutoStyled = lib.mkForce true;
     useWindowManager = lib.mkForce true;
 
     # Functionality
@@ -146,9 +148,6 @@
       ];
     };
   };
-
-  # Add ad-blocking to hosts file
-  networking.stevenBlackHosts.enable = true;
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   system.stateVersion = "23.05";
