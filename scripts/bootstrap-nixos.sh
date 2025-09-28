@@ -41,20 +41,21 @@ function help_and_exit() {
     echo "USAGE: $0 -n <target_hostname> -d <target_destination> -k <ssh_key> [OPTIONS]"
     echo
     echo "ARGS:"
-    echo "  -n <target_hostname>                    specify target_hostname of the target host to deploy the nixos config on."
-    echo "  -d <target_destination>                 specify ip or domain to the target host."
-    echo "  -k <ssh_key>                            specify the full path to the ssh_key you'll use for remote access to the"
-    echo "                                          target during install process."
+    echo "  -n <target_hostname>                    Specify target_hostname of the target host to deploy the nixos config on."
+    echo "  -d <target_destination>                 Specify ip or domain to the target host."
+    echo "  -k <ssh_key>                            Specify the full path to the ssh_key you'll use for remote access to the"
+    echo "                                          Target during install process."
     echo "                                          Example: -k /home/${target_user}/.ssh/my_ssh_key"
     echo
     echo "OPTIONS:"
-    echo "  -u <target_user>                        specify target_user with sudo access. nix-config will be cloned to their home."
+    echo "  -u <target_user>                        Specify target_user with sudo access. nix-config will be cloned to their home."
     echo "                                          Default='${target_user}'."
-    echo "  --port <ssh_port>                       specify the ssh port to use for remote access. Default=${ssh_port}."
-    echo '  --luks-secondary-drive-labels <drives>  specify the luks device names (as declared with "disko.devices.disk.*.content.luks.name" in host/common/disks/*.nix) separated by commas.'
+    echo "  --port <ssh_port>                       Specify the ssh port to use for remote access. Default=${ssh_port}."
+    echo "  --luks-secondary-drive-labels <drives>  Comma-separated list of luks device names (as declared by disko)"
+    echo "                                          These will have an unlock key generated for automatic post-boot unlocking"
     echo '                                          Example: --luks-secondary-drive-labels "cryptprimary,cryptextra"'
-    echo "  --impermanence                          Use this flag if the target machine has impermanence enabled. WARNING: Assumes /persist path."
-    echo "  --no-shared-secrets                     Use this flag if the target isn't trusted to access shared.yaml in nix-secrets"
+    echo " --impermanence Use this flag if the target machine has impermanence enabled. WARNING: Assumes /persist path."
+    echo " --no-shared-secrets Use this flag if the target isn't trusted to access shared.yaml in nix-secrets"
     echo "  --debug                                 Enable debug mode."
     echo "  -h | --help                             Print this help."
     exit 0

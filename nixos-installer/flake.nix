@@ -34,6 +34,15 @@
             # FIXME: The default user should come from an external source once we make this a lib
             let
               user = if opts ? user then opts.user else "aa";
+              # FIXME: This doesn't account for all disk possibilities we have atm I think
+              diskFile = (
+                if opts ? diskFile then
+                  opts.diskFile
+                else if opts.luks then
+                  ../hosts/common/disks/btrfs-luks-impermanence-disko.nix
+                else
+                  ../hosts/common/disks/btrfs-impermanence-disko.nix
+              );
             in
             [
               # Needed because we use unstable nix sometimes
@@ -49,20 +58,19 @@
               }
 
               inputs.disko.nixosModules.disko
+              diskFile
               {
-                _module.args = {
-                  inherit (opts) disk;
-                  withSwap = opts.swapSize > 0;
-                  swapSize = builtins.toString opts.swapSize;
-                };
+                _module.args =
+                  let
+                    swapSize = if opts ? swapSize then opts.swapSize else 0;
+                    disk = if opts ? disk then opts.disk else "";
+                  in
+                  {
+                    inherit disk;
+                    withSwap = swapSize > 0;
+                    swapSize = builtins.toString swapSize;
+                  };
               }
-              # FIXME: This should be passed args based on opts eventually and use a single disk file
-              (
-                if opts.luks then
-                  ../hosts/common/disks/btrfs-luks-impermanence-disko.nix
-                else
-                  ../hosts/common/disks/btrfs-impermanence-disko.nix
-              )
 
               ./minimal-configuration.nix
               {
@@ -130,7 +138,6 @@
         okra = newConfig {
           name = "okra";
           disk = "/dev/vda";
-          swapSize = 0;
           impermanence = true;
           luks = true;
           facter = false;
@@ -147,6 +154,14 @@
           swapSize = 16;
           impermanence = true;
           luks = false;
+          facter = true;
+          user = "admin";
+        };
+
+        myth = newConfig {
+          name = "myth";
+          diskFile = ../hosts/nixos/myth/disko.nix;
+          impermanence = true;
           facter = true;
           user = "admin";
         };
