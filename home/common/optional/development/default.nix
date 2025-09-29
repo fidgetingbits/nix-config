@@ -14,16 +14,17 @@ let
   privateGitConfig = "${config.home.homeDirectory}/.config/git/gitconfig.private";
   workEmail = inputs.nix-secrets.email.work;
   workGitConfig = "${config.home.homeDirectory}/.config/git/gitconfig.work";
-  workGitUrlsTable = lib.optionalAttrs config.hostSpec.isWork (
-    builtins.listToAttrs (
-      map (url: {
-        name = "ssh://git@${url}";
-        value = {
-          insteadOf = "https://${url}";
-        };
-      }) (lib.splitString " " inputs.nix-secrets.work.git.servers)
-    )
-  );
+
+  #  workGitUrlsTable = lib.optionalAttrs config.hostSpec.isWork (
+  #    builtins.listToAttrs (
+  #      map (url: {
+  #        name = "ssh://git@${url}";
+  #        value = {
+  #          insteadOf = "https://${url}";
+  #        };
+  #      }) (lib.splitString " " inputs.nix-secrets.work.git.servers)
+  #    )
+  #  );
 in
 {
   imports = lib.custom.scanPaths ./.;
@@ -104,13 +105,15 @@ in
 
       # Don't warn on empty git add calls. Because of "git re-commit" automation
       advice.addEmptyPathspec = false;
-      url = lib.optionalAttrs config.hostSpec.isWork (
-        lib.recursiveUpdate {
-          "ssh://git@${inputs.nix-secrets.work.git.serverMain}" = {
-            insteadOf = "https://${inputs.nix-secrets.work.git.serverMain}";
-          };
-        } workGitUrlsTable
-      );
+
+      # Re-enable when applicable
+      #      url = lib.optionalAttrs config.hostSpec.isWork (
+      #        lib.recursiveUpdate {
+      #          "ssh://git@${inputs.nix-secrets.work.git.serverMain}" = {
+      #            insteadOf = "https://${inputs.nix-secrets.work.git.serverMain}";
+      #          };
+      #        } workGitUrlsTable
+      #      );
 
       includeIf."gitdir:${config.home.homeDirectory}/dev/".path = privateGitConfig;
       includeIf."gitdir:${config.home.homeDirectory}/source/".path = privateGitConfig;
