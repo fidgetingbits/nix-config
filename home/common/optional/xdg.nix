@@ -1,9 +1,8 @@
 { config, pkgs, ... }:
 let
   browser = [ "${config.hostSpec.defaultBrowser}.desktop" ];
-  # FIXME: That should use config options and just reference whatever is configured as the default
-  editor = [ "code.desktop" ];
-  media = [ "vlc.desktop" ];
+  editor = [ "${config.hostSpec.defaultEditor}.desktop" ];
+  media = [ "${config.hostSpec.defaultEditor}.desktop" ];
   # Extensive list of assocations here:
   # https://github.com/iggut/GamiNiX/blob/8070528de419703e13b4d234ef39f05966a7fafb/system/desktop/home-main.nix#L77
   associations = {
@@ -53,6 +52,7 @@ let
 
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document" =
       "libreoffice-writer.desktop";
+    # FIXME: These should be in their respective files enabling them?
     "x-scheme-handler/sgnl" = "signal-desktop.desktop";
     "application/x-010intel" = "010editor-import.desktop";
     "application/x-010motorola" = "010editor-import.desktop";
