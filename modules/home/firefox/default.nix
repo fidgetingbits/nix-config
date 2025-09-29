@@ -2,6 +2,7 @@
   lib,
   config,
   pkgs,
+  inputs,
   ...
 }:
 let
@@ -103,8 +104,8 @@ in
               name = "default";
               isDefault = true;
               settings = commonSettings;
-              extensions = import ./extensions.nix;
-              search = import ./search.nix;
+              extensions = import ./extensions.nix { inherit pkgs inputs; };
+              search = import ./search.nix { inherit pkgs; };
             };
           };
       };
