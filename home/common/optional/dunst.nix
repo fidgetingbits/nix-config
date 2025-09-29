@@ -10,6 +10,7 @@
 
   services.dunst = {
     enable = true;
+    package = pkgs.unstable.dunst; # New enough to prevent X11-related #1466 on hyprland startup
     #    waylandDisplay = ""; # set the service's WAYLAND_DISPLAY environment variable
     #    configFile = "";
     iconTheme = {

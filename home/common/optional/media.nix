@@ -7,10 +7,11 @@ in
     (lib.attrValues {
       inherit (pkgs)
         ffmpeg
-        # FIXME: Move this
-        spotify
         spicetify-cli
         spotify-player
+        ;
+      inherit (pkgs.unstable)
+        spotify # New enough to hopefully fix stack corruption spam
         ;
     })
 
