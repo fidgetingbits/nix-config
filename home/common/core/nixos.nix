@@ -48,6 +48,7 @@
     };
   };
 
+  services.displayManager.defaultSession = config.hostSpec.defaultDesktop;
   services.ssh-agent.enable = true;
 
   # Nicely reload system units when changing configs

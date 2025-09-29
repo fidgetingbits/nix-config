@@ -43,7 +43,7 @@ rec {
           "yubikey.nix"
           "tobii.nix"
           "services/openssh.nix"
-          "iphone-backup.nix"
+          #"iphone-backup.nix"
 
           # Binary analysis tools
           "binaryninja.nix"
@@ -89,7 +89,7 @@ rec {
     wallpaper = "${inputs.nix-assets}/images/wallpapers/forest_temple.webp";
     users = lib.mkForce [
       "aa"
-      "media"
+      #"media"
     ];
     defaultDesktop = "hyprland-uwsm";
     persistFolder = lib.mkForce "";
