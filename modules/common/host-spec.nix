@@ -15,7 +15,12 @@
         # Data variables that don't dictate configuration settings
         primaryUsername = lib.mkOption {
           type = lib.types.str;
-          description = "The primary username of the host";
+          description = "The primary administrative username of the host";
+        };
+        primaryDesktopUsername = lib.mkOption {
+          type = lib.types.str;
+          description = "The primary desktop user on the host";
+          default = config.hostSpec.primaryUsername;
         };
         # FIXME: deprecated. Use either primaryUsername or map over users
         username = lib.mkOption {
@@ -179,6 +184,11 @@
           type = lib.types.str;
           default = "nvim";
           description = "The default editor command to use on the host";
+        };
+        defaultMediaPlayer = lib.mkOption {
+          type = lib.types.str;
+          default = "vlc";
+          description = "The default video player to use on the host";
         };
         defaultDesktop = lib.mkOption {
           type = lib.types.str;

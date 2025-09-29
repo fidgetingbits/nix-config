@@ -56,6 +56,7 @@
       "ca"
     ];
     primaryUsername = lib.mkForce "admin";
+    primaryDesktopUsername = lib.mkForce "ca";
     # FIXME: deprecate this
     username = lib.mkForce "admin";
 
