@@ -160,10 +160,11 @@
   };
 
   # Enable automatic login for the user.
-  # FIXME: we will want to tweak the user on multi-user systems
   services.displayManager = lib.optionalAttrs config.hostSpec.useWindowManager {
     autoLogin.enable = true;
-    autoLogin.user = config.hostSpec.username;
+    # FIXME: we will want to tweak the user on multi-user systems
+    autoLogin.user = config.hostSpec.primaryUsername;
+    defaultSession = config.hostSpec.defaultDesktop;
   };
 
 }
