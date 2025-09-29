@@ -8,14 +8,14 @@
     # dnssec breaks on ogre
     # dnssec = "true";
     domains = [ "~." ];
-    # FIXME: Verify this goes to ogre first when on ogre-net, and to the fallbacks when not
-    fallbackDns = [
-      # LibreDNS
-      "116.202.176.26#dot.libredns.gr"
-      # Cloudflare
-      "1.1.1.1#one.one.one.one"
-      "1.0.0.1#one.one.one.one"
-    ];
+    # FIXME: Fix fallbacks so it definitely goes through LAN dns first...
+    #    fallbackDns = [
+    #      # LibreDNS
+    #      "116.202.176.26#dot.libredns.gr"
+    #      # Cloudflare
+    #      "1.1.1.1#one.one.one.one"
+    #      "1.0.0.1#one.one.one.one"
+    #    ];
     #dnsovertls = "true";
   };
 }
