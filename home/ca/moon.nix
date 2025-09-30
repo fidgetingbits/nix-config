@@ -22,7 +22,6 @@
 
           "desktop/gnome"
           "gnome-terminal.nix"
-          "fcitx5"
 
           # Maybe more role-specific stuff
           "document.nix" # document editing
