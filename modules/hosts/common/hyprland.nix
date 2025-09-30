@@ -2,8 +2,7 @@
 {
   programs.hyprland = {
     enable = true;
-    # Use systemd management of hyprland
-    withUWSM = true;
+    withUWSM = true; # systemd management of hyprland
   };
 
   environment.systemPackages = [
