@@ -28,6 +28,12 @@
         "${mainMod}, mouse:273, resizewindow"
       ];
 
+      # This doesn't do anything on onyx in addition to the logind config
+      bindl = [
+        ", switch:on:Lid Switch,exec,systemctl suspend -i"
+        #", switch:off:Lid Switch,exec,hyprctl keyword monitor \"eDP-1, 1920x1200@60, auto, 1\""
+      ];
+
       #
       # ========== Repeat Binds ==========
       #

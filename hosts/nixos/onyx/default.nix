@@ -8,8 +8,11 @@
 }:
 rec {
   imports = lib.flatten [
-    inputs.nixos-hardware.nixosModules.asus-zenbook-ux371
+    #inputs.nixos-hardware.nixosModules.asus-zenbook-ux371
+    # NOTE: I still use this because I have the hardcoded disks, which should move out I guess
     ./hardware-configuration.nix
+    inputs.nixos-facter-modules.nixosModules.facter
+    { config.facter.reportPath = ./facter.json; }
 
     (map lib.custom.relativeToRoot (
       [
@@ -65,6 +68,8 @@ rec {
 
           "distributed-builds.nix"
           "fonts.nix"
+
+          "logind.nix"
         ])
     ))
   ];
