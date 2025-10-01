@@ -230,30 +230,37 @@ rec {
   services.earlyoom = {
     enable = true;
     enableNotifications = true;
-    extraArgs =
-      let
-        catPatterns = patterns: builtins.concatStringsSep "|" patterns;
-        preferPatterns = [
-          ".firefox-wrappe"
-          "java" # If it's written in java it's uninmportant enough it's ok to kill it
-        ];
-        avoidPatterns = [
-          "bash"
-          "zsh"
-          "sshd"
-          "systemd"
-          "systemd-logind"
-          "systemd-udevd"
-        ];
-      in
-      [
-        "--prefer '^(${catPatterns preferPatterns})$'"
-        "--avoid '^(${catPatterns avoidPatterns})$'"
-      ];
+    #    FIXME: unrecognized option '--prefer '^(.firefox-wrappe|java)$''
+    #    extraArgs =
+    #      let
+    #        catPatterns = patterns: builtins.concatStringsSep "|" patterns;
+    #        preferPatterns = [
+    #          ".firefox-wrapped"
+    #          "java" # If it's written in java it's uninmportant enough it's ok to kill it
+    #        ];
+    #        avoidPatterns = [
+    #          "bash"
+    #          "zsh"
+    #          "sshd"
+    #          "systemd"
+    #          "systemd-logind"
+    #          "systemd-udevd"
+    #        ];
+    #      in
+    #      [
+    #        "--prefer '^(${catPatterns preferPatterns})$'"
+    #        "--avoid '^(${catPatterns avoidPatterns})$'"
+    #      ];
   };
 
   #  virtualisation.appvm = {
   #    enable = true;
   #    user = config.hostSpec.primaryUsername;
   #  };
+
+  # Bluetooth
+  # FIXME: Make this a module? hardware should be enabled by facter...
+  hardware.bluetooth.enable = true;
+  services.blueman.enable = true;
+
 }
