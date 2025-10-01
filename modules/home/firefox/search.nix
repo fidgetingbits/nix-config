@@ -3,6 +3,8 @@ let
   icon = "''${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
 in
 {
+  force = true; # Don't complain about clobbering backups
+  default = "ddg";
   engines = {
     "Nix Packages" = {
       urls = [
@@ -42,28 +44,25 @@ in
       ];
       definedAliases = [
         "@no"
-        "@nixopts"
       ];
     };
     "Home Manager Options" = {
-      urls = [ { template = "https://home-manager-options.extranix.com/?query={searchTerms}"; } ];
-      # urls = [
-      #   {
-      #     template = "https://mipmip.github.io/home-manager-option-search";
-      #     params = [
-      #       {
-      #         name = "query";
-      #         value = "{searchTerms}";
-      #       }
-      #     ];
-      #   }
-      # ];
+      inherit icon;
+      urls = [
+        {
+          template = "https://home-manager-options.extranix.com/";
+          params = [
+            # FIXME: Add default release probably
+            {
+              name = "query";
+              value = "{searchTerms}";
+            }
+          ];
+        }
+      ];
       definedAliases = [
         "@hm"
-        "@home"
-        "'homeman"
       ];
-      inherit icon;
     };
     "NixOS Wiki" = {
       urls = [
@@ -92,7 +91,7 @@ in
       inherit icon;
       definedAliases = [ "@ghnl" ];
     };
-    "Github Nixpkgs Search" = {
+    "GitHub Nixpkgs Search" = {
       urls = [
         {
           template = "https://github.com/search";
@@ -100,6 +99,25 @@ in
             {
               name = "q";
               value = "repo:nixos/nixpkgs language:nix {searchTerms}";
+            }
+            {
+              name = "type";
+              value = "code";
+            }
+          ];
+        }
+      ];
+      inherit icon;
+      definedAliases = [ "@ghnp" ];
+    };
+    "GitHub Home-manager Search" = {
+      urls = [
+        {
+          template = "https://github.com/search";
+          params = [
+            {
+              name = "q";
+              value = "repo:nix-community/home-manager language:nix {searchTerms}";
             }
             {
               name = "type";
@@ -130,5 +148,10 @@ in
       inherit icon;
       definedAliases = [ "@ng" ];
     };
+    "Wikipedia (en)".metaData.hidden = true;
+    "google".metaData.hidden = true;
+    "amazondotcom-us".metaData.hidden = true;
+    "bing".metaData.hidden = true;
+    "ebay".metaData.hidden = true;
   };
 }
