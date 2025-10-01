@@ -3,6 +3,8 @@
 # nix-config/home/ta/common/optional/hyprland/
 { lib, ... }:
 {
+  # FIXME: There should be a type "monitor" and monitors should be a list of named monitors.
+  # These can then be handled independently by kanshi, etc
   options.monitors = lib.mkOption {
     type = lib.types.listOf (
       lib.types.submodule {
