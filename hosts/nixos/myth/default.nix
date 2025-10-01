@@ -28,11 +28,8 @@
           "systemd-resolved.nix"
 
           # Misc
-          "msmtp.nix"
-          "plymouth.nix"
-          "sound.nix"
+          # "msmtp.nix" # FIXME: We only need this if we setup emails for logins/backups, etc
           "cli.nix"
-          "fonts.nix"
         ])
     ))
   ];
@@ -53,18 +50,17 @@
     isProduction = lib.mkForce true;
     isRemote = lib.mkForce true;
     isServer = lib.mkForce true;
-    # FIXME: Disable this, but breaks builds otherwise fo rnow
-    isAutoStyled = lib.mkForce true;
-    useWindowManager = lib.mkForce true;
+    isAutoStyled = lib.mkForce false;
+    useWindowManager = lib.mkForce false;
 
     # Functionality
     voiceCoding = lib.mkForce false;
     useYubikey = lib.mkForce false;
-    useNeovimTerminal = lib.mkForce true;
+    useNeovimTerminal = lib.mkForce false;
     useAtticCache = lib.mkForce false;
 
     # Networking
-    wifi = lib.mkForce true;
+    wifi = lib.mkForce false;
 
     # Sysystem settings
     persistFolder = lib.mkForce "/persist";
@@ -77,11 +73,17 @@
   # Bootloader
   boot.loader.systemd-boot = {
     enable = true;
-    # When using plymouth, initrd can expand by a lot each time, so limit how many we keep around
-    configurationLimit = lib.mkDefault 10;
+    # Needs to be lowered if we ever run plymouth
+    configurationLimit = lib.mkDefault 30;
     consoleMode = "1";
   };
   boot.loader.efi.canTouchEfiVariables = true;
+
+  # Note using wifi on this box for now
+  boot.blacklistedKernelModules = [
+    "iwlwifi"
+  ];
+  systemd.network.netdevs.wlo1.enable = false;
 
   # Remote early boot LUKS unlock via ssh
   boot.initrd = {
@@ -105,11 +107,17 @@
     };
   };
 
+  # FIXME: This may be better as part of a module or just in the host-specific file
+  # triggered auto scan of raid5 drives during nixos-anywhere install
+  systemd.services."mdmonitor".environment = {
+    MDADM_MONITOR_ARGS = "--scan --syslog";
+  };
+
   # needed to unlock LUKS on raid drives
   # use partition UUID
   # https://wiki.nixos.org/wiki/Full_Disk_Encryption#Unlocking_secondary_drives
   environment.etc.crypttab.text = lib.optionalString (!config.hostSpec.isMinimal) ''
-    encrypted-backup UUID=TBD /luks-secondary-unlock.key
+    encrypted-backup UUID=25541f69-ee5f-4e2d-8939-2b4f1643fe90 /luks-secondary-unlock.key
   '';
 
   # FIXME:
@@ -117,37 +125,6 @@
   #   enable = true;
   #   borgBackupStartTime = "09:00:00";
   # };
-
-  sops = {
-    secrets = {
-      "keys/ssh/ed25519" = {
-        # User/group created by the autosshTunnel module
-        owner = "autossh";
-        group = "autossh";
-        path = "/etc/ssh/id_ed25519";
-      };
-      "keys/ssh/ed25519_pub" = {
-        owner = "autossh";
-        group = "autossh";
-        path = "/etc/ssh/id_ed25519.pub";
-      };
-    };
-  };
-
-  services.autosshTunnels.sessions = {
-    freshcakes = {
-      user = "tunnel";
-      host = config.hostSpec.networking.hosts.freshcakes;
-      port = 22;
-      secretKey = "/etc/ssh/id_ed25519";
-      tunnels = [
-        {
-          localPort = config.hostSpec.networking.ports.tcp.jellyfin;
-          remotePort = config.hostSpec.networking.ports.tcp.jellyfin;
-        }
-      ];
-    };
-  };
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   system.stateVersion = "23.05";

@@ -14,12 +14,6 @@ let
 in
 {
 
-  # FIXME: This may be better as part of a module or just in the host-specific file
-  # triggered auto scan of raid5 drives during nixos-anywhere install
-  systemd.services."mdmonitor".environment = {
-    MDADM_MONITOR_ARGS = "--scan --syslog";
-  };
-
   boot.swraid.mdadmConf = "PROGRAM ${pkgs.coreutils}/bin/true";
 
   disko.devices = {
