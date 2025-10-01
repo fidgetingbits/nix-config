@@ -5,7 +5,6 @@
 {
   programs.wlogout =
     let
-
       lockAction = "${pkgs.hyprlock}/bin/hyprlock";
     in
     {

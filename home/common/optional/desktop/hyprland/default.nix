@@ -1,20 +1,30 @@
-{ config, pkgs, ... }:
 {
-  imports = [
-    ./binds.nix
-    ./hyprlock.nix
-  ];
-  # Trying to figure out why no tray appears
-  services.status-notifier-watcher.enable = true;
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+{
+
+  imports =
+    (map lib.custom.relativeToRoot (
+      map (f: "home/common/optional/${f}") [
+        "desktop/rofi.nix"
+      ]
+    ))
+    ++ [
+      ./wlogout.nix
+      ./binds.nix
+      ./hyprlock.nix
+    ];
   wayland.windowManager.hyprland = {
     enable = true;
-    # FIXME: Make sure if this is needed despite uswm
+    # This will expose things like XDG_DATA_DIRS to systemd services, which we want
     systemd.variables = [ "--all" ];
     plugins = [
       pkgs.hyprlandPlugins.hy3
     ];
     settings = {
-
       debug = {
         disable_logs = false;
       };
@@ -43,16 +53,10 @@
 
       input = {
         follow_mouse = 2;
-        # FIXME: Maybe only bother setting these on laptops? Not sure it matters
         touchpad = {
-
-          # Invert touchpad scrolling
-          natural_scroll = true;
-
+          natural_scroll = true; # invert touchpad scrolling
           disable_while_typing = true;
-          # Allows two-finger right click
-          clickfinger_behavior = true;
-
+          clickfinger_behavior = true; # two-finger right click
         };
       };
 
@@ -63,9 +67,6 @@
         workspace_swipe_create_new = true;
       };
       exec-once = [
-        ''${pkgs.waybar}/bin/waybar''
-        ''${pkgs.networkmanagerapplet}/bin/nm-applet --indicator''
-        ''${pkgs.blueman}/bin/blueman-applet''
       ];
 
       general.layout = "hy3";
@@ -78,16 +79,8 @@
     # https://github.com/DoMondo/dotfiles/blob/2b32ce2290ba28c809c099dc1934c361c4dfb63a/.hyprland_functions/move_focus.sh#L38
   };
 
-  # FIXME: Why does this get clobbered?
   programs.zsh.shellAliases = {
     hc = "hyprctl";
     hcm = "hyprctl monitors";
-  };
-
-  # FIXME: These are only used on hyprland for now, but should be main optional elsewhere
-
-  programs.rofi = {
-    enable = true;
-    package = if config.hostSpec.useWayland then pkgs.rofi-wayland else pkgs.rofi;
   };
 }
