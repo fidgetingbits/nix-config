@@ -26,23 +26,22 @@ let
     );
 in
 {
-  # Let it try to start a few more times
-  systemd.user.services.waybar = {
-    Unit.StartLimitBurst = 30;
-  };
+  home.packages = [
+    pkgs.font-awesome
+  ];
 
-  # FIXME: Testing getting waybar tray to work (check again after uwsm)
-  # home.packages = [
-  #   pkgs.libappindicator
-  #   pkgs.libappindicator-gtk3
-  # ];
+  # Needed to add these services even if packets are already installed so share path to XDG_DATA_DIRS to correctly find the fonts despite font-awesome being installed
+  # Prevents: [error] Item 'nm-applet': Could not find an icon named 'nm-signal-50' and no pixmap given.
+  services.network-manager-applet.enable = true;
+  # Prevents: [error] Item 'blueman': Could not find an icon named 'blueman-tray' and no pixmap given.
+  services.blueman-applet.enable = true;
 
   programs.waybar = {
     enable = true;
-    # FIXME: Re-enable service ideally if doesn't conflict with uwsm and tray icons
-    #    systemd = {
-    #      enable = true;
-    #target = "hyprland-session.target"; # NOTE = hyprland/default.nix stops graphical-session.target and starts hyprland-sessionl.target };
+    systemd = {
+      enable = true;
+    };
+
     settings = {
       #
       # ========== Main Bar ==========
