@@ -148,7 +148,7 @@ in
       inherit icon;
       definedAliases = [ "@ng" ];
     };
-    "Wikipedia (en)".metaData.hidden = true;
+    "wikipedia".metaData.hidden = true;
     "google".metaData.hidden = true;
     "amazondotcom-us".metaData.hidden = true;
     "bing".metaData.hidden = true;
