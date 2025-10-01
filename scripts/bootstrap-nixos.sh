@@ -171,11 +171,6 @@ function nixos_anywhere() {
         $ssh_root_cmd "/bin/sh -c 'echo $luks_passphrase > /tmp/disko-password'"
     fi
 
-    # if luks_secondary_drive_labels cli argument was set, assign the above passphrase to those disks
-    if [ -n "${luks_secondary_drive_labels}" ]; then
-        luks_setup_secondary_drive_decryption
-    fi
-
     # If you are rebuilding a machine without any hardware changes, this is likely unneeded or even possibly disruptive
     if no_or_yes "Generate a new hardware config for this host? Yes if your nix config doesn't have an entry for this host"; then
 
@@ -203,6 +198,12 @@ function nixos_anywhere() {
 
     if ! yes_or_no "Has your system restarted and are you ready to continue? (no exits)"; then
         exit 0
+    fi
+
+    # if luks_secondary_drive_labels cli argument was set, assign the above passphrase to those disks
+    # FIXME: The old location for this was definitely wrong, but post minimal install it should be ok?
+    if [ -n "${luks_secondary_drive_labels}" ]; then
+        luks_setup_secondary_drive_decryption
     fi
 
     green "Adding $target_destination's ssh host fingerprint to ~/.ssh/known_hosts"
