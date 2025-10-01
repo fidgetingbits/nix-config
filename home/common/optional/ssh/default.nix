@@ -22,6 +22,7 @@ let
     "oppo"
     "moon"
     "myth"
+    "myth-unlock"
   ]
   ++ inputs.nix-secrets.networking.ssh.yubikeyHostsWithDomain;
   yubikeyHostsWithoutDomain = [
@@ -157,6 +158,17 @@ in
             hostname = "myth.${config.hostSpec.domain}";
             user = "admin";
             port = config.hostSpec.networking.ports.tcp.ssh;
+          };
+
+          "myth-unlock" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
+            host = "myth";
+            hostname = "myth.${config.hostSpec.domain}";
+            user = "root";
+            port = config.hostSpec.networking.ports.tcp.ssh;
+            extraOptions = {
+              UserKnownHostsFile = "/dev/null";
+              StrictHostKeyChecking = "no";
+            };
           };
 
           # FIXME(ssh): Use https://superuser.com/questions/838898/ssh-config-host-match-port
