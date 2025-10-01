@@ -17,6 +17,7 @@
       ./binds.nix
       ./hyprlock.nix
     ];
+
   wayland.windowManager.hyprland = {
     enable = true;
     # This will expose things like XDG_DATA_DIRS to systemd services, which we want
@@ -83,4 +84,5 @@
     hc = "hyprctl";
     hcm = "hyprctl monitors";
   };
+
 }

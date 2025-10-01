@@ -13,37 +13,43 @@
         {
           label = "lock";
           action = lockAction;
-          text = "Lock";
-          keybind = "l";
+          text = "Loc[k]";
+          keybind = "k";
         }
         {
           label = "hibernate";
           action = "${lockAction} & systemctl hibernate";
-          text = "Hibernate";
+          text = "[H]ibernate";
           keybind = "h";
+        }
+        {
+          label = "suspend";
+          action = "${lockAction} & systemctl suspend";
+          text = "[S]uspend";
+          keybind = "s";
         }
         {
           label = "logout";
           action = "hyprctl dispatch exit";
-          text = "Logout";
-          keybind = "x";
+          text = "[L]ogout";
+          keybind = "l";
         }
         {
           label = "shutdown";
           action = "systemctl poweroff";
-          text = "Shutdown";
-          keybind = "s";
+          text = "Shutd[o]wn";
+          keybind = "o";
         }
         {
-          label = "suspend";
+          label = "screen off";
           action = "${lockAction} & hyprctl dispatch dpms off";
-          text = "Screen Off";
-          keybind = "u";
+          text = "Screen Of[f]";
+          keybind = "f";
         }
         {
           label = "reboot";
           action = "systemctl reboot";
-          text = "Reboot";
+          text = "[R]eboot";
           keybind = "r";
         }
       ];
