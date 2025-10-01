@@ -87,7 +87,8 @@ in
     };
 
     sessionVariables = {
-      EDITOR = config.hostSpec.defaultEditor;
+      #EDITOR = config.hostSpec.defaultEditor; FIXME: Why does this set nano when we have it set to nvim? :/
+      EDITOR = "nvim";
       BAT_THEME = "Dracula"; # Stylix bug, they use "dracula" instead of "Dracula"
       #
       # FZF key-binding.zsh tweaks
