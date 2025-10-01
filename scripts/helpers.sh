@@ -44,6 +44,17 @@ function yes_or_no() {
     done
 }
 
+# Need this to avoid some wacky pre-commit hook issues related to if rebuild fails and
+# flake.lock stays staged, which ends up wiping out all changes due to stashing bug
+cleanup_flake_lock() {
+    if [ $? -ne 0 ]; then
+        red "Rebuild failed, cleaning up lock files"
+        git rm --cached -f flake.lock 2>/dev/null || true
+        rm flake.lock 2>/dev/null || true
+        rm "$BUILD_LOG"
+    fi
+}
+
 # Ask yes or no, with no being the default
 function no_or_yes() {
     echo -en "\x1B[34m[?] $* [y/n] (default: n): \x1B[0m"
