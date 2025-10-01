@@ -42,7 +42,8 @@
           # FIXME: This should only be if wayland
           "desktop/wayland"
           "desktop/hyprland"
-          "waybar.nix"
+          "desktop/kanshi.nix"
+          "desktop/waybar.nix"
 
           "fcitx5"
           # Maybe more role-specific stuff
