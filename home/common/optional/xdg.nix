@@ -78,6 +78,17 @@ in
       [update]
       interval=never
     '';
+
+    # https://discourse.nixos.org/t/no-such-interface-org-freedesktop-portal-settings/67701/6
+    # Fix "No such interface "org.freedesktop.portal.RemoteDesktop" warnings in waybar and similar
+    portal = {
+      enable = true;
+      extraPortals = with pkgs; [
+        xdg-desktop-portal
+        xdg-desktop-portal-hyprland
+        xdg-desktop-portal-gtk
+      ];
+    };
   };
 
   home.packages = builtins.attrValues {
