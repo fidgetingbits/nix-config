@@ -28,7 +28,8 @@ copy-lock-out HOST=`hostname`:
 rebuild-pre HOST=`hostname`:
     just update-nix-secrets {{ HOST }} && \
     just update-nix-assets {{ HOST }} && \
-    just update-neovim-flake {{ HOST }}
+    just update-neovim-flake {{ HOST }} && \
+    just update {{ HOST }} nix-index-database
     @git add --intent-to-add .
 
 # Run post-rebuild checks, like if sops is running properly afterwards
@@ -252,3 +253,10 @@ dovecot-hash:
 [group("admin")]
 firefox-addons:
     mozilla-addons-to-nix overlays/firefox/addons.json overlays/firefox/generated.nix
+
+# Turn off mdadm raid5 resync that inhibits restart from nixos-anywhere during boot
+[group("admin")]
+turn-off-raid-resync:
+    ssh aa@myth "sudo /bin/sh -c 'echo frozen > /sys/block/md127/md/sync_action; \
+        echo none > /sys/block/md127/md/resync_start; \
+        echo idle > /sys/block/md127/md/sync_action'"
