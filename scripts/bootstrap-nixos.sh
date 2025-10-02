@@ -189,6 +189,8 @@ function nixos_anywhere() {
     fi
 
     # --extra-files here picks up the ssh host key we generated earlier and puts it onto the target machine
+    # FIXME: If you kexec into the default nixos-installer instead of doing the install from the iso,
+    # the --post-kexec-ssh-port will be wrong as the nixos-installer image will be 22
     SHELL=/bin/sh nix run github:nix-community/nixos-anywhere -- \
         --ssh-port "$ssh_port" \
         --post-kexec-ssh-port "$ssh_port" \
@@ -196,14 +198,12 @@ function nixos_anywhere() {
         --flake .#"$target_hostname" \
         root@"$target_destination"
 
-    if ! yes_or_no "Has your system restarted and are you ready to continue? (no exits)"; then
+    if
+        ! yes_or_no "Has your system restarted and are you ready to continue?\n \
+        Your system should be LUKS unlocked before answering y\n \
+        NOTE: Answering n exits the installer"
+    then
         exit 0
-    fi
-
-    # if luks_secondary_drive_labels cli argument was set, assign the above passphrase to those disks
-    # FIXME: The old location for this was definitely wrong, but post minimal install it should be ok?
-    if [ -n "${luks_secondary_drive_labels}" ]; then
-        luks_setup_secondary_drive_decryption
     fi
 
     green "Adding $target_destination's ssh host fingerprint to ~/.ssh/known_hosts"
@@ -238,15 +238,22 @@ function sops_generate_host_age_key() {
 }
 
 function luks_setup_secondary_drive_decryption() {
-    green "Generating /luks-secondary-unlock.key"
-    local key=${persist_dir}/luks-secondary-unlock.key
+    green "Generating secondary unlock key"
+
+    local key="$persist_dir/luks-secondary-unlock.key"
     $ssh_root_cmd "dd bs=512 count=4 if=/dev/random of=$key iflag=fullblock && chmod 400 $key"
 
-    green "Cryptsetup luksAddKey will now be used to add /luks-secondary-unlock.key for the specified secondary drive names."
+    green "$key will be added as an additional unlock for drives: $luks_secondary_drive_labels"
+    green "Add the following lines to your environment.etc.crypttab.text for this system"
     readarray -td, drivenames <<<"$luks_secondary_drive_labels"
     for name in "${drivenames[@]}"; do
-        device_path=$($ssh_root_cmd -q "cryptsetup status \"$name\" | awk \'/device:/ {print \$2}\'")
-        $ssh_root_cmd "echo \"$luks_passphrase\" | cryptsetup luksAddKey $device_path /luks-secondary-unlock.key"
+        stripped=$(echo "$name" | xargs)
+        device_path=$($ssh_root_cmd -q "/bin/sh -c 'cryptsetup status $stripped'" | awk '/device:/ {print $2}')
+        # Strip out any \n or \r
+        device_path="${device_path%%[[:cntrl:]]}"
+        $ssh_root_cmd "/bin/sh -c 'echo \"$luks_passphrase\" | cryptsetup luksAddKey $device_path $key'"
+        uuid=$($ssh_root_cmd "/bin/sh -c 'lsblk -f ${device_path} -n | head -1'" | awk '{print $NF}')
+        echo "$name UUID=$uuid /luks-secondary-unlock.key nofail"
     done
 }
 
@@ -258,12 +265,14 @@ if [ -z "${target_hostname}" ] || [ -z "${target_destination}" ] || [ -z "${ssh_
     help_and_exit
 fi
 
+ran_nixos_anywhere=0
 if yes_or_no "Run nixos-anywhere installation?"; then
     nixos_anywhere
+    ran_nixos_anywhere=1 # indicates we must rekey since there was a new host ssh key created
 fi
 
 updated_age_keys=0
-if yes_or_no "Generate host (ssh-based) age key?"; then
+if [[ $ran_nixos_anywhere -eq 1 ]] || yes_or_no "Generate host (ssh-based) age key?"; then
     sops_generate_host_age_key
     updated_age_keys=1
 fi
@@ -276,6 +285,12 @@ if yes_or_no "Generate user age key?"; then
     git add sops/"${target_hostname}".yaml
     cd - >/dev/null
     updated_age_keys=1
+fi
+
+if [ -n "${luks_secondary_drive_labels}" ]; then
+    if yes_or_no "Generate additional LUKS drive keys?"; then
+        luks_setup_secondary_drive_decryption
+    fi
 fi
 
 if [[ $updated_age_keys == 1 ]]; then
