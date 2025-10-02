@@ -11,7 +11,7 @@
     settings = {
       general = {
         disable_loading_bar = true;
-        grace = 5; # grace period in seconds that the lock will unlock on mouse movement.
+        grace = 2; # grace period in seconds that the lock will unlock on mouse movement.
         hide_cursor = true;
         no_fade_in = false;
       };
