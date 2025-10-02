@@ -105,7 +105,7 @@ in
               isDefault = true;
               settings = commonSettings;
               extensions = import ./extensions.nix { inherit pkgs inputs; };
-              search = import ./search.nix { inherit pkgs; };
+              search = import ./search.nix { inherit lib pkgs; };
             };
           };
       };
