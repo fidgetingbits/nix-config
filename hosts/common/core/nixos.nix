@@ -8,7 +8,6 @@
 }:
 {
   imports = [
-    #inputs.nixvim-flake.nixosModules.nixvim
     inputs.nixcats-flake.nixosModules.default
   ];
 
@@ -19,11 +18,7 @@
     inherit (pkgs)
       cntr # derivation debugging
       # editing
-      xclip # required for clipboard with vim
-
-      # ricing
-      plymouth # bootscreen
-      adi1090x-plymouth-themes # https://github.com/adi1090x/plymouth-themes
+      xclip # required for clipboard with vim (FIXME: this is only if not using wayland, so maybe check)
       ;
   };
 
@@ -38,13 +33,9 @@
     in
     {
       # FIXME(networking): oxid IP will be different depending on if we are on it's network or not
-      "oxid.${config.hostSpec.domain}" = [ network.subnets.oxid.gateway ];
-      "oxid-external.${config.hostSpec.domain}" = [
-        network.subnets.ogre.hosts.oxid.ip
-      ];
-      # FIXME(networking): not sure why these are failing to add on ogre
-      "moon.${config.hostSpec.domain}" = [ network.subnets.ogre.hosts.moon.ip ];
-      "myth.${config.hostSpec.domain}" = [ network.subnets.ogre.hosts.myth.ip ];
+      network.subnets.oxid.gateway = [ "oxid.${config.hostSpec.domain}" ];
+      network.subnets.ogre.hosts.moon.ip = [ "moon.${config.hostSpec.domain}" ];
+      network.subnets.ogre.hosts.myth.ip = [ "myth.${config.hostSpec.domain}" ];
     }
     // lib.optionalAttrs config.hostSpec.isWork network.work.hosts;
 
@@ -163,7 +154,6 @@
   # Enable automatic login for the user.
   services.displayManager = lib.optionalAttrs config.hostSpec.useWindowManager {
     autoLogin.enable = true;
-    # FIXME: we will want to tweak the user on multi-user systems
     autoLogin.user = config.hostSpec.primaryDesktopUsername;
     defaultSession = config.hostSpec.defaultDesktop;
   };
