@@ -43,7 +43,7 @@
         # Then all your changes are gone. So this check is meant to fail early and indicate the lock needs to be removed.
         # FIXME: Probably could make it to just delete the lock file as an auto-fix...
         enable = true;
-        name = "ensure flake.lock isn't staged accidentally";
+        name = "check-flake-lock";
         entry = "${./check-flake-lock.sh}";
         files = ".*";
         language = "script";
