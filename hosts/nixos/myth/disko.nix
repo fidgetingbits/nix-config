@@ -1,5 +1,17 @@
 # mdadm and raid5 reference:
 # https://github.com/mitchty/nix/blob/shenanigans/nix/nixosConfigurations/gw0/diskconfig.nix
+
+# NOTE this will automatically trigger a resync, which can impact nixos-anywhere's ability to
+# reboot. You can see with systemd-inhibit that udiskd is running an operation
+# See the progress with cat /proc/mdstat (takes about 2 hours with 6TB)
+# You can stop the resync by using the following:
+
+# ```
+# echo frozen > /sys/block/md0/md/sync_action
+# echo none > /sys/block/md0/md/resync_start
+# echo idle > /sys/block/md0/md/sync_action
+# ```
+# See https://serverfault.com/questions/216508/how-to-interrupt-software-raid-resync
 {
   pkgs,
   config,

@@ -79,11 +79,14 @@
   };
   boot.loader.efi.canTouchEfiVariables = true;
 
-  # Note using wifi on this box for now
-  boot.blacklistedKernelModules = [
-    "iwlwifi"
-  ];
-  systemd.network.netdevs.wlo1.enable = false;
+  # NOTE: I removed wlo1 entirely from facter.json since the below didn't work,
+  # but leaving it in.
+  # Disable wlo1 completely since we aren't using wifi
+  # boot.blacklistedKernelModules = [
+  #   "iwlwifi"
+  # ];
+  # networking.interfaces.wlo1.useDHCP = false;
+  # systemd.network.netdevs.wlo1.enable = false;
 
   # Remote early boot LUKS unlock via ssh
   boot.initrd = {
@@ -114,10 +117,24 @@
   };
 
   # needed to unlock LUKS on raid drives
-  # use partition UUID
   # https://wiki.nixos.org/wiki/Full_Disk_Encryption#Unlocking_secondary_drives
+  # lsblk -o name,uuid,mountpoints
+  environment.persistence."${config.hostSpec.persistFolder}" = {
+    files = [
+      "/luks-secondary-unlock.key"
+    ];
+  };
+
+  # NOTE: Using /dev/disk/by-partlabel/ would be nicer than UUID, however because we are using raid5, there is no
+  # single partlabel to use, we need the UUID assigned to the raid5 device created by mdadm (/dev/md127)
+  # FIXME: See if the secondary-unlock key can actually be part of sops, which would be possible if
+  # systemd-cryptsetup@xxx.service runs after sops service
+  # https://github.com/ckiee/nixfiles/blob/aa0138bc4b183d939cd8d2e60bcf2828febada36/hosts/pansear/hardware.nix#L16
+  # We may need to make our own systemd unit that tries to mount but that isn't critical, so that we can ignore it
+  # in the event of an error (like if you forget to update the UUID after bootstrap, etc).
+  # Not bothering for now, as it's not pressing. The drives are already using the same passphrase as the main drive, which we have recorded
   environment.etc.crypttab.text = lib.optionalString (!config.hostSpec.isMinimal) ''
-    encrypted-backup UUID=25541f69-ee5f-4e2d-8939-2b4f1643fe90 /luks-secondary-unlock.key
+    encrypted-storage UUID=ff3207ca-0af8-4dc3-a21f-4ec815b57c56 /luks-secondary-unlock.key nofail,x-systemd.device-timeout=10
   '';
 
   # FIXME:
