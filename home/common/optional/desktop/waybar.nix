@@ -39,7 +39,7 @@ in
 
   programs.waybar = {
     enable = true;
-    #package = pkgs.unstable.waybar;
+    package = pkgs.unstable.waybar;
     systemd = {
       enable = true;
     };
@@ -68,7 +68,7 @@ in
               "tray"
               "pulseaudio"
               "battery"
-              "backlight"
+              #"backlight"
               "clock#time"
               "clock#date"
             ]

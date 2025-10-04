@@ -68,7 +68,7 @@
     autostart = lib.mkForce true;
   };
 
-  services.snixembed.enable = true;
+  services.snixembed.enable = config.hostSpec.voiceCoding;
 
   sops = {
     secrets = {

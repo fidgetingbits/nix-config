@@ -57,6 +57,7 @@
     )
   );
 
+  # FIXME: this should be tied to hostSpec.voiceCoding
   talon = {
     enable = false;
     autostart = false;
@@ -91,8 +92,9 @@
   };
   programs.firefox.nativeMessagingHosts = [ pkgs.tridactyl-native ];
 
-  # Allows to show talon icon in system tray
-  services.snixembed.enable = true;
+  # Allows to show talon icon in system tray.
+  # NOTE: Important this doesn't run if using wayland, as conflicts with waybar
+  services.snixembed.enable = config.hostSpec.voiceCoding;
   services.yubikey-touch-detector.enable = true;
   services.yubikey-touch-detector.notificationSound = true;
 
