@@ -120,6 +120,11 @@
           default = false;
           description = "Used to indicate a host that is remotely managed";
         };
+        isLocal = lib.mkOption {
+          type = lib.types.bool;
+          default = (!config.hostSpec.isRemote);
+          description = "Used to indicate a host that is remotely managed";
+        };
         useYubikey = lib.mkOption {
           type = lib.types.bool;
           default = false;
