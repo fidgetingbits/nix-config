@@ -152,7 +152,7 @@ In the above snippet, we enable the backup module and declare specific optional 
 6. Rebuild nix-config, and then run `sudo borg-backup-init`. This will create a borg repository for the host, on the borg server and generate a BORG_KEY using our previously provided passphrase. In our example, when the module has been enabled our host called `ghost`, running the command will create a borg repository on the borg server at `/var/services/homes/ta/backups/ghost`.
 
 7. This step is optional. Log back into the server if needed, and run `borg key export backups/<hostname>`. Follow any prompts. This will print the BORG_KEY that borg generated for the repository. The key itself will be is stored on the server with the repo; we are exporting it for future reference. Copy the BORG_KEY data to a secure location such as Proton Pass.
-8. Rebuild nix-config and update inputs so that the nix-secrets changes are pulled in. With nix-config we can do this by running `just rebuild-update`.
+8. Rebuild nix-config and update inputs so that the nix-secrets changes are pulled in. With nix-config we can do this by running `just upgrade`.
 9. To test that email notification is working correctly, run `borg-backup-test-email` and then check your email inbox for an email from your msmtp notifier to whichever address you configure.
 10. To specify which files or directories should be excluded from backup, refer to [Exclude Lists](#Exclude Lists) below.
 

@@ -333,11 +333,21 @@ bump_lock() {
     )
 }
 
-## Nix Config Helpers
-nix_hosts() {
-    nix flake show --json | jq -r '.nixConfigurations | keys[]'
+# FIXME: These should move to the nix-config devshell probably
+function nix_hosts() {
+    nix flake show -reference-lock-file locks/"$(hostname)".lock --json 2>/dev/null | jq -r '.nixConfigurations | keys[]'
 }
 
-build_host() {
+function build() {
+    just build-host "$(nix_hosts | fzf_auto_select)"
+}
 
+function update() {
+    just update "$(nix_hosts | fzf_auto_select)"
+}
+
+function upgrade() {
+    host="$(nix_hosts | fzf_auto_select)"
+    just update "$host"
+    just build-host "$host"
 }

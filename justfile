@@ -77,7 +77,7 @@ update HOST=`hostname` *INPUT:
 
 # Update and then rebuild
 [group("building")]
-rebuild-update: update rebuild
+upgrade: update rebuild
 
 # Generate a new age key
 [group("secrets")]

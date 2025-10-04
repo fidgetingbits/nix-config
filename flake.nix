@@ -129,7 +129,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     silentSDDM = {
-      url = "github:uiriansan/SilentSDDM";
+      # FIXME(sddm): Pinned because of https://github.com/uiriansan/SilentSDDM/issues/55
+      url = "github:uiriansan/SilentSDDM?rev=cfb0e3eb380cfc61e73ad4bce90e4dcbb9400291";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

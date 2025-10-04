@@ -30,14 +30,16 @@ in
     pkgs.font-awesome
   ];
 
-  # Needed to add these services even if packets are already installed so share path to XDG_DATA_DIRS to correctly find the fonts despite font-awesome being installed
-  # Prevents: [error] Item 'nm-applet': Could not find an icon named 'nm-signal-50' and no pixmap given.
+  # Needed to add these services even if packets are already installed so share
+  # path to XDG_DATA_DIRS to correctly find the fonts despite font-awesome
+  # being installed Prevents: [error] Item 'nm-applet': Could not find an icon
+  # named 'nm-signal-50' and no pixmap given.
   services.network-manager-applet.enable = true;
-  # Prevents: [error] Item 'blueman': Could not find an icon named 'blueman-tray' and no pixmap given.
   services.blueman-applet.enable = true;
 
   programs.waybar = {
     enable = true;
+    #package = pkgs.unstable.waybar;
     systemd = {
       enable = true;
     };
@@ -62,21 +64,21 @@ in
         modules-right =
           if config.hostSpec.isMobile then
             [
-              "gamemode"
+              #"gamemode"
+              "tray"
               "pulseaudio"
               "battery"
               "backlight"
               "clock#time"
               "clock#date"
-              "tray"
             ]
           else
             [
-              "gamemode"
+              #"gamemode"
+              "tray"
               "pulseaudio"
               "clock#time"
               "clock#date"
-              "tray"
             ];
 
         # ========= Modules =========
