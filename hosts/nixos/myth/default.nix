@@ -80,9 +80,15 @@
   };
   boot.loader.efi.canTouchEfiVariables = true;
 
-  # NOTE: I removed wlo1 entirely from facter.json since the below didn't work,
-  # but leaving it in.
-  # Disable wlo1 completely since we aren't using wifi
+  # wlo1 boot delay
+  #
+  # FIXME: I removed wlo1 entirely from facter.json since the below didn't work,
+  # but leaving it in. See facter.json.wlo1.bk for old version (or regenerate).
+  #
+  # Add neededForBoot = false to stop the 1m30s wait on startup once
+  # https://github.com/NixOS/nixpkgs/pull/360092 is finalized
+  #
+  # None of these work to stop the 1m30s delay on boot, but leaving for reference
   # boot.blacklistedKernelModules = [
   #   "iwlwifi"
   # ];
