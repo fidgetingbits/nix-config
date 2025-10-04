@@ -44,6 +44,7 @@
           "cli.nix"
           # "yubikey.nix"
           "fonts.nix"
+          "logind.nix"
         ])
     ))
   ];
@@ -116,6 +117,8 @@
   services.displayManager.sddm.autoLogin = {
     relogin = true;
   };
+
+  services.logind.powerKey = lib.mkForce "reboot";
 
   # FIXME:
   # services.backup = {
