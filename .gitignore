@@ -13,5 +13,8 @@ node_modules
 ida-pro_90_x64linux.run
 binaryninja_linux_stable_commercial.zip
 
+# Backup files for temporary changes
+*.bk
+
 /.git-crypt.key
 /flake.lock

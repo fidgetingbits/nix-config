@@ -22,10 +22,14 @@ let
     "oppo"
     "moon"
     "myth"
-    "myth-unlock"
   ]
   ++ inputs.nix-secrets.networking.ssh.yubikeyHostsWithDomain;
   yubikeyHostsWithoutDomain = [
+    # FIXME: These could be automated by having a hostSpec entry that indicates they use boot-time ssh server
+    # it could also auto-add the ssh server...
+    "myth-unlock"
+    "myth-backup"
+    "ooze-unlock"
     "oath_gitlab" # FIXME(ssh): Would be nice to do per-port match on this, but HM doesn't support
     config.hostSpec.networking.subnets.ogre.wildcard
   ]
@@ -46,7 +50,7 @@ let
 
   # FIXME: Not sure how I want to do this, but for now using "super
   #yubikeyPath = "hosts/common/users/${config.hostSpec.primaryUsername}/keys/yubikeys";
-  yubikeyPath = "hosts/common/users/super/keys/yubikeys";
+  yubikeyPath = "hosts/common/users/super/keys";
 
   # There is a list of yubikey pubkeys in keys/yubikey. Build a list of corresponding private key files in .ssh
   yubikeys =
@@ -165,6 +169,19 @@ in
             hostname = "myth.${config.hostSpec.domain}";
             user = "root";
             port = config.hostSpec.networking.ports.tcp.ssh;
+            extraOptions = {
+              UserKnownHostsFile = "/dev/null";
+              StrictHostKeyChecking = "no";
+            };
+          };
+
+          # Backup dns entry in fact ddclient screws up
+          # FIXME: Should script these entries probably
+          "myth-backup" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
+            host = "myth-backup";
+            hostname = config.hostSpec.networking.domains.myth-backup;
+            user = "root";
+            port = config.hostSpec.networking.ports.tcp.gitlab;
             extraOptions = {
               UserKnownHostsFile = "/dev/null";
               StrictHostKeyChecking = "no";

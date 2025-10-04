@@ -332,3 +332,12 @@ bump_lock() {
         gcm "chore: bump ${host} lock"
     )
 }
+
+## Nix Config Helpers
+nix_hosts() {
+    nix flake show --json | jq -r '.nixConfigurations | keys[]'
+}
+
+build_host() {
+
+}
