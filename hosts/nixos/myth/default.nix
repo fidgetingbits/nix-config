@@ -29,6 +29,7 @@
 
           # Misc
           # "msmtp.nix" # FIXME: We only need this if we setup emails for logins/backups, etc
+          "logind.nix"
           "cli.nix"
         ])
     ))
@@ -110,11 +111,14 @@
     };
   };
 
-  # FIXME: This may be better as part of a module or just in the host-specific file
-  # triggered auto scan of raid5 drives during nixos-anywhere install
+  # NOTE: This triggers a warning about /usr/lib/mdadm/mdadm_env.sh not existing, which is part of
+  # the ExecStartPre, but is benign
+  # FIXME: Is mdchecks better for this?
   systemd.services."mdmonitor".environment = {
     MDADM_MONITOR_ARGS = "--scan --syslog";
   };
+
+  services.logind.powerKey = lib.mkForce "reboot";
 
   # needed to unlock LUKS on raid drives
   # https://wiki.nixos.org/wiki/Full_Disk_Encryption#Unlocking_secondary_drives

@@ -13,7 +13,6 @@
 # ```
 # See https://serverfault.com/questions/216508/how-to-interrupt-software-raid-resync
 {
-  pkgs,
   config,
   ...
 }:
@@ -26,7 +25,9 @@ let
 in
 {
 
-  boot.swraid.mdadmConf = "PROGRAM ${pkgs.coreutils}/bin/true";
+  # FIXME: To delete, this should be fixed in 24.05 actually
+  # https://github.com/NixOS/nixpkgs/issues/72394
+  #boot.swraid.mdadmConf = "PROGRAM ${pkgs.coreutils}/bin/true";
 
   disko.devices = {
     disk = {
