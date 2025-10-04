@@ -18,6 +18,10 @@
     name = "you-should-use";
     src = "${pkgs.zsh-you-should-use}/share/zsh/plugins/you-should-use";
   }
+  {
+    name = "zsh-vi-mode";
+    src = "${pkgs.zsh-vi-mode}/share/zsh-vi-mode";
+  }
   # Allow zsh to be used in nix-shell
   {
     name = "zsh-nix-shell";
