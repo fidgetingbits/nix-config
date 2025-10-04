@@ -12,7 +12,7 @@ let
   genPubKeyList =
     user:
     let
-      keyPath = (lib.custom.relativeToRoot "hosts/common/users/${user}/keys/yubikeys/");
+      keyPath = (lib.custom.relativeToRoot "hosts/common/users/${user}/keys/");
     in
     if (builtins.pathExists keyPath) then
       lib.lists.forEach (lib.filesystem.listFilesRecursive keyPath) (key: builtins.readFile key)
