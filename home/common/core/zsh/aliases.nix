@@ -140,8 +140,6 @@ in
   jr = "just rebuild";
   jrt = "just rebuild-trace";
   jl = "just --list";
-  jc = "$just check";
-  jct = "$just check-trace";
 
   # direnv
   da = "direnv allow";
@@ -167,6 +165,10 @@ in
   sula = "systemctl --user list-units --all";
   sr = "systemctl restart";
   sur = "systemctl --user restart";
+
+  # journalctl
+  jc = "journalctl";
+  jcu = "journalctl --user";
 
   # ssh
   sshnc = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o GlobalKnownHostsFile=/dev/null";
