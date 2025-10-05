@@ -149,7 +149,7 @@ in
             u2fAuth = true;
           };
           # Attempt to auto-unlock gnome-keyring using u2f
-          # NOTE: vscode uses gnome-keyring even if we aren't using gnome, which is why it's still here
+          # NOTE: apps like vscode/signal uses gnome-keyring even if we aren't using gnome, which is why it's still here
           # This doesn't work
           #gnome-keyring = {
           #  text = ''
