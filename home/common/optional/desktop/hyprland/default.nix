@@ -20,9 +20,10 @@
 
   wayland.windowManager.hyprland = {
     enable = true;
-    # This will expose things like XDG_DATA_DIRS to systemd services, which we want
     systemd = {
       enable = true;
+      # This will expose things like XDG_DATA_DIRS to systemd services, which we want
+      # FIXME: Make this a more granular list
       variables = [ "--all" ];
     };
     plugins = [
