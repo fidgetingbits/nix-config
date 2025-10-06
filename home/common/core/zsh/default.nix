@@ -60,7 +60,7 @@ in
     oh-my-zsh = {
       enable = true;
       plugins = [
-        "gcloud" # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/gcloud
+        #"gcloud" # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/gcloud
         "grc" # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/grc
         "eza" # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/eza/
         "cp" # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/cp

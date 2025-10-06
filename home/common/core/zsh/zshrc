@@ -42,7 +42,14 @@ setopt pushd_minus
 # NOTE: Many of these used for voice mappings. Better to just use vi mode when outside voice.
 ##
 
-bindkey -r '^G' # Conflicts with fzf-git.sh
+function post_vi_mode_binds() {
+    bindkey -r '^G' # Conflicts with fzf-git.sh
+}
+
+# Force any binds/unbinds after zsh-vi-mode initializes to prevent conflicts
+# see https://github.com/jeffreytse/zsh-vi-mode/issues/4#issuecomment-757234569
+zvm_after_init_commands+=(post_vi_mode_binds)
+
 # ^[3~ is sent by many terminals for the delete key
 bindkey '^[[3~' delete-char
 # ^[3;5~ is sent by some terminals for ctrl+delete key
@@ -129,7 +136,7 @@ function fzf_closest() {
 }
 
 # Fuzzy find file and jump to it's directory. Automatically select fzf result if only one match.
-cdf() {
+function cdf() {
     local files
     # NOTE: uses fd rather than fzf --filter to get built-in gitignore support
     files=$(fd $1)
@@ -146,7 +153,7 @@ cdf() {
 }
 
 # Fuzzy find directory and jump to it
-cdd() {
+function cdd() {
     local dirs
     # NOTE: uses fd rather than fzf --filter to get built-in gitignore support
     dirs=$(fd -t d "$1")
@@ -163,7 +170,7 @@ cdd() {
 }
 
 # Fuzzy jump backwards up the current directory tree
-cdup() {
+function cdup() {
     local parent_dir
     parent_dir=$( (
         current_dir=$(pwd)
@@ -207,15 +214,15 @@ function fdr() {
 ##
 # Misc functions
 ##
-nameshell() {
+function nameshell() {
     echo -ne "\033]0;$*\007"
 }
 
-reload() {
+function reload() {
     exec "${SHELL}" "$@"
 }
 
-escape() {
+function escape() {
     # useful when you need to translate weird paths into single-argument string.
     local escape_string_input
     echo -n "String to escape: "
@@ -240,7 +247,7 @@ escape() {
 # We shouldn't need this with programs.zoxide.enableZshIntegration but I seem to anyway :/
 eval "$(zoxide init zsh)"
 
-nix_wrapper() {
+function nix_wrapper() {
     if [[ $1 == "build" ]]; then
         shift
         nix_log_extract build "$@"
@@ -249,7 +256,7 @@ nix_wrapper() {
     fi
 }
 
-nix_log_extract() {
+function nix_log_extract() {
     # Run the original nix command and capture its output
     temp_file=$(mktemp)
     script -q -f "$temp_file" -c "command nix $*"
@@ -306,16 +313,29 @@ nix_log_extract() {
 alias nix='nix_wrapper'
 alias nix-log-last='NIX_PAGER=cat nix log $NIX_LAST_DERIVATION'
 
-git_smart_rebase() {
+function git_smart_rebase() {
     GIT_STASH_MESSAGE="git_smart_rebase: $RANDOM"
     git stash push -m "$GIT_STASH_MESSAGE"
     git fetch && git rebase
     git stash list | (grep "${GIT_STASH_MESSAGE}" && git stash pop) || true
 }
 
+function git_changed_files() {
+    unstaged=$(git diff --name-only)
+    staged=$(git diff --staged --name-only)
+    echo "$unstaged" "$staged" | fzf
+}
+
+# Use fzf-git.sh style ctrl+g binding
+zle -N git_changed_files
+for m in emacs vicmd viins; do
+    #bindkey -M $m '^g^d' git_changed_files
+    bindkey -M $m '^gc' git_changed_files
+done
+
 # Add and commit an updated flake lock file for the current or given host
 # Uses a subshell () to allow `set -ex`
-bump_lock() {
+function bump_lock() {
     (
         cd-gitroot >/dev/null
         if [ ! -e "locks" ]; then
