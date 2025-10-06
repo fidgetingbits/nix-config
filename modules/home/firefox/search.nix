@@ -1,6 +1,6 @@
-{ pkgs, lib, ... }:
+{ lib, ... }:
 let
-  icon = "''${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
+  icon = "https://search.nixos.org/favicon.png";
 in
 {
   force = true; # Don't complain about clobbering backups
@@ -29,6 +29,7 @@ in
         };
       };
       mkLang = lang: aliases: { inherit lang aliases; };
+      # FIXME: Would be nice to have per-lang icons for clearer alias results
       gitHubLangSearches = lib.mergeAttrsList (
         map (entry: mkGitHubLangSearch entry.lang entry.aliases) [
           (mkLang "nix" [ "@nl" ])
@@ -151,7 +152,7 @@ in
       "Noogle" = {
         urls = [
           {
-            template = "https://noogle.dev/q";
+            template = "https://noogle.dev/";
             params = [
               {
                 name = "q";
@@ -166,6 +167,40 @@ in
         ];
         inherit icon;
         definedAliases = [ "@ng" ];
+      };
+      "Unix Porn" = {
+        urls = [
+          {
+            template = "https://www.reddit.com/r/unixporn/search";
+            params = [
+              {
+                name = "q";
+                value = "{searchTerms}";
+              }
+              {
+                name = "type";
+                value = "code";
+              }
+            ];
+          }
+        ];
+        icon = "https://styles.redditmedia.com/t5_2sx2i/styles/communityIcon_7fixeonxbxd41.png";
+        definedAliases = [ "@up" ];
+      };
+      "GitHub Search" = {
+        urls = [
+          {
+            template = "https://github.com/search";
+            params = [
+              {
+                name = "q";
+                value = "{searchTerms}";
+              }
+            ];
+          }
+        ];
+        icon = "https://github.githubassets.com/favicons/favicon.png";
+        definedAliases = [ "@gh" ];
       };
       "wikipedia".metaData.hidden = true;
       "google".metaData.hidden = true;
