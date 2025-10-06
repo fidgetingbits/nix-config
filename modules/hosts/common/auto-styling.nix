@@ -15,15 +15,12 @@ in
     inputs.stylix.${platformModules}.stylix
   ];
 
+  # Also seem modules/home/auto-styling.nix
   config = lib.mkIf config.hostSpec.isAutoStyled {
     stylix = {
       enable = true;
       autoEnable = true;
-      #      cursor = {
-      #        package = pkgs.catppuccin-cursors;
-      #        name = "frappeDark";
-      #      };
-      opacity.terminal = 0.97;
+      opacity.terminal = 0.80;
       base16Scheme = "${pkgs.base16-schemes}/share/themes/${config.hostSpec.theme}.yaml";
       # FIXME: This needs to be synchronized with fonts.nix
       fonts = rec {
