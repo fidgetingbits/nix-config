@@ -1,4 +1,9 @@
-{ config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 {
   # FIXME: Add the background sync service
   # https://forum.atuin.sh/t/getting-the-daemon-working-on-nixos/334
@@ -6,7 +11,7 @@
     enable = true;
 
     enableBashIntegration = false;
-    enableZshIntegration = true;
+    enableZshIntegration = false; # NOTE: false because of zsh-vi-mode, see below
     enableFishIntegration = false;
 
     settings = {
@@ -40,9 +45,21 @@
     path = "${config.home.homeDirectory}/.local/share/atuin/key";
   };
 
-  programs.zsh.initContent = ''
-    # Bind down key for atuin, specifically because we use invert
-    bindkey "$key[Down]"  atuin-up-search
-  '';
+  programs.zsh.initContent =
+    let
+      flagsStr = lib.escapeShellArgs config.programs.atuin.flags;
+    in
+    ''
+      # Bind down key for atuin, specifically because we use invert
+      bindkey "$key[Down]"  atuin-up-search
 
+      # Work around zsh-vi-mode bug
+      # https://github.com/atuinsh/atuin/issues/1826
+      if [[ $options[zle] = on ]]; then
+        function atuin_init() {
+          eval "$(${pkgs.atuin}/bin/atuin init zsh ${flagsStr})"
+        }
+        zvm_after_init_commands+=(atuin_init)
+      fi
+    '';
 }
