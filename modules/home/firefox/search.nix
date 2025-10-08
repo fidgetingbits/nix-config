@@ -97,6 +97,7 @@ in
         ];
         definedAliases = [
           "@ho"
+          "@hmo"
         ];
       };
       "NixOS Wiki" = {
@@ -146,6 +147,7 @@ in
         ];
         inherit icon;
         definedAliases = [
+          "@hm"
           "@hmr" # home-manager repo
         ];
       };
