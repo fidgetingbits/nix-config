@@ -83,6 +83,8 @@
     MESA_LOG_FILE = "/dev/null";
   };
 
+  services.swww2.enable = true;
+
   # FIXME: Move this to tridactyl location
   # See https://github.com/DivitMittal/firefox-nixCfg/blob/dc55e3750eac4d6381301901e269106efae621ff/config/tridactyl/config/tridactylrc for more examples (and tridactyl repo)
   xdg.configFile."tridactyl/tridactylrc" = {
