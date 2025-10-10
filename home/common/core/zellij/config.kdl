@@ -3,33 +3,19 @@ keybinds clear-defaults=true {
     locked {
         bind "Alt g" { SwitchToMode "Normal" ; }
     }
-    resize {
-        bind "Alt r"     { SwitchToMode "Normal" ; }
-        bind "h" "Left"  { Resize "Increase Left" ; }
-        bind "j" "Down"  { Resize "Increase Down" ; }
-        bind "k" "Up"    { Resize "Increase Up" ; }
-        bind "l" "Right" { Resize "Increase Right" ; }
-    }
     pane {
         bind "Alt p"     { SwitchToMode "Normal" ; }
         bind "c"         { Clear ; }
         bind "e"         { TogglePaneEmbedOrFloating ; SwitchToMode "Normal" ; }
         bind "f"         { ToggleFocusFullscreen ; SwitchToMode "Normal" ; }
-        bind "j" "Down"  { NewPane "Down" ; SwitchToMode "Normal" ; }
-        bind "l" "Right" { NewPane "Right" ; SwitchToMode "Normal" ; }
+        bind "j"         { NewPane "Down" ; SwitchToMode "Normal" ; }
+        bind "l"         { NewPane "Right" ; SwitchToMode "Normal" ; }
         bind "n"         { NewPane ; SwitchToMode "Normal" ; }
         bind "p"         { SwitchFocus ; SwitchToMode "Normal" ; }
         bind "r"         { SwitchToMode "RenamePane" ; PaneNameInput 0 ; }
         bind "w"         { ToggleFloatingPanes ; SwitchToMode "Normal" ; }
         bind "x"         { CloseFocus ; SwitchToMode "Normal" ; }
         bind "z"         { TogglePaneFrames ; SwitchToMode "Normal" ; }
-    }
-    move {
-        bind "Alt m"     { SwitchToMode "Normal"; }
-        bind "h" "Left"  { MovePane "Left" ; }
-        bind "j" "Down"  { MovePane "Down" ; }
-        bind "k" "Up"    { MovePane "Up" ; }
-        bind "l" "Right" { MovePane "Right" ; }
     }
     tab {
         bind "Alt t" { SwitchToMode "Normal" ; }
@@ -95,10 +81,23 @@ keybinds clear-defaults=true {
     shared_except "locked" {
         bind "Alt g"             { SwitchToMode "Locked" ; }
         bind "Alt q"             { Quit ; }
-        bind "Alt h" "Alt Left"  { MoveFocusOrTab "Left" ; }
-        bind "Alt l" "Alt Right" { MoveFocusOrTab "Right" ; }
-        bind "Alt j" "Alt Down"  { MoveFocus "Down" ; }
-        bind "Alt k" "Alt Up"    { MoveFocus "Up" ; }
+        // Focus
+        bind "Alt h"             { MoveFocusOrTab "Left" ; }
+        bind "Alt l"             { MoveFocusOrTab "Right" ; }
+        bind "Alt j"             { MoveFocus "Down" ; }
+        bind "Alt k"             { MoveFocus "Up" ; }
+        bind "Alt ."             { FocusPreviousPane ; }
+        // Move
+        bind "Alt H"             { MovePane "Left" ; }
+        bind "Alt J"             { MovePane "Down" ; }
+        bind "Alt K"             { MovePane "Up" ; }
+        bind "Alt L"             { MovePane "Right" ; }
+        // Resize
+        bind "Alt Left"  { Resize "Increase Left" ; }
+        bind "Alt Down"  { Resize "Increase Down" ; }
+        bind "Alt Up"    { Resize "Increase Up" ; }
+        bind "Alt Right" { Resize "Increase Right" ; }
+        // Swap
         bind "Alt ["             { PreviousSwapLayout ; }
         bind "Alt ]"             { NextSwapLayout ; }
     }
@@ -107,9 +106,6 @@ keybinds clear-defaults=true {
     }
     shared_except "pane" "locked" {
         bind "Alt p" { SwitchToMode "Pane" ; }
-    }
-    shared_except "resize" "locked" {
-        bind "Alt r" { SwitchToMode "Resize" ; }
     }
     shared_except "scroll" "locked" {
         bind "Alt s" { SwitchToMode "Scroll" ; }
@@ -120,35 +116,16 @@ keybinds clear-defaults=true {
     shared_except "tab" "locked" {
         bind "Alt t" { SwitchToMode "Tab" ; }
     }
-    shared_except "move" "locked" {
-        bind "Alt m" { SwitchToMode "Move" ; }
-    }
 }
 
 plugins {
-    compact-bar location="zellij:compact-bar"
+//    compact-bar location="zellij:compact-bar"
 }
 
-simplified_ui true
-//pane_frames false
+//simplified_ui true
+pane_frames true
 
 
-// themes {
-//     base16 {
-//         fg      "#D8D8D8"
-//         bg      "#3b3b3b"
-//         black   "#181818"
-//         red     "#AC4242"
-//         green   "#90A959"
-//         yellow  "#F4BF75"
-//         blue    "#6A9FB5"
-//         magenta "#AA759F"
-//         cyan    "#75B5AA"
-//         white   "#F8F8F8"
-//         orange  "#ffa066"
-//     }
-// }
 
-theme "base16"
-//default_layout "simple"
+theme "stylix"
 copy_on_select true
