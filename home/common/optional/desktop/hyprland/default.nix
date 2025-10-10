@@ -18,6 +18,10 @@
       ./hyprlock.nix
     ];
 
+  # Prefer swww, and avoid hyprpaper crash loop
+  services.hyprpaper.enable = lib.mkForce false;
+  stylix.targets.hyprpaper.enable = lib.mkForce false;
+
   wayland.windowManager.hyprland = {
     enable = true;
     systemd = {
