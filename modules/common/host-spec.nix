@@ -142,7 +142,8 @@
         };
         theme = lib.mkOption {
           type = lib.types.str;
-          default = "dracula";
+          #default = "dracula";
+          default = "catppuccin-mocha";
           description = "The theme to use for the host (stylix, vscode, neovim, etc)";
         };
         useNeovimTerminal = lib.mkOption {
