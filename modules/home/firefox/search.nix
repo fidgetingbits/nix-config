@@ -267,7 +267,7 @@ in
 
         definedAliases = [ "@aw" ];
       };
-      "Reddit" = {
+      "reddit" = {
         urls = [ { template = "https://www.reddit.com/search/?q={searchTerms}"; } ];
 
         definedAliases = [
@@ -344,7 +344,7 @@ in
           "@librs"
         ];
       };
-      "YouTube" = {
+      "youtube" = {
         urls = [ { template = "https://www.youtube.com/results?search_query={searchTerms}"; } ];
 
         definedAliases = [
@@ -369,7 +369,6 @@ in
           "@searx"
         ];
       };
-
       "AlternativeTo" = {
         urls = [ { template = "https://alternativeto.net/browse/search?q={searchTerms}"; } ];
 
