@@ -105,6 +105,7 @@ in
   # folders
 
   # Directory convenience
+  ".h" = "cd ~"; # Because I find pressing ~ tedious"
   cdr = "cd-gitroot";
   ".r" = "cd-gitroot";
   cdpr = "..; cd-gitroot";
