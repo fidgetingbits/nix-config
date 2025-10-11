@@ -18,10 +18,6 @@
       ./hyprlock.nix
     ];
 
-  # Prefer swww, and avoid hyprpaper crash loop
-  services.hyprpaper.enable = lib.mkForce false;
-  stylix.targets.hyprpaper.enable = lib.mkForce false;
-
   wayland.windowManager.hyprland = {
     enable = true;
     systemd = {
@@ -76,7 +72,8 @@
         workspace_swipe_create_new = true;
       };
       exec-once = [
-      ];
+      ]
+      ++ lib.optional config.services.swww.enable "swww img ${config.hostSpec.wallpaper}";
 
       general.layout = "hy3";
       plugin = {
@@ -84,7 +81,7 @@
       };
     };
 
-    # FIXME: Implement a smarter window focus for single monitor where moving right/left will swap worksapces if already on the edge. There is something similar ish here:
+    # FIXME: Implement a smarter window focus for single monitor where moving right/left will swap workspaces if already on the edge. There is something similar ish here:
     # https://github.com/DoMondo/dotfiles/blob/2b32ce2290ba28c809c099dc1934c361c4dfb63a/.hyprland_functions/move_focus.sh#L38
   };
 

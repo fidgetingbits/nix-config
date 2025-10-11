@@ -85,10 +85,10 @@
 
   # FIXME: Move this
   programs.yazi.enable = true;
-  services.swww.enable = true;
-  # FIXME: Rename this from swww2
-  # Revisit this since the way it runs the daemon is busted
-  #services.swww2.enable = true;
+  services.swww = {
+    enable = true;
+    wallpaperDir = "${config.home.homeDirectory}/images/walls-catppuccin-mocha";
+  };
 
   # FIXME: Move this to tridactyl location
   # See https://github.com/DivitMittal/firefox-nixCfg/blob/dc55e3750eac4d6381301901e269106efae621ff/config/tridactyl/config/tridactylrc for more examples (and tridactyl repo)

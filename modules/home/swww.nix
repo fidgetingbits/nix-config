@@ -1,4 +1,3 @@
-# Originally from https://github.com/JenSeReal/NixOS/blob/main/packages/swww/default.nix
 {
   lib,
   config,
@@ -6,19 +5,17 @@
   ...
 }:
 
-with lib;
-
 let
-  cfg = config.services.swww2;
+  inherit (lib) mkIf mkOption types;
+  cfg = config.services.swww;
 in
 {
-  options.services.swww2 = {
-    enable = mkEnableOption "Enable the swww wallpaper manager";
-
+  options.services.swww = {
     interval = mkOption {
       type = types.int;
-      default = 10;
-      description = "Interval value for the swww daemon";
+      #default = (60 * 60); # Hourly
+      default = 60; # Minutely
+      description = "Interval value for cycling between images";
     };
 
     transitionFPS = mkOption {
@@ -41,33 +38,9 @@ in
   };
 
   config = mkIf cfg.enable {
-    home.packages = [ pkgs.swww ];
-
-    systemd.user.services.swww = {
-      Unit = {
-        Description = "swww daemon";
-        After = [ "graphical-session.target" ];
-      };
-
-      Service = {
-        ExecStart = [
-          "${pkgs.swww}/bin/swww"
-          "daemon"
-          "--interval"
-          (toString cfg.interval)
-          "--transition-fps"
-          (toString cfg.transitionFPS)
-          "--transition-step"
-          (toString cfg.transitionStep)
-        ];
-        Restart = "always";
-        RestartSec = 5;
-      };
-
-      Install = {
-        WantedBy = [ "default.target" ];
-      };
-    };
+    # Prefer swww, and avoid hyprpaper crash loop
+    services.hyprpaper.enable = lib.mkForce false;
+    stylix.targets.hyprpaper.enable = lib.mkForce false;
 
     # Optionally, cycle through images in the wallpaper directory
     systemd.user.services.swww-cycle = mkIf (cfg.wallpaperDir != "") {
@@ -78,18 +51,19 @@ in
       };
 
       Service = {
-        ExecStart = [
-          "${pkgs.bash}/bin/bash"
-          "-c"
-          ''
-            while true; do
-              for img in ${cfg.wallpaperDir}/*; do
-                ${pkgs.swww}/bin/swww img "$img"
-                sleep ${toString cfg.interval}
-              done
+        ExecStart = pkgs.writeShellScript "swww-cycle" ''
+          #!/bin/bash
+          while true; do
+            images=($(ls -d ${cfg.wallpaperDir}/* | shuf))
+            for img in "''${images[@]}" | shuf); do
+              ${pkgs.swww}/bin/swww img \
+                --transition-fps ${toString cfg.transitionFPS} \
+                --transition-step ${toString cfg.transitionStep} \
+                "$img"
+              sleep ${toString cfg.interval}
             done
-          ''
-        ];
+          done
+        '';
         Restart = "always";
         RestartSec = 5;
       };
