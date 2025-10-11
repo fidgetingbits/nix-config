@@ -13,8 +13,7 @@ in
   options.services.swww = {
     interval = mkOption {
       type = types.int;
-      #default = (60 * 60); # Hourly
-      default = 60; # Minutely
+      default = (60 * 60); # Hourly
       description = "Interval value for cycling between images";
     };
 

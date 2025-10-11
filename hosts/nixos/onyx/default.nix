@@ -91,13 +91,13 @@ rec {
     useAtticCache = lib.mkForce true;
     isDevelopment = lib.mkForce true;
     isMobile = lib.mkForce true;
-    wallpaper = "${inputs.nix-assets}/images/wallpapers/forest_temple.webp";
     users = lib.mkForce [
       "aa"
       #"media"
     ];
     defaultDesktop = "hyprland-uwsm";
     persistFolder = lib.mkForce "";
+    timeZone = lib.mkForce "America/Edmonton";
   };
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
@@ -137,10 +137,6 @@ rec {
 
   environment.systemPackages = builtins.attrValues {
     inherit (pkgs)
-      # Access iphone data
-      ifuse
-      libimobiledevice
-
       # gnupg - see yubikey.nix
       paperkey # printed gpg key backup utilitie
       pinentry-curses # for gpg-agent
