@@ -54,7 +54,7 @@ in
           #!/bin/bash
           while true; do
             images=($(ls -d ${cfg.wallpaperDir}/* | shuf))
-            for img in "''${images[@]}" | shuf); do
+            for img in "''${images[@]}"; do
               ${pkgs.swww}/bin/swww img \
                 --transition-fps ${toString cfg.transitionFPS} \
                 --transition-step ${toString cfg.transitionStep} \
