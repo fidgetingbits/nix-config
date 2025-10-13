@@ -27,6 +27,7 @@
     ++
       # Optional common modules
       (map (f: "hosts/common/optional/${f}") [
+        "keyd.nix"
         "cli.nix"
         "services/openssh.nix"
         "services/atuin.nix"

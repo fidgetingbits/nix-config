@@ -21,6 +21,7 @@
           ##
           # Optional
           ##
+          "keyd.nix"
 
           # Host-specific stuff
           "msmtp.nix"

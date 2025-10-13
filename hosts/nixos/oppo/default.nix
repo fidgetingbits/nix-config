@@ -19,6 +19,7 @@
       ++ (map (f: "hosts/common/optional/${f}") [
 
         # Host-specific stuff
+        "keyd.nix"
         "msmtp.nix"
         # WARNING: Blocks on boot on both gpus atm (Granite Ridge and 9070XT)
         #"plymouth.nix"

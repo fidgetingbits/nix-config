@@ -25,6 +25,7 @@ rec {
         # Optional common modules
         (map (f: "hosts/common/optional/${f}") [
           # Host-specific stuff
+          "keyd.nix"
           "msmtp.nix"
           "plymouth.nix"
           "printing.nix"
