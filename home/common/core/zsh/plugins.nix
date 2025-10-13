@@ -5,11 +5,20 @@
     src = ./p10k;
     file = "p10k.zsh.theme"; # NOTE: Don't use .zsh because of shfmt barfs on it, and can't ignore files
   }
+
+  # FIXME: Make this only apply if we are usting catppuccin
   {
-    name = "zsh-powerlevel10k";
-    src = "${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k";
-    file = "powerlevel10k.zsh-theme";
+    name = "p10k-catppuccin-theme";
+    src = ./p10k;
+    file = "mocha.p10k.zsh.theme"; # NOTE: Don't use .zsh because of shfmt barfs on it, and can't ignore files
   }
+
+  # FIXME(zsh): double check why I had added this in addition to my own theme above
+  #  {
+  #    name = "zsh-powerlevel10k";
+  #    src = "${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k";
+  #    file = "powerlevel10k.zsh-theme";
+  #  }
   {
     name = "zhooks";
     src = "${pkgs.zsh-zhooks}/share/zsh/zhooks";

@@ -148,6 +148,8 @@ in
                   src = lib.custom.relativeToRoot "home/common/core/zsh/p10k";
                   file = "p10k.zsh.theme";
                 }
+
+                # FIXME(zsh): double check why I had added this in addition to my own theme above
                 {
                   name = "zsh-powerlevel10k";
                   src = "${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k";
