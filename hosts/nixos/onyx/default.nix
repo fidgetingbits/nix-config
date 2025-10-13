@@ -96,6 +96,7 @@ rec {
       "aa"
       #"media"
     ];
+    wallpaper = "${inputs.nix-assets}/images/wallpapers/astronaut.webp";
     defaultDesktop = "hyprland-uwsm";
     persistFolder = lib.mkForce "";
     timeZone = lib.mkForce "America/Edmonton";
