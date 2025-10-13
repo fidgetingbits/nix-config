@@ -45,6 +45,7 @@
         enable = true;
         name = "check-flake-lock";
         entry = "${./check-flake-lock.sh}";
+        fail_fast = true; # Bail immediately if this fails
         files = ".*";
         language = "script";
         #pass_on_error = false;
