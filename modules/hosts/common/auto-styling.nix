@@ -25,8 +25,8 @@ in
       # FIXME: This needs to be synchronized with fonts.nix
       fonts = rec {
         monospace = {
-          name = "FiraCode Nerd Font";
-          package = pkgs.nerd-fonts.fira-code;
+          name = "FiraMono Nerd Font";
+          package = pkgs.nerd-fonts.fira-mono;
         };
         sansSerif = monospace;
         serif = monospace;

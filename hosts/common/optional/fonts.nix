@@ -186,14 +186,14 @@ in
         "Iosevka Nerd Font Mono"
         "MesloLGS NF"
         "Nerd Fonts Symbols Only"
-        "FiraCode Nerd Font Mono"
+        "FiraMono Nerd Font Mono"
       ];
       sansSerif = chineseSansDefaults ++ [
         "Noto Color Emoji"
         "Iosevka Nerd Font Mono"
         "MesloLGS NF"
         "Nerd Fonts Symbols Only"
-        "FiraCode Nerd Font Mono"
+        "FiraMono Nerd Font Mono"
       ];
       monospace = [
         "JetBrainsMono Nerd Font"
@@ -201,7 +201,7 @@ in
         "Iosevka Nerd Font Mono"
         "MesloLGS NF"
         "Nerd Fonts Symbols Only"
-        "FiraCode Nerd Font Mono"
+        "FiraMono Nerd Font Mono"
       ];
       emoji = [
         "Noto Color Emoji"
