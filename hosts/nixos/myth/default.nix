@@ -41,6 +41,7 @@
     users = lib.mkForce [
       "admin"
       "pa"
+      "borg"
     ];
     primaryUsername = lib.mkForce "admin";
     # FIXME: deprecate this
