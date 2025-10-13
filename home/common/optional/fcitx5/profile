@@ -27,3 +27,6 @@ Layout=
 
 [GroupOrder]
 0=Default
+
+[Hotkey/TriggerKeys]
+0=Alt+space
