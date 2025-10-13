@@ -1,4 +1,9 @@
-{ pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 {
   imports = lib.custom.scanPaths ./.;
   # Probably move this eventually
@@ -35,6 +40,10 @@
       speed = 2;
       accel-profile = "default";
       natural-scroll = false;
+    };
+    # FIXME: Not sure how this works if monitors differ
+    "org/gnome/desktop/interface" = {
+      scaling-factor = lib.hm.gvariant.mkUint32 config.hostSpec.scaling;
     };
   };
 
