@@ -25,40 +25,31 @@ keybinds clear-defaults=true {
         bind "n"     { NewTab ; SwitchToMode "Normal" ; }
         bind "r"     { SwitchToMode "RenameTab" ; TabNameInput 0 ; }
         bind "x"     { CloseTab ; SwitchToMode "Normal" ; }
-        bind "1"     { GoToTab 1 ; SwitchToMode "Normal" ; }
-        bind "2"     { GoToTab 2 ; SwitchToMode "Normal" ; }
-        bind "3"     { GoToTab 3 ; SwitchToMode "Normal" ; }
-        bind "4"     { GoToTab 4 ; SwitchToMode "Normal" ; }
-        bind "5"     { GoToTab 5 ; SwitchToMode "Normal" ; }
-        bind "6"     { GoToTab 6 ; SwitchToMode "Normal" ; }
-        bind "7"     { GoToTab 7 ; SwitchToMode "Normal" ; }
-        bind "8"     { GoToTab 8 ; SwitchToMode "Normal" ; }
-        bind "9"     { GoToTab 9 ; SwitchToMode "Normal" ; }
     }
-    scroll {
-        bind "Alt s"    { SwitchToMode "Normal" ; }
-        bind "d"        { HalfPageScrollDown ; }
-        bind "u"        { HalfPageScrollUp ; }
-        bind "j" "Down" { ScrollDown ; }
-        bind "k" "Up"   { ScrollUp ; }
-        bind "Home"     { ScrollToTop ; SwitchToMode "Normal" ; }
-        bind "End"      { ScrollToBottom ; SwitchToMode "Normal" ; }
-        bind "PageDown" { PageScrollDown ; }
-        bind "PageUp"   { PageScrollUp ; }
-        bind "s"        { SwitchToMode "EnterSearch" ; SearchInput 0 ; }
-    }
-    search {
-        bind "Alt s" { SwitchToMode "Normal" ; }
-        bind "n"     { Search "down" ; }
-        bind "p"     { Search "up" ; }
-        bind "c"     { SearchToggleOption "CaseSensitivity" ; }
-        bind "w"     { SearchToggleOption "Wrap" ; }
-        bind "o"     { SearchToggleOption "WholeWord" ; }
-    }
-    entersearch {
-        bind "Alt c" "Esc" { SwitchToMode "Scroll" ; }
-        bind "Enter"       { SwitchToMode "Search" ; }
-    }
+//    scroll {
+//        bind "Alt s"    { SwitchToMode "Normal" ; }
+//        bind "d"        { HalfPageScrollDown ; }
+//        bind "u"        { HalfPageScrollUp ; }
+//        bind "j" "Down" { ScrollDown ; }
+//        bind "k" "Up"   { ScrollUp ; }
+//        bind "Home"     { ScrollToTop ; SwitchToMode "Normal" ; }
+//        bind "End"      { ScrollToBottom ; SwitchToMode "Normal" ; }
+//        bind "PageDown" { PageScrollDown ; }
+//        bind "PageUp"   { PageScrollUp ; }
+//        bind "s"        { SwitchToMode "EnterSearch" ; SearchInput 0 ; }
+//    }
+//    search {
+//        bind "Alt s" { SwitchToMode "Normal" ; }
+//        bind "n"     { Search "down" ; }
+//        bind "p"     { Search "up" ; }
+//        bind "c"     { SearchToggleOption "CaseSensitivity" ; }
+//        bind "w"     { SearchToggleOption "Wrap" ; }
+//        bind "o"     { SearchToggleOption "WholeWord" ; }
+//    }
+//    entersearch {
+//        bind "Alt c" "Esc" { SwitchToMode "Scroll" ; }
+//        bind "Enter"       { SwitchToMode "Search" ; }
+//    }
     renametab {
         bind "Alt c" { SwitchToMode "Normal" ; }
         bind "Esc"   { UndoRenameTab ; SwitchToMode "Tab" ; }
@@ -79,27 +70,48 @@ keybinds clear-defaults=true {
         }
     }
     shared_except "locked" {
-        bind "Alt g"             { SwitchToMode "Locked" ; }
-        bind "Alt q"             { Quit ; }
+        bind "Alt g"     { SwitchToMode "Locked" ; }
+        bind "Alt q"     { Quit ; }
         // Focus
-        bind "Alt h"             { MoveFocusOrTab "Left" ; }
-        bind "Alt l"             { MoveFocusOrTab "Right" ; }
-        bind "Alt j"             { MoveFocus "Down" ; }
-        bind "Alt k"             { MoveFocus "Up" ; }
-        bind "Alt ."             { FocusPreviousPane ; }
+        bind "Alt h"     { MoveFocusOrTab "Left" ; }
+        bind "Alt l"     { MoveFocusOrTab "Right" ; }
+        bind "Alt j"     { MoveFocus "Down" ; }
+        bind "Alt k"     { MoveFocus "Up" ; }
+        bind "Alt ."     { FocusPreviousPane ; }
+        bind "Alt 1"     { GoToTab 1 ; }
+        bind "Alt 2"     { GoToTab 2 ; }
+        bind "Alt 3"     { GoToTab 3 ; }
+        bind "Alt 4"     { GoToTab 4 ; }
+        bind "Alt 5"     { GoToTab 5 ; }
+        bind "Alt 6"     { GoToTab 6 ; }
+        bind "Alt 7"     { GoToTab 7 ; }
+        bind "Alt 8"     { GoToTab 8 ; }
+        bind "Alt 9"     { GoToTab 9 ; }
         // Move
-        bind "Alt H"             { MovePane "Left" ; }
-        bind "Alt J"             { MovePane "Down" ; }
-        bind "Alt K"             { MovePane "Up" ; }
-        bind "Alt L"             { MovePane "Right" ; }
+        bind "Alt H"     { MovePane "Left" ; }
+        bind "Alt J"     { MovePane "Down" ; }
+        bind "Alt K"     { MovePane "Up" ; }
+        bind "Alt L"     { MovePane "Right" ; }
         // Resize
         bind "Alt Left"  { Resize "Increase Left" ; }
         bind "Alt Down"  { Resize "Increase Down" ; }
         bind "Alt Up"    { Resize "Increase Up" ; }
         bind "Alt Right" { Resize "Increase Right" ; }
         // Swap
-        bind "Alt ["             { PreviousSwapLayout ; }
-        bind "Alt ]"             { NextSwapLayout ; }
+        bind "Alt ["     { PreviousSwapLayout ; }
+        bind "Alt ]"     { NextSwapLayout ; }
+        // Console
+        bind "Alt e"     { EditScrollback ; }
+
+        // FIXME: not sure if this is needed
+        bind "Alt ;" {
+            MessagePlugin "compact-bar" {
+                name "toggle_tooltip"
+                payload "1"
+                floating false
+                tooltip "Alt ;"
+            }
+        }
     }
     shared_except "normal" "locked" {
         bind "Enter" "Esc" { SwitchToMode "Normal" ; }
@@ -119,13 +131,19 @@ keybinds clear-defaults=true {
 }
 
 plugins {
-//    compact-bar location="zellij:compact-bar"
+    compact-bar location="zellij:compact-bar" {
+       tooltip "Alt ;"
+    }
+}
+
+ui {
+    pane_frames {
+        rounded_corners true
+    }
 }
 
 //simplified_ui true
+//theme "stylix"
 pane_frames true
-
-
-
-theme "stylix"
 copy_on_select true
+show_startup_tips false
