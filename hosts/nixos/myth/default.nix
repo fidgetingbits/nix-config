@@ -71,6 +71,7 @@
 
   system.impermanence.enable = true;
 
+  environment.systemPackages = [ pkgs.borgbackup ];
   boot.kernelPackages = pkgs.linuxPackages_latest;
   # Bootloader
   boot.loader.systemd-boot = {
@@ -147,6 +148,15 @@
   environment.etc.crypttab.text = lib.optionalString (!config.hostSpec.isMinimal) ''
     encrypted-storage UUID=ff3207ca-0af8-4dc3-a21f-4ec815b57c56 /luks-secondary-unlock.key nofail,x-systemd.device-timeout=10
   '';
+
+  systemd = {
+    tmpfiles.rules =
+      let
+        user = config.users.users."borg".name;
+        group = config.users.users."borg".group;
+      in
+      [ "d /mnt/storage/backup/ 0750 ${user} ${group} -" ];
+  };
 
   # FIXME:
   # services.backup = {
