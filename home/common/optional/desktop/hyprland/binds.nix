@@ -89,6 +89,7 @@
           "${mainMod}, space, exec, rofi -show drun"
           "${mainMod} SHIFT, space, exec, rofi -show run"
           "${mainMod}, tab, exec, rofi -show window"
+          "ctrl, semicolon, exec, rofi-copyq"
 
           "${mainMod}, return, exec, ghostty"
           "${mainMod}, v, exec, ghostty neovim"
