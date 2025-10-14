@@ -76,8 +76,7 @@
   # Bootloader
   boot.loader.systemd-boot = {
     enable = true;
-    # Needs to be lowered if we ever run plymouth
-    configurationLimit = lib.mkDefault 30;
+    configurationLimit = lib.mkDefault 10;
     consoleMode = "1";
   };
   boot.loader.efi.canTouchEfiVariables = true;
