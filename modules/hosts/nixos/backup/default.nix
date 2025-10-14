@@ -200,11 +200,17 @@ in
         BORG_SERVER="''${BORG_SERVER:-${cfg.borgServer}}"
         BORG_PORT="''${BORG_PORT:-${cfg.borgPort}}"
         BORG_HOST="''${BORG_HOST:-${config.networking.hostName}}"
-        BORG_REMOTE_REPO="''$BORG_SERVER:''${BORG_REMOTE_REPO:-${cfg.borgBackupPath}/$BORG_HOST}"
+        BORG_REMOTE_REPO="''${BORG_REMOTE_REPO:-${cfg.borgBackupPath}/$BORG_HOST}"
+        #shellcheck disable=SC2304
+        BORG_REMOTE="''${BORG_SERVER}:''${BORG_REMOTE_REPO}"
+        export BORG_REMOTE # hack to shutup shellcheck
         BORG_SSH_KEY="''${BORG_SSH_KEY:-${cfg.borgSshKey}}"
-        BORG_REMOTE_PATH="''${BORG_REMOTE_PATH:---remote-path ${cfg.borgRemotePath}}"
+        BORG_REMOTE_PATH="''${BORG_REMOTE_PATH:-${cfg.borgRemotePath}}"
         BORG_BACKUP_NAME="''${BORG_BACKUP_NAME:-${cfg.borgBackupName}}"
         BORG_BACKUP_PATHS="''${BORG_BACKUP_PATHS:-${lib.concatStringsSep " " cfg.borgBackupPaths}}"
+        if [ -v BORG_TRACE ]; then
+          set -x
+        fi
 
         # Export variables not used directly in script, or only used in some scripts
         export BORG_BTRFS_VOLUME="''${BORG_BTRFS_VOLUME:-${cfg.borgBtrfsVolume}}"
@@ -294,12 +300,12 @@ in
             # prevent it from showing up while doing recoveries
             cd "$BACKUP_PATH"
             #shellcheck disable=SC2086
-            if borg create $BORG_REMOTE_PATH -v --stats --exclude-caches "$BORG_REMOTE_REPO::$BORG_BACKUP_NAME" $PWD \
+            if borg create --remote-path $BORG_REMOTE_PATH -v --stats --exclude-caches "$BORG_REMOTE::$BORG_BACKUP_NAME" $PWD \
               --exclude-if-present .nobackup \
               ${if pkgs.stdenv.isDarwin then "--exclude-from ${darwinExcludesFile}" else " "} \
               --exclude-from ${borgExcludesFile}; then
               # NOTE: --glob-archives works like a tag, so we can rename pinned backups with a none matching prefix like pinned-...
-              borg prune $BORG_REMOTE_PATH -v --list "$BORG_REMOTE_REPO" --glob-archives "$BORG_HOST-*" $BORG_EXPIRY
+              borg prune --remote-path $BORG_REMOTE_PATH -v --list "$BORG_REMOTE" --glob-archives "$BORG_HOST-*" $BORG_EXPIRY
             fi
             cd -
             umount "$MOUNTDIR"
@@ -332,11 +338,11 @@ in
               done
               # FIXME(borg): Add a check to see if we need to run borg init
               #shellcheck disable=SC2096,SC2068,SC2086
-              if borg create $BORG_REMOTE_PATH -v --stats --exclude-caches "$BORG_REMOTE_REPO::$BORG_BACKUP_NAME" \
+              if borg create --remote-path $BORG_REMOTE_PATH -v --stats --exclude-caches "$BORG_REMOTE::$BORG_BACKUP_NAME" \
                 $BORG_BACKUP_PATHS \
                 --exclude-from ${borgExcludesFile} \
                 ''${MOUNT_EXCLUDES[@]}; then
-                borg prune $BORG_REMOTE_PATH -v --list "$BORG_REMOTE_REPO" --glob-archives "$BORG_HOST-*" $BORG_EXPIRY
+                borg prune --remote-path $BORG_REMOTE_PATH -v --list "$BORG_REMOTE" --glob-archives "$BORG_HOST-*" $BORG_EXPIRY
               fi
             }
           borg_backup >$LOGFILE 2>&1
@@ -362,7 +368,7 @@ in
           fi
 
           #shellcheck disable=SC2086
-          borg mount $BORG_REMOTE_PATH -v "$BORG_REMOTE_REPO"::"$backup_name" "$BORG_MOUNT_PATH"
+          borg mount --remote-path $BORG_REMOTE_PATH -v "$BORG_REMOTE"::"$backup_name" "$BORG_MOUNT_PATH"
           echo "Backup mounted at $BORG_MOUNT_PATH"
         '';
       };
@@ -405,7 +411,7 @@ in
           parse_args "0" "$@"
 
           #shellcheck disable=SC2086
-          borg list $BORG_REMOTE_PATH $BORG_REMOTE_REPO
+          borg list --remote-path $BORG_REMOTE_PATH $BORG_REMOTE
         '';
       };
       borg-backup-break-lock = pkgs.writeShellApplication {
@@ -419,7 +425,7 @@ in
           parse_args "0" "$@"
 
           #shellcheck disable=SC2086
-          borg break-lock $BORG_REMOTE_PATH $BORG_REMOTE_REPO
+          borg break-lock --remote-path $BORG_REMOTE_PATH $BORG_REMOTE
         '';
       };
       borg-backup-init = pkgs.writeShellApplication {
@@ -433,7 +439,7 @@ in
           parse_args "0" "$@"
 
           #shellcheck disable=SC2086
-          borg init $BORG_REMOTE_PATH --encryption=repokey "$BORG_REMOTE_REPO"
+          borg init --remote-path $BORG_REMOTE_PATH --encryption=repokey "$BORG_REMOTE"
         '';
       };
       borg-backup-rename = pkgs.writeShellApplication {
@@ -450,7 +456,7 @@ in
           new_name="''${POSITIONAL_ARGS[1]}"
 
           #shellcheck disable=SC2086
-          borg rename $BORG_REMOTE_PATH -v "$BORG_REMOTE_REPO"::"$backup_name" "$new_name"
+          borg rename --remote-path $BORG_REMOTE_PATH -v "$BORG_REMOTE"::"$backup_name" "$new_name"
           echo "Renamed backup $backup_name with new_name $new_name"
         '';
       };
@@ -467,8 +473,8 @@ in
           backup_name="''${POSITIONAL_ARGS[0]}"
 
           #shellcheck disable=SC2086,SC2068
-          borg delete --dry-run $BORG_REMOTE_PATH -v --list \
-            "$BORG_REMOTE_REPO"::"$backup_name" \
+          borg delete --dry-run --remote-path $BORG_REMOTE_PATH -v --list \
+            "$BORG_REMOTE"::"$backup_name" \
             ''${POSITIONAL_ARGS[@]:1:''${#POSITIONAL_ARGS[@]}-1}
           echo "Deleted backup $backup_name"
         '';
@@ -487,8 +493,8 @@ in
           restore_path="''${POSITIONAL_ARGS[1]}"
 
           #shellcheck disable=SC2086,SC2068
-          borg extract $BORG_REMOTE_PATH -v \
-            "$BORG_REMOTE_REPO"::"$backup_name" \
+          borg extract --remote-path $BORG_REMOTE_PATH -v \
+            "$BORG_REMOTE"::"$backup_name" \
             --strip-components 1 -p "$restore_path" \
             --list \
             ''${POSITIONAL_ARGS[@]:2:''${#POSITIONAL_ARGS[@]}-1}
@@ -513,7 +519,8 @@ in
           borg-backup-delete
           borg-backup-restore
           borg-backup-break-lock
-        ] ++ lib.optional config.system.impermanence.enable borg-backup-btrfs-subvolume;
+        ]
+        ++ lib.optional config.system.impermanence.enable borg-backup-btrfs-subvolume;
         sops.secrets = {
           "keys/ssh/borg" = {
             # FIXME: ATM this is required by nix-darwin PR I'm using
