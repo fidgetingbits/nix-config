@@ -13,6 +13,24 @@
       force = true;
     };
     #"fcitx5/conf/classicui.conf".source = ./classicui.conf;
+    # Disable ctrl-; key for clipboard (probably just disable tthis eventually, since we use rofi-copyq now
+    "fcitx5/conf/clipboard.conf" = {
+      force = true;
+      text = ''
+        # Trigger Key
+        TriggerKey=
+        # Paste Primary
+        PastePrimaryKey=
+        # Number of entries
+        Number of entries=5
+        # Do not show password from password managers
+        IgnorePasswordFromPasswordManager=False
+        # Hidden clipboard content that contains a password
+        ShowPassword=False
+        # Seconds before clearing password
+        ClearPasswordAfter=30
+      '';
+    };
   };
   i18n.inputMethod = {
     type = "fcitx5";
