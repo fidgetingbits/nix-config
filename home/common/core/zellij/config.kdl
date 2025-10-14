@@ -151,3 +151,4 @@ pane_frames true
 copy_on_select true
 show_startup_tips false
 //default_shell "vi -c ':term zsh'"
+default_layout "default"
