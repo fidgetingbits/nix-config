@@ -13,6 +13,7 @@ in
   gdb = "gdb -q";
   rg = "rg -M300";
   du = "dust";
+  # FIXME: Switch this to a function since you always do 'df -h'
   df = "duf";
   calc = "eva";
   c = "clear";
