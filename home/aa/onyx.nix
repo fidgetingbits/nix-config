@@ -105,6 +105,9 @@
   services.yubikey-touch-detector.enable = true;
   services.yubikey-touch-detector.notificationSound = true;
 
+  # FIXME: Make this part of a module
+  services.copyq.enable = true;
+
   sops = {
     secrets = {
       "tokens/fly" = {
