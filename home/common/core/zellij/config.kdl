@@ -101,17 +101,17 @@ keybinds clear-defaults=true {
         bind "Alt ["     { PreviousSwapLayout ; }
         bind "Alt ]"     { NextSwapLayout ; }
         // Console
-        bind "Alt e"     { EditScrollback ; }
+        //bind "Alt e"     { EditScrollback ; }
 
         // FIXME: not sure if this is needed
-        bind "Alt ;" {
-            MessagePlugin "compact-bar" {
-                name "toggle_tooltip"
-                payload "1"
-                floating false
-                tooltip "Alt ;"
-            }
-        }
+ //       bind "Alt ;" {
+ //           MessagePlugin "compact-bar" {
+ //               name "toggle_tooltip"
+ //               payload "1"
+ //               floating false
+ //               tooltip "Alt ;"
+ //           }
+ //       }
     }
     shared_except "normal" "locked" {
         bind "Enter" "Esc" { SwitchToMode "Normal" ; }
@@ -130,6 +130,9 @@ keybinds clear-defaults=true {
     }
 }
 
+// These are aliases. To use configured plugin via alias, like if you add a
+// tooltip, refer to the alias elsewhere using 'plugin location="compact-bar"'
+// not 'plugin location="zellij:compact-bar"'
 plugins {
     compact-bar location="zellij:compact-bar" {
        tooltip "Alt ;"
@@ -147,3 +150,4 @@ ui {
 pane_frames true
 copy_on_select true
 show_startup_tips false
+//default_shell "vi -c ':term zsh'"

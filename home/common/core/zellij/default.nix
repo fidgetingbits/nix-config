@@ -12,7 +12,7 @@
   # Use manual file until extraConfig PR is fixed
   xdg.configFile = {
     "zellij/config.kdl".source = ./config.kdl;
-    #"zellij/layouts/default.kdl".source = ./default_layout.kdl;
+    "zellij/layouts/default.kdl".source = ./default_layout.kdl;
   };
 
   programs.zsh = {
