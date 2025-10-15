@@ -51,7 +51,8 @@ rec {
 
           # Binary analysis tools
           "binaryninja.nix"
-          "cynthion.nix"
+          # FIXME: Temporary to work around build error on update
+          #"cynthion.nix"
           "saleae.nix"
 
           # Network management
