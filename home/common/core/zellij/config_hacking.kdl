@@ -1,0 +1,74 @@
+layout {
+    cwd "$HOME"
+    tab name="TODO" hide_floating_panes=true {
+        pane size=1 borderless=true {
+            plugin location="compact-bar"
+        }
+        pane command="vi" cwd="wiki" {
+            args  "todo.md"
+            start_suspended false
+        }
+    }
+    tab name="Config" hide_floating_panes=true {
+        pane size=1 borderless=true {
+            plugin location="compact-bar"
+        }
+        pane split_direction="vertical" {
+            pane command="vi" cwd="$HOME/dev/nix/nix-config" size="50%" {
+                start_suspended false
+            }
+            pane size="50%" {
+                pane command="zsh" cwd="$HOME/dev/nix/nix-config" size="50%" {
+                    start_suspended true
+                }
+                pane cwd="$HOME/dev/nix/nix-config" size="50%"
+            }
+        }
+    }
+    tab name="Neovim" hide_floating_panes=true {
+        pane size=1 borderless=true {
+            plugin location="compact-bar"
+        }
+        pane split_direction="vertical" {
+            pane command="vi" cwd="$HOME/dev/nix/nixCats-example" size="50%" {
+                start_suspended true
+            }
+            pane size="50%" {
+                pane cwd="$HOME/dev/nix/nixCats-example" size="50%"
+                pane cwd="$HOME/dev/nix/nixvim-flake/config" size="50%"
+            }
+        }
+    }
+    tab name="Abbot" hide_floating_panes=true {
+        pane size=1 borderless=true {
+            plugin location="compact-bar"
+        }
+        pane cwd="$HOME/wikis/abbot-wiki" size="50%"
+        pane cwd="$HOME/wikis/abbot-wiki" size="50%"
+    }
+    tab name="EmergentMind" hide_floating_panes=true {
+        pane size=1 borderless=true {
+            plugin location="compact-bar"
+        }
+        pane split_direction="vertical" {
+            pane command="vi" cwd="$HOME/persist/public/source/dotfiles/nix/emergentmind" size="50%" {
+                start_suspended true
+            }
+            pane cwd="$HOME/persist/public/source/dotfiles/nix/emergentmind" size="50%"
+        }
+    }
+
+    tab name="Wiki" hide_floating_panes=true {
+        pane size=1 borderless=true {
+            plugin location="compact-bar"
+        }
+        pane cwd="home/aa/wiki" size="50%"
+    }
+
+    new_tab_template {
+        pane size=1 borderless=true {
+            plugin location="compact-bar"
+        }
+        pane cwd="$HOME"
+    }
+}
