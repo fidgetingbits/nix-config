@@ -102,7 +102,7 @@ in
       # Yubikey required services and config. See Dr. Duh NixOS config for
       # reference
       services = lib.optionalAttrs (!isDarwin) {
-        yubikey-agent.enable = true;
+        #yubikey-agent.enable = true;
 
         udev.extraRules =
           lib.optionalString pkgs.stdenv.isLinux ''
