@@ -32,11 +32,11 @@ in
   lib.mkMerge [
     {
 
-      # FIXME: Drop older key types and stuff since we should enver be using them anyway
+      # FIXME: Drop older key types and stuff since we should never be using them anyway
       services.openssh = {
         enable = true;
         ports = [ sshPort ];
-        # Fix LPE vulnerability with sudo use SSH_AUTH_SOCK: https://github.com/NixOS/nixpkgs/issues/31611
+        # Fix LPE vulnerability with sudo abusing SSH_AUTH_SOCK: https://github.com/NixOS/nixpkgs/issues/31611
         authorizedKeysFiles = lib.mkForce [ "/etc/ssh/authorized_keys.d/%u" ];
         settings = {
           # Harden
