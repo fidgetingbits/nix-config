@@ -371,3 +371,18 @@ function upgrade() {
     just update "$host"
     just build-host "$host"
 }
+
+# List the dates for all flake.lock inputs to see how long ago they were updated
+function flake_lock_dates() {
+    LOCK_FILE=${1-flake.lock}
+    jq -r '.nodes
+        | to_entries[]
+        | .key as $name
+        | .value.locked.lastModified as $ts
+        | select($ts != null)
+        | "\($name)\t\( $ts )"' \
+        "$LOCK_FILE" |
+        while IFS=$'\t' read -r name ts; do
+            printf "%-20s %s\n" "$name" "$(date -d @$ts '+%Y-%m-%d %H:%M:%S %Z')"
+        done
+}
