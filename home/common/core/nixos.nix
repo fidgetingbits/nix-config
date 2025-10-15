@@ -18,7 +18,6 @@
           cntr # nixpkgs sandbox debugging
           strace
           steam-run # run non-NixOS-packaged binaries on Nix
-          copyq # clipboard manager
           trash-cli # tools for managing trash
           socat # General networking utility, ex: used for serial console forwarding over ssh
           ;
