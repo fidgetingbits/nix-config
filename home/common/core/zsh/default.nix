@@ -12,6 +12,7 @@ in
     pkgs.bitwarden-cli # for cmd line password generation
     pkgs.rmtrash # temporarily cache deleted files for recovery
     pkgs.fzf # fuzzy finder used by initExtra.zsh
+    pkgs.gum # ricing cli tools
   ];
   programs.zsh = {
     enable = true;
