@@ -1,3 +1,17 @@
+# Kill and Delete multiple Zellij sessions using auto-completion
+zlkd() {
+    if [ $# -eq 0 ]; then
+        echo "Usage: zlkd <session-name-1> [session-name-2] ..."
+        echo "Kills and deletes the specified Zellij sessions."
+        return 1
+    fi
+    for session_name in "$@"; do
+        zellij kill-session  "$session_name" || true
+        zellij delete-session "$session_name" || true
+    done
+    zellij list-sessions
+}
+
 #  FIXME: rename this after pre-commit shfmt can be made to ignore it
 # Session tab completion from: https://github.com/zellij-org/zellij/issues/1933
 # shellcheck disable=SC2148
@@ -18,6 +32,7 @@ _zellij_sessions() {
     # Provide completion options with descriptions
     _describe -t sessions 'active session' session_names_with_desc
 }
+
 # ----------------------------------------------------------------------------
 # Tab Completion Setup
 # ----------------------------------------------------------------------------
@@ -34,3 +49,4 @@ _zellij_sessions() {
     s/::target-session -- Name of target session:/::target-session:_zellij_sessions/
     s/^(_(zellij) ).*/compdef \1\2/
 ')
+compdef '_zellij_sessions' zlkd

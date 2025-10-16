@@ -13,10 +13,6 @@ in
     pkgs.rmtrash # temporarily cache deleted files for recovery
     pkgs.fzf # fuzzy finder used by initExtra.zsh
   ];
-  programs.nix-index = {
-    enable = true;
-    enableZshIntegration = true;
-  };
   programs.zsh = {
     enable = true;
     enableCompletion = true;

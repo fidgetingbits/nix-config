@@ -1,3 +1,6 @@
+# See https://github.com/dj95/zjstatus/discussions/44 for some ricing ideas
+# Interesting way to auto-update plugins:
+# https://github.com/viperML/dotfiles/blob/master/modules/wrapper-manager/zellij/default.nix
 {
   lib,
   pkgs,
@@ -8,11 +11,10 @@
     enable = true;
     package = pkgs.unstable.zellij;
   };
-  # See https://github.com/dj95/zjstatus/discussions/44 for some ricing ideas
-  # Use manual file until extraConfig PR is fixed
   xdg.configFile = {
+    # Use manual file until extraConfig PR is fixed
     "zellij/config.kdl".source = ./config.kdl;
-    "zellij/layouts/default.kdl".source = ./default_layout.kdl;
+    "zellij/layouts/".source = ./layouts;
   };
 
   programs.zsh = {
