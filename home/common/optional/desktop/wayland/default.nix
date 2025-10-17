@@ -1,4 +1,7 @@
 { pkgs, ... }:
 {
-  home.packages = [ pkgs.wl-clipboard ];
+  home.packages = [
+    pkgs.wl-clipboard
+    pkgs.unstable.grimblast
+  ];
 }

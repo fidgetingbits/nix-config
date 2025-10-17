@@ -27,7 +27,7 @@
       variables = [ "--all" ];
     };
     plugins = [
-      pkgs.hyprlandPlugins.hy3
+      pkgs.unstable.hyprlandPlugins.hy3
     ];
     settings = {
       debug = {
@@ -66,10 +66,10 @@
       };
 
       gestures = {
-        workspace_swipe = true;
-        workspace_swipe_fingers = 3;
+        workspace_swipe_touch = true;
         workspace_swipe_distance = 100;
         workspace_swipe_create_new = true;
+        gesture = [ "3, horizontal, workspace" ];
       };
       exec-once = [
       ]
