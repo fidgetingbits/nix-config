@@ -1,5 +1,5 @@
 {
-  config,
+  #config,
   lib,
   pkgs,
   writeShellScriptBin,
@@ -9,10 +9,14 @@ let
     pkgs.jq
     pkgs.jtbl
     pkgs.fzf
-    config.programs.hyprland.package
+    # FIXME: This should ideally use whatever version of hyprland is already installed,
+    # but config.programs.hyprland.package isn't working
+    pkgs.unstable.hyprland
   ];
 in
-writeShellScriptBin "hypr-binds" ''
-  export PATH=${lib.makeBinPath dependencies}:$PATH
-''
-+ (builtins.readFile ./hypr-binds.sh)
+writeShellScriptBin "hypr-binds" (
+  ''
+    export PATH=${lib.makeBinPath dependencies}:$PATH
+  ''
+  + (builtins.readFile ./hypr-binds.sh)
+)
