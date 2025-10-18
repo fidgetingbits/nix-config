@@ -16,7 +16,8 @@
       tokei
       curl
       wget
-      jq
+      jq # json query tool
+      jtbl # json table output
       mailutils
       direnv
       mlocate # locate
