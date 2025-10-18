@@ -266,7 +266,4 @@ rec {
   # FIXME: Make this a module? hardware should be enabled by facter...
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
-  # NOTE: Unstable mesa (25.2.x) causes a lot of issues atm
-  #hardware.graphics.package = pkgs.unstable.mesa;
-
 }
