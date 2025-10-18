@@ -13,6 +13,7 @@
 let
   cfg = config.services.backup;
   hasPerNetworkServices = lib.hasAttr "per-network-services" config.services;
+  hasImpermanence = (config.system ? impermanence && config.system.impermanence.enable);
 
   hostName = config.networking.hostName;
   homeBase = if pkgs.stdenv.isLinux then "/home" else "/Users";
@@ -520,7 +521,7 @@ in
           borg-backup-restore
           borg-backup-break-lock
         ]
-        ++ lib.optional config.system.impermanence.enable borg-backup-btrfs-subvolume;
+        ++ lib.optional hasImpermanence borg-backup-btrfs-subvolume;
         sops.secrets = {
           "keys/ssh/borg" = {
             # FIXME: ATM this is required by nix-darwin PR I'm using
@@ -536,10 +537,8 @@ in
         # Linux specific
         systemd =
           let
-            backupTool =
-              if config.system.impermanence.enable then borg-backup-btrfs-subvolume else borg-backup-paths;
-            backupToolName =
-              if config.system.impermanence.enable then "borg-backup-btrfs-subvolume" else "borg-backup-paths";
+            backupTool = if hasImpermanence then borg-backup-btrfs-subvolume else borg-backup-paths;
+            backupToolName = if hasImpermanence then "borg-backup-btrfs-subvolume" else "borg-backup-paths";
             serviceEntries = {
               services."borg-backup" = {
                 description = "Run ${backupToolName} to backup system";
