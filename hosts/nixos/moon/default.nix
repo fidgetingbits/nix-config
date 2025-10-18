@@ -38,11 +38,11 @@
           "systemd-resolved.nix"
 
           # Misc
-          "msmtp.nix"
+          # FIXME: Need to make this work without postfix-relay
+          # "msmtp.nix"
           "plymouth.nix"
           "sound.nix"
           "cli.nix"
-          # "yubikey.nix"
           "fonts.nix"
           "logind.nix"
         ])
@@ -93,7 +93,8 @@
   # Bootloader.
   boot.loader.systemd-boot = {
     enable = true;
-    # When using plymouth, initrd can expand by a lot each time, so limit how many we keep around
+    # When using plymouth, initrd can expand by a lot each time, so limit how
+    # many we keep around
     configurationLimit = lib.mkDefault 10;
     consoleMode = "1";
   };
