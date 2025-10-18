@@ -1,11 +1,14 @@
 # NOTE: Actions prepended with `hy3;` are specific to the hy3 hyprland plugin
 {
-  #config,
+  config,
   lib,
   pkgs,
   ...
 }:
 {
+
+  # Package the hyprland scripts
+
   wayland.windowManager.hyprland.settings =
     let
       mainMod = "SUPER";
@@ -95,6 +98,15 @@
           "${mainMod}, v, exec, ghostty neovim"
 
           #
+          # ========== Wallpaper ==========
+          #
+          # FIXME: This should be a waybar widget really...
+          # Cycle to the next wallaper
+          "${mainMod}, equals, exec, systemctl --user kill --signal SIGUSR1 swww-cycle.service"
+          # Set the primary wallpaper
+          "${mainMod} SHIFT, equals, exec, swww img ${config.hostSpec.wallpaper}"
+
+          #
           # ========== Media Controls ==========
           #
           # see "binde" above for volume ctrls that need repeat binding
@@ -178,7 +190,7 @@
           ) directions)
 
           #
-          # ========== Monitors==========
+          # ========== Monitors ==========
           #
           "${mainMod}, m, exec, toggleMonitors"
           "${mainMod}, n, exec, toggleMonitorsNonPrimary"

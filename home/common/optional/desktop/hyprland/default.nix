@@ -18,6 +18,7 @@
       ./hyprlock.nix
     ];
 
+  home.packages = [ pkgs.hypr-binds ];
   wayland.windowManager.hyprland = {
     enable = true;
     systemd = {
@@ -31,10 +32,14 @@
     ];
     settings = {
       debug = {
-        disable_logs = false;
+        disable_logs = true;
       };
       env = [
       ];
+      ecosystem = {
+        no_update_news = true;
+        no_donation_nag = true;
+      };
 
       #
       # ========== Monitor ==========
@@ -56,6 +61,7 @@
         ) (config.monitors)
       );
 
+      # Mouse/Touchpad
       input = {
         follow_mouse = 2;
         touchpad = {
@@ -71,10 +77,22 @@
         workspace_swipe_create_new = true;
         gesture = [ "3, horizontal, workspace" ];
       };
+
+      # Ricing
+      decoration = {
+        fullscreen_opacity = 1.0;
+        shadow = {
+          enabled = true;
+          range = 2;
+          sharp = true;
+        };
+      };
+
       exec-once = [
       ]
       ++ lib.optional config.services.swww.enable "swww img ${config.hostSpec.wallpaper}";
 
+      # Plugins
       general.layout = "hy3";
       plugin = {
         hy3 = { };
