@@ -51,7 +51,6 @@ in
 
       Service = {
         ExecStart = pkgs.writeShellScript "swww-cycle" ''
-          #!/bin/bash
           while true; do
             images=($(ls -d ${cfg.wallpaperDir}/* | shuf))
             for img in "''${images[@]}"; do
