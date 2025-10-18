@@ -13,7 +13,6 @@ let
   ];
 in
 writeShellScriptBin "hypr-binds" ''
-  #!/usr/bin/env bash
   export PATH=${lib.makeBinPath dependencies}:$PATH
 ''
 + (builtins.readFile ./hypr-binds.sh)
