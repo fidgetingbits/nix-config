@@ -1,16 +1,15 @@
 {
   description = "Fidgetingbits Nix Flake";
   outputs =
-    { self, nixpkgs, ... }@inputs:
+    {
+      self,
+      nixpkgs,
+      flake-parts,
+      ...
+    }@inputs:
     let
       inherit (self) outputs;
       inherit (nixpkgs) lib;
-
-      forAllSystems = nixpkgs.lib.genAttrs [
-        "x86_64-linux"
-        "aarch64-linux"
-        "aarch64-darwin"
-      ];
 
       mkHost = host: isDarwin: {
         ${host} =
@@ -33,51 +32,53 @@
         hosts: isDarwin: lib.foldl (acc: set: acc // set) { } (lib.map (host: mkHost host isDarwin) hosts);
       readHosts = folder: lib.attrNames (builtins.readDir ./hosts/${folder});
     in
-    {
-      overlays = import ./overlays { inherit inputs; };
-      nixosConfigurations = mkHostConfigs (readHosts "nixos") false;
-      darwinConfigurations = mkHostConfigs (readHosts "darwin") true;
-      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-rfc-style);
-      devShells = forAllSystems (
-        system:
-        import ./shell.nix {
-          pkgs = nixpkgs.legacyPackages.${system};
-          checks = self.checks.${system};
-          inherit inputs;
-          inherit system;
-          unstable = inputs.nixpkgs-unstable.legacyPackages.${system};
-        }
-      );
-      checks = forAllSystems (
-        system:
-        import ./checks {
-          inherit inputs system;
-          pkgs = nixpkgs.legacyPackages.${system};
-        }
-      );
-      packages = forAllSystems (
-        system:
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      flake = {
+        overlays = import ./overlays { inherit inputs; };
+        nixosConfigurations = mkHostConfigs (readHosts "nixos") false;
+        darwinConfigurations = mkHostConfigs (readHosts "darwin") true;
+      };
+      systems = [
+        "x86_64-linux"
+      ];
+      perSystem =
+        { system, ... }:
+
         let
           pkgs = import nixpkgs {
             inherit system;
             overlays = [ self.overlays.default ];
           };
         in
-        lib.packagesFromDirectoryRecursive {
-          callPackage = lib.callPackageWith pkgs;
-          directory = ./pkgs/common;
-        }
-        // {
-          ghidra = pkgs.unstable.ghidra;
-        }
-      );
+        rec {
+          packages = lib.packagesFromDirectoryRecursive {
+            callPackage = lib.callPackageWith pkgs;
+            directory = ./pkgs/common;
+          };
+          checks = import ./checks { inherit inputs pkgs system; };
+          formatter = pkgs.nixfmt;
+          devShells = import ./shell.nix {
+            inherit
+              checks
+              inputs
+              system
+              pkgs
+              ;
+          };
+        };
     };
 
   inputs = {
-    #################### Official NixOS / Nix-Darwin / HM Package Sources ####################
+
+    #################### Core Nix Sources ####################
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     #nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.05";
+
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      #inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # orby is gone
     #nixpkgs-darwin.url = "github:nixos/nixpkgs/nixpkgs-25.05-darwin";
@@ -90,8 +91,17 @@
       url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
     home-manager-unstable = {
       url = "github:nix-community/home-manager/master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    #################### Utilities ####################
+
+    # Secret management
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -104,11 +114,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    #lanzaboote = {
-    #  url = "github:nix-community/lanzaboote/v0.3.0";
-    #  inputs.nixpkgs.follows = "nixpkgs";
-    #};
-
+    # Modern nixos-hardware alternative
+    nixos-facter-modules.url = "github:nix-community/nixos-facter-modules";
     nixos-hardware = {
       url = "github:nixos/nixos-hardware";
     };
@@ -118,29 +125,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nixvirt = {
-      url = "https://flakehub.com/f/AshleyYakeley/NixVirt/*.tar.gz";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    # Theming
-    stylix = {
-      url = "github:danth/stylix/release-25.05";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    silentSDDM = {
-      # FIXME(sddm): Pinned because of https://github.com/uiriansan/SilentSDDM/issues/55
-      url = "github:uiriansan/SilentSDDM?rev=cfb0e3eb380cfc61e73ad4bce90e4dcbb9400291";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    #################### Utilities ####################
-    # HM module to fix up launchers for nix apps on darwin
-    #mac-app-util.url = "github:hraban/mac-app-util";
-
-    # Secret management
-    sops-nix = {
-      url = "github:Mic92/sops-nix";
+    nix-index-database = {
+      url = "github:nix-community/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -156,11 +142,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # firefox is broken on darwin
-    #nixpkgs-firefox-darwin = {
-    #  url = "github:bandithedoge/nixpkgs-firefox-darwin";
-    #  inputs.nixpkgs.follows = "nixpkgs";
-    #};
+    nixvirt = {
+      url = "https://flakehub.com/f/AshleyYakeley/NixVirt/*.tar.gz";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     firefox-addons = {
       url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -170,17 +156,23 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nix-index-database = {
-      url = "github:nix-community/nix-index-database";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     talon-nix = {
       url = "github:fidgetingbits/talon-nix?ref=overrides";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    #################### Personal Repositories ####################
+    #################### Ricing ####################
+    stylix = {
+      url = "github:danth/stylix/release-25.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    silentSDDM = {
+      # FIXME(sddm): Pinned because of https://github.com/uiriansan/SilentSDDM/issues/55
+      url = "github:uiriansan/SilentSDDM?rev=cfb0e3eb380cfc61e73ad4bce90e4dcbb9400291";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    #################### Personal ####################
     nix-secrets = {
       url = "git+ssh://git@gitlab.com/fidgetingbits/nix-secrets.git?shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -190,13 +182,15 @@
     #  inputs.nixpkgs.follows = "nixpkgs";
     #};
     nixcats-flake = {
-      url = "github:fidgetingbits/neovim?shallow=1?ref=main";
+      url = "github:fidgetingbits/neovim?shallow=1?ref=main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     nix-assets = {
-      url = "github:fidgetingbits/nix-assets";
+      url = "github:fidgetingbits/nix-assets?shallow=1";
     };
-    # Modern nixos-hardware alternative
-    nixos-facter-modules.url = "github:nix-community/nixos-facter-modules";
+
+    #    introdus = {
+    #      url = "github:emergentmind/introdus?shallow=1";
+    #    };
   };
 }
