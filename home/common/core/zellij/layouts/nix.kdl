@@ -37,22 +37,26 @@ layout {
             }
         }
     }
-    tab name="Abbot" hide_floating_panes=true {
+    tab name="Introdus" hide_floating_panes=true {
         pane size=1 borderless=true {
             plugin location="compact-bar"
         }
-        pane cwd="$HOME/wikis/abbot-wiki" size="50%"
-        pane cwd="$HOME/wikis/abbot-wiki" size="50%"
+        pane split_direction="vertical" {
+            pane command="vi" cwd="$HOME/dev/nix/introdus" size="50%" {
+                start_suspended false
+            }
+            pane cwd="$HOME/dev/nix/introdus" size="50%"
+        }
     }
     tab name="EmergentMind" hide_floating_panes=true {
         pane size=1 borderless=true {
             plugin location="compact-bar"
         }
         pane split_direction="vertical" {
-            pane command="vi" cwd="$HOME/persist/public/source/dotfiles/nix/emergentmind" size="50%" {
+            pane command="vi" cwd="$HOME/dev/nix/emergentmind" size="50%" {
                 start_suspended false
             }
-            pane cwd="$HOME/persist/public/source/dotfiles/nix/emergentmind" size="50%"
+            pane cwd="$HOME/dev/nix/emergentmind" size="50%"
         }
     }
 
