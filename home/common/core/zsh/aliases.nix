@@ -72,6 +72,7 @@ in
   gl = "git log";
   gc = "git clone";
 
+  # FIXME: Could be devshell specific for nix-config
   bump = "bump_lock";
 
   # lsusb
@@ -139,9 +140,13 @@ in
 
   # justfiles
   j = "just";
+  # FIXME: These should be devshell-specific aliases for nix-config
   jr = "just rebuild";
   jrt = "just rebuild-trace";
   jl = "just --list";
+  jup = "just update";
+  jug = "just upgrade";
+  jb = "just build-host";
 
   # direnv
   da = "direnv allow";
@@ -173,7 +178,9 @@ in
   jcu = "journalctl --user";
 
   # ssh
-  sshnc = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o GlobalKnownHostsFile=/dev/null";
+  sshnc = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o GlobalKnownHostsFile=/dev/null"; # sshnc = ssh no checks
+  # Helper if haven't set up explicit host entry
+  ssh-unlock = "ssh -i~/.ssh/id_yubikey -oUserKnownHostsFile=/dev/null -oGlobalKnownHostsFile=/dev/null -oport=10022 -lroot";
 
   # Force alias use with xargs
   # https://unix.stackexchange.com/questions/141367/have-xargs-use-alias-instead-of-binary/244516#244516
