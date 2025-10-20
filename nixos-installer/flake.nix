@@ -131,6 +131,7 @@
           luks = true;
           facter = false;
         };
+
         # FIXME: Double check this when framework arrives
         #onyx = newConfig { name = "onyx"; disk = "/dev/nvme0n1"; swapSize = 98; impermanence = true; luks = true; };
 
@@ -165,6 +166,15 @@
           facter = true;
           user = "admin";
         };
+
+        oops = newConfig {
+          name = "oops";
+          diskFile = ../hosts/nixos/oops/disko.nix;
+          impermanence = true;
+          facter = true;
+          user = "aa";
+        };
+
       };
     };
 }
