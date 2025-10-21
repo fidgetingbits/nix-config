@@ -72,7 +72,6 @@
   system.impermanence.enable = true;
 
   environment.systemPackages = [ pkgs.borgbackup ];
-  boot.kernelPackages = pkgs.linuxPackages_latest;
   # Bootloader
   boot.loader.systemd-boot = {
     enable = true;
@@ -155,6 +154,31 @@
         group = config.users.users."borg".group;
       in
       [ "d /mnt/storage/backup/ 0750 ${user} ${group} -" ];
+  };
+
+  # Network UPS Tools (NUT) client
+  # FIXME: Maybe play around with some upsmon NOTIFYFLAG settings, as not sure the defaults
+  # see: https://github.com/VTimofeenko/monorepo-machine-config/blob/master/nixosModules/services/nut-client/nut-client.nix
+  power.ups = {
+    enable = true;
+    mode = "netclient";
+    upsmon.monitor.synology =
+      let
+        server = config.hostSpec.networking.subnets.myth.hosts.synology;
+        port = config.hostSpec.networking.ports.tcp.nut;
+      in
+      {
+        system = "synology@${server}:${port}";
+        user = config.sops.secrets."nut/user";
+        passwordFile = config.sops.secrets."nut/password".path;
+        type = "slave";
+      };
+
+    # Default upsmon settings use upssched for notifycmd, and wait on /run/killpower to die via
+    # `shutdown now`.
+    # FIXME: Would be nice to get email to notify when it decides to go down
+    #schedulerRules =
+
   };
 
   # FIXME:

@@ -2,7 +2,6 @@
 {
   inputs,
   lib,
-  pkgs,
   config,
   ...
 }:
@@ -89,7 +88,6 @@
 
   system.impermanence.enable = true;
 
-  boot.kernelPackages = pkgs.linuxPackages_latest;
   # Bootloader.
   boot.loader.systemd-boot = {
     enable = true;

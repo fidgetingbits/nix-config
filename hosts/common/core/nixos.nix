@@ -27,6 +27,11 @@
   # enable firmware with a license allowing redistribution
   hardware.enableRedistributableFirmware = true;
 
+  # Pin to 6.16 for now, as 6.17.x seems to have issues with systemd-boot
+  # possibly related to https://github.com/NixOS/nixpkgs/issues/449939
+  boot.kernelPackages = pkgs.linuxPackages_6_16;
+  #boot.kernelPackages = pkgs.linuxPackages_latest;
+
   networking.hosts =
     let
       network = config.hostSpec.networking;

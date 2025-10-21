@@ -94,7 +94,9 @@
   boot = {
     # Cooling / RGB
     # FIXME: probably remove liquidtux since it's for different models
-    extraModulePackages = with config.boot.kernelPackages; [ liquidtux ];
+    extraModulePackages = builtins.attrValues {
+      inherit (config.boot.kernelPackages) liquidtux;
+    };
     kernelModules = [
       "liquidtux"
       "i2c-dev"
@@ -102,7 +104,6 @@
       "amdgpu-i2c"
     ];
 
-    kernelPackages = pkgs.linuxPackages_latest;
     # Bootloader.
     loader.systemd-boot = {
       enable = true;
