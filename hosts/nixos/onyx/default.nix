@@ -103,7 +103,19 @@ rec {
     timeZone = lib.mkForce "America/Edmonton";
   };
 
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  # 6.17.3 isn't booting, maybe https://github.com/NixOS/nixpkgs/issues/449939
+  boot.kernelPackages = pkgs.linuxPackagesFor (
+    pkgs.linux_6_17.override {
+      argsOverride = rec {
+        src = pkgs.fetchurl {
+          url = "mirror://kernel/linux/kernel/v6.x/linux-${version}.tar.xz";
+          sha256 = "sha256-/evLBlBl9cG43Gim+1nNpQzd2/kQPSB8IZbVXqdk9X8=";
+        };
+        version = "6.17.2";
+        modDirVersion = "6.17.2";
+      };
+    }
+  );
   # Bootloader.
   boot.loader.systemd-boot = {
     enable = true;
