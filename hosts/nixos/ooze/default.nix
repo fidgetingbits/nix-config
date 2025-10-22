@@ -127,5 +127,7 @@
     ACTION=="add", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="A9IPH6E8", SYMLINK+="ttyUSB-frby"
   '';
 
+  mail-delivery.useRelay = true; # Use o-lan postfix-relay
+
   system.stateVersion = "23.05";
 }

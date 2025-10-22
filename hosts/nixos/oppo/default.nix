@@ -251,5 +251,7 @@
     '';
   };
 
+  mail-delivery.useRelay = true; # Use o-lan postfix-relay
+
   system.stateVersion = "23.05";
 }
