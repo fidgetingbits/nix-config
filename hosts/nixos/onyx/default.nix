@@ -129,9 +129,10 @@ rec {
   boot.initrd.systemd.enable = true;
   boot.supportedFilesystems = [ "ntfs" ];
 
-  # We need IPv6 in order to access hetzner cloud systems
   networking.networkmanager.enable = true;
+  networking.networkmanager.wifi.powersave = false;
   networking.useDHCP = lib.mkDefault true;
+  # We need IPv6 in order to access hetzner cloud systems
   #networking.enableIPv6 = true;
 
   # Keyring, required for auth even without gnome
