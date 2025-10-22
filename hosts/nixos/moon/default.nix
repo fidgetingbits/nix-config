@@ -32,6 +32,7 @@
           # Services
           "services/openssh.nix"
           "services/ddclient.nix"
+          "services/blocky.nix"
 
           # Network management
           "systemd-resolved.nix"
@@ -99,8 +100,8 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.initrd.systemd.enable = true;
 
-  # We need IPv6 in order to access hetzner cloud systems
   networking.networkmanager.enable = true;
+  networking.networkmanager.wifi.powersave = false;
   networking.useDHCP = lib.mkDefault true;
   networking.dhcpcd.wait = "background";
   systemd.network.wait-online.enable = false;
