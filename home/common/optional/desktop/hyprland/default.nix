@@ -13,9 +13,14 @@
       ]
     ))
     ++ [
-      ./wlogout.nix
+      # Extra settings
       ./binds.nix
+      ./rules.nix
+
+      # Hyprland utilities
+      ./wlogout.nix
       ./hyprlock.nix
+      #./pyperland.nix
     ];
 
   home.packages = [ pkgs.hypr-binds ];
