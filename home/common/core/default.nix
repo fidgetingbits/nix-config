@@ -103,7 +103,7 @@
           libnotify # for notify-send
 
           # network utilities
-          inetutils # ping, traceroute, etc
+          iputils # ping, traceroute, etc
 
           magic-wormhole # Convenient file transfer
 
