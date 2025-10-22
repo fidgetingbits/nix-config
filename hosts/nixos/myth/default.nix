@@ -150,26 +150,30 @@
   systemd = {
     tmpfiles.rules =
       let
-        user = config.users.users."borg".name;
-        group = config.users.users."borg".group;
+        name = user: config.users.users.${user}.name;
+        group = user: config.users.users.${user}.group;
       in
-      [ "d /mnt/storage/backup/ 0750 ${user} ${group} -" ];
+      [
+        "d /mnt/storage/backup/ 0750 ${name "borg"} ${group "borg"} -"
+        "d /mnt/storage/backup/pa 0700 ${name "pa"} ${group "pa"} -"
+      ];
   };
 
   # Network UPS Tools (NUT) client
   # FIXME: Maybe play around with some upsmon NOTIFYFLAG settings, as not sure the defaults
   # see: https://github.com/VTimofeenko/monorepo-machine-config/blob/master/nixosModules/services/nut-client/nut-client.nix
+
   power.ups = {
     enable = true;
     mode = "netclient";
-    upsmon.monitor.synology =
+    upsmon.monitor.ups =
       let
-        server = config.hostSpec.networking.subnets.myth.hosts.synology;
-        port = config.hostSpec.networking.ports.tcp.nut;
+        server = config.hostSpec.networking.subnets.myth.hosts.synology.ip;
+        port = toString config.hostSpec.networking.ports.tcp.nut;
       in
       {
-        system = "synology@${server}:${port}";
-        user = config.sops.secrets."nut/user";
+        system = "ups@${server}:${port}";
+        user = "monuser";
         passwordFile = config.sops.secrets."nut/password".path;
         type = "slave";
       };
@@ -179,6 +183,15 @@
     # FIXME: Would be nice to get email to notify when it decides to go down
     #schedulerRules =
 
+  };
+
+  sops.secrets = {
+    "nut/password" = {
+      # power.ups.upsmon.user default is "nutmon"
+      owner = "nutmon";
+      group = "nutmon";
+      mode = "0600";
+    };
   };
 
   # FIXME:

@@ -18,5 +18,10 @@
     ];
 
   home.packages = builtins.attrValues {
+
   };
+
+  systemd.user.tmpfiles.rules = [
+    "L+ %h/backup - - - - /mnt/storage/backup/pa/"
+  ];
 }
