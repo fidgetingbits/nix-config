@@ -59,29 +59,33 @@ in
         Type = "simple";
         Restart = "always";
         RestartSec = 5;
-        ExecStart = pkgs.writeShellScript "swww-cycle" ''
-          LAST_IMAGE=""
-          function skip() {
-            echo "Skipped $LAST_IMAGE"
-            return
-          }
-          trap skip SIGUSR1
+        ExecStart =
+          let
+            shuf = lib.getExe' pkgs.coreutils "shuf";
+          in
+          pkgs.writeShellScript "swww-cycle" ''
+            LAST_IMAGE=""
+            function skip() {
+              echo "Skipped $LAST_IMAGE"
+              return
+            }
+            trap skip SIGUSR1
 
-          while true; do
-            images=($(ls -d ${cfg.wallpaperDir}/* | shuf))
-            for img in "''${images[@]}"; do
-              ${pkgs.swww}/bin/swww img \
-                --transition-fps ${toString cfg.transitionFPS} \
-                --transition-step ${toString cfg.transitionStep} \
-                --transition-type ${cfg.transitionType} \
-                "$img"
-              LAST_IMAGE="$img"
+            while true; do
+              images=($(ls -d ${cfg.wallpaperDir}/* | ${shuf}))
+              for img in "''${images[@]}"; do
+                ${pkgs.swww}/bin/swww img \
+                  --transition-fps ${toString cfg.transitionFPS} \
+                  --transition-step ${toString cfg.transitionStep} \
+                  --transition-type ${cfg.transitionType} \
+                  "$img"
+                LAST_IMAGE="$img"
 
-              sleep ${toString cfg.interval}
-              wait $!
+                sleep ${toString cfg.interval}
+                wait $!
+              done
             done
-          done
-        '';
+          '';
       };
 
       Install = {
