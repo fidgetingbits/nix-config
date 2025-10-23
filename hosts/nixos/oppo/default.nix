@@ -20,7 +20,7 @@
 
         # Host-specific stuff
         "keyd.nix"
-        "msmtp.nix"
+        "mail.nix"
         # WARNING: Blocks on boot on both gpus atm (Granite Ridge and 9070XT)
         #"plymouth.nix"
         "locale.nix"

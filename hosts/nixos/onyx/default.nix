@@ -26,12 +26,13 @@ rec {
         (map (f: "hosts/common/optional/${f}") [
           # Host-specific stuff
           "keyd.nix"
-          "msmtp.nix"
           "plymouth.nix"
           "printing.nix"
           "locale.nix"
           "x11.nix"
           "sound.nix"
+          # FIXME: Rename this
+          "mail.nix"
 
           # Desktop environment and login manager
           # "gdm.nix"
@@ -101,6 +102,10 @@ rec {
     defaultDesktop = "hyprland-uwsm";
     persistFolder = lib.mkForce "";
     timeZone = lib.mkForce "America/Edmonton";
+  };
+
+  mail-delivery = {
+    enable = true;
   };
 
   # Bootloader

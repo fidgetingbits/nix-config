@@ -24,7 +24,7 @@
           "keyd.nix"
 
           # Host-specific stuff
-          "msmtp.nix"
+          "mail.nix"
           "plymouth.nix"
           "printing.nix"
           "locale.nix"

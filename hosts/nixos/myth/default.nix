@@ -23,12 +23,13 @@
           # Services
           "services/openssh.nix"
           "services/ddclient.nix"
+          "mail.nix"
 
           # Network management
           "systemd-resolved.nix"
 
           # Misc
-          # "msmtp.nix" # FIXME: We only need this if we setup emails for logins/backups, etc
+          # "mail.nix" # FIXME: We only need this if we setup emails for logins/backups, etc
           "logind.nix"
           "cli.nix"
         ])
@@ -174,7 +175,7 @@
       {
         system = "ups@${server}:${port}";
         user = "monuser";
-        passwordFile = config.sops.secrets."nut/password".path;
+        passwordFile = config.sops.secrets."passwords/nut".path;
         type = "slave";
       };
 
@@ -185,8 +186,13 @@
 
   };
 
+  mail-delivery.users = [ "nutmon" ];
+  # users.groups.msmtp-secret-users = {
+  #   members = [ "nutmon" ];
+  # };
+
   sops.secrets = {
-    "nut/password" = {
+    "passwords/nut" = {
       # power.ups.upsmon.user default is "nutmon"
       owner = "nutmon";
       group = "nutmon";

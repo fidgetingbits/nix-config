@@ -28,7 +28,7 @@
           "systemd-resolved.nix"
 
           # Misc
-          # "msmtp.nix" # FIXME: We only need this if we setup emails for logins/backups, etc
+          "mail.nix"
           "logind.nix"
           "cli.nix"
         ])

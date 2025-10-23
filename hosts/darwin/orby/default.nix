@@ -17,7 +17,7 @@
       # FIXME: homebrew itself should be core, but packages should be per host
       "hosts/common/darwin/homebrew.nix"
       #../common/optional/yubikey/darwin.nix
-      #"hosts/common/optional/msmtp.nix"
+      #"hosts/common/optional/mail.nix"
     ])
   ];
 

@@ -39,7 +39,7 @@
 
           # Misc
           # FIXME: Need to make this work without postfix-relay
-          # "msmtp.nix"
+          # "mail.nix"
           "plymouth.nix"
           "sound.nix"
           "cli.nix"
