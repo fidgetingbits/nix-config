@@ -35,10 +35,9 @@
         # timeout = "30s";
         init.strategy = "fast";
         groups = {
-          default = [
-            # FIXME: Need to fix this so it's an option
-            config.hostSpec.networking.subnets.moon.dns.upstreams
-          ];
+          # FIXME: Need to fix this so it's an option
+          default = config.hostSpec.networking.subnets.moon.dns.upstreams;
+
         };
       };
 
