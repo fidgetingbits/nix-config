@@ -10,7 +10,7 @@ let
   upsmonNotifyTypes = {
     ONLINE = "UPS is back online";
     ONBATT = "UPS is on battery";
-    LOWBATT = "UPS is on battery and has a low b{attery (is critical)";
+    LOWBATT = "UPS is on battery and has a low battery (is critical)";
     FSD = "UPS is being shutdown by the primary";
     COMMOK = "Communications established with the UPS";
     COMMBAD = "Communications lost to the UPS";
