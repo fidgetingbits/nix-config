@@ -32,7 +32,7 @@ if [ "$os" == "Darwin" ]; then
     if [ ! -f $CONF ]; then
         # Enable nix-command and flakes to bootstrap
         cat <<-EOF >$CONF
-			experimental-features = nix-command flakes
+			experimental-features = nix-command flakes pipe-operators
 		EOF
     fi
 

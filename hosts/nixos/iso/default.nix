@@ -61,8 +61,8 @@ rec {
     settings.experimental-features = [
       "nix-command"
       "flakes"
+      "pipe-operators"
     ];
-    extraOptions = "experimental-features = nix-command flakes";
   };
 
   services = {
