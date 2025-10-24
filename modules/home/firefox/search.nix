@@ -108,6 +108,13 @@ in
         icon = "https://nixos.wiki/favicon.png";
         definedAliases = [ "@nw" ];
       };
+      "Lix Wiki" = {
+        urls = [
+          { template = "https://wiki.lix.systems/search?term={searchTerms}"; }
+        ];
+        icon = "https://external-content.duckduckgo.com/ip3/lix.systems.ico";
+        definedAliases = [ "@lix" ];
+      };
       "GitHub Nixpkgs Search" = {
         urls = [
           {
