@@ -23,13 +23,13 @@
           # Services
           "services/openssh.nix"
           "services/ddclient.nix"
-          "mail.nix"
+          "services/nut-client"
 
           # Network management
           "systemd-resolved.nix"
 
           # Misc
-          # "mail.nix" # FIXME: We only need this if we setup emails for logins/backups, etc
+          "mail.nix"
           "logind.nix"
           "cli.nix"
         ])
@@ -96,6 +96,7 @@
   # networking.interfaces.wlo1.useDHCP = false;
   # systemd.network.netdevs.wlo1.enable = false;
 
+  # FIXME: This coulud be a module now, with an option for the key location
   # Remote early boot LUKS unlock via ssh
   boot.initrd = {
     systemd = {
@@ -158,46 +159,6 @@
         "d /mnt/storage/backup/ 0750 ${name "borg"} ${group "borg"} -"
         "d /mnt/storage/backup/pa 0700 ${name "pa"} ${group "pa"} -"
       ];
-  };
-
-  # Network UPS Tools (NUT) client
-  # FIXME: Maybe play around with some upsmon NOTIFYFLAG settings, as not sure the defaults
-  # see: https://github.com/VTimofeenko/monorepo-machine-config/blob/master/nixosModules/services/nut-client/nut-client.nix
-
-  power.ups = {
-    enable = true;
-    mode = "netclient";
-    upsmon.monitor.ups =
-      let
-        server = config.hostSpec.networking.subnets.myth.hosts.synology.ip;
-        port = toString config.hostSpec.networking.ports.tcp.nut;
-      in
-      {
-        system = "ups@${server}:${port}";
-        user = "monuser";
-        passwordFile = config.sops.secrets."passwords/nut".path;
-        type = "slave";
-      };
-
-    # Default upsmon settings use upssched for notifycmd, and wait on /run/killpower to die via
-    # `shutdown now`.
-    # FIXME: Would be nice to get email to notify when it decides to go down
-    #schedulerRules =
-
-  };
-
-  mail-delivery.users = [ "nutmon" ];
-  # users.groups.msmtp-secret-users = {
-  #   members = [ "nutmon" ];
-  # };
-
-  sops.secrets = {
-    "passwords/nut" = {
-      # power.ups.upsmon.user default is "nutmon"
-      owner = "nutmon";
-      group = "nutmon";
-      mode = "0600";
-    };
   };
 
   # FIXME:
