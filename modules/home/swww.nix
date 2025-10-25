@@ -62,6 +62,8 @@ in
         ExecStart =
           let
             shuf = lib.getExe' pkgs.coreutils "shuf";
+            ls = lib.getExe' pkgs.coreutils "ls";
+            sleep = lib.getExe' pkgs.coreutils "sleep";
           in
           pkgs.writeShellScript "swww-cycle" ''
             LAST_IMAGE=""
@@ -72,7 +74,7 @@ in
             trap skip SIGUSR1
 
             while true; do
-              images=($(ls -d ${cfg.wallpaperDir}/* | ${shuf}))
+              images=($(${ls} -d ${cfg.wallpaperDir}/* | ${shuf}))
               for img in "''${images[@]}"; do
                 ${pkgs.swww}/bin/swww img \
                   --transition-fps ${toString cfg.transitionFPS} \
@@ -81,7 +83,7 @@ in
                   "$img"
                 LAST_IMAGE="$img"
 
-                sleep ${toString cfg.interval}
+                ${sleep} ${toString cfg.interval}
                 wait $!
               done
             done
