@@ -29,11 +29,31 @@ in
 
 {
   imports = [ ./upssched.nix ];
+  systemd.tmpfiles.rules = [
+    "d /var/state/ups 0755 nutmon nutmon -"
+  ];
+
+  systemd.services.upsmon = {
+    serviceConfig = {
+      # Gets rid of the warning:
+      # `upsnotify: notify about state 2 with libsystemd: was requested, but ...`
+      # Note however that the above warning isn't actually important afaict and doesn't
+      # adversely affect the functionality of the upsmon service.
+      NotifyAccess = "all";
+      # The IPC in upssched defines these, but nutmon user doesn't have access
+      ReadWritePaths = "/var/state/ups";
+    };
+    environment = {
+      # Useful to check if you are actually talking to the server, if no upssched
+      # output yet
+      NUT_DEBUG_LEVEL = "10";
+    };
+  };
   power.ups = {
     enable = true;
     mode = "netclient";
     upsmon = {
-      enable = true;
+      #enable = true;
       monitor.ups =
         let
           # FIXME: The client info should be set or configured externally to this module
@@ -77,7 +97,7 @@ in
           ]
           [
             "COMMOK"
-            "SYSLOG+WALL"
+            "SYSLOG+WALL+EXEC"
           ]
           [
             "COMMBAD"

@@ -84,7 +84,8 @@ in
       # If communication to the server is lost -- start death timer
       AT COMMBAD   * START-TIMER halt ${systemGraceTime}
       AT NOCOMM    * START-TIMER halt ${systemGraceTime}
-      AT COMMOK    * CANCEL-TIMER halt
+      AT COMMOK    * CANCEL-TIMER halt comm_ok_action
+      AT COMMOK    * EXECUTE COMMOK
 
 
       # Log the following as unknown commands. Revisit these
