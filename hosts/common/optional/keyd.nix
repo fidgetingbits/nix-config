@@ -17,6 +17,7 @@
           rightcontrol = "layer(layer1)";
           # FIXME: this key only on onyx
           menu = "super";
+          escape = "noop";
         };
         layer1 = {
           h = "left";
