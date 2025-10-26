@@ -1,6 +1,7 @@
 # See https://github.com/berbiche/dotfiles/blob/4048a1746ccfbf7b96fe734596981d2a1d857930/modules/home-manager/yubikey-touch-detector.nix#L9
 # FIXME: Send a PR to HM to add this service
 {
+  inputs,
   config,
   lib,
   pkgs,
@@ -41,7 +42,8 @@ in
     };
     notificationSoundFile = lib.mkOption {
       type = lib.types.str;
-      default = "${pkgs.sound-theme-freedesktop}/share/sounds/freedesktop/stereo/window-attention.oga";
+      #default = "${pkgs.sound-theme-freedesktop}/share/sounds/freedesktop/stereo/window-attention.oga";
+      default = "${inputs.nix-assets}/notifications/john_spartan.ogg";
       description = ''
         Path to the sound file to play when the YubiKey is waiting for a touch.
       '';
