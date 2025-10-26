@@ -45,7 +45,7 @@ let
         case $1 in
           halt)
             log_event "Got the halt event"
-            upssched-notify "$*"
+            ${upssched-notify} "$*"
             # Tell upsmon to trigger shutdown
             upsmon -c fsd
             ;;
