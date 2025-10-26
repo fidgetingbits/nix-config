@@ -12,15 +12,14 @@ let
   upssched-notify = pkgs.writeShellApplication {
     name = "upssched-notify";
     runtimeInputs = [
-      pkgs.mailutils
+      pkgs.msmtp
     ];
     text =
       # bash
       ''
-        MAILTO="${config.hostSpec.email.admin}"
-
-        exec mail -t <<EOF
-        To: $MAILTO
+        exec msmtp -t <<EOF
+        To: ${config.hostSpec.email.admin}
+        From: ${config.hostSpec.email.notifier}
         Subject: $HOSTNAME UPS status: $*
 
         $HOSTNAME UPS status: $*
@@ -45,7 +44,7 @@ let
         case $1 in
           halt)
             log_event "Got the halt event"
-            ${upssched-notify} "$*"
+            ${lib.getExe' upssched-notify "upssched-notify"} "$*"
             # Tell upsmon to trigger shutdown
             upsmon -c fsd
             ;;
@@ -59,6 +58,8 @@ in
 {
 
   # see https://networkupstools.org/docs/man/upssched.conf.html
+  # These entries are parsed in sequence, so you can include multiple
+  # rules or each event.
   power.ups.schedulerRules =
     ''
       CMDSCRIPT ${lib.getExe upssched-cmd}
@@ -84,7 +85,7 @@ in
       # If communication to the server is lost -- start death timer
       AT COMMBAD   * START-TIMER halt ${systemGraceTime}
       AT NOCOMM    * START-TIMER halt ${systemGraceTime}
-      AT COMMOK    * CANCEL-TIMER halt comm_ok_action
+      AT COMMOK    * CANCEL-TIMER halt
       AT COMMOK    * EXECUTE COMMOK
 
 
