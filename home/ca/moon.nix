@@ -36,10 +36,24 @@
       ;
   };
 
+  # FIXME(firefox): Add extensions
   programs.firefox = {
-    policies.OfferToSaveLogins = lib.mkForce true;
+    policies = {
+      DisableFirefoxAccounts = lib.mkForce true;
+    };
     profiles.default = {
-      settings."signon.rememberSignons" = lib.mkForce true;
+      settings = {
+        # "signon.rememberSignons" = lib.mkForce "false";
+      };
+      # Tweaks for Firefox ui/layout
+      # Try to make the extension icons bigger
+      userChrome = ''
+        /* Size of tool bar extension icons */
+        .toolbarbutton-icon {
+          width: 40px !important;
+          height: 40px !important;
+        }
+      '';
       bookmarks = {
         force = true;
         settings = [
@@ -55,6 +69,14 @@
                 name = "Netflix";
                 url = "https://www.netflix.com";
               }
+              {
+                name = "YouTube";
+                url = "https://www.youtube.com";
+              }
+              {
+                name = "Photos";
+                url = "https://photos.google.com";
+              }
             ];
           }
         ];
@@ -62,12 +84,39 @@
     };
   };
 
-  xdg.autostart = {
-    enable = true;
-    #readOnly = true;
-    entries = [
-      "${pkgs.firefox}/share/applications/firefox.desktop"
-    ];
+  # Keep firefox running if it's closed
+  systemd.user.services.firefox = {
+    Unit = {
+      description = "Firefox Browser";
+      After = [
+        "graphical-session.target"
+        "graphical-session-pre.target"
+      ];
+      PartOf = [ "graphical-session.target" ];
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
+    Service = {
+      Type = "simple";
+      ExecStart = "/home/ca/.nix-profile/bin/firefox";
+      Restart = "always";
+      RestartSec = 5;
+    };
   };
 
+  # xdg.autostart = {
+  #   enable = true;
+  #   #readOnly = true;
+  #   entries = [
+  #     "${pkgs.firefox}/share/applications/firefox.desktop"
+  #   ];
+  # };
+
+  # Make cursor bigger than defualt
+  stylix = {
+    cursor = lib.mkOrder 10 {
+      name = "catppuccin-mocha-light-cursors";
+      package = pkgs.catppuccin-cursors.mochaLight;
+      size = 40;
+    };
+  };
 }

@@ -157,6 +157,20 @@
     };
   };
 
+  services.keyd = {
+    enable = true;
+    keyboards.default = {
+      ids = [ "*" ]; # Apply to all keyboards
+      settings = {
+        main = {
+          mute = "noop";
+          volumedown = "noop";
+          volumeup = "noop";
+        };
+      };
+    };
+  };
+
   # Add ad-blocking to hosts file
   networking.stevenBlackHosts.enable = true;
 
