@@ -58,7 +58,7 @@ in
       Service = {
         Type = "simple";
         Restart = "always";
-        RestartSec = 5;
+        RestartSec = 1;
         ExecStart =
           let
             shuf = lib.getExe' pkgs.coreutils "shuf";
