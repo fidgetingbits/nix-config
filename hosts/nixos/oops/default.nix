@@ -146,6 +146,10 @@
   #   borgBackupStartTime = "09:00:00";
   # };
 
+  # FIXME(ups): Setup NUT server for cyberpower UPS
+
+  # See https://github.com/bercribe/nixos/blob/f6ee318d84b1a438b459a6cf596a848d5286be4d/modules/systems/hardware/ups/server.nix#L63
+
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   system.stateVersion = "23.05";
 }
