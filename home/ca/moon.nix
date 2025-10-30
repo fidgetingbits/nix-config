@@ -47,14 +47,9 @@
         "layout.css.devPixelsPerPx" = 2.4; # Hi DPI is already 2.0, but extension icons are small on TV
       };
       # Tweaks for Firefox ui/layout
-      # Try to make the extension icons bigger
-      # userChrome = ''
-      #   /* Size of tool bar extension icons */
-      #   .toolbarbutton-icon {
-      #     width: 40px !important;
-      #     height: 40px !important;
-      #   }
-      # '';
+      userChrome = ''
+        }
+      '';
       bookmarks = {
         force = true;
         settings = [

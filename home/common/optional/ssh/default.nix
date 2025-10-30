@@ -211,9 +211,9 @@ in
           };
 
           # FIXME: Can't most of the following at least have their host/hostname/port be automated to reduce the size?
-          "oops" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            host = "oops";
-            hostname = "oops.${config.hostSpec.domain}";
+          "moth" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
+            host = "moth";
+            hostname = "moth.${config.hostSpec.domain}";
             port = config.hostSpec.networking.ports.tcp.ssh;
             localForwards = [
               {

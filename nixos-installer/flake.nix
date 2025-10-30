@@ -167,9 +167,9 @@
           user = "admin";
         };
 
-        oops = newConfig {
+        moth = newConfig {
           name = "oops";
-          diskFile = ../hosts/nixos/oops/disko.nix;
+          diskFile = ../hosts/nixos/moth/disko.nix;
           impermanence = true;
           facter = true;
           user = "aa";
