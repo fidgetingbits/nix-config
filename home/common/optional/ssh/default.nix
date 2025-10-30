@@ -155,6 +155,19 @@ in
             hostname = "moon.${config.hostSpec.domain}";
             user = "admin";
             port = config.hostSpec.networking.ports.tcp.ssh;
+            localForwards =
+              let
+                unifi = config.hostSpec.networking.ports.tcp.unifi-controller;
+              in
+              [
+                {
+                  # For unifi-controller web interface
+                  bind.address = "localhost";
+                  bind.port = unifi;
+                  host.address = "localhost";
+                  host.port = unifi;
+                }
+              ];
           };
 
           "myth" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {

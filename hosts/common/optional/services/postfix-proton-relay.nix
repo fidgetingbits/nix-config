@@ -87,10 +87,14 @@ in
 
   security.acme.certs."mail.${config.hostSpec.domain}" = {
     #domains = [ "mail.${config.hostSpec.domain}" ];
-    extraDomainNames = [
-      "ooze.${config.hostSpec.domain}"
-      "mail.ooze.${config.hostSpec.domain}"
-    ];
+    extraDomainNames =
+      let
+        domain = "${config.hostSpec.hostName}.${config.hostSpec.domain}";
+      in
+      [
+        domain
+        "mail.${domain}"
+      ];
     postRun = "systemctl restart postfix.service";
     group = "postfix";
     email = config.hostSpec.email.letsEncrypt;

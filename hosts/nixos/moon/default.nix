@@ -31,16 +31,16 @@
 
           # Services
           "services/openssh.nix"
-          "services/ddclient.nix"
-          "services/blocky.nix"
+          "services/ddclient.nix" # Dynamic DNS
+          "services/blocky.nix" # Ad Blocking DNS
+          "services/unifi.nix" # Unifi Controller
 
           # Network management
           "systemd-resolved.nix"
 
           # Misc
-          # FIXME: Need to make this work without postfix-relay
-          # "mail.nix"
-          "plymouth.nix"
+          "mail.nix"
+          "plymouth.nix" # Boot graphics
           "sound.nix"
           "cli.nix"
           "fonts.nix"
@@ -48,6 +48,9 @@
         ])
     ))
   ];
+
+  # Turn off nginx reverse proxy
+  services.unifi.useProxy = lib.mkForce false;
 
   # Host Specification
   hostSpec = {

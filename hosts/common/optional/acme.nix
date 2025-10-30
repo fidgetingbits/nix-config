@@ -25,8 +25,8 @@ in
       "${config.hostSpec.persistFolder}".directories = [ "/var/lib/acme" ];
     };
   };
-  # FIXME: This should probably move to server-specific
+
   sops.secrets."tokens/gandi" = {
-    sopsFile = "${sopsFolder}/shared.yaml";
+    sopsFile = "${sopsFolder}/${config.hostSpec.hostName}.yaml";
   };
 }
