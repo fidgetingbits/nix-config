@@ -37,14 +37,14 @@
 
   # Host Specification
   hostSpec = {
-    hostName = "oops";
+    hostName = "moth";
     users = lib.mkForce [
       "aa"
       "ta"
       "borg"
     ];
     primaryUsername = lib.mkForce "aa";
-    username = lib.mkForce "ta";
+    username = lib.mkForce "aa";
 
     # System type flags
     isWork = lib.mkForce false;
