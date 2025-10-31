@@ -41,7 +41,7 @@
       # FIXME(networking): oxid IP will be different depending on if we are on it's network or not
       "${network.subnets.oxid.gateway}" = [ "oxid.${config.hostSpec.domain}" ];
       "${network.subnets.moon.hosts.moon.ip}" = [ "moon.${config.hostSpec.domain}" ];
-      "${network.subnets.moth.hosts.moth.ip}" = [ "moth.${config.hostSpec.domain}" ];
+      "${network.subnets.moon.hosts.moth.ip}" = [ "moth.${config.hostSpec.domain}" ];
     }
     // lib.optionalAttrs config.hostSpec.isWork network.work.hosts;
 
