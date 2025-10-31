@@ -22,12 +22,14 @@ let
     "oppo"
     "moon"
     "myth"
+    "moth"
   ]
   ++ inputs.nix-secrets.networking.ssh.yubikeyHostsWithDomain;
   yubikeyHostsWithoutDomain = [
     # FIXME: These could be automated by having a hostSpec entry that indicates they use boot-time ssh server
     # it could also auto-add the ssh server...
     "myth-unlock"
+    "moth-unlock"
     "myth-backup"
     "ooze-unlock"
     "oath_gitlab" # FIXME(ssh): Would be nice to do per-port match on this, but HM doesn't support
@@ -177,8 +179,19 @@ in
             port = config.hostSpec.networking.ports.tcp.ssh;
           };
 
+          # FIXME: These unlock entries could be reduced with a builder function
           "myth-unlock" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
             host = "myth";
+            hostname = "myth.${config.hostSpec.domain}";
+            user = "root";
+            port = config.hostSpec.networking.ports.tcp.ssh;
+            extraOptions = {
+              UserKnownHostsFile = "/dev/null";
+              StrictHostKeyChecking = "no";
+            };
+          };
+          "moth-unlock" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
+            host = "moath";
             hostname = "myth.${config.hostSpec.domain}";
             user = "root";
             port = config.hostSpec.networking.ports.tcp.ssh;
