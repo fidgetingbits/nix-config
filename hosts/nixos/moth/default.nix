@@ -10,7 +10,8 @@
   imports = lib.flatten [
     inputs.nixos-facter-modules.nixosModules.facter
     { config.facter.reportPath = ./facter.json; }
-    ./disko.nix
+    #./disko.nix
+    ./disks.nix
 
     (map lib.custom.relativeToRoot (
       [
@@ -110,14 +111,15 @@
 
   services.logind.powerKey = lib.mkForce "reboot";
 
+  # FIXME: remove
   # needed to unlock LUKS on raid drives
   # https://wiki.nixos.org/wiki/Full_Disk_Encryption#Unlocking_secondary_drives
   # lsblk -o name,uuid,mountpoints
-  environment.persistence."${config.hostSpec.persistFolder}" = {
-    files = [
-      "/luks-secondary-unlock.key"
-    ];
-  };
+  #  environment.persistence."${config.hostSpec.persistFolder}" = {
+  #    files = [
+  #      "/luks-secondary-unlock.key"
+  #    ];
+  #  };
 
   # NOTE: Using /dev/disk/by-partlabel/ would be nicer than UUID, however because we are using raid5, there is no
   # single partlabel to use, we need the UUID assigned to the raid5 device created by mdadm (/dev/md127)
@@ -127,9 +129,9 @@
   # We may need to make our own systemd unit that tries to mount but that isn't critical, so that we can ignore it
   # in the event of an error (like if you forget to update the UUID after bootstrap, etc).
   # Not bothering for now, as it's not pressing. The drives are already using the same passphrase as the main drive, which we have recorded
-  environment.etc.crypttab.text = lib.optionalString (!config.hostSpec.isMinimal) ''
-    encrypted-storage UUID=TBD /luks-secondary-unlock.key nofail,x-systemd.device-timeout=10
-  '';
+  # environment.etc.crypttab.text = lib.optionalString (!config.hostSpec.isMinimal) ''
+  #   encrypted-storage UUID=TBD /luks-secondary-unlock.key nofail,x-systemd.device-timeout=10
+  # '';
 
   systemd = {
     tmpfiles.rules =

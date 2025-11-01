@@ -71,6 +71,8 @@
                     swapSize = builtins.toString swapSize;
                   };
               }
+              # This is options we set for the disks.nix file, which eventually will replace the above
+              opts.diskConfig
 
               ./minimal-configuration.nix
               {
@@ -168,11 +170,12 @@
         };
 
         moth = newConfig {
-          name = "oops";
-          diskFile = ../hosts/nixos/moth/disko.nix;
+          name = "moth";
+          user = "aa";
           impermanence = true;
           facter = true;
-          user = "aa";
+          diskFile = ../hosts/common/optional/disks.nix;
+          diskConfig = import ../hosts/nixos/moth/disks.nix;
         };
 
       };

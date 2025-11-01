@@ -1,0 +1,261 @@
+# Options for setting up disks with disko. This is very opinionated and just
+# made to avoid duplication across systems using similar btrs partitions and
+# settings across
+{ lib, config, ... }:
+let
+  cfg = config.system.disks;
+  hasRaid = cfg.raidDisks != null;
+
+  # Base luks volume that will contains btrfs sub-content
+  luksContent = {
+    size = "100%";
+    content = {
+      type = "luks";
+      name = "encrypted-nixos";
+      passwordFile = "/tmp/disko-password"; # populated by bootstrap-nixos.sh
+      settings = {
+        allowDiscards = true;
+      };
+      content = btrfsContent;
+    };
+  };
+
+  # Root level btrfs volumes for non-luks, or sub-content volumes for luks
+  # NOTE: Rational for @-labels here: https://askubuntu.com/a/987116
+  btrfsContent = {
+    type = "btrfs";
+    extraArgs = [ "-f" ]; # force overwrite
+    subvolumes = {
+      "@root" = {
+        mountpoint = "/";
+        mountOptions = [
+          "compress=zstd"
+          "noatime"
+        ];
+      };
+      "@nix" = {
+        mountpoint = "/nix";
+        mountOptions = [
+          "compress=zstd"
+          "noatime"
+        ];
+      };
+    }
+    // (lib.optionalAttrs config.system.impermanence.enable {
+      "@persist" = {
+        mountpoint = "${config.hostSpec.persistFolder}";
+        mountOptions = [
+          "compress=zstd"
+          "noatime"
+        ];
+      };
+    })
+    // (lib.optionalAttrs (config.system.disks.swapSize != null) {
+      "@swap" = {
+        mountpoint = "/.swapvol";
+        swap.swapfile.size = config.system.disks.swapSize;
+      };
+    });
+  };
+
+  # Turn a list of drives into disko disks suitable for a raid array
+  mkRaid =
+    level: disks:
+    disks
+    |> lib.imap0 (
+      i: disk: {
+        "raidDrive${(toString (i + 1))}" = {
+          type = "disk";
+          device = disk;
+          content = {
+            type = "gpt";
+            partitions = {
+              mdadm = {
+                size = "100%";
+                content = {
+                  type = "mdraid";
+                  name = "raid${toString level}";
+                };
+              };
+            };
+          };
+        };
+      }
+    )
+    |> lib.mergeAttrsList;
+in
+{
+  options = {
+    system.disks = {
+      primary = lib.mkOption {
+        type = lib.types.str;
+        example = "/dev/disk/by-id/mmc-SCA64G_0x56567305";
+        description = "Primary install disk";
+      };
+      useLuks = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        example = true;
+        description = "Use LUKs on primary and raid drives";
+      };
+      swapSize = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        example = "2G";
+        description = "Size of swap drive or null for no swap";
+        default = null;
+      };
+      bootSize = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        example = "512M";
+        description = "Size of /boot partition. Bigger allows more boot entries";
+        default = "512M";
+      };
+      raidLevel = lib.mkOption {
+        type = lib.types.int;
+        example = 5;
+        default = 5;
+        description = "Type of raid to use with mdadm";
+      };
+      raidDisks = lib.mkOption {
+        type = lib.types.nullOr (lib.types.listOf lib.types.str);
+        default = null;
+        example = [
+          "/dev/disk/by-id/nvme-EDILOCA_EN705_4TB_AA251809669"
+          "/dev/disk/by-id/nvme-EDILOCA_EN705_4TB_AA251809987"
+        ];
+        description = "List of drives to add to mdadm raid array. Raid disabled if not set";
+      };
+      extraDisks = lib.mkOption {
+        type = lib.types.listOf (lib.types.attrsOf lib.types.str);
+        default = [
+          {
+            name = "encrypted-storage";
+            uuid = "TBD";
+          }
+        ];
+        description = "Names and UUIDs of non-primary luks-encrypted disks, used for automatic boot-time LUKS unlocking";
+        example = [
+          {
+            name = "encrypted-storage";
+            uuid = "ff3207ca-0af8-4dc3-a21f-4ec815b57c56";
+          }
+        ];
+      };
+      raidMountPath = lib.mkOption {
+        type = lib.types.str;
+        default = "/mnt/storage";
+        description = "Path to mount the RAID array";
+        example = "/mnt/storage";
+      };
+    };
+  };
+
+  config = {
+    # Describe our primary and raid array disks, as well as relevant mdadm settings if needed
+    disko.devices = {
+      disk = {
+        primary = {
+          type = "disk";
+          device = cfg.primary;
+          content = {
+            type = "gpt";
+            partitions = {
+              ESP = {
+                priority = 1;
+                name = "ESP";
+                size = config.system.disks.bootSize;
+                type = "EF00";
+                content = {
+                  type = "filesystem";
+                  format = "vfat";
+                  mountpoint = "/boot";
+                  mountOptions = [ "defaults" ];
+                };
+              };
+            }
+            // (if cfg.useLuks then { luks = luksContent; } else { root = btrfsContent; });
+          };
+        };
+      }
+      // lib.optionalAttrs hasRaid (mkRaid cfg.raidLevel cfg.raidDisks);
+    }
+    // lib.optionalAttrs hasRaid {
+      # FIXME: This could use a raidLuks and primaryLuks
+      mdadm = {
+        raid5 = {
+          type = "mdadm";
+          level = cfg.raidLevel;
+          content = {
+            type = "luks";
+            name = "encrypted-storage";
+            passwordFile = "/tmp/disko-password";
+            settings = {
+              allowDiscards = true;
+            };
+            # Add a boot.initrd.luks.devices entry to auto-decrypt
+            initrdUnlock = if config.hostSpec.isMinimal then true else false;
+
+            content = {
+              type = "btrfs";
+              extraArgs = [ "-f" ]; # force overwrite
+              subvolumes = {
+                "@storage" = {
+                  mountpoint = cfg.raidMountPath;
+                  mountOptions = [
+                    "compress=zstd"
+                    "noatime"
+                  ];
+                };
+              };
+            };
+          };
+        };
+      };
+    };
+
+    # Unlock extra disks
+    # https://wiki.nixos.org/wiki/Full_Disk_Encryption#Unlocking_secondary_drives
+    #
+    # NOTE: Using /dev/disk/by-partlabel/ would be nicer than UUID, however
+    # because we are sometimes using raid5, there is no single part-label to
+    # use, we need the UUID assigned to the raid5 device created by mdadm (ex:
+    # /dev/md127)
+    #
+    # FIXME: See if the secondary-unlock key can actually be part of sops,
+    # which would be possible if systemd-cryptsetup@xxx.service runs after sops
+    # service
+    # https://github.com/ckiee/nixfiles/blob/aa0138bc4b183d939cd8d2e60bcf2828febada36/hosts/pansear/hardware.nix#L16
+    # We may need to make our own systemd unit that tries to mount but that
+    # isn't critical, so that we can ignore it in the event of an error (like
+    # if you forget to update the UUID after bootstrap, etc). Not bothering for
+    # now, as it's not pressing. The drives are already using the same
+    # passphrase as the main drive, which we have recorded
+    #
+    # Find UUID with: lsblk -o name,uuid,mountpoints
+    #
+    environment = {
+      etc.crypttab.text = lib.optionalString (!config.hostSpec.isMinimal) (
+        lib.concatMapStringsSep "\n" (
+          d: "${d.name} UUID=${d.uuid} /luks-secondary-unlock.key nofail,x-systemd.device-timeout=10"
+        ) cfg.extraDisks
+      );
+    }
+    // lib.optionalAttrs config.system.impermanence.enable {
+      persistence."${config.hostSpec.persistFolder}" = {
+        files = [
+          "/luks-secondary-unlock.key"
+        ];
+      };
+    };
+    #    FIXME: Check for any TBD entries in array
+    #    warnings =
+    #      if (hasRaid && cfg.raidUUID == "TBD") then
+    #        [
+    #          "You haven't set config.system.disks.raidUUID to a valid UUID yet.\
+    #          Your raid array will not auto-decrypt.\
+    #          Use: lsblk -oname,uuid,mountpoints"
+    #        ]
+    #      else
+    #        [ ];
+  };
+}
