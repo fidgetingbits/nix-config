@@ -89,7 +89,10 @@ in
   nswp = "nix shell nixpkgs#"; # nsw: nix shell with package
   nlg = "sudo nix profile history --profile /nix/var/nix/profiles/system";
   ncs = "REPO_PATH=$PWD nh os switch --no-nom . -- --impure"; # ncs = nix config switch
-  nrepl = "nix repl --expr 'import <nixpkgs>{}'";
+  nrepl = ''
+    nix repl --option experimental-features "pipe-operators" \
+    --expr 'rec { pkgs = import <nixpkgs>{}; lib = pkgs.lib; }'
+  '';
 
   dmesg = "sudo dmesg -H";
   # finding
