@@ -11,5 +11,10 @@ lib.mkIf config.hostSpec.isAutoStyled {
       name = "BreezeX-RosePine-Linux";
       size = 30;
     };
+    # cursor = lib.mkForce {
+    #   name = "Breeze_Hacked";
+    #   package = pkgs.breeze-hacked-cursor-theme;
+    #   size = 30;
+    # };
   };
 }
