@@ -8,16 +8,13 @@ let
 
   # Base luks volume that will contains btrfs sub-content
   luksContent = {
-    size = "100%";
-    content = {
-      type = "luks";
-      name = "encrypted-nixos";
-      passwordFile = "/tmp/disko-password"; # populated by bootstrap-nixos.sh
-      settings = {
-        allowDiscards = true;
-      };
-      content = btrfsContent;
+    type = "luks";
+    name = "encrypted-nixos";
+    passwordFile = "/tmp/disko-password"; # populated by bootstrap-nixos.sh
+    settings = {
+      allowDiscards = true;
     };
+    content = btrfsContent;
   };
 
   # Root level btrfs volumes for non-luks, or sub-content volumes for luks
@@ -173,7 +170,20 @@ in
                 };
               };
             }
-            // (if cfg.useLuks then { luks = luksContent; } else { root = btrfsContent; });
+            // (
+              let
+                name = (if cfg.useLuks then "luks" else "root");
+                content = (if cfg.useLuks then luksContent else btrfsContent);
+              in
+              {
+                ${name} = {
+                  size = "100%";
+                  inherit content;
+                };
+              }
+            );
+
+            #if cfg.useLuks then { luks = { size = "100%"; content = luksContent; };} else { root = { size = "100%"; content = btrfsContent; }; });
           };
         };
       }
@@ -236,7 +246,10 @@ in
     environment = {
       etc.crypttab.text = lib.optionalString (!config.hostSpec.isMinimal) (
         lib.concatMapStringsSep "\n" (
-          d: "${d.name} UUID=${d.uuid} /luks-secondary-unlock.key nofail,x-systemd.device-timeout=10"
+          d:
+          # FIXME: noauto doesn't work, so UUID has to be correct or boot fails
+          # investigate a way to make this work and just mount from a script after the normal boot proceed, or ideally have x-systemd.automount mount on access for us (but need to test how it fails if UUID is wrong)
+          "${d.name} UUID=${d.uuid} /luks-secondary-unlock.key noauto,nofail,x-systemd.device-timeout=10,x-systemd.automount"
         ) cfg.extraDisks
       );
     }

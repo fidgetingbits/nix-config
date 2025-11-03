@@ -157,7 +157,7 @@
       in
       [
         "d /mnt/storage/backup/ 0750 ${name "borg"} ${group "borg"} -"
-        "d /mnt/storage/backup/pa 0700 ${name "pa"} ${group "pa"} -"
+        "d /mnt/storage/backup/ta 0700 ${name "ta"} ${group "ta"} -"
       ];
   };
 

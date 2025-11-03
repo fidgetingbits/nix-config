@@ -24,7 +24,8 @@
     extraDisks = [
       {
         name = "encrypted-storage";
-        uuid = "483ce643-d45f-4992-a23d-d502a5afe365";
+        # NOTE: This UUID changes on a re-install
+        uuid = "64ce59b9-756a-4897-b772-bd5d11f6839a";
       }
     ];
   };

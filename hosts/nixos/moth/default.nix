@@ -105,17 +105,13 @@
   # NOTE: This triggers a warning about /usr/lib/mdadm/mdadm_env.sh not existing, which is part of
   # the ExecStartPre, but is benign
   # FIXME: Is mdchecks better for this?
-  # FIXME: Double check this is needed. Triggers a ~3h rebuild right on array creation, which affects nixos-anywhere
-  # See https://github.com/NixOS/nixpkgs/issues/72394#issuecomment-549110501
-  config = {
-    boot.initrd.services.swraid.mdadmConf = ''
-      MAILADDR root
-    '';
-  };
+  boot.swraid.mdadmConf = ''
+    MAILADDR ${config.hostSpec.email.admin}
+  '';
   # Override mdmonitor to log to syslog instead of emailing or alerting
-  # systemd.services."mdmonitor".environment = {
-  #   MDADM_MONITOR_ARGS = "--scan --syslog";
-  # };
+  systemd.services."mdmonitor".environment = {
+    MDADM_MONITOR_ARGS = "--scan --syslog";
+  };
 
   services.logind.powerKey = lib.mkForce "reboot";
 
