@@ -191,7 +191,7 @@ function nixos_anywhere() {
     # --extra-files here picks up the ssh host key we generated earlier and puts it onto the target machine
     # FIXME: If you kexec into the default nixos-installer instead of doing the install from the iso,
     # the --post-kexec-ssh-port will be wrong as the nixos-installer image will be 22
-    SHELL=/bin/sh nix run github:nix-community/nixos-anywhere -- \
+    SHELL=/bin/sh nix run --refresh github:fidgetingbits/nixos-anywhere/check-reboot -- \
         --ssh-port "$ssh_port" \
         --post-kexec-ssh-port "$ssh_port" \
         --extra-files "$temp" \
