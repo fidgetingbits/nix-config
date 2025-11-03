@@ -12,7 +12,7 @@ default:
 [private]
 copy-lock-in HOST=`hostname`:
     @mkdir -p locks
-    @cp locks/{{ HOST }}.lock flake.lock || cp locks/$(hostname).lock locks/{{ HOST }}.lock && git add locks/{{ HOST }}.lock
+    @cp locks/{{ HOST }}.lock flake.lock || cp locks/$(hostname).lock locks/{{ HOST }}.lock && git add locks/{{ HOST }}.lock && cp locks/{{ HOST }}.lock flake.lock
     @git add --intent-to-add -f flake.lock
     @git update-index --assume-unchanged flake.lock
 
