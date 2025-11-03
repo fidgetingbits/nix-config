@@ -21,6 +21,11 @@
       # after initial install/disko run
       #"/dev/disk/by-id/nvme-EDILOCA_EN705_4TB_AA251809684"
     ];
-    extraDisks = [ ];
+    extraDisks = [
+      {
+        name = "encrypted-storage";
+        uuid = "483ce643-d45f-4992-a23d-d502a5afe365";
+      }
+    ];
   };
 }

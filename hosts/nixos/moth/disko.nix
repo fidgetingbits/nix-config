@@ -14,28 +14,53 @@
 # See https://serverfault.com/questions/216508/how-to-interrupt-software-raid-resync
 {
   config,
+  lib,
   ...
 }:
 let
   raidDisks = [
-    "/dev/disk/by-id/nvme-CT2000P3PSSD8_2504E9A1BF6E"
-    "/dev/disk/by-id/nvme-CT2000P3PSSD8_2504E9A1BF62"
-    "/dev/disk/by-id/nvme-CT2000P3PSSD8_2504E9A1BF79"
+
+    "/dev/disk/by-id/nvme-EDILOCA_EN705_4TB_AA251809669"
+    "/dev/disk/by-id/nvme-EDILOCA_EN705_4TB_AA251809987"
+    "/dev/disk/by-id/nvme-EDILOCA_EN705_4TB_AA251809895"
+    # FIXME: Uncomment after already created, to test adding drive to array
+    # after initial install/disko run
+    #"/dev/disk/by-id/nvme-EDILOCA_EN705_4TB_AA251809684"
   ];
+  primaryDisk = "/dev/disk/by-id/mmc-SCA64G_0x56567305";
+
+  mkRaid =
+    level: disks:
+    disks
+    |> lib.imap0 (
+      i: disk: {
+        "raidDrive${(toString (i + 1))}" = {
+          type = "disk";
+          device = disk;
+          content = {
+            type = "gpt";
+            partitions = {
+              mdadm = {
+                size = "100%";
+                content = {
+                  type = "mdraid";
+                  name = "raid${toString level}";
+                };
+              };
+            };
+          };
+        };
+      }
+    )
+    |> lib.mergeAttrsList;
 in
 {
-
-  # FIXME: To delete, this should be fixed in 24.05 actually
-  # https://github.com/NixOS/nixpkgs/issues/72394
-  #boot.swraid.mdadmConf = "PROGRAM ${pkgs.coreutils}/bin/true";
-
   disko.devices = {
     disk = {
       # EMMC 64GB
       primary = {
         type = "disk";
-        #device = "/dev/mmcblk0"; # 64GB
-        device = "/dev/disk/by-id/mmc-DV4064_0x6101b932";
+        device = primaryDisk;
         content = {
           type = "gpt";
           partitions = {
@@ -99,63 +124,8 @@ in
           };
         };
       };
-
-      # FIXME: Use a mkRaidDisk func?
-      # RAID5 three 2TB drives
-      # Disk 1
-      d1 = {
-        type = "disk";
-        device = builtins.elemAt raidDisks 0;
-        content = {
-          type = "gpt";
-          partitions = {
-            mdadm = {
-              size = "100%";
-              content = {
-                type = "mdraid";
-                name = "raid5";
-              };
-            };
-          };
-        };
-      };
-
-      # Disk 2
-      d2 = {
-        type = "disk";
-        device = builtins.elemAt raidDisks 1;
-        content = {
-          type = "gpt";
-          partitions = {
-            mdadm = {
-              size = "100%";
-              content = {
-                type = "mdraid";
-                name = "raid5";
-              };
-            };
-          };
-        };
-      };
-
-      # Disk 3
-      d3 = {
-        type = "disk";
-        device = builtins.elemAt raidDisks 2;
-        content = {
-          type = "gpt";
-          partitions = {
-            mdadm = {
-              size = "100%";
-              content = {
-                type = "mdraid";
-                name = "raid5";
-              };
-            };
-          };
-        };
-      };
-    };
+    }
+    // mkRaid raidDisks;
 
     mdadm = {
       raid5 = {
