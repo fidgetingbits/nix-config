@@ -24,6 +24,7 @@
           # Services
           "services/openssh.nix"
           "services/ddclient.nix"
+          "services/nut-server"
 
           # Network management
           "systemd-resolved.nix"
@@ -140,10 +141,13 @@
   systemd = {
     tmpfiles.rules =
       let
-        user = config.users.users."borg".name;
-        group = config.users.users."borg".group;
+        name = user: config.users.users.${user}.name;
+        group = user: config.users.users.${user}.group;
       in
-      [ "d /mnt/storage/backup/ 0750 ${user} ${group} -" ];
+      [
+        "d /mnt/storage/backup/ 0750 ${name "borg"} ${group "borg"} -"
+        "d /mnt/storage/backup/ta 0700 ${name "ta"} ${group "ta"} -"
+      ];
   };
 
   # FIXME:
@@ -151,10 +155,6 @@
   #   enable = true;
   #   borgBackupStartTime = "09:00:00";
   # };
-
-  # FIXME(ups): Setup NUT server for cyberpower UPS
-
-  # See https://github.com/bercribe/nixos/blob/f6ee318d84b1a438b459a6cf596a848d5286be4d/modules/systems/hardware/ups/server.nix#L63
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   system.stateVersion = "23.05";

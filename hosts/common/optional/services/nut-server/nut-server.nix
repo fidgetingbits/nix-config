@@ -1,5 +1,4 @@
-# Network UPS Tools (NUT) client
-# FIXME: This is partially specific to myth atm
+# Network UPS Tools (NUT) server
 {
   lib,
   config,
@@ -46,26 +45,37 @@ in
     environment = {
       # Useful to check if you are actually talking to the server, if no upssched
       # output yet
-      # NUT_DEBUG_LEVEL = "10";
+      #NUT_DEBUG_LEVEL = "10";
     };
   };
   power.ups = {
     enable = true;
-    mode = "netclient";
+    mode = "netserver";
+    ups.cyberpower = {
+      driver = "usbhid-ups";
+      description = "CyberPower CP1500PFCLCDa";
+      port = "auto";
+      directives = [
+        "vendorid = 0764"
+        "productid = 0601"
+      ];
+    };
+
+    # These are the users that can auth to the nut server
+    users.nut = {
+      passwordFile = config.sops.secrets."passwords/nut".path;
+      upsmon = "primary";
+    };
+
     upsmon = {
       #enable = true;
-      monitor.ups =
-        let
-          # FIXME: The client info should be set or configured externally to this module
-          server = config.hostSpec.networking.subnets.myth.hosts.synology.ip;
-          port = toString config.hostSpec.networking.ports.tcp.nut;
-        in
-        {
-          system = "ups@${server}:${port}";
-          user = "monuser";
-          passwordFile = config.sops.secrets."passwords/nut".path;
-          type = "slave";
-        };
+      #monitor."CP1500PFCLCDa" =
+      monitor."cyberpower" = {
+        system = "cyberpower@localhost";
+        user = "nut";
+        passwordFile = config.sops.secrets."passwords/nut".path;
+        type = "primary";
+      };
 
       # Default upsmon settings use upssched command for NOTIFYCMD,
       # and waits on /run/killpower to die via. We use these upssched
