@@ -103,9 +103,9 @@ in
       };
       "NixOS Wiki" = {
         urls = [
-          { template = "https://nixos.wiki/index.php?search={searchTerms}"; }
+          { template = "https://wiki.nixos.org/index.php?search={searchTerms}"; }
         ];
-        icon = "https://nixos.wiki/favicon.png";
+        icon = "https://wiki.nixos.org/favicon.png";
         definedAliases = [ "@nw" ];
       };
       "Lix Wiki" = {
