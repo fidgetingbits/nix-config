@@ -43,6 +43,8 @@
                 else
                   ../hosts/common/disks/btrfs-impermanence-disko.nix
               );
+              # FIXME: This is a hack for now to and we'll replace
+              diskConfig = (if opts ? diskConfig then opts.diskConfig else { });
             in
             [
               # Needed because we use unstable nix sometimes
@@ -72,7 +74,7 @@
                   };
               }
               # This is options we set for the disks.nix file, which eventually will replace the above
-              opts.diskConfig
+              diskConfig
 
               ./minimal-configuration.nix
               {
