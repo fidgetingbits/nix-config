@@ -14,7 +14,7 @@ rec {
     (map lib.custom.relativeToRoot [
       # FIXME: Switch this to just import hosts/common/core (though have to be careful to purposefully not add platform file..
       "hosts/common/optional/minimal-user.nix"
-      "hosts/common/core/keyd.nix" # FIXME: Remove if we move to hosts/common/core above
+      "hosts/common/optional/keyd.nix"
       "modules/common/host-spec.nix"
     ])
     (
@@ -26,6 +26,7 @@ rec {
   ];
 
   hostSpec = {
+    primaryUsername = "aa";
     username = "aa";
     hostName = "iso";
     isProduction = lib.mkForce false;
