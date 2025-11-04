@@ -25,7 +25,6 @@ let
     NOTBYPASS = "UPS no longer on bypass";
   };
 in
-
 {
   imports = [ ./upssched.nix ];
   systemd.tmpfiles.rules = [
@@ -51,6 +50,18 @@ in
   power.ups = {
     enable = true;
     mode = "netserver";
+    # FIXME: add a list of trusted hosts that can connect on grove LAN
+    # currently restricted by guard rules
+    openFirewall = true;
+    upsd = {
+      listen = [
+        {
+          address = "0.0.0.0";
+          port = config.hostSpec.networking.ports.tcp.nut;
+        }
+      ];
+    };
+
     ups.cyberpower = {
       driver = "usbhid-ups";
       description = "CyberPower CP1500PFCLCDa";
