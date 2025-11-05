@@ -33,6 +33,7 @@ let
     "myth-backup"
     "ooze-unlock"
     "oath_gitlab" # FIXME(ssh): Would be nice to do per-port match on this, but HM doesn't support
+    "okra"
     config.hostSpec.networking.subnets.ogre.wildcard
   ]
   ++ inputs.nix-secrets.networking.ssh.yubikeyHosts;
@@ -89,7 +90,12 @@ let
     "onyx"
     "oppo"
     "orby"
+    "okra"
   ];
+  # FIXME: A lot of hosts have the same properties, but different username, so we
+  # should modify this to pass the port for each host, and then we can reduce a lot
+  # of noise. We could probably also just use a flag for yubikey and copy a bunch of them.
+  # If we do that we should just use options and modularize more of it
   vanillaHostsConfig = lib.attrsets.mergeAttrsList (
     lib.lists.map (host: {
       "${host}" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
@@ -101,7 +107,6 @@ let
   );
 in
 {
-
   programs.ssh =
     let
       workConfig = if config.hostSpec.isWork then ''Include config.d/work'' else "";
@@ -171,12 +176,27 @@ in
                 }
               ];
           };
-
           "myth" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
             host = "myth";
             hostname = "myth.${config.hostSpec.domain}";
             user = "admin";
             port = config.hostSpec.networking.ports.tcp.ssh;
+          };
+
+          # FIXME: Can't most of the following at least have their host/hostname/port be automated to reduce the size?
+          "moth" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
+            host = "moth";
+            hostname = "moth.${config.hostSpec.domain}";
+            port = config.hostSpec.networking.ports.tcp.ssh;
+            localForwards = [
+              {
+                # For web interface
+                bind.address = "localhost";
+                bind.port = 15001;
+                host.address = "localhost";
+                host.port = 15001;
+              }
+            ];
           };
 
           # FIXME: These unlock entries could be reduced with a builder function
@@ -190,6 +210,7 @@ in
               StrictHostKeyChecking = "no";
             };
           };
+
           "moth-unlock" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
             host = "moath";
             hostname = "myth.${config.hostSpec.domain}";
@@ -221,22 +242,6 @@ in
             hostname = "oath.${config.hostSpec.domain}";
             user = "git";
             port = config.hostSpec.networking.ports.tcp.gitlab;
-          };
-
-          # FIXME: Can't most of the following at least have their host/hostname/port be automated to reduce the size?
-          "moth" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            host = "moth";
-            hostname = "moth.${config.hostSpec.domain}";
-            port = config.hostSpec.networking.ports.tcp.ssh;
-            localForwards = [
-              {
-                # For web interface
-                bind.address = "localhost";
-                bind.port = 15001;
-                host.address = "localhost";
-                host.port = 15001;
-              }
-            ];
           };
 
           "omen" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
