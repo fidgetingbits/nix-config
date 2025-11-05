@@ -32,16 +32,24 @@
   boot.kernelPackages = pkgs.linuxPackages_6_16;
   #boot.kernelPackages = pkgs.linuxPackages_latest;
 
+  # FIXME(networking): Some IPs will be different depending on if we are on
+  # there network or not. This needs per-network dispatcher scripts likely,
+  # which might preclude a read-only host file like this generates.
   networking.hosts =
     let
       network = config.hostSpec.networking;
     in
     { }
     // lib.optionalAttrs config.hostSpec.isLocal {
-      # FIXME(networking): oxid IP will be different depending on if we are on it's network or not
+      # Internal
       "${network.subnets.oxid.gateway}" = [ "oxid.${config.hostSpec.domain}" ];
+
+      # External
       "${network.subnets.moon.hosts.moon.ip}" = [ "moon.${config.hostSpec.domain}" ];
-      "${network.subnets.grove.hosts.moth.ip}" = [ "moth.${config.hostSpec.domain}" ];
+      # "${network.subnets.grove.hosts.moth.ip}" = [ "moth.${config.hostSpec.domain}" ];
+
+      # VMs
+      "${network.subnets.vm-lan.hosts.okra.ip}" = [ "okra.${config.hostSpec.domain}" ];
     }
     // lib.optionalAttrs config.hostSpec.isWork network.work.hosts;
 
