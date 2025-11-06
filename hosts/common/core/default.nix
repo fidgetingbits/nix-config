@@ -52,7 +52,6 @@ in
 
   # If there is a conflict file that is backed up, use this extension
   home-manager.backupFileExtension = "bk";
-  # home-manager.useUserPackages = true;
 
   # On darwin it's important this is outside home-manager
   programs.zsh = {
@@ -83,7 +82,6 @@ in
     dates = [ "03:45" ]; # Periodically optimize the store
   };
 
-  # FIXME(darwin): I'm not sure this works on darwin...
   security.pki.certificates = lib.flatten (
     lib.optional config.hostSpec.isWork inputs.nix-secrets.work.certificates
   );

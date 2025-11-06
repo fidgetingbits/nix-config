@@ -10,7 +10,6 @@
   imports = lib.flatten [
     inputs.nixos-facter-modules.nixosModules.facter
     { config.facter.reportPath = ./facter.json; }
-    #./disko.nix
     ./disks.nix
 
     (map lib.custom.relativeToRoot (
@@ -24,7 +23,6 @@
           # Services
           "services/openssh.nix"
           "services/ddclient.nix"
-          "services/nut-server"
 
           # Network management
           "systemd-resolved.nix"
@@ -103,9 +101,10 @@
     };
   };
 
-  # NOTE: This triggers a warning about /usr/lib/mdadm/mdadm_env.sh not existing, which is part of
-  # the ExecStartPre, but is benign
-  # FIXME: Is mdchecks better for this?
+  # Override the physical key to reboot on short press
+  services.logind.powerKey = lib.mkForce "reboot";
+
+  # Prevent warning
   boot.swraid.mdadmConf = ''
     MAILADDR ${config.hostSpec.email.admin}
   '';
@@ -114,29 +113,22 @@
     MDADM_MONITOR_ARGS = "--scan --syslog";
   };
 
-  services.logind.powerKey = lib.mkForce "reboot";
-
-  # FIXME: remove
-  # needed to unlock LUKS on raid drives
-  # https://wiki.nixos.org/wiki/Full_Disk_Encryption#Unlocking_secondary_drives
-  # lsblk -o name,uuid,mountpoints
-  #  environment.persistence."${config.hostSpec.persistFolder}" = {
-  #    files = [
-  #      "/luks-secondary-unlock.key"
-  #    ];
-  #  };
-
-  # NOTE: Using /dev/disk/by-partlabel/ would be nicer than UUID, however because we are using raid5, there is no
-  # single partlabel to use, we need the UUID assigned to the raid5 device created by mdadm (/dev/md127)
-  # FIXME: See if the secondary-unlock key can actually be part of sops, which would be possible if
-  # systemd-cryptsetup@xxx.service runs after sops service
-  # https://github.com/ckiee/nixfiles/blob/aa0138bc4b183d939cd8d2e60bcf2828febada36/hosts/pansear/hardware.nix#L16
-  # We may need to make our own systemd unit that tries to mount but that isn't critical, so that we can ignore it
-  # in the event of an error (like if you forget to update the UUID after bootstrap, etc).
-  # Not bothering for now, as it's not pressing. The drives are already using the same passphrase as the main drive, which we have recorded
-  # environment.etc.crypttab.text = lib.optionalString (!config.hostSpec.isMinimal) ''
-  #   encrypted-storage UUID=TBD /luks-secondary-unlock.key nofail,x-systemd.device-timeout=10
-  # '';
+  # Setup NUT server and corresponding client for USB-attached UPS device
+  services.ups = {
+    server.enable = true;
+    username = "nut";
+    name = "cyberpower";
+    powerDownTimeOut = (2 * 60); # 2m. UPS reports ~10min
+  };
+  power.ups.ups.cyberpower = {
+    driver = "usbhid-ups";
+    description = "CyberPower CP1500PFCLCDa";
+    port = "auto";
+    directives = [
+      "vendorid = 0764"
+      "productid = 0601"
+    ];
+  };
 
   systemd = {
     tmpfiles.rules =

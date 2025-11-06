@@ -23,7 +23,6 @@
           # Services
           "services/openssh.nix"
           "services/ddclient.nix"
-          "services/nut-client"
 
           # Network management
           "systemd-resolved.nix"
@@ -166,6 +165,15 @@
   #   enable = true;
   #   borgBackupStartTime = "09:00:00";
   # };
+
+  # Connect our NUT client to the UPS on the network
+  services.ups = {
+    client.enable = true;
+    name = "ups";
+    username = "monuser";
+    ip = config.hostSpec.networking.subnets.myth.hosts.synology.ip;
+    powerDownTimeOut = (60 * 30); # 30m. UPS reports ~45min
+  };
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   system.stateVersion = "23.05";
