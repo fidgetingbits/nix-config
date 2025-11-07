@@ -104,15 +104,6 @@
   # Override the physical key to reboot on short press
   services.logind.powerKey = lib.mkForce "reboot";
 
-  # Prevent warning
-  boot.swraid.mdadmConf = ''
-    MAILADDR ${config.hostSpec.email.admin}
-  '';
-  # Override mdmonitor to log to syslog instead of emailing or alerting
-  systemd.services."mdmonitor".environment = {
-    MDADM_MONITOR_ARGS = "--scan --syslog";
-  };
-
   # Setup NUT server and corresponding client for USB-attached UPS device
   services.ups = {
     server.enable = true;

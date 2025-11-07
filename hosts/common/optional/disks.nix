@@ -1,6 +1,23 @@
 # Options for setting up disks with disko. This is very opinionated and just
 # made to avoid duplication across systems using similar btrs partitions and
 # settings across
+
+# mdadm and raid5 reference:
+# https://github.com/mitchty/nix/blob/shenanigans/nix/nixosConfigurations/gw0/diskconfig.nix
+#
+# NOTE use of mdadm and raid5 will automatically trigger a resync during
+# initial installation, which can impact nixos-anywhere's ability to reboot.
+# You can see with systemd-inhibit that udiskd is running an operation See the
+# progress with cat /proc/mdstat (takes about 2 hours with 6TB) You can stop
+# the resync by using the following:
+
+# ```
+# echo frozen > /sys/block/md0/md/sync_action
+# echo none > /sys/block/md0/md/resync_start
+# echo idle > /sys/block/md0/md/sync_action
+# ```
+# See https://serverfault.com/questions/216508/how-to-interrupt-software-raid-resync
+
 { lib, config, ... }:
 let
   cfg = config.system.disks;
@@ -260,6 +277,18 @@ in
         ];
       };
     };
+
+    # Configure some mdadm-related settings, but should only be applicable if
+    # raid/mdadm is actually setup by disko
+    # Prevent failure: mdadm: No mail address or alert command - not monitoring
+    boot.swraid.mdadmConf = ''
+      MAILADDR ${config.hostSpec.email.admin}
+    '';
+    # Override mdmonitor to log to syslog instead of emailing or alerting
+    systemd.services."mdmonitor".environment = {
+      MDADM_MONITOR_ARGS = "--scan --syslog";
+    };
+
     #    FIXME: Check for any TBD entries in array
     #    warnings =
     #      if (hasRaid && cfg.raidUUID == "TBD") then
