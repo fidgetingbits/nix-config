@@ -34,17 +34,6 @@
             # FIXME: The default user should come from an external source once we make this a lib
             let
               user = if opts ? user then opts.user else "aa";
-              # FIXME: This doesn't account for all disk possibilities we have atm I think
-              diskFile = (
-                if opts ? diskFile then
-                  opts.diskFile
-                else if opts.luks then
-                  ../hosts/common/disks/btrfs-luks-impermanence-disko.nix
-                else
-                  ../hosts/common/disks/btrfs-impermanence-disko.nix
-              );
-              # FIXME: This is a hack for now to and we'll replace
-              diskConfig = (if opts ? diskConfig then opts.diskConfig else { });
             in
             [
               # Needed because we use unstable nix sometimes
@@ -59,22 +48,8 @@
                 ];
               }
 
-              inputs.disko.nixosModules.disko
-              diskFile
-              {
-                _module.args =
-                  let
-                    swapSize = if opts ? swapSize then opts.swapSize else 0;
-                    disk = if opts ? disk then opts.disk else "";
-                  in
-                  {
-                    inherit disk;
-                    withSwap = swapSize > 0;
-                    swapSize = builtins.toString swapSize;
-                  };
-              }
-              # This is options we set for the disks.nix file, which eventually will replace the above
-              diskConfig
+              # Disk definitions for this host
+              ../hosts/nixos/${ops.name}/disks.nix
 
               ./minimal-configuration.nix
               {
@@ -84,6 +59,8 @@
               ../modules/hosts/nixos/impermanence
               {
                 networking.hostName = opts.name;
+                # FIXME: we can pull this out of the disks config now once
+                # everything is converted
                 system.impermanence.enable = opts.impermanence;
               }
 
@@ -142,9 +119,7 @@
         # virtual machines
         okra = newConfig {
           name = "okra";
-          disk = "/dev/vda";
           impermanence = true;
-          luks = true;
           facter = false;
         };
 
@@ -169,6 +144,7 @@
           impermanence = true;
           facter = true;
           user = "admin";
+          diskConfig = import ../hosts/nixos/myth/disks.nix;
         };
 
         moth = newConfig {
