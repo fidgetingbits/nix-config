@@ -8,15 +8,7 @@
   imports = lib.flatten [
     # Every host needs this
     ./hardware-configuration.nix
-    # disk layout
-
-    (lib.custom.relativeToRoot "hosts/common/disks/btrfs-luks-impermanence-disko.nix")
-    {
-      _module.args = {
-        disk = "/dev/vda";
-        withSwap = false;
-      };
-    }
+    ./disks.nix
     (map lib.custom.relativeToRoot (
       [
 
