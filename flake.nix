@@ -34,7 +34,7 @@
     in
     flake-parts.lib.mkFlake { inherit inputs; } {
       flake = {
-        overlays = import ./overlays { inherit inputs; };
+        overlays = import ./overlays { inherit inputs lib; };
         nixosConfigurations = mkHostConfigs (readHosts "nixos") false;
         darwinConfigurations = mkHostConfigs (readHosts "darwin") true;
       };
