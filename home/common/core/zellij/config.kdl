@@ -20,6 +20,7 @@ keybinds clear-defaults=true {
     tab {
         bind "Alt t" { SwitchToMode "Normal" ; }
         bind "b"     { BreakPane; SwitchToMode "Normal" ; }
+        // FIXME: Why don't these show up in the legend?
         bind "h"     { MoveTab "Left" ; }
         bind "l"     { MoveTab "Right" ; }
         bind "n"     { NewTab ; SwitchToMode "Normal" ; }
@@ -152,6 +153,8 @@ copy_on_select true
 show_startup_tips false
 //default_shell "vi -c ':term zsh'"
 default_layout "default"
+// Prevent 90s pause on restart/shutdown
+on_force_close "quit"
 
 // Whether to enable mouse hover effects and pane grouping functionality
 // Default: true
