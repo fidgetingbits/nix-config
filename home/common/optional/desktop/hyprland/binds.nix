@@ -201,8 +201,8 @@
           # ========== Misc ==========
           #
           "${mainMod} SHIFT, r, exec, hyprctl reload" # reload the configuration file
-          "${mainMod}, l, exec, hyprlock" # lock the wm
-          "${mainMod}, e, exec, wlogout" # lock the wm
+          # "${mainMod}, l, exec, hyprlock" # lock the wm
+          "${mainMod}, e, exec, wlogout" # trigger lock/logout/suspend options
         ];
     };
 }
