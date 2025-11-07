@@ -10,12 +10,7 @@
     inputs.adblock-hosts.nixosModule
     inputs.nixos-facter-modules.nixosModules.facter
     { config.facter.reportPath = ./facter.json; }
-    (lib.custom.relativeToRoot "hosts/common/disks/btrfs-impermanence-disko.nix")
-    {
-      _module.args = {
-        withSwap = true;
-      };
-    }
+    ./disks.nix
 
     (map lib.custom.relativeToRoot (
       [

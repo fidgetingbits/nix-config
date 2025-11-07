@@ -114,6 +114,16 @@ in
         example = "/dev/disk/by-id/mmc-SCA64G_0x56567305";
         description = "Primary install disk";
       };
+      primaryLabel = lib.mkOption {
+        type = lib.types.str;
+        default = "primary";
+        example = "primary";
+        description = ''
+          Label of primary drive defined in disko.device.disk.
+          Only useful if you already had a different label defined and \
+          are switching to this module or want a specific disk label in \
+          /dev/disk/by-partlabel/ other than disk-primary-{root,luks}'';
+      };
       useLuks = lib.mkOption {
         type = lib.types.bool;
         default = true;
@@ -176,7 +186,8 @@ in
     # Describe our primary and raid array disks, as well as relevant mdadm settings if needed
     disko.devices = {
       disk = {
-        primary = {
+        # This label name should be configurable
+        ${cfg.primaryLabel} = {
           type = "disk";
           device = cfg.primary;
           content = {
@@ -197,6 +208,7 @@ in
             }
             // (
               let
+                # FIXME: Make make these configurable
                 name = (if cfg.useLuks then "luks" else "root");
               in
               {
