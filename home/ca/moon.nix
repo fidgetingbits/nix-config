@@ -22,10 +22,6 @@
 
           "desktop/gnome"
           "gnome-terminal.nix"
-
-          # Maybe more role-specific stuff
-          "document.nix" # document editing
-          "gui-utilities.nix" # core for any desktop
         ])
     )
   );
@@ -99,20 +95,14 @@
     };
   };
 
-  # xdg.autostart = {
-  #   enable = true;
-  #   #readOnly = true;
-  #   entries = [
-  #     "${pkgs.firefox}/share/applications/firefox.desktop"
-  #   ];
-  # };
-
-  # Make cursor bigger than defualt
-  stylix = {
-    cursor = lib.mkOrder 10 {
-      name = "catppuccin-mocha-light-cursors";
-      package = pkgs.catppuccin-cursors.mochaLight;
-      size = 40;
-    };
+  #  stylix.cursor = lib.mkForce {
+  #    name = lib.mkForce "Breeze_Hacked";
+  #    package = lib.mkForce pkgs.breeze-hacked-cursor-theme;
+  #    size = lib.mkForce 128;
+  #  };
+  stylix.cursor = lib.mkForce {
+    name = lib.mkForce "catppuccin-mocha-light-cursors";
+    package = lib.mkForce pkgs.catppuccin-cursors.mochaLight;
+    size = lib.mkForce 40;
   };
 }
