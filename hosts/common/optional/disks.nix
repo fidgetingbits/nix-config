@@ -1,6 +1,6 @@
 # Options for setting up disks with disko. This is very opinionated and just
-# made to avoid duplication across systems using similar btrs partitions and
-# settings across
+# made to avoid duplication across systems using similar btrfs partitions and
+# settings across hosts
 
 # mdadm and raid5 reference:
 # https://github.com/mitchty/nix/blob/shenanigans/nix/nixosConfigurations/gw0/diskconfig.nix
@@ -18,7 +18,12 @@
 # ```
 # See https://serverfault.com/questions/216508/how-to-interrupt-software-raid-resync
 
-{ lib, config, ... }:
+{
+  lib,
+  config,
+  inputs,
+  ...
+}:
 let
   cfg = config.system.disks;
   hasRaid = cfg.raidDisks != null;
@@ -99,6 +104,9 @@ let
     |> lib.mergeAttrsList;
 in
 {
+  imports = [
+    inputs.disko.nixosModules.disko
+  ];
   options = {
     system.disks = {
       primary = lib.mkOption {
@@ -190,17 +198,14 @@ in
             // (
               let
                 name = (if cfg.useLuks then "luks" else "root");
-                content = (if cfg.useLuks then luksContent else btrfsContent);
               in
               {
                 ${name} = {
                   size = "100%";
-                  inherit content;
+                  content = (if cfg.useLuks then luksContent else btrfsContent);
                 };
               }
             );
-
-            #if cfg.useLuks then { luks = { size = "100%"; content = luksContent; };} else { root = { size = "100%"; content = btrfsContent; }; });
           };
         };
       }
@@ -278,14 +283,13 @@ in
       };
     };
 
-    # Configure some mdadm-related settings, but should only be applicable if
-    # raid/mdadm is actually setup by disko
     # Prevent failure: mdadm: No mail address or alert command - not monitoring
-    boot.swraid.mdadmConf = ''
+    boot.swraid.mdadmConf = lib.optionalString hasRaid ''
       MAILADDR ${config.hostSpec.email.admin}
     '';
+
     # Override mdmonitor to log to syslog instead of emailing or alerting
-    systemd.services."mdmonitor".environment = {
+    systemd.services."mdmonitor".environment = lib.optionalAttrs hasRaid {
       MDADM_MONITOR_ARGS = "--scan --syslog";
     };
 
