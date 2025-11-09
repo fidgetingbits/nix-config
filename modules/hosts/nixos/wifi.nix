@@ -79,11 +79,11 @@ in
           "work"
         ];
         description = ''
-          The set of WLANs the system will have configured for NetworkManager use
+          The set of WLANs the system will have configured for NetworkManager use.
 
-                Set 'config.hostSpec.isRoaming = true;' to use all
+          Set 'config.hostSpec.isRoaming = true;' to use all.
 
-                An age key will need to be configured for every WLAN's wifi.*.yaml secret file in nix-secrets'';
+          An age key will need to be configured for every WLAN's wifi.*.yaml secret file in nix-secrets.'';
       };
       disableWhenWired = lib.mkOption {
         type = lib.types.bool;
