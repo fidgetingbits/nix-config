@@ -5,6 +5,13 @@
 # LAN, however it is also used as a catchall for unrelated access points, like
 # in the roaming case, which would be the set of all untrusted access points
 # that a laptop might connect to.
+#
+# Note that for now my approach is to just drop an nmconnection entry into sops
+# secrets and link the file, but something like ensureConnections or
+# ensureProfiles would be better if I can use sops-nix to template in a way
+# that both the connection names and passwords are hidden. The nmconnection
+# approach is "easier" because I can just manually connect with NetworkManager
+# and then quickly copy the whole file (minus the interface) elsewhere.
 {
   inputs,
   lib,
@@ -17,6 +24,7 @@ let
   cfg = config.wifi;
 
   # Return a list of all Access Point (AP) names from the given WLAN secret file
+  # NOTE: This uses IFD in order to read SOPS yaml keys
   readAPNames =
     file:
     pkgs.runCommand "${getWLAN file}-ap-names.txt" { } ''
@@ -53,13 +61,12 @@ let
     |> map (
       file:
       readAPNames file
-      # FIXME: Would be nice if we just never had empty names
+      # nixfmt hack to not merge |> lines
       |> lib.filter (name: name != "")
       |> map (name: connectionEntry (getWLAN file) name)
     )
     |> builtins.concatLists
     |> lib.mergeAttrsList;
-
 in
 {
   options = {
@@ -92,6 +99,19 @@ in
     # category, but also if the system isRoaming, then we add all connections from all
     # categories.
     sops.secrets = genWifiConnections;
+
+    # sops-nix won't clean up old nmconnection files, so this just removes any dead links
+    # from /etc/NetworkManager/system-connections/ that may be left over from wlan changes
+    # or other testing
+    system.activationScripts.dead-wifi-cleanup =
+      let
+        find = lib.getExe' pkgs.findutils "find";
+        rm = lib.getExe' pkgs.coreutils "rm";
+      in
+      {
+        deps = [ "setupSecrets" ]; # sops dependency
+        text = "${find} -L . -name . -o -type d -prune -o -type l -exec ${rm} {} +";
+      };
 
     networking.networkmanager.dispatcherScripts = lib.optional cfg.disableWhenWired [
       {
