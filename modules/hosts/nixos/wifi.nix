@@ -1,16 +1,16 @@
 # Module to manage sets of wifi access points.
 #
 # This file loosely uses the term WLAN to refer to a set of access point names. In
-# some cases this will be an actual set of Access Points on teh same Wireless
+# some cases this will be an actual set of Access Points on the same Wireless
 # LAN, however it is also used as a catchall for unrelated access points, like
 # in the roaming case, which would be the set of all untrusted access points
 # that a laptop might connect to.
 #
-# Note that for now my approach is to just drop an nmconnection entry into sops
+# Note that for now my approach is to drop an nmconnection entry into sops
 # secrets and link the file, but something like ensureConnections or
 # ensureProfiles would be better if I can use sops-nix to template in a way
 # that both the connection names and passwords are hidden. The nmconnection
-# approach is "easier" because I can just manually connect with NetworkManager
+# approach is "easier" because I can manually connect with NetworkManager
 # and then quickly copy the whole file (minus the interface) elsewhere.
 {
   inputs,
@@ -95,12 +95,9 @@ in
   };
 
   config = lib.mkIf config.hostSpec.wifi {
-    # Wifi networks are broken into categories. We add the connections from the given
-    # category, but also if the system isRoaming, then we add all connections from all
-    # categories.
     sops.secrets = genWifiConnections;
 
-    # sops-nix won't clean up old nmconnection files, so this just removes any dead links
+    # sops-nix won't clean up old nmconnection files, so this removes any dead links
     # from /etc/NetworkManager/system-connections/ that may be left over from wlan changes
     # or other testing
     system.activationScripts.dead-wifi-cleanup =
