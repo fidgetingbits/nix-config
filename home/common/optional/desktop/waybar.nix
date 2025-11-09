@@ -61,25 +61,13 @@ in
           "hyprland/workspaces"
         ];
         modules-center = [ "hyprland/window" ];
-        modules-right =
-          if config.hostSpec.isMobile then
-            [
-              #"gamemode"
-              "tray"
-              "pulseaudio"
-              "battery"
-              #"backlight"
-              "clock#time"
-              "clock#date"
-            ]
-          else
-            [
-              #"gamemode"
-              "tray"
-              "pulseaudio"
-              "clock#time"
-              "clock#date"
-            ];
+        modules-right = [
+          "tray"
+          "pulseaudio"
+          "clock#time"
+          "clock#date"
+        ]
+        ++ lib.optional config.hostSpec.isRoaming "battery";
 
         # ========= Modules =========
         #

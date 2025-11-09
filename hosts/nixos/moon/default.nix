@@ -85,6 +85,8 @@
     timeZone = lib.mkForce "America/Edmonton";
   };
 
+  wifi.wlans = [ "moon" ];
+
   system.impermanence.enable = true;
 
   # Bootloader.

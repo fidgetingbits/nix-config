@@ -93,7 +93,7 @@ rec {
     isProduction = lib.mkForce true;
     useAtticCache = lib.mkForce true;
     isDevelopment = lib.mkForce true;
-    isMobile = lib.mkForce true;
+    isRoaming = lib.mkForce true;
     users = lib.mkForce [
       "aa"
       #"media"

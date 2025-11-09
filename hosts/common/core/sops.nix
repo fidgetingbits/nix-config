@@ -8,21 +8,6 @@
 }:
 let
   sopsFolder = (builtins.toString inputs.nix-secrets) + "/sops";
-
-  wifiNames = (inputs.nix-secrets.networking.wifiNetworks);
-  wifiEntries = lib.optionalAttrs config.hostSpec.wifi (
-    lib.attrsets.mergeAttrsList (
-      lib.lists.map (name: {
-        "wifi/${name}" = {
-          sopsFile = "${sopsFolder}/wifi.yaml";
-          owner = "root";
-          group = "root";
-          mode = "0600";
-          path = "/etc/NetworkManager/system-connections/${name}.nmconnection";
-        };
-      }) wifiNames
-    )
-  );
 in
 {
   sops = {
@@ -43,8 +28,8 @@ in
   # the age key.
   sops.secrets =
     let
-      linuxEntries =
-        (lib.mergeAttrsList (
+      linuxEntries = (
+        lib.mergeAttrsList (
           map (user: {
             # FIXME: This might end up not being linux-specific depending on nix-darwin sops PR
             "passwords/${user}" = {
@@ -52,8 +37,8 @@ in
               neededForUsers = true;
             };
           }) config.hostSpec.users
-        ))
-        // wifiEntries;
+        )
+      );
     in
     lib.mkMerge [
       {
