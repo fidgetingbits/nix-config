@@ -130,6 +130,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nix-sweep = {
+      url = "github:jzbor/nix-sweep/v0.7.0";
+      # inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Allows most third-party vscode extensions
     nix-vscode-extensions = {
       url = "github:nix-community/nix-vscode-extensions";

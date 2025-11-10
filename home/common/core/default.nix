@@ -97,8 +97,11 @@
 
           findutils # find
           file # file type analysis
-          nix-tree # show nix store contents
           openssh
+
+          # nix utlities
+          nix-tree # show nix store contents
+          #nix-sweep # tool for generation garbage collection root analysis
 
           libnotify # for notify-send
 

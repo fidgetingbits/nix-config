@@ -17,6 +17,7 @@ let
         #neovim = inputs.nixvim-flake.packages.${final.system}.default;
         neovim = inputs.nixcats-flake.packages.${final.system}.default;
         nixcats = inputs.nixcats-flake.packages.${final.system}.default;
+        nix-sweep = inputs.nix-sweep.packages.${prev.system}.default;
       };
 
     linuxModifications =
