@@ -113,7 +113,7 @@
         isRoaming = lib.mkOption {
           type = lib.types.bool;
           default = false;
-          description = "Used to indicate a wireless roaming host";
+          description = "Used to indicate a roaming host for wireless, battery use, etc";
         };
         isRemote = lib.mkOption {
           type = lib.types.bool;

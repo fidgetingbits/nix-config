@@ -37,12 +37,15 @@ let
   getWLAN = f: lib.elemAt (lib.splitString "." f) 1;
   isWLANUsed = f: lib.elem (getWLAN f) cfg.wlans;
 
-  # Return a list of all WLAN secret files applicable to the system
-  wifiSecretFiles =
+  allWLANFiles =
     builtins.readDir sopsFolder
     |> lib.attrNames
-    |> lib.filter (name: builtins.match "wifi\..*\.yaml" name != null)
-    |> lib.filter (name: config.hostSpec.isRoaming || (isWLANUsed name));
+    |> lib.filter (name: builtins.match "wifi\..*\.yaml" name != null);
+
+  allWLANs = allWLANFiles |> map (file: getWLAN file);
+
+  # Return a list of all WLAN secret files applicable to the system
+  filteredWLANFiles = allWLANFiles |> lib.filter (name: cfg.roaming || (isWLANUsed name));
 
   # Create the nmconnection entry used by NetworkManager
   connectionEntry = wlan: name: {
@@ -57,7 +60,7 @@ let
 
   # Generate NetworkManager nmconnection files for all applicable WLANs
   genWifiConnections =
-    wifiSecretFiles
+    filteredWLANFiles
     |> map (
       file:
       readAPNames file
@@ -71,6 +74,13 @@ in
 {
   options = {
     wifi = {
+      enable = lib.mkEnableOption (lib.mdDoc ''Wireless LAN Management'');
+      roaming = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        example = true;
+        description = "Indicates a host that moves between locations and should get all wifi networks configured. Using config.wifi.wlans is not required if this value is true.";
+      };
       wlans = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [ ];
@@ -81,7 +91,7 @@ in
         description = ''
           The set of WLANs the system will have configured for NetworkManager use.
 
-          Set 'config.hostSpec.isRoaming = true;' to use all.
+          Set 'config.wifi.roaming = true;' to use all.
 
           An age key will need to be configured for every WLAN's wifi.*.yaml secret file in nix-secrets.'';
       };
@@ -94,7 +104,7 @@ in
     };
   };
 
-  config = lib.mkIf config.hostSpec.wifi {
+  config = lib.mkIf cfg.enable {
     sops.secrets = genWifiConnections;
 
     # sops-nix won't clean up old nmconnection files, so this removes any dead links
@@ -135,6 +145,12 @@ in
                       ;;
               esac
             '';
+      }
+    ];
+    assertions = [
+      {
+        assertion = (cfg.roaming || lib.length cfg.wlans != 0);
+        message = "config.wifi.roaming must be true or config.wifi.wlans should be set to one of:\n  ${toString allWLANs}";
       }
     ];
   };

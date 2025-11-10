@@ -86,7 +86,6 @@ rec {
     useWayland = lib.mkForce true;
     useWindowManager = lib.mkForce true;
     isAutoStyled = lib.mkForce true;
-    wifi = lib.mkForce true;
     useNeovimTerminal = lib.mkForce true;
     hdr = lib.mkForce true;
     scaling = lib.mkForce "2";
@@ -102,6 +101,11 @@ rec {
     defaultDesktop = "hyprland-uwsm";
     persistFolder = lib.mkForce "";
     timeZone = lib.mkForce "America/Edmonton";
+  };
+
+  wifi = {
+    enable = true;
+    roaming = config.hostSpec.isRoaming;
   };
 
   mail-delivery = {

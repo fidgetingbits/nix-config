@@ -71,9 +71,6 @@
     useNeovimTerminal = lib.mkForce true;
     useAtticCache = lib.mkForce false;
 
-    # Networking
-    wifi = lib.mkForce true;
-
     # Graphical
     defaultDesktop = "gnome";
     useWayland = lib.mkForce true;
@@ -85,7 +82,10 @@
     timeZone = lib.mkForce "America/Edmonton";
   };
 
-  wifi.wlans = [ "moon" ];
+  wifi = {
+    enable = true;
+    wlans = [ "moon" ];
+  };
 
   system.impermanence.enable = true;
 
