@@ -260,6 +260,8 @@ pin:
     # Set the new root to prevent garbage collection
     PINNED_ROOT=/nix/var/nix/gcroots/pinned-$(hostname)
     sudo nix-store --add-root $PINNED_ROOT -r /nix/var/nix/profiles/system >/dev/null
+    git add $PINNED
+    git commit -m "chore: pin boot entry for generation $CURRENT"
     echo "Pinned generation $CURRENT to $PINNED_ROOT"
 
 # Copy all the config files to the remote host
