@@ -201,7 +201,7 @@ in
 
           # FIXME: These unlock entries could be reduced with a builder function
           "myth-unlock" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            host = "myth";
+            host = "myth-unlock";
             hostname = "myth.${config.hostSpec.domain}";
             user = "root";
             port = config.hostSpec.networking.ports.tcp.ssh;
@@ -212,8 +212,8 @@ in
           };
 
           "moth-unlock" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            host = "moath";
-            hostname = "myth.${config.hostSpec.domain}";
+            host = "moth-unlock";
+            hostname = "moth.${config.hostSpec.domain}";
             user = "root";
             port = config.hostSpec.networking.ports.tcp.ssh;
             extraOptions = {
