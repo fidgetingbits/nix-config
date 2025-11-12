@@ -12,7 +12,7 @@
       };
 
       # Explicit IP to avoid conflict with systemd-resolve. Note explicit IP requires
-      # the network to actually be up, so need network-online.target. See later.
+      # the network to actually be up, so need network-online.target
       ports =
         let
           ip = config.hostSpec.networking.subnets.moon.hosts.moon.ip;
@@ -50,6 +50,7 @@
             "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"
           ];
         };
+        clientGroupsBlock.default = [ "default" ];
       };
     };
   };
