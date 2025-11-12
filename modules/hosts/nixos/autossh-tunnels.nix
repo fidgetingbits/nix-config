@@ -136,6 +136,8 @@ in
       map (name: {
         name = "autossh-${name}";
         value = {
+          wants = [ "network-online.target" ];
+          after = [ "network-online.target" ];
           serviceConfig = {
             Environment = [ "LD_PRELOAD=${pkgs.graphene-hardened-malloc}/lib/libhardened_malloc.so" ];
             CapabilityBoundingSet = lib.mkForce [ "CAP_NET_BIND_SERVICE" ];

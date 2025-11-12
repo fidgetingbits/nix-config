@@ -24,6 +24,14 @@ in
     '';
   };
 
+  systemd.services.ddclient = {
+    wants = [ "network-online.target" ];
+    after = [ "network-online.target" ];
+
+    startLimitIntervalSec = 1;
+    startLimitBurst = 50;
+  };
+
   environment =
     lib.optionalAttrs (config.system ? impermanence && config.system.impermanence.enable)
       {
