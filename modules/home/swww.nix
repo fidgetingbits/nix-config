@@ -73,13 +73,16 @@ in
             }
             trap skip SIGUSR1
 
-            echo "Checking that swww daemon is up"
-            while ! swww query 2>/dev/null; do
-              # Wait for swww daemon to actually start
-              # Avoids: Error: "Socket file not found. Are you sure swww-daemon is running?"
-              sleep 5;
-            done
-            echo "swww daemon is accessible"
+            function wait_swww() {
+              echo "Checking swww daemon is up"
+              while ! swww query 2>/dev/null; do
+                # Handle: 'Error: "Socket file not found. Are you sure swww-daemon is running?"'
+                sleep 1;
+              done
+              echo "swww daemon is accessible"
+            }
+
+            wait_swww
 
             while true; do
               images=($(${ls} -d ${cfg.wallpaperDir}/* | ${shuf}))
@@ -90,6 +93,10 @@ in
                   --transition-type ${cfg.transitionType} \
                   "$img"
                 LAST_IMAGE="$img"
+                if [ $? -ne 0 ]; then
+                  echo "swww went down?"
+                  wait_swww
+                fi
 
                 ${sleep} ${toString cfg.interval}
                 wait $!
