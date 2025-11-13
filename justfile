@@ -263,6 +263,9 @@ pin:
     git add $PINNED
     git commit -m "chore: pin boot entry for generation $CURRENT"
     echo "Pinned generation $CURRENT to $PINNED_ROOT"
+    # Rebuild in order for the newly pinned generation to populate in systemd-boot,
+    echo "Rebuilding host to populate boot entry..." && sleep 2
+    just rebuild
 
 # Copy all the config files to the remote host
 [group("admin")]
