@@ -95,6 +95,9 @@
   # networking.interfaces.wlo1.useDHCP = false;
   # systemd.network.netdevs.wlo1.enable = false;
 
+  # Enable
+  services.remoteLuksUnlock.enable = true;
+
   # FIXME: This coulud be a module now, with an option for the key location
   # Remote early boot LUKS unlock via ssh
   boot.initrd = {
