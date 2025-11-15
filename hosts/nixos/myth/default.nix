@@ -95,7 +95,9 @@
   # networking.interfaces.wlo1.useDHCP = false;
   # systemd.network.netdevs.wlo1.enable = false;
 
-  services.remoteLuksUnlock.enable = true;
+  services.remoteLuksUnlock = {
+    enable = true;
+  };
   services.logind.powerKey = lib.mkForce "reboot";
 
   systemd = {
