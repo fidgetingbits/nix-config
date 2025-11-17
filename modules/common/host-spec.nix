@@ -32,7 +32,13 @@
           description = "The hostname of the host";
         };
         email = lib.mkOption {
-          type = lib.types.attrsOf lib.types.str;
+          type =
+            with lib.types;
+            attrsOf (oneOf [
+              str
+              (listOf str)
+              int
+            ]);
           description = "The email of the user";
         };
         work = lib.mkOption {
