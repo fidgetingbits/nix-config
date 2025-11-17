@@ -18,130 +18,77 @@
 
   inherit hostSpec;
 
-  home.packages =
-    let
-      # FIXME: This should move to packages
-      json5-jq = pkgs.stdenv.mkDerivation {
-        name = "json5-jq";
+  home.packages = builtins.attrValues (
+    {
+      inherit (pkgs)
+        jq5 # json5-capable jq
+        eza # ls replacement
+        zoxide # cd replacement
+        fd # tree-style ls
+        procs # ps replacement
+        duf # df replacement
+        ripgrep # grep replacement
+        du-dust # du replacement
+        p7zip # archive
+        pstree # tree-style ps
+        lsof # list open files
+        tealdeer # smaller man pages
+        eva # cli calculator
+        hexyl # hexdump replacement
+        grc # colorize output
+        # toybox # decode uuencoded files (conflicts with llvm binutils wrapper)
+        fastfetch
+        jq # json
+        gnupg
+        yq-go # yaml
+        dig
 
-        src = pkgs.fetchFromGitHub {
-          owner = "wader";
-          repo = "json5.jq";
-          rev = "ac46e5b58dfcdaa44a260adeb705000f5f5111bd";
-          sha256 = "sha256-xBVnbx7L2fhbKDfHOCU1aakcixhgimFqz/2fscnZx9g=";
-        };
+        findutils # find
+        file # file type analysis
+        openssh
 
-        dontBuild = true;
+        # nix utlities
+        nix-tree # show nix store contents
+        nix-sweep # tool for generation garbage collection root analysis
 
-        installPhase = ''
-          mkdir -p $out/share
-          cp json5.jq $out/share/json5.jq
-        '';
-      };
+        libnotify # for notify-send
 
-      jq5 = pkgs.writeShellScriptBin "jq5" ''
-        # Initialize arrays for options and query parts
-        declare -a JQ_OPTS=()
-        declare -a QUERY_PARTS=()
+        # network utilities
+        iputils # ping, traceroute, etc
 
-        # Collect arguments
-        while [ $# -gt 1 ]; do
-          if [[ $1 == -* ]]; then
-            JQ_OPTS+=("$1")
-          else
-            QUERY_PARTS+=("$1")
-          fi
-          shift
-        done
+        magic-wormhole # Convenient file transfer
 
-        # Last argument is always the file
-        FILE="$1"
+        # FIXME: This likely isn't needed as core, since we can use dev flake for it
+        pre-commit # git hooks
+        ;
 
-        # Join query parts with spaces
-        QUERY="$(printf "%s " "''${QUERY_PARTS[@]}")"
+    }
+    // lib.optionalAttrs (config.hostSpec.isProduction) {
+      inherit (pkgs.llvmPackages)
+        bintools # strings, etc
+        ;
+    }
+    // lib.optionalAttrs (config.hostSpec.isProduction && (!config.hostSpec.isServer)) {
+      inherit (pkgs)
+        ##
+        # Core GUI Utilities
+        ##
+        evince # pdf reader
+        zathura # pdf reader
 
-        if [ ''${#QUERY_PARTS[@]} -eq 0 ]; then
-          # No query case
-          jq -Rs -L "${json5-jq}/share/" "''${JQ_OPTS[@]}" 'include "json5"; fromjson5' "$FILE"
-        else
-          # Query case
-          jq -Rs -L "${json5-jq}/share/" "''${JQ_OPTS[@]}" "include \"json5\"; fromjson5 | $QUERY" "$FILE"
-        fi
-      '';
+        mdcat # Markdown preview in cli
 
-    in
-    [ jq5 ]
-    ++ builtins.attrValues (
-      {
-        inherit (pkgs)
-          eza # ls replacement
-          zoxide # cd replacement
-          fd # tree-style ls
-          procs # ps replacement
-          duf # df replacement
-          ripgrep # grep replacement
-          du-dust # du replacement
-          p7zip # archive
-          pstree # tree-style ps
-          lsof # list open files
-          tealdeer # smaller man pages
-          eva # cli calculator
-          hexyl # hexdump replacement
-          grc # colorize output
-          # toybox # decode uuencoded files (conflicts with llvm binutils wrapper)
-          fastfetch
-          jq # json
-          gnupg
-          yq-go # yaml
-          dig
+        xsel # X clipboard manager
 
-          findutils # find
-          file # file type analysis
-          openssh
-
-          # nix utlities
-          nix-tree # show nix store contents
-          nix-sweep # tool for generation garbage collection root analysis
-
-          libnotify # for notify-send
-
-          # network utilities
-          iputils # ping, traceroute, etc
-
-          magic-wormhole # Convenient file transfer
-
-          # FIXME: This likely isn't needed as core, since we can use dev flake for it
-          pre-commit # git hooks
-          ;
-
-      }
-      // lib.optionalAttrs (config.hostSpec.isProduction) {
-        inherit (pkgs.llvmPackages)
-          bintools # strings, etc
-          ;
-      }
-      // lib.optionalAttrs (config.hostSpec.isProduction && (!config.hostSpec.isServer)) {
-        inherit (pkgs)
-          ##
-          # Core GUI Utilities
-          ##
-          evince # pdf reader
-          zathura # pdf reader
-
-          mdcat # Markdown preview in cli
-
-          xsel # X clipboard manager
-
-          ;
-        inherit (pkgs.unstable)
-          ##
-          # Core GUI Utilities
-          ##
-          obsidian # note taking
-          ;
-      }
-
-    );
+        ;
+      inherit (pkgs.unstable)
+        ##
+        # Core GUI Utilities
+        ##
+        obsidian # note taking
+        ;
+    }
+  );
 
   programs.bash.enable = true;
   programs.home-manager.enable = true;
