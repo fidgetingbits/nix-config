@@ -3,36 +3,37 @@
   # cli tools that we want everywhere, not managed by home-manager
   environment.systemPackages = builtins.attrValues {
     inherit (pkgs)
-      fzf # Fuzzy search
-      zoxide # Smarter cd
-      tree # cli directory listing
+      fzf # fuzzy search
+      zoxide # smarter cd
+      tree # tree-based directory listing
       ripgrep # better grep
-      findutils # find, xargs, locate, etc
-      eza # better cat
+      findutils # find, xargs, etc
+      eza # better ls
       htop # better top
       cyme # better lsusb
-      pciutils
-      usbutils
-      tokei
-      curl
-      wget
+      pciutils # lspci
+      usbutils # lsusb
+      tokei # code lines summary
+      curl # cli http utility
+      wget # cli http utility
       jq # json query tool
       jtbl # json table output
       mailutils
-      direnv
+      direnv # develoment environment utility
       mlocate # locate
 
+      nix-output-monitor # better nix output
+
       # compression
-      nix-output-monitor
       p7zip
       zip
       unzip
       unrar
+
       # security
       checksec
       ;
     inherit (pkgs.unstable)
-      # cli tools
       bat # better cat
       ;
   };
