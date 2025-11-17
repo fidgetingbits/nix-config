@@ -75,7 +75,7 @@
   # Bootloader
   boot.loader.systemd-boot = {
     enable = true;
-    configurationLimit = lib.mkDefault 10;
+    configurationLimit = lib.mkDefault 8; # NOTE: 10 ran out of disk space
     consoleMode = "1";
   };
   boot.loader.efi.canTouchEfiVariables = true;
@@ -97,6 +97,10 @@
 
   services.remoteLuksUnlock = {
     enable = true;
+    notify = {
+      enable = true; # Off until we can set it up correctly on moth
+      to = config.hostSpec.email.mythAdmins;
+    };
   };
   services.logind.powerKey = lib.mkForce "reboot";
 

@@ -1,3 +1,5 @@
+# https://github.com/jasonodoom/nixos-configs/blob/a4512bd282baef497802e91777b908cc1124f4a2/framework-desktop/modules/security/luks.nix#L36
+# Does that config imply you can maybe yubikey unlock the disk over ssh? Should test
 {
   config,
   lib,
@@ -107,7 +109,7 @@ in
           Subject: [${host}: boot] LUKS Unlock Ready
           To: ${recipients}
 
-          ${host} is booted and ssh for LUKS unlock is ready.
+          ${host} is booted and ssh for LUKS unlock is ready
           EOF
         '';
       in
@@ -115,8 +117,8 @@ in
         luks.forceLuksSupportInInitrd = true;
         # Setup the host key as a secret in initrd, so it's not exposed in the /nix/store
         # this is all too earlier for sops
-        secrets =
-          lib.mkForce {
+        secrets = lib.mkForce (
+          {
             "/etc/secrets/initrd/ssh_host_ed25519_key" = cfg.ssh.key;
           }
           // lib.optionalAttrs cfg.notify.enable {
@@ -136,7 +138,8 @@ in
               tls_certcheck off
               user ${cfg.notify.user}
             '';
-          };
+          }
+        );
         network = {
           enable = true;
           ssh = {
@@ -167,11 +170,19 @@ in
 
               services.luks-ready-notify = {
                 description = "Email notification when LUKS unlock via SSH is ready";
+                unitConfig.DefaultDependencies = false;
                 after = [
-                  "initrd-network.target"
-                  "initrd-sshd.service"
+                  "network-online.target"
+                  "initrd-nixos-copy-secrets.service"
                 ];
-                wantedBy = [ "initrd.target" ];
+                before = [
+                  "sshd.service"
+                ];
+                wants = [
+                  "network-online.target"
+                  "initrd-nixos-copy-secrets.service"
+                ];
+                wantedBy = [ "sshd.service" ];
 
                 serviceConfig = {
                   Type = "oneshot";
