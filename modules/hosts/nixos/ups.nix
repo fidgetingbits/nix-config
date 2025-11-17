@@ -37,11 +37,14 @@ let
       pkgs.msmtp
     ];
     text =
+      let
+        recipients = lib.concatStringsSep ", " cfg.notify.to;
+      in
       # bash
       ''
         exec msmtp -t <<EOF
-        To: ${config.hostSpec.email.admin}
-        From: ${config.hostSpec.email.notifier}
+        To: ${recipients}
+        From: ${cfg.notify.from}
         Subject: $HOSTNAME UPS status: $*
 
         $HOSTNAME UPS status: $*
@@ -90,7 +93,11 @@ in
         example = "nut";
         description = "Username for accessing the NUT server";
       };
-
+      sopsFile = lib.mkOption {
+        type = lib.types.path;
+        default = config.sops.defaultSopsFile;
+        description = "SOPS yaml file containing the password for the NUT server";
+      };
       powerDownTimeOut = lib.mkOption {
         type = lib.types.int;
         default = 120; # 2 minutes
@@ -128,6 +135,26 @@ in
           description = "Enables the NUT client logic. Automatically set to true for NUT servers.";
         };
       };
+      notify = lib.mkOption {
+        type = lib.types.submodule {
+          options = {
+            to = lib.mkOption {
+              type = lib.types.listOf lib.types.str;
+              default = [ config.hostSpec.email.admin ];
+              example = [ "admin@example.com" ];
+              description = "List of emails to send UPS notifications to";
+            };
+            from = lib.mkOption {
+              type = lib.types.str;
+              default = config.hostSpec.email.notifier;
+              example = "notifications@example.com";
+              description = "Email address to send UPS notifications from";
+            };
+          };
+
+        };
+        default = { };
+      };
     };
   };
 
@@ -156,6 +183,7 @@ in
       };
     };
 
+    # modules/hosts/nixos/mail-delivery module
     mail-delivery.users = [
       config.hostSpec.primaryUsername
       config.power.ups.upsmon.user
@@ -166,6 +194,7 @@ in
         owner = config.power.ups.upsmon.user;
         group = config.power.ups.upsmon.group;
         mode = "0600";
+        sopsFile = cfg.sopsFile;
       };
     };
 
@@ -268,7 +297,7 @@ in
         listen = [
           {
             address = "0.0.0.0";
-            port = config.hostSpec.networking.ports.tcp.nut;
+            port = cfg.port;
           }
         ];
       };
