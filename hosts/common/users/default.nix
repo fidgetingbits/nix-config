@@ -24,6 +24,7 @@ let
 
   platform = if isDarwin then "darwin" else "nixos";
   hostSpec = config.hostSpec;
+  monitors = config.monitors;
 in
 {
   # No matter what environment we are in we want these tools for root, and the user(s)
@@ -99,7 +100,6 @@ in
     rec {
       extraSpecialArgs = {
         inherit pkgs inputs;
-        hostSpec = config.hostSpec;
       };
       # FIXME: Common for all users (will include root too!)
       # sharedModules = map (module: (import module)) (
@@ -108,6 +108,7 @@ in
       #     (if isDarwin then "home/common/core/darwin.nix" else "home/common/core/nixos.nix")
       #   ])
       # );
+
       # Add all non-root users to home-manager
       users =
         (lib.mergeAttrsList (
@@ -124,6 +125,7 @@ in
               (
                 { ... }:
                 {
+                  inherit hostSpec monitors; # Bring nixos option values into hm copy
                   home = {
                     stateVersion = "23.05";
                     homeDirectory = if isDarwin then "/Users/${user}" else "/home/${user}";
