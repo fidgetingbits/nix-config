@@ -34,9 +34,9 @@
 
   # FIXME(firefox): Add extensions
   programs.firefox = {
-    policies = {
-      DisableFirefoxAccounts = lib.mkForce true;
-    };
+    # policies = {
+    #   DisableFirefoxAccounts = lib.mkForce true;
+    # };
     profiles.default = {
       settings = {
         # "signon.rememberSignons" = lib.mkForce "false";
