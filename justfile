@@ -289,3 +289,17 @@ turn-off-raid-resync:
     ssh aa@myth "sudo /bin/sh -c 'echo frozen > /sys/block/md127/md/sync_action; \
         echo none > /sys/block/md127/md/resync_start; \
         echo idle > /sys/block/md127/md/sync_action'"
+
+[group("admin")]
+facter HOST:
+    #!/usr/bin/env bash
+    ssh {{ HOST }} "sudo /bin/sh -c 'nix run --option experimental-features \"nix-command flakes\" nixpkgs#nixos-facter -- -o facter.json' && sudo chmod 644 facter.json" && \
+    scp {{ HOST }}:/home/$USER/facter.json hosts/nixos/{{ HOST }}/ && \
+    chown $USER:$(id -g) hosts/nixos/{{ HOST }}/facter.json
+    if ! grep facter .gitattributes | grep -q crypt; then
+        echo "WARNING: You are potenttially exposing your facter.json file publicly. Add a git-crypt entry to .gitattributes"
+        exit 0
+    else
+        echo "Added and generated hosts/nixos/{{ HOST }}/facter.json"
+        git add hosts/nixos/{{ HOST }}/facter.json
+    fi
