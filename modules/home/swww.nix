@@ -55,55 +55,57 @@ in
         PartOf = [ "swww.service" ];
       };
 
-      Service = {
-        Type = "simple";
-        Restart = "always";
-        RestartSec = 1;
-        ExecStart =
-          let
-            shuf = lib.getExe' pkgs.coreutils "shuf";
-            ls = lib.getExe' pkgs.coreutils "ls";
-            sleep = lib.getExe' pkgs.coreutils "sleep";
-          in
-          pkgs.writeShellScript "swww-cycle" ''
-            LAST_IMAGE=""
-            function skip() {
-              echo "Skipped $LAST_IMAGE"
-              return
-            }
-            trap skip SIGUSR1
+      Service =
+        let
+          swww-cycle = pkgs.writeShellApplication {
+            name = "swww-cycle";
+            runtimeInputs = builtins.attrValues { inherit (pkgs) coreutils; };
+            text = ''
+              LAST_IMAGE=""
+              function skip() {
+                echo "Skipped $LAST_IMAGE"
+                return
+              }
+              trap skip SIGUSR1
 
-            function wait_swww() {
-              echo "Checking swww daemon is up"
-              while ! swww query 2>/dev/null; do
-                # Handle: 'Error: "Socket file not found. Are you sure swww-daemon is running?"'
-                sleep 1;
+              function wait_swww() {
+                echo "Checking swww daemon is up"
+                while ! swww query 2>/dev/null; do
+                  # Handle: 'Error: "Socket file not found. Are you sure swww-daemon is running?"'
+                  sleep 1;
+                done
+                echo "swww daemon is accessible"
+              }
+
+              wait_swww
+
+              while true; do
+                mapfile -t images < <(find ${cfg.wallpaperDir}/ -maxdepth 1 | shuf)
+                for img in "''${images[@]}"; do
+                  LAST_IMAGE="$img"
+                  if ! ${pkgs.swww}/bin/swww img \
+                    --transition-fps ${toString cfg.transitionFPS} \
+                    --transition-step ${toString cfg.transitionStep} \
+                    --transition-type ${cfg.transitionType} \
+                    "$img";
+                  then
+                    echo "swww went down?"
+                    wait_swww
+                  fi
+
+                  sleep ${toString cfg.interval}
+                  wait $!
+                done
               done
-              echo "swww daemon is accessible"
-            }
-
-            wait_swww
-
-            while true; do
-              images=($(${ls} -d ${cfg.wallpaperDir}/* | ${shuf}))
-              for img in "''${images[@]}"; do
-                ${pkgs.swww}/bin/swww img \
-                  --transition-fps ${toString cfg.transitionFPS} \
-                  --transition-step ${toString cfg.transitionStep} \
-                  --transition-type ${cfg.transitionType} \
-                  "$img"
-                LAST_IMAGE="$img"
-                if [ $? -ne 0 ]; then
-                  echo "swww went down?"
-                  wait_swww
-                fi
-
-                ${sleep} ${toString cfg.interval}
-                wait $!
-              done
-            done
-          '';
-      };
+            '';
+          };
+        in
+        {
+          Type = "simple";
+          Restart = "always";
+          RestartSec = 1;
+          ExecStart = lib.getExe' swww-cycle "swww-cycle";
+        };
 
       Install = {
         WantedBy = [ "default.target" ];
