@@ -290,6 +290,7 @@ turn-off-raid-resync:
         echo none > /sys/block/md127/md/resync_start; \
         echo idle > /sys/block/md127/md/sync_action'"
 
+# Generate remote facter.json and add it to the repo. Mostly for migrating hosts. Use nixos-bootstrap.sh otherwise
 [group("admin")]
 facter HOST:
     #!/usr/bin/env bash
