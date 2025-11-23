@@ -6,7 +6,7 @@
   ...
 }:
 let
-  attic = pkgs.attic-client;
+  # attic = pkgs.attic-client;
   attic_token = config.sops.secrets."tokens/attic-client".path;
   attic_server = "https://atticd.ooze.${config.hostSpec.domain}";
   sopsFolder = (builtins.toString inputs.nix-secrets) + "/sops";
@@ -60,7 +60,7 @@ in
                     TMPDIR=$(mktemp -d)
             cat >"$TMPDIR"/expiry.txt <<-EOF
           From:box@${config.hostSpec.domain}
-          Subject: [${config.networking.hostName}] $(date) Attic Token Expiry Notice
+          Subject: [${config.networking.hostName}: attic] $(date) Attic Token Expiry Notice
           The attic token for ${config.attic-client.cache-name} is expiring soon.
             $2
           EOF
@@ -84,21 +84,22 @@ in
       };
     };
 
-    systemd.services.attic-watch-store = {
-      description = "Attic client watch-store service";
-      after = [ "network.target" ];
-      wantedBy = [ "default.target" ];
-      serviceConfig = {
-        ExecStart = "${pkgs.writeShellScript "watch-store" ''
-          #!/run/current-system/sw/bin/bash
-          ATTIC_TOKEN=$(cat ${attic_token})
-          ${attic}/bin/attic login ${config.attic-client.cache-name} ${attic_server} $ATTIC_TOKEN
-          ${attic}/bin/attic watch-store ${config.attic-client.cache-name}
-        ''}";
-        Restart = "on-failure";
-        RestartSec = "5s";
-      };
-    };
+    # FIXME: Disable for now due to some bug on oedo
+    # systemd.services.attic-watch-store = {
+    #   description = "Attic client watch-store service";
+    #   after = [ "network.target" ];
+    #   wantedBy = [ "default.target" ];
+    #   serviceConfig = {
+    #     ExecStart = "${pkgs.writeShellScript "watch-store" ''
+    #       #!/run/current-system/sw/bin/bash
+    #       ATTIC_TOKEN=$(cat ${attic_token})
+    #       ${attic}/bin/attic login ${config.attic-client.cache-name} ${attic_server} $ATTIC_TOKEN
+    #       ${attic}/bin/attic watch-store ${config.attic-client.cache-name}
+    #     ''}";
+    #     Restart = "on-failure";
+    #     RestartSec = "5s";
+    #   };
+    # };
 
     services.per-network-services.trustedNetworkServices = [ "attic-watch-store" ];
 
