@@ -3,6 +3,7 @@
   inputs,
   lib,
   config,
+  pkgs,
   ...
 }:
 {
@@ -69,7 +70,7 @@
 
   hostSpec = {
     hostName = "oedo";
-    isWork = lib.mkForce true;
+    isWork = lib.mkForce false;
     voiceCoding = lib.mkForce false;
     useYubikey = lib.mkForce true;
     wifi = lib.mkForce true;
@@ -90,13 +91,16 @@
   # Bootloader.
   boot.loader.systemd-boot = {
     enable = true;
-    # When using plymouth, initrd can expand by a lot each time, so limit how many we keep around
-    configurationLimit = lib.mkDefault 10;
+    configurationLimit = lib.mkDefault 8;
   };
   boot.loader.efi.canTouchEfiVariables = true;
   boot.supportedFilesystems = [ "ntfs" ];
   boot.initrd.systemd.enable = true;
 
+  boot.kernelParams = [
+    # "pci=realloc" # Try to prevent framebuffer from using the ethernet pci address
+    # "video=efifb:off"
+  ];
   # FIXME: This should move to somewhere generic
   systemd.tmpfiles.rules = [
     "d    /home/${config.hostSpec.username}/mount    0700    ${config.hostSpec.username}    users    -    -"
@@ -110,7 +114,8 @@
     };
   };
 
-  # networking.useDHCP = lib.mkDefault true;
+  networking.useDHCP = lib.mkDefault true;
+
   # FIXME(network): Ideally this should be done using the networking.interfaces approach, but doesn't seem to work...
   # In the interfaces change due to me using usb dongles, we should explicitly test if they interface being used is
   # assign to an IP address that we expect to be the one we want their route for
@@ -189,10 +194,10 @@
   #systemd.services.NetworkManager-wait-online.enable = false;
   #systemd.services.systemd-networkd-wait-online.enable = false;
 
-  boot.initrd.kernelModules = [
-    "amdgpu"
+  boot.initrd.availableKernelModules = [
     "ixgbe" # Not auto-loaded by facter for some reason
   ];
+
   systemd.network.wait-online.enable = false;
 
   services.gnome.gnome-keyring.enable = true;
@@ -207,6 +212,11 @@
   };
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+
+  services.fwupd.enable = true;
+  environment.systemPackages = [
+    pkgs.unstable.lshw
+  ];
 
   system.stateVersion = "23.05";
 }

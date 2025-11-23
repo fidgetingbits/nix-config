@@ -63,10 +63,10 @@
       ;
   };
 
-  talon = {
-    enable = true;
-    autostart = lib.mkForce true;
-  };
+  # talon = {
+  #   enable = true;
+  #   autostart = lib.mkForce true;
+  # };
 
   services.snixembed.enable = config.hostSpec.voiceCoding;
 
