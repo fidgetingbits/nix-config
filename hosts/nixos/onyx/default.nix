@@ -95,12 +95,10 @@ rec {
     isRoaming = lib.mkForce true;
     users = lib.mkForce [
       "aa"
-      #"media"
     ];
     wallpaper = "${inputs.nix-assets}/images/wallpapers/astronaut.webp";
     defaultDesktop = "hyprland-uwsm";
     persistFolder = lib.mkForce "";
-    timeZone = lib.mkForce "America/Edmonton";
   };
 
   wifi = {
