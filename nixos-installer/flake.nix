@@ -49,7 +49,7 @@
               }
 
               # Disk definitions for this host
-              ../hosts/nixos/${ops.name}/disks.nix
+              ../hosts/nixos/${opts.name}/disks.nix
 
               ./minimal-configuration.nix
               {
@@ -90,11 +90,11 @@
         # physical machines
         oedo = newConfig {
           name = "oedo";
-          disk = "/dev/nvme0n1";
           swapSize = 64;
           impermanence = true;
           luks = true;
-          facter = false;
+          facter = true;
+          diskConfig = import ../hosts/nixos/oedo/disks.nix;
         };
         ooze = newConfig {
           name = "ooze";
@@ -104,6 +104,7 @@
           luks = true;
           facter = false;
         };
+
         oppo = newConfig {
           name = "oppo";
           disk = "/dev/nvme0n1";
@@ -140,7 +141,6 @@
 
         myth = newConfig {
           name = "myth";
-          diskFile = ../hosts/nixos/myth/disko.nix;
           impermanence = true;
           facter = true;
           user = "admin";
@@ -152,10 +152,18 @@
           user = "aa";
           impermanence = true;
           facter = true;
-          diskFile = ../hosts/common/optional/disks.nix;
           diskConfig = import ../hosts/nixos/moth/disks.nix;
         };
 
+        # virtual machines
+
+        maze = newConfig {
+          name = "maze";
+          impermanence = true;
+          facter = true;
+          user = "aa";
+          diskConfig = import ../hosts/nixos/maze/disks.nix;
+        };
       };
     };
 }

@@ -17,7 +17,7 @@
 
           "ssh"
           "audio-tools.nix"
-          "vscode"
+          # "vscode"
           "xdg.nix"
           "helper-scripts"
           "development"
@@ -37,7 +37,7 @@
 
           "chat.nix"
           "work.nix"
-          "gnome"
+          "desktop/gnome"
 
           "reversing"
 
