@@ -242,7 +242,7 @@ in
           TMPDIR=$(mktemp -d)
           cat >"$TMPDIR"/backup-mail.txt <<-EOF
         From:${cfg.borgNotifyFrom}
-        Subject: [${config.networking.hostName}] $(date) $SUBJECT"
+        Subject: [${config.networking.hostName}: backup] $(date) $SUBJECT"
 
         $(cat "$LOGFILE")
         EOF

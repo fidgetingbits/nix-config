@@ -18,7 +18,7 @@ let
       TMPDIR=$(mktemp -d)
       cat >"$TMPDIR"/heartbeat.txt <<-EOF
     From:box@${config.hostSpec.domain}
-    Subject: [${config.networking.hostName}] $(date) $host Heartbeat Notice
+    Subject: [${config.networking.hostName}: heartbeat] $(date) $host Heartbeat Notice
       $2
     EOF
       ${lib.getBin pkgs.msmtp}/bin/msmtp -t admin@${config.hostSpec.domain} <"$TMPDIR"/heartbeat.txt
