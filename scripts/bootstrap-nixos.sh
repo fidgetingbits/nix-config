@@ -175,6 +175,7 @@ function nixos_anywhere() {
     if no_or_yes "Generate a new hardware config for this host? Yes if your nix config doesn't have an entry for this host"; then
 
         if yes_or_no "Use nixos-facter to generate the hardware profile?"; then
+            # FIXME: This could be a helper that the justfile uses too, but lots of args to pass..
             $ssh_root_cmd 'nix --extra-experimental-features "flakes nix-command" run github:nix-community/nixos-facter > facter.json'
             $scp_cmd root@"$target_destination":facter.json "${git_root}"/hosts/nixos/"$target_hostname"/facter.json
             git add "${git_root}"/hosts/nixos/"$target_hostname"/facter.json
