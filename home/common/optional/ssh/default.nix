@@ -32,11 +32,13 @@ let
     "moth-unlock"
     "myth-backup"
     "ooze-unlock"
+    "oedo-unlock"
     "oath_gitlab" # FIXME(ssh): Would be nice to do per-port match on this, but HM doesn't support
     "okra"
     config.hostSpec.networking.subnets.ogre.wildcard
   ]
   ++ inputs.nix-secrets.networking.ssh.yubikeyHosts;
+
   # Add domain to each host name
   genDomains = lib.map (h: "${h}.${config.hostSpec.domain}");
   yubikeyHostAll =
@@ -51,11 +53,11 @@ let
     forwardAgentHosts ++ (genDomains forwardAgentHosts)
   );
 
-  # FIXME: Not sure how I want to do this, but for now using "super
-  #yubikeyPath = "hosts/common/users/${config.hostSpec.primaryUsername}/keys/yubikeys";
+  # Super keys are yubikeys that have access to every host
   yubikeyPath = "hosts/common/users/super/keys";
 
-  # There is a list of yubikey pubkeys in keys/yubikey. Build a list of corresponding private key files in .ssh
+  # There is a list of yubikey pubkeys in keys/yubikey. Build a list of
+  # corresponding private key files in .ssh
   yubikeys =
     lib.lists.forEach
       (builtins.attrNames (builtins.readDir (lib.custom.relativeToRoot "${yubikeyPath}/")))
@@ -96,15 +98,16 @@ let
   # should modify this to pass the port for each host, and then we can reduce a lot
   # of noise. We could probably also just use a flag for yubikey and copy a bunch of them.
   # If we do that we should just use options and modularize more of it
-  vanillaHostsConfig = lib.attrsets.mergeAttrsList (
-    lib.lists.map (host: {
+  vanillaHostsConfig =
+    vanillaHosts
+    |> lib.lists.map (host: {
       "${host}" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
         match = "host ${host},${host}.${config.hostSpec.domain}";
         hostname = "${host}.${config.hostSpec.domain}";
         port = config.hostSpec.networking.ports.tcp.ssh;
       };
-    }) vanillaHosts
-  );
+    })
+    |> lib.attrsets.mergeAttrsList;
 in
 {
   programs.ssh =
@@ -126,6 +129,7 @@ in
 
       # Bring in decrypted config
       extraConfig = ''
+        SetEnv TERM=xterm-256color
         UpdateHostKeys ask
         ${workConfig}
       '';
@@ -200,6 +204,17 @@ in
           };
 
           # FIXME: These unlock entries could be reduced with a builder function
+          "oedo-unlock" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
+            host = "oedo-unlock";
+            hostname = "oedo.${config.hostSpec.domain}";
+            user = "root";
+            port = config.hostSpec.networking.ports.tcp.ssh;
+            extraOptions = {
+              UserKnownHostsFile = "/dev/null";
+              StrictHostKeyChecking = "no";
+            };
+          };
+
           "myth-unlock" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
             host = "myth-unlock";
             hostname = "myth.${config.hostSpec.domain}";
