@@ -46,34 +46,33 @@ in
     # Linux: Exists in $XDG_RUNTIME_DIR/id_dade
     # Darwin: Exists in $(getconf DARWIN_USER_TEMP_DIR)
     #   ex: /var/folders/pp/t8_sr4ln0qv5879cp3trt1b00000gn/T/id_dade
-    secrets =
-      {
-        "keys/git-crypt" = {
-          sopsFile = "${sopsFolder}/shared.yaml";
-        };
+    secrets = {
+      "keys/git-crypt" = {
+        sopsFile = "${sopsFolder}/shared.yaml";
+      };
 
-        "passwords/netrc" = {
-          sopsFile = "${sopsFolder}/shared.yaml";
-        };
-        # formatted as extra-access-tokens = github.com=<PAT token>
-        "tokens/nix-access-tokens" = {
-          sopsFile = "${sopsFolder}/shared.yaml";
-        };
-      }
-      // lib.optionalAttrs config.hostSpec.isDevelopment {
-        "tokens/openai" = {
-          sopsFile = "${sopsFolder}/shared.yaml";
-          path = "${homeDirectory}/.config/openai/token";
-        };
-      }
-      // lib.optionalAttrs config.hostSpec.isWork {
-        # FIXME(secrets): Need an activation script to build a config.yml using multiple files (ie: work and personal)
-        "config/glab" = {
-          sopsFile = "${sopsFolder}/development.yaml";
-          path = "${homeDirectory}/.config/glab/config.yml";
-        };
-      }
-      // yubikeySecrets
-      // workSopsSecrets;
+      "passwords/netrc" = {
+        sopsFile = "${sopsFolder}/shared.yaml";
+      };
+      # formatted as extra-access-tokens = github.com=<PAT token>
+      "tokens/nix-access-tokens" = {
+        sopsFile = "${sopsFolder}/shared.yaml";
+      };
+    }
+    # // lib.optionalAttrs config.hostSpec.isDevelopment {
+    #   "tokens/openai" = {
+    #     sopsFile = "${sopsFolder}/shared.yaml";
+    #     path = "${homeDirectory}/.config/openai/token";
+    #   };
+    # }
+    // lib.optionalAttrs config.hostSpec.isWork {
+      # FIXME(secrets): Need an activation script to build a config.yml using multiple files (ie: work and personal)
+      "config/glab" = {
+        sopsFile = "${sopsFolder}/development.yaml";
+        path = "${homeDirectory}/.config/glab/config.yml";
+      };
+    }
+    // yubikeySecrets
+    // workSopsSecrets;
   };
 }
