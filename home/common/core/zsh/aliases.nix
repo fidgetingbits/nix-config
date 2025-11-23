@@ -182,6 +182,7 @@ in
 
   # ssh
   sshnc = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o GlobalKnownHostsFile=/dev/null"; # sshnc = ssh no checks
+  scpnc = "scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o GlobalKnownHostsFile=/dev/null"; # scpnc = scp no checks
   # Helper if haven't set up explicit host entry
   ssh-unlock = "ssh -i~/.ssh/id_yubikey -oUserKnownHostsFile=/dev/null -oGlobalKnownHostsFile=/dev/null -oport=10022 -lroot";
 
