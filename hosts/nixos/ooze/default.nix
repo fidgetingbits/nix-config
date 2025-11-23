@@ -5,9 +5,10 @@
 }:
 {
   imports = [
-    #inputs.nixos-hardware.nixosModules.common-gpu-nvidia-sync
-    ./hardware-configuration.nix
+    inputs.nixos-facter-modules.nixosModules.facter
+    { config.facter.reportPath = ./facter.json; }
 
+    # FIXME: Switch with disks.nix
     # Impermanence
     (lib.custom.relativeToRoot "hosts/common/disks/btrfs-luks-impermanence-disko.nix")
     {
@@ -64,39 +65,26 @@
   # Bootloader.
   boot.loader.systemd-boot = {
     enable = true;
-    # When using plymouth, initrd can expand by a lot each time, so limit how many we keep around
-    configurationLimit = lib.mkDefault 10;
+    configurationLimit = lib.mkDefault 8;
   };
   boot.loader.efi.canTouchEfiVariables = true;
 
   boot.initrd.availableKernelModules = [ "r8169" ];
-  boot.initrd = {
-    systemd = {
-      enable = true;
-      # emergencyAccess = true;
-      users.root.shell = "/bin/systemd-tty-ask-password-agent";
-    };
-    luks.forceLuksSupportInInitrd = true;
-    # Setup the host key as a secret in initrd, so it's not exposed in the /nix/store
-    # this is all too earlier for sops
-    secrets = lib.mkForce { "/etc/secrets/initrd/ssh_host_ed25519_key" = ./initrd_ed25519_key; };
-    network = {
-      enable = true;
-      ssh = {
-        enable = true;
-        port = config.hostSpec.networking.ports.tcp.ssh;
-        authorizedKeys = config.users.users.${config.hostSpec.username}.openssh.authorizedKeys.keys;
-        hostKeys = [ "/etc/secrets/initrd/ssh_host_ed25519_key" ];
-      };
+
+  # Allow remote luks unlock over ssh and email admins when the system is ready
+  # to unlock
+  services.remoteLuksUnlock = {
+    enable = true;
+    notify = {
+      enable = true; # Off until we can set it up correctly on moth
+      to = config.hostSpec.email.olanAdmins;
     };
   };
 
   # Override this because we do remote builds
-  # FIXME: Double chec this is actually needed anymore
+  # FIXME: Double check this is actually needed anymore
   services.openssh.settings.PermitRootLogin = lib.mkForce "yes";
 
-  # We need IPv6 in order to access hetzner cloud
-  #networking.enableIPv6 = true;
   networking.useDHCP = lib.mkDefault true;
 
   services.heartbeat-check = {
