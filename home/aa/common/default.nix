@@ -5,7 +5,6 @@
   ...
 }:
 {
-
   # NOTE: Some folders are handled in hosts/common/core/nixos.nix via xdg user dirs
   home.file = {
     # Avatar used by login managers like SDDM (must be PNG)
@@ -23,7 +22,6 @@
       ++ lib.optional config.hostSpec.isWork "work"
     )
   );
-
   home.activation.setupHomeLinks = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
     if [ ! -n ${config.home.homeDirectory}/source ]; then
       ln -sf ${config.home.homeDirectory}/dev ${config.home.homeDirectory}/source
