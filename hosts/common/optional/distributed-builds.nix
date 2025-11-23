@@ -13,45 +13,52 @@
     connect-timeout = 5;
   };
 
-  nix.buildMachines = [
-    #    {
-    #      hostName = "localhost";
-    #      system = pkgs.stdenv.hostPlatform.system;
-    #      maxJobs = 4;
-    #      speedFactor = 1;
-    #      supportedFeatures = [
-    #        "nixos-test"
-    #        "big-parallel"
-    #        "kvm"
-    #      ];
-    #    }
-    {
-      hostName = "oppo";
-      sshUser = "builder";
-      sshKey = "/root/.ssh/id_builder";
-      system = pkgs.stdenv.hostPlatform.system;
-      supportedFeatures = [
-        "nixos-test"
-        "big-parallel"
-        "kvm"
+  nix.buildMachines =
+    let
+      buildMachines = [
+        {
+          hostName = "oppo";
+          sshUser = "builder";
+          sshKey = "/root/.ssh/id_builder";
+          system = pkgs.stdenv.hostPlatform.system;
+          supportedFeatures = [
+            "nixos-test"
+            "big-parallel"
+            "kvm"
+          ];
+          speedFactor = 5;
+          maxJobs = 32;
+        }
+        {
+          hostName = "oedo";
+          sshUser = "builder";
+          sshKey = "/root/.ssh/id_builder";
+          system = pkgs.stdenv.hostPlatform.system;
+          supportedFeatures = [
+            "nixos-test"
+            "big-parallel"
+            "kvm"
+          ];
+          speedFactor = 5;
+          maxJobs = 32;
+        }
+        # Seems slower than it's worth
+        # {
+        #   hostName = "ooze";
+        #   sshUser = "builder";
+        #   sshKey = "/root/.ssh/id_builder";
+        #   system = pkgs.stdenv.hostPlatform.system;
+        #   supportedFeatures = [
+        #     "nixos-test"
+        #     "big-parallel"
+        #     "kvm"
+        #   ];
+        #   speedFactor = 2;
+        #   maxJobs = 8;
+        # }
       ];
-      speedFactor = 5;
-      maxJobs = 32;
-    }
-    {
-      hostName = "ooze";
-      sshUser = "builder";
-      sshKey = "/root/.ssh/id_builder";
-      system = pkgs.stdenv.hostPlatform.system;
-      supportedFeatures = [
-        "nixos-test"
-        "big-parallel"
-        "kvm"
-      ];
-      speedFactor = 2;
-      maxJobs = 8;
-    }
-  ];
+    in
+    lib.filter (m: m.hostName != config.networking.hostName) buildMachines;
 
   sops.secrets = {
     "keys/ssh/builder" = {
@@ -61,7 +68,6 @@
   };
 }
 // lib.optionalAttrs (inputs ? "home-manager") {
-
   home-manager.users.root.home.file.".ssh/config".text =
     let
       genHostEntry = hostName: ''
