@@ -29,8 +29,8 @@
 
   # Pin to 6.16 for now, as 6.17.x seems to have issues with systemd-boot
   # possibly related to https://github.com/NixOS/nixpkgs/issues/449939
-  boot.kernelPackages = pkgs.linuxPackages_6_16;
-  #boot.kernelPackages = pkgs.linuxPackages_latest;
+  # boot.kernelPackages = pkgs.linuxPackages_6_16;
+  boot.kernelPackages = pkgs.linuxPackages_latest;
 
   # Pin a boot entry if it exists. In order to generate the
   # pinned-boot-entry.conf for a "stable" generation run: 'just pin' and then
@@ -54,10 +54,6 @@
     // lib.optionalAttrs config.hostSpec.isLocal {
       # Internal
       "${network.subnets.oxid.gateway}" = [ "oxid.${config.hostSpec.domain}" ];
-
-      # External
-      "${network.subnets.moon.hosts.moon.ip}" = [ "moon.${config.hostSpec.domain}" ];
-      # "${network.subnets.grove.hosts.moth.ip}" = [ "moth.${config.hostSpec.domain}" ];
 
       # VMs
       "${network.subnets.vm-lan.hosts.okra.ip}" = [ "okra.${config.hostSpec.domain}" ];
