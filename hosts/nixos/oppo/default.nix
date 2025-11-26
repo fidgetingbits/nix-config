@@ -234,6 +234,9 @@
     ${builtins.readFile "${pkgs.liquidctl}/lib/udev/rules.d/71-liquidctl.rules"}
   '';
 
+  tunnels.cakes.enable = true;
+  services.logind.powerKey = lib.mkForce "suspend";
+
   #networking.granularFirewall.enable = true;
 
   powerManagement = {

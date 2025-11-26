@@ -142,20 +142,21 @@
     };
   };
 
-  services.autosshTunnels.sessions = {
-    freshcakes = {
-      user = "tunnel";
-      host = config.hostSpec.networking.hosts.freshcakes;
-      port = 22;
-      secretKey = "/etc/ssh/id_ed25519";
-      tunnels = [
-        {
-          localPort = config.hostSpec.networking.ports.tcp.jellyfin;
-          remotePort = config.hostSpec.networking.ports.tcp.jellyfin;
-        }
-      ];
-    };
-  };
+  tunnels.cakes.enable = true;
+  # services.autosshTunnels.sessions = {
+  #   freshcakes = {
+  #     user = "tunnel";
+  #     host = config.hostSpec.networking.hosts.freshcakes;
+  #     port = 22;
+  #     secretKey = "/etc/ssh/id_ed25519";
+  #     tunnels = [
+  #       {
+  #         localPort = config.hostSpec.networking.ports.tcp.jellyfin;
+  #         remotePort = config.hostSpec.networking.ports.tcp.jellyfin;
+  #       }
+  #     ];
+  #   };
+  # };
 
   services.keyd = {
     enable = true;

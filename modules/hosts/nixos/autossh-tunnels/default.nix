@@ -19,6 +19,7 @@ let
     + "${toString tunnel.remotePort}";
 in
 {
+  imports = lib.custom.scanPaths ./.;
   options = {
     services.autosshTunnels = {
       sessions = lib.mkOption {
