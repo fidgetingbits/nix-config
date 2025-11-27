@@ -13,6 +13,7 @@ rec {
     ./hardware-configuration.nix
     inputs.nixos-facter-modules.nixosModules.facter
     { config.facter.reportPath = ./facter.json; }
+    ./disks.nix
 
     (map lib.custom.relativeToRoot (
       [
@@ -129,10 +130,6 @@ rec {
   };
 
   # Enable swap on luks
-  boot.initrd.luks.devices."luks-e2232963-327f-4833-9bcc-5e5a8dae9551".device =
-    "/dev/disk/by-uuid/e2232963-327f-4833-9bcc-5e5a8dae9551";
-  boot.initrd.luks.devices."luks-e2232963-327f-4833-9bcc-5e5a8dae9551".keyFile =
-    "/crypto_keyfile.bin";
   boot.initrd.systemd.enable = true;
   boot.supportedFilesystems = [ "ntfs" ];
 

@@ -10,9 +10,7 @@
 
     inputs.nixos-facter-modules.nixosModules.facter
     { config.facter.reportPath = ./facter.json; }
-    # ./hardware-configuration.nix
-    # inputs.nixos-hardware.nixosModules.common-cpu-amd
-    # inputs.nixos-hardware.nixosModules.common-gpu-amd
+    ./disks.nix
 
     (map lib.custom.relativeToRoot (
       [
@@ -56,14 +54,6 @@
 
       ])
     ))
-    # Impermanence
-    (lib.custom.relativeToRoot "hosts/common/disks/btrfs-luks-impermanence-disko.nix")
-    {
-      _module.args = {
-        disk = "/dev/nvme0n1";
-        withSwap = true;
-      };
-    }
   ];
 
   # Host Specification
@@ -110,8 +100,7 @@
     # Bootloader.
     loader.systemd-boot = {
       enable = true;
-      # When using plymouth, initrd can expand by a lot each time, so limit how many we keep around
-      configurationLimit = lib.mkDefault 10;
+      configurationLimit = lib.mkDefault 8;
     };
     loader.efi.canTouchEfiVariables = true;
 

@@ -109,6 +109,12 @@ in
   ];
   options = {
     system.disks = {
+      # NOTE: Enabled by default
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Use disko templates to manage disks";
+      };
       primary = lib.mkOption {
         type = lib.types.str;
         example = "/dev/disk/by-id/mmc-SCA64G_0x56567305";
@@ -184,7 +190,7 @@ in
     };
   };
 
-  config = {
+  config = lib.mkIf cfg.enable {
     # Describe our primary and raid array disks, as well as relevant mdadm settings if needed
     disko.devices = {
       disk = {
