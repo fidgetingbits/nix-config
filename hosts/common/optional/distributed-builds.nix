@@ -20,6 +20,7 @@
           hostName = "oppo";
           sshUser = "builder";
           sshKey = "/root/.ssh/id_builder";
+          publicHostKey = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSUh2ZkIwLzNQdTZ5T0NhVG9uWXVQRGhiYW5mZG5GZ1VMOWY5TFM1cGdvNkggYWFAb3Bwbwo=";
           system = pkgs.stdenv.hostPlatform.system;
           supportedFeatures = [
             "nixos-test"
@@ -33,6 +34,7 @@
           hostName = "oedo";
           sshUser = "builder";
           sshKey = "/root/.ssh/id_builder";
+          publicHostKey = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSUREdG9zSHIrMDdJcjQ0Q1FRQ0h3M05RYnlVT0tTaGo1azFZNXdrd1VwelUgYWFAb2Vkbwo=";
           system = pkgs.stdenv.hostPlatform.system;
           supportedFeatures = [
             "nixos-test"
@@ -47,6 +49,7 @@
         #   hostName = "ooze";
         #   sshUser = "builder";
         #   sshKey = "/root/.ssh/id_builder";
+        #   publicHostKey = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSUk4SU92SHVwTXB4M3AxRFhDWmRaVVhuYnp1bDZhQ0liYWd1dCtxNCt5dUQgYWFAb296ZQo=";
         #   system = pkgs.stdenv.hostPlatform.system;
         #   supportedFeatures = [
         #     "nixos-test"
