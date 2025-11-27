@@ -122,7 +122,9 @@ in
           Label of primary drive defined in disko.device.disk.
           Only useful if you already had a different label defined and \
           are switching to this module or want a specific disk label in \
-          /dev/disk/by-partlabel/ other than disk-primary-{root,luks}'';
+          /dev/disk/by-partlabel/ other than disk-primary-{root,luks}. \
+          View with 'lsblk -o NAME,PARTLABEL,LABEL,FSTYPE,MOUNTPOINT'
+        '';
       };
       useLuks = lib.mkOption {
         type = lib.types.bool;
