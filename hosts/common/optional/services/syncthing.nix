@@ -10,7 +10,6 @@ let
   homeDirectory = config.hostSpec.home;
 
   desktops = [
-    "orby"
     "onyx"
     "oedo"
     # "okra"
@@ -20,7 +19,6 @@ let
     "opal"
   ];
   deviceList = [
-    "orby"
     "onyx"
     "oedo"
     "opal"
@@ -36,7 +34,6 @@ let
   hosts = builtins.attrValues {
     inherit (inputs.nix-secrets.networking.subnets.ogre.hosts)
       oedo
-      orby
       oryx
       opia
       opal
