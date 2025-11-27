@@ -12,7 +12,6 @@ let
     "ogre"
     "onyx"
     "oedo"
-    "orby"
     "oath"
     "omen"
     "owls"
@@ -28,11 +27,12 @@ let
   yubikeyHostsWithoutDomain = [
     # FIXME: These could be automated by having a hostSpec entry that indicates they use boot-time ssh server
     # it could also auto-add the ssh server...
+    "myth-backup"
     "myth-unlock"
     "moth-unlock"
-    "myth-backup"
     "ooze-unlock"
     "oedo-unlock"
+    "oppo-unlock"
     "oath_gitlab" # FIXME(ssh): Would be nice to do per-port match on this, but HM doesn't support
     "okra"
     config.hostSpec.networking.subnets.ogre.wildcard
@@ -91,7 +91,6 @@ let
     "oedo"
     "onyx"
     "oppo"
-    "orby"
     "okra"
   ];
   # FIXME: A lot of hosts have the same properties, but different username, so we
@@ -105,6 +104,25 @@ let
         match = "host ${host},${host}.${config.hostSpec.domain}";
         hostname = "${host}.${config.hostSpec.domain}";
         port = config.hostSpec.networking.ports.tcp.ssh;
+      };
+    })
+    |> lib.attrsets.mergeAttrsList;
+
+  # Generate an remote unlock entry for every host we have that uses ssh in initrd
+  unlockableHostsConfig =
+    inputs.self.nixosConfigurations
+    |> lib.filterAttrs (name: host: host.config.services.remoteLuksUnlock.enable or false)
+    |> lib.attrNames
+    |> lib.lists.map (host: {
+      "${host}-unlock" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
+        host = "${host}-unlock";
+        hostname = "${host}.${config.hostSpec.domain}";
+        user = "root";
+        port = config.hostSpec.networking.ports.tcp.ssh;
+        extraOptions = {
+          UserKnownHostsFile = "/dev/null";
+          StrictHostKeyChecking = "no";
+        };
       };
     })
     |> lib.attrsets.mergeAttrsList;
@@ -203,40 +221,6 @@ in
             ];
           };
 
-          # FIXME: These unlock entries could be reduced with a builder function
-          "oedo-unlock" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            host = "oedo-unlock";
-            hostname = "oedo.${config.hostSpec.domain}";
-            user = "root";
-            port = config.hostSpec.networking.ports.tcp.ssh;
-            extraOptions = {
-              UserKnownHostsFile = "/dev/null";
-              StrictHostKeyChecking = "no";
-            };
-          };
-
-          "myth-unlock" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            host = "myth-unlock";
-            hostname = "myth.${config.hostSpec.domain}";
-            user = "root";
-            port = config.hostSpec.networking.ports.tcp.ssh;
-            extraOptions = {
-              UserKnownHostsFile = "/dev/null";
-              StrictHostKeyChecking = "no";
-            };
-          };
-
-          "moth-unlock" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            host = "moth-unlock";
-            hostname = "moth.${config.hostSpec.domain}";
-            user = "root";
-            port = config.hostSpec.networking.ports.tcp.ssh;
-            extraOptions = {
-              UserKnownHostsFile = "/dev/null";
-              StrictHostKeyChecking = "no";
-            };
-          };
-
           # Backup dns entry in fact ddclient screws up
           # FIXME: Should script these entries probably
           "myth-backup" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
@@ -322,6 +306,7 @@ in
           # NOTE: Work entries are encrypted and added via extraConfig for now
         }
         // (inputs.nix-secrets.networking.ssh.matchBlocks lib)
+        // unlockableHostsConfig
         // vanillaHostsConfig;
 
     };
