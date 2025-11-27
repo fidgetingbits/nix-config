@@ -9,6 +9,6 @@ in
     smtpHost =
       if useRelay then config.hostSpec.email.internalServer else config.hostSpec.email.externalServer;
     smtpPort = if useRelay then 25 else 587;
-    smtpUser = if useRelay then config.hostSpec.hostname else config.hostSpec.email.notifier;
+    smtpUser = if useRelay then config.hostSpec.hostName else config.hostSpec.email.notifier;
   };
 }
