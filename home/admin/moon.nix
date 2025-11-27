@@ -21,4 +21,6 @@
 
   };
 
+  system.ssh-motd.enable = true;
+
 }

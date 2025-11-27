@@ -26,7 +26,6 @@
 
           # Services
           "services/openssh.nix"
-          "services/ddclient.nix" # Dynamic DNS
           "services/blocky.nix" # Ad Blocking DNS
           "services/unifi.nix" # Unifi Controller
 
@@ -46,6 +45,7 @@
 
   # Turn off nginx reverse proxy
   services.unifi.useProxy = lib.mkForce false;
+  services.dyndns.enable = true;
 
   # Host Specification
   hostSpec = {

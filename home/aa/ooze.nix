@@ -23,4 +23,6 @@
       screen # Needed for serial console attached to server
       ;
   };
+
+  system.ssh-motd.enable = true;
 }

@@ -22,7 +22,6 @@
         (map (f: "hosts/common/optional/${f}") [
           # Services
           "services/openssh.nix"
-          "services/ddclient.nix"
 
           # Network management
           "systemd-resolved.nix"
@@ -97,12 +96,10 @@
 
   services.remoteLuksUnlock = {
     enable = true;
-    notify = {
-      enable = true; # Off until we can set it up correctly on moth
-      to = config.hostSpec.email.mythAdmins;
-    };
+    notify.to = config.hostSpec.email.mythAdmins;
   };
   services.logind.powerKey = lib.mkForce "reboot";
+  services.dyndns.enable = true;
 
   systemd = {
     tmpfiles.rules =

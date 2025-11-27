@@ -25,4 +25,6 @@
   home.packages = builtins.attrValues {
 
   };
+
+  system.ssh-motd.enable = true;
 }

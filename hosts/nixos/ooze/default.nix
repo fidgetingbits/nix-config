@@ -1,4 +1,5 @@
 {
+  inputs,
   lib,
   config,
   ...
@@ -75,10 +76,12 @@
   # to unlock
   services.remoteLuksUnlock = {
     enable = true;
-    notify = {
-      enable = true; # Off until we can set it up correctly on moth
-      to = config.hostSpec.email.olanAdmins;
-    };
+    notify.to = config.hostSpec.email.olanAdmins;
+  };
+
+  services.dyndns = {
+    enable = true;
+    subDomain = "ogre";
   };
 
   # Override this because we do remote builds

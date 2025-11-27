@@ -267,5 +267,14 @@
 
   mail-delivery.useRelay = true; # Use o-lan postfix-relay
 
+  # Enable WoL port
+  networking.firewall = {
+    allowedUDPPorts = [ 9 ];
+  };
+  # Should already be on as per ethtool, but just in case
+  networking.interfaces.ens3 = {
+    wakeOnLan.enable = true;
+  };
+
   system.stateVersion = "23.05";
 }

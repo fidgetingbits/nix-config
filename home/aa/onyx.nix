@@ -108,7 +108,7 @@
   # FIXME: Make this part of a module
   services.copyq.enable = true;
 
-  system.motd.enable = true;
+  system.ssh-motd.enable = true;
 
   sops = {
     secrets = {

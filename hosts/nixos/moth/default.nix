@@ -22,7 +22,6 @@
         (map (f: "hosts/common/optional/${f}") [
           # Services
           "services/openssh.nix"
-          "services/ddclient.nix"
 
           # Network management
           "systemd-resolved.nix"
@@ -69,6 +68,7 @@
   };
 
   system.impermanence.enable = true;
+  services.dyndns.enable = true;
 
   environment.systemPackages = [ pkgs.borgbackup ];
   # Bootloader
@@ -81,10 +81,7 @@
 
   services.remoteLuksUnlock = {
     enable = true;
-    notify = {
-      enable = true; # Off until we can set it up correctly on moth
-      to = config.hostSpec.email.mothAdmins;
-    };
+    notify.to = config.hostSpec.email.mothAdmins;
   };
 
   # Override the physical key to reboot on short press
