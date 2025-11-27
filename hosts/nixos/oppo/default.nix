@@ -7,9 +7,12 @@
 }:
 {
   imports = lib.flatten [
-    ./hardware-configuration.nix
-    inputs.nixos-hardware.nixosModules.common-cpu-amd
-    inputs.nixos-hardware.nixosModules.common-gpu-amd
+
+    inputs.nixos-facter-modules.nixosModules.facter
+    { config.facter.reportPath = ./facter.json; }
+    # ./hardware-configuration.nix
+    # inputs.nixos-hardware.nixosModules.common-cpu-amd
+    # inputs.nixos-hardware.nixosModules.common-gpu-amd
 
     (map lib.custom.relativeToRoot (
       [
@@ -178,6 +181,11 @@
     ];
   };
 
+  services.remoteLuksUnlock = {
+    enable = true;
+    notify.to = config.hostSpec.email.olanAdmins;
+  };
+
   # openrgb
   # FIXME: Move all this
   services.udev.packages = [ pkgs.openrgb-with-all-plugins ];
@@ -235,7 +243,10 @@
   '';
 
   tunnels.cakes.enable = true;
-  services.logind.powerKey = lib.mkForce "suspend";
+  services.logind = {
+    powerKey = lib.mkForce "suspend";
+    powerKeyLongPress = lib.mkForce "poweroff";
+  };
 
   #networking.granularFirewall.enable = true;
 
