@@ -8,15 +8,7 @@
   imports = [
     inputs.nixos-facter-modules.nixosModules.facter
     { config.facter.reportPath = ./facter.json; }
-
-    # FIXME: Switch with disks.nix
-    # Impermanence
-    (lib.custom.relativeToRoot "hosts/common/disks/btrfs-luks-impermanence-disko.nix")
-    {
-      _module.args = {
-        withSwap = true;
-      };
-    }
+    ./disks.nix
   ]
   ++ (map lib.custom.relativeToRoot (
     [
@@ -83,10 +75,6 @@
     enable = true;
     subDomain = "ogre";
   };
-
-  # Override this because we do remote builds
-  # FIXME: Double check this is actually needed anymore
-  services.openssh.settings.PermitRootLogin = lib.mkForce "yes";
 
   networking.useDHCP = lib.mkDefault true;
 
