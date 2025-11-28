@@ -1,4 +1,4 @@
-{ ... }:
+{ lib, ... }:
 {
   system.disks = {
     primary = "/dev/disk/by-id/mmc-SCA64G_0x56567305";
