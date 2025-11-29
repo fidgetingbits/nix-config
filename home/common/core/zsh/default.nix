@@ -100,7 +100,7 @@ in
       # OPENAI_API_KEY = "$(cat ${homeDirectory}/.config/openai/token)";
     };
 
-    shellAliases = import ./aliases.nix { inherit config; };
+    shellAliases = import ./aliases.nix { inherit config pkgs lib; };
   };
   programs.zoxide = {
     enable = true;

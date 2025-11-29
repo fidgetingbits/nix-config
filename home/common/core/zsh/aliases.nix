@@ -1,4 +1,9 @@
-{ config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
   devFolder = "~/dev";
   devTalon = "${devFolder}/talon";
@@ -201,5 +206,5 @@ in
     let
       oppo = config.hostSpec.networking.subnets.ogre.hosts.oppo;
     in
-    "wakeonlan ${oppo.mac} -i ${oppo.ip}";
+    "${lib.getExe' pkgs.wakeonlan "wakeonlan"} ${oppo.mac} -i ${oppo.ip}";
 }
