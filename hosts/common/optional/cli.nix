@@ -21,6 +21,7 @@
       mailutils
       direnv # develoment environment utility
       mlocate # locate
+      wakeonlan # utility for WoL
 
       nix-output-monitor # better nix output
 

@@ -1,3 +1,4 @@
+{ config, ... }:
 let
   devFolder = "~/dev";
   devTalon = "${devFolder}/talon";
@@ -195,4 +196,10 @@ in
 
   # Sometimes touchpad stops working and it seems like cycling this option fixes it
   kb-reset = "sudo modprobe -r hid_multitouch && sudo modprobe hid_multitouch";
+
+  wake-oppo =
+    let
+      oppo = config.hostSpec.networking.subnets.ogre.hosts.oppo;
+    in
+    "wakeonlan ${oppo.mac} -i ${oppo.ip}";
 }
