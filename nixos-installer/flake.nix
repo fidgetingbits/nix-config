@@ -60,11 +60,8 @@
               ../modules/hosts/nixos/impermanence
               {
                 networking.hostName = opts.name;
-                # FIXME: we can pull this out of the disks config now once
-                # everything is converted
                 system.impermanence.enable = opts.impermanence;
               }
-
             ]
             ++ (
               if opts.facter then
@@ -91,32 +88,26 @@
         # physical machines
         oedo = newConfig {
           name = "oedo";
-          swapSize = 64;
           impermanence = true;
-          luks = true;
           facter = true;
-          diskConfig = import ../hosts/nixos/oedo/disks.nix;
         };
         ooze = newConfig {
           name = "ooze";
-          disk = "/dev/nvme0n1";
-          swapSize = 64;
           impermanence = true;
-          luks = true;
           facter = false;
         };
 
         oppo = newConfig {
           name = "oppo";
-          disk = "/dev/nvme0n1";
-          swapSize = 64;
           impermanence = true;
-          luks = true;
           facter = false;
         };
 
-        # FIXME: Double check this when framework arrives
-        #onyx = newConfig { name = "onyx"; disk = "/dev/nvme0n1"; swapSize = 98; impermanence = true; luks = true; };
+        onyx = newConfig {
+          name = "onyx";
+          impermanence = true;
+          facter = true;
+        };
 
         # virtual machines
         okra = newConfig {
@@ -131,29 +122,23 @@
 
         # physical machines
         moon = newConfig {
-          name = "moon";
-          disk = "/dev/nvme0n1";
-          swapSize = 16;
-          impermanence = true;
-          luks = false;
-          facter = true;
           user = "admin";
+          name = "moon";
+          impermanence = true;
+          facter = true;
         };
 
         myth = newConfig {
+          user = "admin";
           name = "myth";
           impermanence = true;
           facter = true;
-          user = "admin";
-          diskConfig = import ../hosts/nixos/myth/disks.nix;
         };
 
         moth = newConfig {
           name = "moth";
-          user = "aa";
           impermanence = true;
           facter = true;
-          diskConfig = import ../hosts/nixos/moth/disks.nix;
         };
 
         # virtual machines
@@ -162,8 +147,6 @@
           name = "maze";
           impermanence = true;
           facter = true;
-          user = "aa";
-          diskConfig = import ../hosts/nixos/maze/disks.nix;
         };
       };
     };
