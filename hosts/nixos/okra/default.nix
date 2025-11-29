@@ -6,12 +6,10 @@
 }:
 {
   imports = lib.flatten [
-    # Every host needs this
     ./hardware-configuration.nix
     ./disks.nix
     (map lib.custom.relativeToRoot (
       [
-
         "hosts/common/core"
         "hosts/common/core/nixos.nix"
       ]
