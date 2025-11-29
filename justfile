@@ -238,34 +238,46 @@ talon OS URL:
 # ========= Admin Recipes ==========
 #
 
-# Pin the current nixos generation to the systemd-boot loader menu
+# Pin the current nixos generation of a host to the systemd-boot loader menu
 [group("admin")]
-pin:
+pin HOST=`hostname`:
     #!/usr/bin/env bash
     shopt -u expand_aliases
 
+    cmd_prefix=''
+    cp_cmd='cp '
+    if [ "{{ HOST }}" != "$(hostname)" ]; then
+        cmd_prefix="ssh {{ HOST }}"
+        cp_cmd="scp {{ HOST }}:"
+    fi
+
+    if [ ! -e "hosts/nixos/{{ HOST }}/" ]; then
+        echo "ERROR: there is no {{ HOST }} host in this config"
+        exit 1
+    fi
+
     # Create a modified copy of the current systemd-boot entry and denote it as pinned
-    CURRENT=$(sudo nix-env --list-generations --profile /nix/var/nix/profiles/system | rg current | awk '{print $1}')
+    CURRENT=$($cmd_prefix sudo nix-env --list-generations --profile /nix/var/nix/profiles/system | rg current | awk '{print $1}')
     if [[ -z $CURRENT ]]; then
         echo "ERROR: Failed to find nixos generation."
         exit 1
     fi
-    PINNED=hosts/nixos/$(hostname)/pinned-boot-entry.conf
-    cp /boot/loader/entries/nixos-generation-$CURRENT.conf $PINNED
+    PINNED=hosts/nixos/{{ HOST }}/pinned-boot-entry.conf
+    ${cp_cmd}/boot/loader/entries/nixos-generation-$CURRENT.conf $PINNED
     chmod -x $PINNED
     sed -i 's/sort-key nixos/sort-key pinned/' $PINNED
     VERSION=$(grep version $PINNED | cut -f2- -d' ')
     sed -i "s/title.*/title PINNED: $VERSION/" $PINNED
 
     # Set the new root to prevent garbage collection
-    PINNED_ROOT=/nix/var/nix/gcroots/pinned-$(hostname)
-    sudo nix-store --add-root $PINNED_ROOT -r /nix/var/nix/profiles/system >/dev/null
+    PINNED_ROOT=/nix/var/nix/gcroots/pinned-{{ HOST }}
+    $exec_prefix sudo nix-store --add-root $PINNED_ROOT -r /nix/var/nix/profiles/system >/dev/null
     git add $PINNED
-    git commit -m "chore: pin boot entry for generation $CURRENT"
+    git commit -m "chore: pin {{ HOST }} boot entry for generation $CURRENT"
     echo "Pinned generation $CURRENT to $PINNED_ROOT"
     # Rebuild in order for the newly pinned generation to populate in systemd-boot,
-    echo "Rebuilding host to populate boot entry..." && sleep 2
-    just rebuild
+    echo "Rebuilding {{ HOST }} to populate boot entry..." && sleep 2
+    just rebuild {{ HOST }}
 
 # Copy all the config files to the remote host
 [group("admin")]
