@@ -49,6 +49,7 @@
               }
 
               # Disk definitions for this host
+              ../modules/hosts/nixos/disks.nix
               ../hosts/nixos/${opts.name}/disks.nix
 
               ./minimal-configuration.nix
