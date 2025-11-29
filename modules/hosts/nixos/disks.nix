@@ -194,7 +194,6 @@ in
     # Describe our primary and raid array disks, as well as relevant mdadm settings if needed
     disko.devices = {
       disk = {
-        # This label name should be configurable
         ${cfg.primaryLabel} = {
           type = "disk";
           device = cfg.primary;
@@ -234,7 +233,7 @@ in
     // lib.optionalAttrs hasRaid {
       # FIXME: This could use a raidLuks and primaryLuks
       mdadm = {
-        raid5 = {
+        "raid${cfg.raidLevel}" = {
           type = "mdadm";
           level = cfg.raidLevel;
           content = {
