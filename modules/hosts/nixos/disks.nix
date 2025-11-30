@@ -233,7 +233,7 @@ in
     // lib.optionalAttrs hasRaid {
       # FIXME: This could use a raidLuks and primaryLuks
       mdadm = {
-        "raid${cfg.raidLevel}" = {
+        "raid${toString cfg.raidLevel}" = {
           type = "mdadm";
           level = cfg.raidLevel;
           content = {

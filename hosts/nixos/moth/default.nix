@@ -112,9 +112,20 @@
       in
       [
         "d /mnt/storage/backup/ 0750 ${name "borg"} ${group "borg"} -"
+        "d /mnt/storage/mirror/ 0750 ${name "borg"} ${group "borg"} -"
         "d /mnt/storage/backup/ta 0700 ${name "ta"} ${group "ta"} -"
       ];
   };
+
+  services.mirror-backups = {
+    enable = true;
+    time = "*-*-* 5:00:00"; # Keep sync with myth times
+    server = "myth.${config.hostSpec.domain}";
+  };
+  # Allow myth to mirror into moth
+  users.users.borg.openssh.authorizedKeys.keys = [
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICMso7GIZT7pDRxeE8xd+hkwUySI8v8LwvDn1gPJyGFK root@myth"
+  ];
 
   # FIXME:
   # services.backup = {

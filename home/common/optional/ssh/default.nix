@@ -92,6 +92,7 @@ let
     "onyx"
     "oppo"
     "okra"
+    "moth"
   ];
   # FIXME: A lot of hosts have the same properties, but different username, so we
   # should modify this to pass the port for each host, and then we can reduce a lot
@@ -198,27 +199,13 @@ in
                 }
               ];
           };
+
+          # FIXME: These should just be automated via vanilla by querying primaryUsername from the host instead of setting default user to my user...
           "myth" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
             host = "myth";
             hostname = "myth.${config.hostSpec.domain}";
             user = "admin";
             port = config.hostSpec.networking.ports.tcp.ssh;
-          };
-
-          # FIXME: Can't most of the following at least have their host/hostname/port be automated to reduce the size?
-          "moth" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            host = "moth";
-            hostname = "moth.${config.hostSpec.domain}";
-            port = config.hostSpec.networking.ports.tcp.ssh;
-            localForwards = [
-              {
-                # For web interface
-                bind.address = "localhost";
-                bind.port = 15001;
-                host.address = "localhost";
-                host.port = 15001;
-              }
-            ];
           };
 
           # Backup dns entry in fact ddclient screws up
@@ -308,7 +295,6 @@ in
         // (inputs.nix-secrets.networking.ssh.matchBlocks lib)
         // unlockableHostsConfig
         // vanillaHostsConfig;
-
     };
 
   home.file = {
