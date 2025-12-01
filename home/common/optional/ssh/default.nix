@@ -12,6 +12,7 @@ let
     "ogre"
     "onyx"
     "oedo"
+    "oedo-wifi"
     "oath"
     "omen"
     "owls"

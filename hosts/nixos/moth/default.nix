@@ -85,7 +85,7 @@
   };
 
   # Override the physical key to reboot on short press
-  services.logind.powerKey = lib.mkForce "reboot";
+  services.logind.settings.Login.HandlePowerKey = lib.mkForce "reboot";
 
   # Setup NUT server and corresponding client for USB-attached UPS device
   services.ups = {

@@ -8,9 +8,9 @@ source "$(dirname "${BASH_SOURCE[0]}")/helpers.sh"
 trap cleanup_flake_lock EXIT HUP INT QUIT TERM
 
 if [[ $# -ne 1 ]]; then
-    echo "Usage: $0 HOST"
-    exit 1
+	echo "Usage: $0 HOST"
+	exit 1
 fi
 
 HOST="$1"
-NIX_SSHOPTS="-p10022" nixos-rebuild --target-host "$HOST" --use-remote-sudo --show-trace --impure --flake .#"$HOST" switch
+NIX_SSHOPTS="-p10022" nixos-rebuild --target-host "$HOST" --sudo --show-trace --impure --flake .#"$HOST" switch

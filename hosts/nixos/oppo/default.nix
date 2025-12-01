@@ -233,8 +233,10 @@
 
   tunnels.cakes.enable = true;
   services.logind = {
-    powerKey = lib.mkForce "suspend";
-    powerKeyLongPress = lib.mkForce "poweroff";
+    settings.Login = {
+      HandlePowerKey = lib.mkForce "suspend";
+      HandlePowerKeyLongPress = lib.mkForce "poweroff";
+    };
   };
 
   #networking.granularFirewall.enable = true;

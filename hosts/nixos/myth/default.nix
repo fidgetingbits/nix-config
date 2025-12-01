@@ -98,7 +98,7 @@
     enable = true;
     notify.to = config.hostSpec.email.mythAdmins;
   };
-  services.logind.powerKey = lib.mkForce "reboot";
+  services.logind.settings.Login.HandlePowerKey = lib.mkForce "reboot";
   services.dyndns.enable = true;
 
   systemd = {

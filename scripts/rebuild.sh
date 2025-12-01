@@ -16,99 +16,99 @@ export NIXPKGS_ALLOW_UNFREE=1
 
 switch_args="--show-trace --impure --flake "
 if [[ -n $1 && $1 == "trace" ]]; then
-    switch_args="$switch_args --show-trace "
+	switch_args="$switch_args --show-trace "
 elif [[ -n $1 ]]; then
-    HOST=$1
+	HOST=$1
 else
-    HOST=$(hostname)
+	HOST=$(hostname)
 fi
 switch_args="$switch_args .#$HOST switch"
 
 os=$(uname -s)
 if [ "$os" == "Darwin" ]; then
-    # On Darwin we end up doing some bootstrapping just in case
-    mkdir -p ~/.config/nix || true
-    CONF=~/.config/nix/nix.conf
-    if [ ! -f $CONF ]; then
-        # Enable nix-command and flakes to bootstrap
-        cat <<-EOF >$CONF
+	# On Darwin we end up doing some bootstrapping just in case
+	mkdir -p ~/.config/nix || true
+	CONF=~/.config/nix/nix.conf
+	if [ ! -f $CONF ]; then
+		# Enable nix-command and flakes to bootstrap
+		cat <<-EOF >$CONF
 			experimental-features = nix-command flakes pipe-operators
 		EOF
-    fi
+	fi
 
-    # Do some darwin pre-installation for bootstrapping
-    if ! which git &>/dev/null; then
-        echo "Installing xcode tools"
-        xcode-select --install
-    fi
+	# Do some darwin pre-installation for bootstrapping
+	if ! which git &>/dev/null; then
+		echo "Installing xcode tools"
+		xcode-select --install
+	fi
 
-    # https://docs.brew.sh/Installation
-    if [ ! -e /opt/homebrew/bin/brew ]; then
-        echo "Installing rosetta"
-        # This is required for emulation of x86_64 binaries, so let's just
-        # assume if they didn't install brew yet, they need this
-        softwareupdate --install-rosetta --agree-to-license
-        echo "Installing homebrew"
-        export NONINTERACTIVE=1
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-    fi
+	# https://docs.brew.sh/Installation
+	if [ ! -e /opt/homebrew/bin/brew ]; then
+		echo "Installing rosetta"
+		# This is required for emulation of x86_64 binaries, so let's just
+		# assume if they didn't install brew yet, they need this
+		softwareupdate --install-rosetta --agree-to-license
+		echo "Installing homebrew"
+		export NONINTERACTIVE=1
+		/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+	fi
 
-    green "====== REBUILD ======"
-    # Test if there's no darwin-rebuild, then use nix build and then run it
-    if ! which darwin-rebuild &>/dev/null; then
-        nix build --show-trace .#darwinConfigurations."$HOST".system
-        ./result/sw/bin/darwin-rebuild $switch_args
-    else
-        echo $switch_args
-        darwin-rebuild $switch_args
-    fi
+	green "====== REBUILD ======"
+	# Test if there's no darwin-rebuild, then use nix build and then run it
+	if ! which darwin-rebuild &>/dev/null; then
+		nix build --show-trace .#darwinConfigurations."$HOST".system
+		./result/sw/bin/darwin-rebuild $switch_args
+	else
+		echo $switch_args
+		darwin-rebuild $switch_args
+	fi
 else
-    extra_args=""
-    if [[ $HOST != "$(hostname)" ]]; then
-        extra_args="--target-host $HOST --use-remote-sudo"
-        nixos-rebuild --target-host "$HOST" --use-remote-sudo $switch_args
-    else
-        green "====== REBUILD ======"
-        REPO_PATH=$(pwd)
-        export REPO_PATH
-        NIXPKGS_ALLOW_BROKEN=1
-        export NIXPKGS_ALLOW_BROKEN
-        # NH_NO_CHECKS=1 because of https://github.com/nix-community/nh/issues/353
-        NH_NO_CHECKS=1 nh os switch . -- --impure --show-trace --reference-lock-file locks/$HOST.lock $extra_args 2>&1 | tee "$BUILD_LOG"
-        #nixos-rebuild $switch_args $extra_args switch
-    fi
+	extra_args=""
+	if [[ $HOST != "$(hostname)" ]]; then
+		extra_args="--target-host $HOST --sudo"
+		nixos-rebuild --target-host "$HOST" --sudo $switch_args
+	else
+		green "====== REBUILD ======"
+		REPO_PATH=$(pwd)
+		export REPO_PATH
+		NIXPKGS_ALLOW_BROKEN=1
+		export NIXPKGS_ALLOW_BROKEN
+		# NH_NO_CHECKS=1 because of https://github.com/nix-community/nh/issues/353
+		NH_NO_CHECKS=1 nh os switch . -- --impure --show-trace --reference-lock-file locks/$HOST.lock $extra_args 2>&1 | tee "$BUILD_LOG"
+		#nixos-rebuild $switch_args $extra_args switch
+	fi
 fi
 
 # shellcheck disable=SC2181
 if [ $? -eq 0 ]; then
-    # Certain services can fail without nh reporting an error like:
-    # warning: the following units failed: earlyoom.service
-    # So we want to make it way more obvious, since it could be home-manager
-    # FIXME: When this fails due to the line not existing, it triggers the cleanup..
-    #FAILED=$(rg 'warning: the following units failed:' "$BUILD_LOG")
-    FAILED=""
-    if [ -n "$FAILED" ]; then
-        red "====== Service Units Failed ======"
-        echo ${FAILED##*:} | tr ',' '\n'
-    else
-        green "====== POST-REBUILD ======"
-        green "Rebuilt successfully"
+	# Certain services can fail without nh reporting an error like:
+	# warning: the following units failed: earlyoom.service
+	# So we want to make it way more obvious, since it could be home-manager
+	# FIXME: When this fails due to the line not existing, it triggers the cleanup..
+	#FAILED=$(rg 'warning: the following units failed:' "$BUILD_LOG")
+	FAILED=""
+	if [ -n "$FAILED" ]; then
+		red "====== Service Units Failed ======"
+		echo ${FAILED##*:} | tr ',' '\n'
+	else
+		green "====== POST-REBUILD ======"
+		green "Rebuilt successfully"
 
-        # Check if there are any pending changes that would affect the build succeeding.
-        if git diff --exit-code >/dev/null && git diff --staged --exit-code >/dev/null; then
-            # Check if the current commit has a buildable tag
-            if git tag --points-at HEAD | grep -q buildable; then
-                yellow "Current commit is already tagged as buildable"
-            else
-                git tag "$HOST"-buildable-"$(date +%Y%m%d%H%M%S)" -m ''
-                green "Tagged current commit as buildable"
-            fi
-        else
-            yellow "WARN: There are pending changes that would affect the build succeeding. Commit them before tagging"
-        fi
-    fi
+		# Check if there are any pending changes that would affect the build succeeding.
+		if git diff --exit-code >/dev/null && git diff --staged --exit-code >/dev/null; then
+			# Check if the current commit has a buildable tag
+			if git tag --points-at HEAD | grep -q buildable; then
+				yellow "Current commit is already tagged as buildable"
+			else
+				git tag "$HOST"-buildable-"$(date +%Y%m%d%H%M%S)" -m ''
+				green "Tagged current commit as buildable"
+			fi
+		else
+			yellow "WARN: There are pending changes that would affect the build succeeding. Commit them before tagging"
+		fi
+	fi
 else
-    red "Build failed?"
+	red "Build failed?"
 fi
 
 rm "$BUILD_LOG"

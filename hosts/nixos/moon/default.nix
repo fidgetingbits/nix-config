@@ -2,7 +2,6 @@
 {
   inputs,
   lib,
-  config,
   ...
 }:
 {
@@ -118,7 +117,9 @@
     relogin = true;
   };
 
-  services.logind.powerKey = lib.mkForce "reboot";
+  services.logind = {
+    settings.Login.HandlePowerKey = lib.mkForce "reboot";
+  };
 
   # FIXME:
   # services.backup = {
