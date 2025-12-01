@@ -31,7 +31,7 @@
           maxJobs = 32;
         }
         {
-          hostName = "oedo-wifi";
+          hostName = "oedo";
           sshUser = "builder";
           sshKey = "/root/.ssh/id_builder";
           publicHostKey = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSUREdG9zSHIrMDdJcjQ0Q1FRQ0h3M05RYnlVT0tTaGo1azFZNXdrd1VwelUgYWFAb2Vkbwo=";
