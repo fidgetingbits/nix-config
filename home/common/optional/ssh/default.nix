@@ -5,54 +5,56 @@
   ...
 }:
 let
-  # There are a subset of hosts where yubikey is used for authentication. An ssh config entry is constructed for each
-  # of these hosts that roughly follows the same pattern. Some of these hosts use a domain suffix, so build a list of
-  # all hosts with and without domains
-  yubikeyHostsWithDomain = [
+  nixosHostNames =
+    inputs.self.nixosConfigurations
+    |> lib.attrNames
+    # nixfmt hack
+    |> lib.filter (name: name != "iso");
+
+  nixosHostsUnlockable =
+    inputs.self.nixosConfigurations
+    |> lib.filterAttrs (name: host: host.config.services.remoteLuksUnlock.enable or false)
+    |> lib.attrNames;
+  nixosHostsUnlockableNames = lib.lists.map (host: "${host}-unlock") nixosHostsUnlockable;
+
+  # There are a subset of hosts where yubikey is used for authentication.
+  # A yubikey-supported ssh config entry is constructed for each host some with
+  # domains and some without.
+  ykDomainHosts = [
     "ogre"
-    "onyx"
-    "oedo"
-    "oedo-wifi"
+    "oxid"
+    "oedo-wifi" # FIXME: Generate these based on some setting in nixosConfigurations
     "oath"
+    "onus"
     "omen"
     "owls"
-    "onus"
-    "oxid"
-    "ooze"
-    "oppo"
-    "moon"
-    "myth"
-    "moth"
   ]
-  ++ inputs.nix-secrets.networking.ssh.yubikeyHostsWithDomain;
-  yubikeyHostsWithoutDomain = [
-    # FIXME: These could be automated by having a hostSpec entry that indicates they use boot-time ssh server
-    # it could also auto-add the ssh server...
-    "myth-backup"
-    "myth-unlock"
-    "moth-unlock"
-    "ooze-unlock"
-    "oedo-unlock"
-    "oppo-unlock"
-    "oath_gitlab" # FIXME(ssh): Would be nice to do per-port match on this, but HM doesn't support
-    "okra"
+  ++ nixosHostNames
+  ++ inputs.nix-secrets.networking.ssh.ykDomainHosts;
+
+  ykNoDomainHosts = [
+    "oath_gitlab" # FIXME(ssh): per-port match on this, but HM doesn't support
     config.hostSpec.networking.subnets.ogre.wildcard
   ]
+  ++ nixosHostsUnlockableNames
   ++ inputs.nix-secrets.networking.ssh.yubikeyHosts;
 
   # Add domain to each host name
   genDomains = lib.map (h: "${h}.${config.hostSpec.domain}");
-  yubikeyHostAll =
-    yubikeyHostsWithDomain ++ yubikeyHostsWithoutDomain ++ (genDomains yubikeyHostsWithDomain);
-  yubikeyHostsString = lib.concatStringsSep " " yubikeyHostAll;
+  ykHosts =
+    ykDomainHosts ++ ykNoDomainHosts ++ (genDomains ykDomainHosts)
+    #
+    |> lib.concatStringsSep " ";
 
   # Only a subset of hosts are trusted enough to allow agent forwarding
-  forwardAgentHosts = lib.foldl' (acc: b: lib.filter (a: a != b) acc) yubikeyHostsWithDomain (
-    [ ] ++ inputs.nix-secrets.networking.ssh.forwardAgentUntrusted
-  );
-  forwardAgentHostsString = lib.concatStringsSep " " (
+  forwardAgentHosts =
+    inputs.nix-secrets.networking.ssh.forwardAgentUntrusted
+    |> lib.foldl' (acc: b: lib.filter (a: a != b) acc) ykDomainHosts;
+
+  forwardAgentHostsString =
     forwardAgentHosts ++ (genDomains forwardAgentHosts)
-  );
+    #
+    |> lib.concatStringsSep " ";
 
   # Super keys are yubikeys that have access to every host
   yubikeyPath = "hosts/common/users/super/keys";
@@ -61,9 +63,16 @@ let
   # corresponding private key files in .ssh
   yubikeys =
     lib.lists.forEach
-      (builtins.attrNames (builtins.readDir (lib.custom.relativeToRoot "${yubikeyPath}/")))
+      (
+        "${yubikeyPath}/"
+        |> lib.custom.relativeToRoot
+        |> builtins.readDir
+        # nixfmt hack
+        |> builtins.attrNames
+      )
       # id_drzt.pub -> id_drzt
       (key: lib.substring 0 (lib.stringLength key - lib.stringLength ".pub") key);
+
   # FIXME(ssh): Only works if the system supports yubikey (ie: not remote only systems)
   # remote-only servers shouldn't use the id_yubikey mechanism.
   mainKey = [
@@ -74,9 +83,9 @@ let
   # - We should introduce an option so each host can specify which keys to use as their main key
   identityFiles = if config.hostSpec.hostName == "orby" then yubikeys ++ [ "id_orby" ] else mainKey;
 
-  # NOTE: Yubikey pub keys are purposefully not in .ssh/ root, otherwise they're picked up by ssh-agent, and
-  # will used before manual password login or other keys, which can sometimes exhaust the maximum number
-  # of authentication attempts
+  # NOTE: Yubikey .pub files aren't stored in .ssh/ root otherwise they're
+  # picked up by ssh-agent, and will used before manual password login or other
+  # keys, which can exhaust the maximum number of authentication attempts
   yubikeyPublicKeyEntries = lib.attrsets.mergeAttrsList (
     lib.lists.map (key: {
       ".ssh/yubikeys/${key}.pub".source = lib.custom.relativeToRoot "${yubikeyPath}/${key}.pub";
@@ -89,12 +98,9 @@ let
     "oath"
     "oxid"
     "onus"
-    "oedo"
-    "onyx"
-    "oppo"
-    "okra"
-    "moth"
-  ];
+  ]
+  ++ nixosHostNames;
+
   # FIXME: A lot of hosts have the same properties, but different username, so we
   # should modify this to pass the port for each host, and then we can reduce a lot
   # of noise. We could probably also just use a flag for yubikey and copy a bunch of them.
@@ -106,18 +112,18 @@ let
         match = "host ${host},${host}.${config.hostSpec.domain}";
         hostname = "${host}.${config.hostSpec.domain}";
         port = config.hostSpec.networking.ports.tcp.ssh;
+        # FIXME: Fix the default name later
+        user = inputs.self.nixosConfigurations.${host}.config.hostSpec.primaryUsername or "aa";
       };
     })
     |> lib.attrsets.mergeAttrsList;
 
   # Generate an remote unlock entry for every host we have that uses ssh in initrd
   unlockableHostsConfig =
-    inputs.self.nixosConfigurations
-    |> lib.filterAttrs (name: host: host.config.services.remoteLuksUnlock.enable or false)
-    |> lib.attrNames
+    nixosHostsUnlockableNames
     |> lib.lists.map (host: {
-      "${host}-unlock" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-        host = "${host}-unlock";
+      "${host}" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
+        inherit host;
         hostname = "${host}.${config.hostSpec.domain}";
         user = "root";
         port = config.hostSpec.networking.ports.tcp.ssh;
@@ -141,7 +147,7 @@ in
       {
         # Only try to use yubikey for hosts that support it
         "yubikey-hosts" = lib.hm.dag.entryAfter [ "*" ] {
-          host = "${workHosts} ${yubikeyHostsString}";
+          host = "${workHosts} ${ykHosts}";
           identitiesOnly = true;
           identityFile = lib.lists.forEach identityFiles (file: "${config.home.homeDirectory}/.ssh/${file}");
         };
@@ -160,12 +166,9 @@ in
           identityFile = lib.lists.forEach identityFiles (file: "${config.home.homeDirectory}/.ssh/${file}");
         };
 
-        # NOTE: If these are in vanillaHosts then with an extra user entry it doesn't get added
+        # NOTE: These 2 are config hosts, but still have dedicated entries because of the local forward. Not sure how to deal with that yet.
         "moon" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
           host = "moon";
-          hostname = "moon.${config.hostSpec.domain}";
-          user = "admin";
-          port = config.hostSpec.networking.ports.tcp.ssh;
           localForwards =
             let
               unifi = config.hostSpec.networking.ports.tcp.unifi-controller;
@@ -181,25 +184,27 @@ in
             ];
         };
 
-        # FIXME: These should just be automated via vanilla by querying primaryUsername from the host instead of setting default user to my user...
-        "myth" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-          host = "myth";
-          hostname = "myth.${config.hostSpec.domain}";
-          user = "admin";
-          port = config.hostSpec.networking.ports.tcp.ssh;
-        };
-
-        # Backup dns entry in fact ddclient screws up
-        # FIXME: Should script these entries probably
-        "myth-backup" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-          host = "myth-backup";
-          hostname = config.hostSpec.networking.domains.myth-backup;
-          user = "root";
-          port = config.hostSpec.networking.ports.tcp.gitlab;
-          extraOptions = {
-            UserKnownHostsFile = "/dev/null";
-            StrictHostKeyChecking = "no";
-          };
+        "ooze" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
+          host = "ooze";
+          # Serial consoles are attached to the server, so use socat to forward
+          # them as needed
+          localForwards = lib.flatten (
+            lib.optionals config.hostSpec.isWork (
+              lib.map
+                (port: {
+                  bind.address = "localhost";
+                  bind.port = port;
+                  host.address = "localhost";
+                  host.port = port;
+                })
+                [
+                  5000
+                  5001
+                  5002
+                  5003
+                ]
+            )
+          );
         };
 
         # FIXME(ssh): Use https://superuser.com/questions/838898/ssh-config-host-match-port
@@ -237,30 +242,6 @@ in
           hostname = "ottr.${config.hostSpec.domain}";
           user = config.hostSpec.networking.subnets.ogre.hosts.ottr.user;
           port = 22;
-        };
-
-        "ooze" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-          host = "ooze";
-          hostname = "ooze.${config.hostSpec.domain}";
-          port = config.hostSpec.networking.ports.tcp.ssh;
-          # Serial consoles are attached to the server, so use socat to forward them as needed
-          localForwards = lib.flatten (
-            lib.optionals config.hostSpec.isWork (
-              lib.map
-                (port: {
-                  bind.address = "localhost";
-                  bind.port = port;
-                  host.address = "localhost";
-                  host.port = port;
-                })
-                [
-                  5000
-                  5001
-                  5002
-                  5003
-                ]
-            )
-          );
         };
 
         # Isolated lab network, where IPs overlap all the time
