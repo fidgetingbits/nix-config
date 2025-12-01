@@ -295,7 +295,7 @@ in
       // (inputs.nix-secrets.networking.ssh.matchBlocks lib)
       // unlockableHostsConfig
       // vanillaHostsConfig
-      // lib.optionalAttrs config.hostSpec.isWork inputs.nix-secrets.work.ssh.matchBlocks;
+      // lib.optionalAttrs config.hostSpec.isWork (inputs.nix-secrets.work.ssh.matchBlocks lib);
   };
 
   home.file = {
