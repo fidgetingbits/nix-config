@@ -2,7 +2,7 @@
   description = "Minimal NixOS configuration for bootstrapping systems";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     disko.url = "github:nix-community/disko";
     impermanence.url = "github:nix-community/impermanence";
@@ -41,7 +41,7 @@
                 nixpkgs.overlays = [
                   (final: prev: {
                     unstable = import inputs.nixpkgs-unstable {
-                      inherit (final) system;
+                      system = final.stdenv.hostPlatform.system;
                       config.allowUnfree = true;
                     };
                   })

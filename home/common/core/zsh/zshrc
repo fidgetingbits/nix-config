@@ -236,14 +236,6 @@ function escape() {
 
 # FIXME: Using $XDG_RUNTIME_DIR due to https://github.com/Mic92/sops-nix/issues/287
 
-# Need to add a work-only option for this
-
-#if [ "$(uname -s)" = "Darwin" ]; then
-#    source $(getconf DARWIN_USER_TEMP_DIR)/secrets/ida_teams_vault
-#else
-#    source $XDG_RUNTIME_DIR/secrets/ida_teams_vault
-#fi
-
 # We shouldn't need this with programs.zoxide.enableZshIntegration but I seem to anyway :/
 eval "$(zoxide init zsh)"
 

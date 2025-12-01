@@ -14,10 +14,10 @@ let
       )
       # Other external inputs
       // {
-        #neovim = inputs.nixvim-flake.packages.${final.system}.default;
-        neovim = inputs.nixcats-flake.packages.${final.system}.default;
-        nixcats = inputs.nixcats-flake.packages.${final.system}.default;
-        nix-sweep = inputs.nix-sweep.packages.${prev.system}.default;
+        #neovim = inputs.nixvim-flake.packages.${final.stdenv.hostPlatform.system}.default;
+        neovim = inputs.nixcats-flake.packages.${final.stdenv.hostPlatform.system}.default;
+        nixcats = inputs.nixcats-flake.packages.${final.stdenv.hostPlatform.system}.default;
+        nix-sweep = inputs.nix-sweep.packages.${prev.stdenv.hostPlatform.system}.default;
       };
 
     linuxModifications =
@@ -94,7 +94,7 @@ let
     };
     unstable-packages = final: _prev: {
       unstable = import inputs.nixpkgs-unstable {
-        inherit (final) system;
+        system = final.stdenv.hostPlatform.system;
         config.allowUnfree = true;
         overlays = [
           # FIXME: waiting for pyghidra to be merged

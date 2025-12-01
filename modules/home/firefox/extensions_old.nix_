@@ -73,7 +73,7 @@ let
     if ext.package != null then
       ext.package
     else if ext.shortId != null then
-      inputs.firefox-addons.packages.${pkgs.system}.${ext.shortId}
+      inputs.firefox-addons.packages.${pkgs.stdenv.hostPlatform.system}.${ext.shortId}
     else
       throw "Extension must have either 'package' or 'shortId' defined.";
 

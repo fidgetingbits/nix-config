@@ -129,177 +129,174 @@ let
     |> lib.attrsets.mergeAttrsList;
 in
 {
-  programs.ssh =
-    let
-      workConfig = if config.hostSpec.isWork then ''Include config.d/work'' else "";
-    in
-    {
-      enable = true;
+  programs.ssh = {
+    enable = true;
+    enableDefaultConfig = false;
 
-      matchBlocks =
-        let
-          workHosts = if config.hostSpec.isWork then inputs.nix-secrets.work.git.servers else "";
-        in
-        {
-          # Only try to use yubikey for hosts that support it
-          "yubikey-hosts" = lib.hm.dag.entryAfter [ "*" ] {
-            host = "${workHosts} ${yubikeyHostsString}";
-            identitiesOnly = true;
-            identityFile = lib.lists.forEach identityFiles (file: "${config.home.homeDirectory}/.ssh/${file}");
+    matchBlocks =
+      let
+        workHosts = if config.hostSpec.isWork then inputs.nix-secrets.work.git.servers else "";
+      in
+      {
+        # Only try to use yubikey for hosts that support it
+        "yubikey-hosts" = lib.hm.dag.entryAfter [ "*" ] {
+          host = "${workHosts} ${yubikeyHostsString}";
+          identitiesOnly = true;
+          identityFile = lib.lists.forEach identityFiles (file: "${config.home.homeDirectory}/.ssh/${file}");
+        };
+
+        # Only forward agent to hosts that need it
+        "forward-agent-hosts" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
+          host = forwardAgentHostsString;
+          forwardAgent = true;
+        };
+
+        "git" = {
+          host = "github.com gitlab.com";
+          user = "git";
+          # NOTE: not included above because we may need to supply a token when using iso, etc. Also don't want to forward
+          # the agent to git servers.
+          identityFile = lib.lists.forEach identityFiles (file: "${config.home.homeDirectory}/.ssh/${file}");
+        };
+
+        # NOTE: If these are in vanillaHosts then with an extra user entry it doesn't get added
+        "moon" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
+          host = "moon";
+          hostname = "moon.${config.hostSpec.domain}";
+          user = "admin";
+          port = config.hostSpec.networking.ports.tcp.ssh;
+          localForwards =
+            let
+              unifi = config.hostSpec.networking.ports.tcp.unifi-controller;
+            in
+            [
+              {
+                # For unifi-controller web interface
+                bind.address = "localhost";
+                bind.port = unifi;
+                host.address = "localhost";
+                host.port = unifi;
+              }
+            ];
+        };
+
+        # FIXME: These should just be automated via vanilla by querying primaryUsername from the host instead of setting default user to my user...
+        "myth" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
+          host = "myth";
+          hostname = "myth.${config.hostSpec.domain}";
+          user = "admin";
+          port = config.hostSpec.networking.ports.tcp.ssh;
+        };
+
+        # Backup dns entry in fact ddclient screws up
+        # FIXME: Should script these entries probably
+        "myth-backup" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
+          host = "myth-backup";
+          hostname = config.hostSpec.networking.domains.myth-backup;
+          user = "root";
+          port = config.hostSpec.networking.ports.tcp.gitlab;
+          extraOptions = {
+            UserKnownHostsFile = "/dev/null";
+            StrictHostKeyChecking = "no";
           };
+        };
 
-          # Only forward agent to hosts that need it
-          "forward-agent-hosts" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            host = forwardAgentHostsString;
-            forwardAgent = true;
-          };
+        # FIXME(ssh): Use https://superuser.com/questions/838898/ssh-config-host-match-port
+        # to match on port, so I don't need to rely on oath_gitlab by name
+        "oath_gitlab" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
+          host = "oath_gitlab";
+          hostname = "oath.${config.hostSpec.domain}";
+          user = "git";
+          port = config.hostSpec.networking.ports.tcp.gitlab;
+        };
 
-          "git" = {
-            host = "github.com gitlab.com";
-            user = "git";
-            # NOTE: not included above because we may need to supply a token when using iso, etc. Also don't want to forward
-            # the agent to git servers.
-            identityFile = lib.lists.forEach identityFiles (file: "${config.home.homeDirectory}/.ssh/${file}");
-          };
+        "omen" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
+          host = "omen";
+          hostname = "omen.${config.hostSpec.domain}";
+          user = config.hostSpec.networking.subnets.ogre.hosts.omen.user;
+          port = config.hostSpec.networking.ports.tcp.ssh;
+        };
 
-          # NOTE: If these are in vanillaHosts then with an extra user entry it doesn't get added
-          "moon" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            host = "moon";
-            hostname = "moon.${config.hostSpec.domain}";
-            user = "admin";
-            port = config.hostSpec.networking.ports.tcp.ssh;
-            localForwards =
-              let
-                unifi = config.hostSpec.networking.ports.tcp.unifi-controller;
-              in
-              [
-                {
-                  # For unifi-controller web interface
+        "owls" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
+          host = "owls";
+          hostname = "owls.${config.hostSpec.domain}";
+          user = config.hostSpec.networking.subnets.ogre.hosts.owls.user;
+          port = config.hostSpec.networking.ports.tcp.ssh;
+        };
+
+        "oryx" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
+          host = "oryx";
+          hostname = "oryx.${config.hostSpec.domain}";
+          user = config.hostSpec.networking.subnets.ogre.hosts.oryx.user;
+          port = 22;
+        };
+
+        "ottr" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
+          host = "ottr";
+          hostname = "ottr.${config.hostSpec.domain}";
+          user = config.hostSpec.networking.subnets.ogre.hosts.ottr.user;
+          port = 22;
+        };
+
+        "ooze" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
+          host = "ooze";
+          hostname = "ooze.${config.hostSpec.domain}";
+          port = config.hostSpec.networking.ports.tcp.ssh;
+          # Serial consoles are attached to the server, so use socat to forward them as needed
+          localForwards = lib.flatten (
+            lib.optionals config.hostSpec.isWork (
+              lib.map
+                (port: {
                   bind.address = "localhost";
-                  bind.port = unifi;
+                  bind.port = port;
                   host.address = "localhost";
-                  host.port = unifi;
-                }
-              ];
+                  host.port = port;
+                })
+                [
+                  5000
+                  5001
+                  5002
+                  5003
+                ]
+            )
+          );
+        };
+
+        # Isolated lab network, where IPs overlap all the time
+        "lab" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
+          host = config.hostSpec.networking.subnets.lab.wildcard;
+          extraOptions = {
+            UserKnownHostsFile = "/dev/null";
+            StrictHostKeyChecking = "no";
+          };
+        };
+
+        # FIXME: Revisit this, just moving for 25.11 deprecations
+        # We ideally want this to be the last entry
+        "*" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
+          # FIXME(ssh): Control path stuff should probably be for a limited set of systems only?
+          controlMaster = "auto";
+          controlPath = "${config.home.homeDirectory}/.ssh/sockets/S.%r@%h:%p";
+          controlPersist = "60m";
+          # Avoids infinite hang if control socket connection interrupted. ex: vpn goes down/up
+          serverAliveCountMax = 3;
+          serverAliveInterval = 5; # 3 * 5s
+          hashKnownHosts = true;
+          addKeysToAgent = "yes";
+
+          # NOTE: Work entries are encrypted and added via extraConfig for now
+          extraOptions = {
+            SetEnv = "TERM=xterm-256color";
+            UpdateHostKeys = "ask";
           };
 
-          # FIXME: These should just be automated via vanilla by querying primaryUsername from the host instead of setting default user to my user...
-          "myth" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            host = "myth";
-            hostname = "myth.${config.hostSpec.domain}";
-            user = "admin";
-            port = config.hostSpec.networking.ports.tcp.ssh;
-          };
-
-          # Backup dns entry in fact ddclient screws up
-          # FIXME: Should script these entries probably
-          "myth-backup" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            host = "myth-backup";
-            hostname = config.hostSpec.networking.domains.myth-backup;
-            user = "root";
-            port = config.hostSpec.networking.ports.tcp.gitlab;
-            extraOptions = {
-              UserKnownHostsFile = "/dev/null";
-              StrictHostKeyChecking = "no";
-            };
-          };
-
-          # FIXME(ssh): Use https://superuser.com/questions/838898/ssh-config-host-match-port
-          # to match on port, so I don't need to rely on oath_gitlab by name
-          "oath_gitlab" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            host = "oath_gitlab";
-            hostname = "oath.${config.hostSpec.domain}";
-            user = "git";
-            port = config.hostSpec.networking.ports.tcp.gitlab;
-          };
-
-          "omen" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            host = "omen";
-            hostname = "omen.${config.hostSpec.domain}";
-            user = config.hostSpec.networking.subnets.ogre.hosts.omen.user;
-            port = config.hostSpec.networking.ports.tcp.ssh;
-          };
-
-          "owls" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            host = "owls";
-            hostname = "owls.${config.hostSpec.domain}";
-            user = config.hostSpec.networking.subnets.ogre.hosts.owls.user;
-            port = config.hostSpec.networking.ports.tcp.ssh;
-          };
-
-          "oryx" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            host = "oryx";
-            hostname = "oryx.${config.hostSpec.domain}";
-            user = config.hostSpec.networking.subnets.ogre.hosts.oryx.user;
-            port = 22;
-          };
-
-          "ottr" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            host = "ottr";
-            hostname = "ottr.${config.hostSpec.domain}";
-            user = config.hostSpec.networking.subnets.ogre.hosts.ottr.user;
-            port = 22;
-          };
-
-          "ooze" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            host = "ooze";
-            hostname = "ooze.${config.hostSpec.domain}";
-            port = config.hostSpec.networking.ports.tcp.ssh;
-            # Serial consoles are attached to the server, so use socat to forward them as needed
-            localForwards = lib.flatten (
-              lib.optionals config.hostSpec.isWork (
-                lib.map
-                  (port: {
-                    bind.address = "localhost";
-                    bind.port = port;
-                    host.address = "localhost";
-                    host.port = port;
-                  })
-                  [
-                    5000
-                    5001
-                    5002
-                    5003
-                  ]
-              )
-            );
-          };
-
-          # Isolated lab network, where IPs overlap all the time
-          "lab" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            host = config.hostSpec.networking.subnets.lab.wildcard;
-            extraOptions = {
-              UserKnownHostsFile = "/dev/null";
-              StrictHostKeyChecking = "no";
-            };
-          };
-
-          # FIXME: Revisit this, just moving for 25.11 deprecations
-          # We ideally want this to be the last entry
-          "*" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            # FIXME(ssh): Control path stuff should probably be for a limited set of systems only?
-            controlMaster = "auto";
-            controlPath = "${config.home.homeDirectory}/.ssh/sockets/S.%r@%h:%p";
-            controlPersist = "60m";
-            # Avoids infinite hang if control socket connection interrupted. ex: vpn goes down/up
-            serverAliveCountMax = 3;
-            serverAliveInterval = 5; # 3 * 5s
-            hashKnownHosts = true;
-            addKeysToAgent = "yes";
-
-            # NOTE: Work entries are encrypted and added via extraConfig for now
-            extraOptions = ''
-              SetEnv TERM=xterm-256color
-              UpdateHostKeys ask
-              ${workConfig}
-            '';
-
-          };
-        }
-        // (inputs.nix-secrets.networking.ssh.matchBlocks lib)
-        // unlockableHostsConfig
-        // vanillaHostsConfig;
-    };
+        };
+      }
+      // (inputs.nix-secrets.networking.ssh.matchBlocks lib)
+      // unlockableHostsConfig
+      // vanillaHostsConfig
+      // lib.optionalAttrs config.hostSpec.isWork inputs.nix-secrets.work.ssh.matchBlocks;
+  };
 
   home.file = {
     ".ssh/config.d/.keep".text = "# Managed by Home Manager";
