@@ -21,11 +21,9 @@ in
     in
     {
       enable = true;
-      relayHost = "smtp.protonmail.ch";
-      relayPort = 587;
 
-      config = {
-
+      settings.main = {
+        relayHost = "smtp.protonmail.ch:587";
         ##
         # smtp_xxx is to auth to the relay
         ##
