@@ -136,23 +136,6 @@ in
     {
       enable = true;
 
-      # FIXME(ssh): This should probably be for git systems only?
-      controlMaster = "auto";
-      controlPath = "${config.home.homeDirectory}/.ssh/sockets/S.%r@%h:%p";
-      controlPersist = "60m";
-      # Avoids infinite hang if control socket connection interrupted. ex: vpn goes down/up
-      serverAliveCountMax = 3;
-      serverAliveInterval = 5; # 3 * 5s
-      hashKnownHosts = true;
-      addKeysToAgent = "yes";
-
-      # Bring in decrypted config
-      extraConfig = ''
-        SetEnv TERM=xterm-256color
-        UpdateHostKeys ask
-        ${workConfig}
-      '';
-
       matchBlocks =
         let
           workHosts = if config.hostSpec.isWork then inputs.nix-secrets.work.git.servers else "";
@@ -290,7 +273,28 @@ in
               StrictHostKeyChecking = "no";
             };
           };
-          # NOTE: Work entries are encrypted and added via extraConfig for now
+
+          # FIXME: Revisit this, just moving for 25.11 deprecations
+          # We ideally want this to be the last entry
+          "*" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
+            # FIXME(ssh): Control path stuff should probably be for a limited set of systems only?
+            controlMaster = "auto";
+            controlPath = "${config.home.homeDirectory}/.ssh/sockets/S.%r@%h:%p";
+            controlPersist = "60m";
+            # Avoids infinite hang if control socket connection interrupted. ex: vpn goes down/up
+            serverAliveCountMax = 3;
+            serverAliveInterval = 5; # 3 * 5s
+            hashKnownHosts = true;
+            addKeysToAgent = "yes";
+
+            # NOTE: Work entries are encrypted and added via extraConfig for now
+            extraOptions = ''
+              SetEnv TERM=xterm-256color
+              UpdateHostKeys ask
+              ${workConfig}
+            '';
+
+          };
         }
         // (inputs.nix-secrets.networking.ssh.matchBlocks lib)
         // unlockableHostsConfig

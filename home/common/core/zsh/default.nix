@@ -21,7 +21,7 @@ in
       autoload bashcompinit && bashcompinit
     '';
     syntaxHighlighting.enable = true;
-    dotDir = ".config/zsh";
+    dotDir = "${config.xdg.configHome}/zsh";
     autocd = true;
     history.size = 500000;
     history.share = false; # Rely on atuin for this

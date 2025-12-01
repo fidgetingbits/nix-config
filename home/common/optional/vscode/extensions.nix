@@ -1,6 +1,7 @@
 { inputs, pkgs, ... }:
 let
-  exts = inputs.nix-vscode-extensions.extensions.${pkgs.system}.vscode-marketplace;
+  exts =
+    inputs.nix-vscode-extensions.extensions.${pkgs.stdenv.hostPlatform.system}.vscode-marketplace;
 in
 builtins.attrValues {
   # Git

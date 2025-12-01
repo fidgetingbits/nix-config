@@ -24,16 +24,6 @@ in
       runAsRoot = true;
       # HW TPM Emulation (need to check what systems I have already have hw TPM that could be used)
       #swtpm.enable = true;
-      ovmf = {
-        enable = true;
-        # Re-enable if needing to test secure boot inside a VM
-        #        packages = [
-        #          (pkgs.OVMF.override {
-        #            secureBoot = true;
-        #            tpmSupport = true;
-        #          }).fd
-        #        ];
-      };
       # Allow shared folder with window's hosts - https://discourse.nixos.org/t/virt-manager-cannot-find-virtiofsd/26752/9
       # requires manual setup on the guest of winfsp and virtio-win-guest-tools
       # https://github.com/virtio-win/kvm-guest-drivers-windows/wiki/Virtiofs:-Shared-file-system#guest

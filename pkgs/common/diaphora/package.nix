@@ -16,6 +16,8 @@ let
       hash = "sha256-goo0JAOu+7endLUkvkNLEKDief0IQISoEGq4E3UQQCE=";
     };
     doCheck = true;
+    pyproject = true;
+    build-system = [ python3Packages.setuptools ];
 
     meta = {
       description = "Python difflib sequence matcher reimplemented in C.";

@@ -71,7 +71,7 @@
   inputs = {
 
     #################### Core Nix Sources ####################
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     #nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.05";
 
@@ -80,15 +80,8 @@
       #inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # orby is gone
-    #nixpkgs-darwin.url = "github:nixos/nixpkgs/nixpkgs-25.05-darwin";
-    #nix-darwin = {
-    #  url = "github:lnl7/nix-darwin";
-    #  inputs.nixpkgs.follows = "nixpkgs-darwin";
-    #};
-
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.05";
+      url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -168,7 +161,7 @@
 
     #################### Ricing ####################
     stylix = {
-      url = "github:danth/stylix/release-25.05";
+      url = "github:danth/stylix/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     silentSDDM = {

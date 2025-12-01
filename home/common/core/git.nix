@@ -13,7 +13,7 @@
   ];
 
   programs.git = {
-    package = pkgs.gitAndTools.gitFull;
+    package = pkgs.gitFull;
     enable = true;
 
     ignores = [

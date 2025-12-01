@@ -93,11 +93,9 @@ in
   ];
 
   programs.git = {
-    userName = config.hostSpec.handle;
-    userEmail = config.hostSpec.email.git;
-
-    # Enforce SSH to leverage yubikey
-    extraConfig = {
+    settings = {
+      user.name = config.hostSpec.handle;
+      user.email = config.hostSpec.email.git;
       # NOTE: This is way too spammy when looking at repo logs with untrusted keys
       # log.showSignature = "true";
       init.defaultBranch = "main";

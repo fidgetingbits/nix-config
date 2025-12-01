@@ -25,7 +25,7 @@
         procs # ps replacement
         duf # df replacement
         ripgrep # grep replacement
-        du-dust # du replacement
+        dust # du replacement
         p7zip # archive
         pstree # tree-style ps
         lsof # list open files

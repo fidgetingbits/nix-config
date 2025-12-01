@@ -2,10 +2,10 @@
 {
   services.acpid.enable = true;
   services.logind = {
-    powerKey = "suspend";
-    lidSwitch = "suspend";
-    extraConfig = ''
-      HandleLidSwitchExternalPower=suspend
-    '';
+    settings.Login = {
+      HandlePowerKey = "suspend";
+      HandleLidSwitch = "suspend";
+      HandleLidSwitchExternalPower = "suspend";
+    };
   };
 }

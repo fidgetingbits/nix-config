@@ -51,7 +51,7 @@
     builtins.attrValues {
       inherit (pkgs)
         chromium
-        chrome-gnome-shell # Allow gnome extension installation from chrome
+        gnome-browser-connector # Allow gnome extension installation from chrome
         # FIXME: See if we can get settings described here https://itsfoss.com/three-finger-swipe-gnome/ declaratively
         # https://discourse.nixos.org/t/need-help-for-nixos-gnome-scaling-settings/24590/5
         #touchegg # touchpad gestures

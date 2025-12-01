@@ -157,7 +157,7 @@ in
           font-awesome
 
           noto-fonts
-          noto-fonts-emoji
+          noto-fonts-color-emoji
           # noto-fonts-extra
 
           source-sans

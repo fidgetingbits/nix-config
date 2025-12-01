@@ -38,11 +38,11 @@
 
     fcitx5 = {
       addons = with pkgs; [
-        fcitx5-chinese-addons
+        qt6Packages.fcitx5-chinese-addons
+        qt6Packages.fcitx5-configtool # Might need to enable rime using configtool after installed
         fcitx5-table-extra
         fcitx5-chewing # Adds zhuyin https://fcitx-im.org/wiki/Chewing
         fcitx5-rime
-        fcitx5-configtool # Might need to enable rime using configtool after installed
         fcitx5-gtk
         libsForQt5.fcitx5-qt
       ];

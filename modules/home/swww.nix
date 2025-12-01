@@ -70,7 +70,8 @@ in
 
               function wait_swww() {
                 echo "Checking swww daemon is up"
-                while ! swww query 2>/dev/null; do
+                #while ! swww query 2>/dev/null; do
+                while ! swww query ; do
                   # Handle: 'Error: "Socket file not found. Are you sure swww-daemon is running?"'
                   sleep 1;
                 done
