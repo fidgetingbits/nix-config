@@ -8,7 +8,7 @@ in
       enable = lib.mkEnableOption "cakes tunnel";
       sopsEntry = lib.mkOption rec {
         type = lib.types.str;
-        default = "keys/ssh/id_ed25519";
+        default = "keys/ssh/ed25519";
         example = default;
         description = "Yaml path in sops file that points to the ssh key";
       };
