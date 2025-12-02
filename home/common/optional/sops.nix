@@ -14,6 +14,10 @@ let
     "derp"
     "desi"
   ];
+
+  # Linux: Exists in $XDG_RUNTIME_DIR/id_dade
+  # Darwin: Exists in $(getconf DARWIN_USER_TEMP_DIR)
+  #   ex: /var/folders/pp/t8_sr4ln0qv5879cp3trt1b00000gn/T/id_dade
   yubikeySecrets = lib.optionalAttrs config.hostSpec.useYubikey (
     {
       "keys/u2f" = {
@@ -44,9 +48,6 @@ in
     defaultSopsFile = "${sopsFolder}/${config.hostSpec.hostName}.yaml";
     validateSopsFiles = false;
 
-    # Linux: Exists in $XDG_RUNTIME_DIR/id_dade
-    # Darwin: Exists in $(getconf DARWIN_USER_TEMP_DIR)
-    #   ex: /var/folders/pp/t8_sr4ln0qv5879cp3trt1b00000gn/T/id_dade
     secrets = {
       "keys/git-crypt" = {
         sopsFile = "${sopsFolder}/shared.yaml";
