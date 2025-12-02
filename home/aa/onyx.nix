@@ -15,7 +15,6 @@
       ++
         # Optional common modules
         (map (f: "home/common/optional/${f}") [
-          "ssh"
           "audio-tools.nix"
           #"vscode"
           "development"

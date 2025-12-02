@@ -12,7 +12,6 @@
         "home/common/core/nixos.nix"
       ]
       ++ (map (f: "home/common/optional/${f}") [
-        "ssh"
         "sops.nix"
       ])
     ))

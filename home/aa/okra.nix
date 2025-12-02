@@ -9,7 +9,6 @@
       ++
         # Optional common modules
         (map (f: "home/common/optional/${f}") [
-          "ssh"
           "gnome-terminal.nix"
         ])
     )
