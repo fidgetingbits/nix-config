@@ -16,9 +16,15 @@ let
         coreutils
         rsync
         openssh
+        util-linux
         ;
     };
     text = ''
+      exec {LOCKFD}> /var/lock/mirror-backups.lock
+      if ! flock -n ''${LOCKFD}; then
+        echo "Another backup running; exiting"
+        exit 0
+      fi
       rsync -e 'ssh -l ${cfg.user} -i ${sshKeyPath} -p ${port}' \
         -cau --no-p --stats \
         ${lib.concatStringsSep " " cfg.folders} \
