@@ -5,7 +5,6 @@
   ...
 }:
 {
-
   imports = (
     map lib.custom.relativeToRoot (
       # FIXME: remove after fixing user/home values in HM
