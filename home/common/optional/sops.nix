@@ -14,8 +14,8 @@ let
     "derp"
     "desi"
   ];
-  yubikeySecrets =
-    lib.optionalAttrs config.hostSpec.useYubikey {
+  yubikeySecrets = lib.optionalAttrs config.hostSpec.useYubikey (
+    {
       "keys/u2f" = {
         path = "${homeDirectory}/.config/Yubico/u2f_keys";
       };
@@ -27,7 +27,8 @@ let
           path = "${homeDirectory}/.ssh/id_${name}";
         };
       }) yubikeys
-    );
+    )
+  );
 
   workSecrets = "${sopsFolder}/work.yaml";
   workSopsSecrets = lib.optionalAttrs config.hostSpec.isWork (
