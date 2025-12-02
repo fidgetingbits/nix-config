@@ -80,6 +80,7 @@
     isProduction = lib.mkForce true;
     isAutoStyled = lib.mkForce true;
     isDevelopment = lib.mkForce true;
+    isAdmin = lib.mkForce true;
   };
   system.impermanence.enable = true;
   voiceCoding.enable = config.hostSpec.voiceCoding;

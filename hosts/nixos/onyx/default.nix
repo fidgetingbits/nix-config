@@ -94,6 +94,7 @@ rec {
     useAtticCache = lib.mkForce true;
     isDevelopment = lib.mkForce true;
     isRoaming = lib.mkForce true;
+    isAdmin = lib.mkForce true;
     users = lib.mkForce [
       "aa"
     ];

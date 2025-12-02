@@ -131,6 +131,11 @@
           default = (!config.hostSpec.isRemote);
           description = "Used to indicate a host that is remotely managed";
         };
+        isAdmin = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = "Used to indicate a host that is used to admin other systems";
+        };
         useYubikey = lib.mkOption {
           type = lib.types.bool;
           default = false;
