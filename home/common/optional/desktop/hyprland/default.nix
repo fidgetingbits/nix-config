@@ -20,10 +20,10 @@
       # Hyprland utilities
       ./wlogout.nix
       ./hyprlock.nix
+      ./preview-share-picker.nix
       #./pyperland.nix
     ];
 
-  home.packages = [ pkgs.hypr-binds ];
   wayland.windowManager.hyprland = {
     enable = true;
     systemd = {
