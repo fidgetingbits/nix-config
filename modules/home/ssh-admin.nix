@@ -9,7 +9,6 @@ let
   cfg = config.hostSpec;
 in
 lib.mkIf cfg.isAdmin {
-
   sshAutoEntries = {
     enable = true;
     ykDomainHosts = [

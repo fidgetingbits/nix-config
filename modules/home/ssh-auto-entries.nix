@@ -16,6 +16,11 @@ in
         default = [ ];
         description = "";
       };
+      unlockableHosts = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [ ];
+        description = "";
+      };
       identityFiles = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [ (if cfg.useYubikey then "id_yubikey" else "id_ed25519") ];
@@ -62,9 +67,12 @@ in
         |> lib.filter (name: name != "iso");
 
       nixosHostsUnlockable =
-        inputs.self.nixosConfigurations
-        |> lib.filterAttrs (name: host: host.config.services.remoteLuksUnlock.enable or false)
-        |> lib.attrNames;
+        (
+          inputs.self.nixosConfigurations
+          |> lib.filterAttrs (name: host: host.config.services.remoteLuksUnlock.enable or false)
+          |> lib.attrNames
+        )
+        ++ cfg.unlockableHosts;
       nixosHostsUnlockableNames = lib.lists.map (host: "${host}-unlock") nixosHostsUnlockable;
 
       # There are a subset of hosts where yubikey is used for authentication.
