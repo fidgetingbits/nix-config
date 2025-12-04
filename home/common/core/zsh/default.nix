@@ -8,11 +8,14 @@ let
   homeDirectory = config.home.homeDirectory;
 in
 {
-  # This can alternate between starship and p10k for testing
   p10k.enable = true;
-  # programs.startship = {
+
+  # programs.starship = {
   #   enable = true;
   #   package = pkgs.unstable.starship;
+  #   right_divider_str = "  ";
+  #   left_divider_str = "  ";
+  #   fill_str = "·";
   # };
 
   home.packages = [
@@ -33,6 +36,12 @@ in
     history.size = 500000;
     history.share = false; # Rely on atuin for this
 
+    # Prevent interference from /etc/zshrc
+    # NOTE: This will omit /etc/zinputrc which is needed elsewhere...
+    # envExtra = ''
+    #   setopt no_global_rcs
+    # '';
+
     # NOTE: zsh module will load *.plugin.zsh files by default if they are located in the src=<folder>, so
     # supply the full folder path to the plugin in src=. To find the correct path, atm you must check the
     # plugins derivation until PR XXXX (file issue) is fixed
@@ -43,7 +52,6 @@ in
     initContent = lib.mkMerge [
       (lib.mkBefore ''
         zmodload zsh/zprof # profiling startup times
-
 
         source "${pkgs.fzf-git-sh}/share/fzf-git-sh/fzf-git.sh"
         source ${pkgs.fzf}/share/fzf/key-bindings.zsh

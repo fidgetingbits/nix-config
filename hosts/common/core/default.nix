@@ -53,13 +53,6 @@ in
   # If there is a conflict file that is backed up, use this extension
   home-manager.backupFileExtension = "bk";
 
-  # On darwin it's important this is outside home-manager
-  programs.zsh = {
-    enable = true;
-    enableCompletion = true;
-    promptInit = "source ''${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
-  };
-
   # FIXME: This doesn't all apply if system is remotely managed, so need to
   # rework it. Ideally want to check something like isRemotelyManaged, but
   # will have to be like isDarwin outside of host-spec

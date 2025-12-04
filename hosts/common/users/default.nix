@@ -139,26 +139,27 @@ in
         ))
         // {
           root = {
-            # FIXME: We should set this to the other users stateVersion instead?
-            #home.stateVersion = users."${config.hostSpec.primaryUsername}".home.stateVersion;
             home.stateVersion = "23.05"; # Avoid error
+            imports = (
+              map lib.custom.relativeToRoot [
+                "modules/home/starship.nix"
+                "modules/home/p10k"
+              ]
+            );
+
+            # programs.starship = {
+            #   enable = true;
+            #   package = pkgs.unstable.starship;
+            #   right_divider_str = "  ";
+            #   left_divider_str = "  ";
+            #   fill_str = "·";
+            # };
+
             programs.zsh = {
               enable = true;
-              plugins = [
-                {
-                  name = "powerlevel10k-config";
-                  src = lib.custom.relativeToRoot "home/common/core/zsh/p10k";
-                  file = "p10k.zsh.theme";
-                }
-
-                # FIXME(zsh): double check why I had added this in addition to my own theme above
-                {
-                  name = "zsh-powerlevel10k";
-                  src = "${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k";
-                  file = "powerlevel10k.zsh-theme";
-                }
-              ];
             };
+            p10k.enable = true;
+
           };
         };
     };

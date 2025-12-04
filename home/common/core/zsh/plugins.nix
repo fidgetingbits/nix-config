@@ -1,12 +1,5 @@
 { pkgs, lib }:
 [
-
-  # FIXME(zsh): double check why I had added this in addition to my own theme above
-  #  {
-  #    name = "zsh-powerlevel10k";
-  #    src = "${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k";
-  #    file = "powerlevel10k.zsh-theme";
-  #  }
   {
     name = "zhooks";
     src = "${pkgs.zsh-zhooks}/share/zsh/zhooks";
