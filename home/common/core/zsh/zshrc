@@ -347,7 +347,7 @@ function bump_lock() {
 
 # FIXME: These should move to the nix-config devshell probably
 function nix_hosts() {
-    nix flake show -reference-lock-file locks/"$(hostname)".lock --json 2>/dev/null | jq -r '.nixConfigurations | keys[]'
+    nix flake show --reference-lock-file locks/"$(hostname)".lock --json 2>/dev/null | jq -r '.nixosConfigurations | keys[]'
 }
 
 function build() {
@@ -362,6 +362,11 @@ function upgrade() {
     host="$(nix_hosts | fzf_auto_select)"
     just update "$host"
     just build-host "$host"
+}
+
+function reboot-host() {
+    host="$(nix_hosts | fzf_auto_select)"
+    ssh $host "systemctl reboot"
 }
 
 # List the dates for all flake.lock inputs to see how long ago they were updated
