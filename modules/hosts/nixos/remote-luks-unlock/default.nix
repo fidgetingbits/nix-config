@@ -1,5 +1,3 @@
-# https://github.com/jasonodoom/nixos-configs/blob/a4512bd282baef497802e91777b908cc1124f4a2/framework-desktop/modules/security/luks.nix#L36
-# Does that config imply you can maybe yubikey unlock the disk over ssh? Should test
 {
   config,
   lib,
@@ -13,6 +11,12 @@ in
   options = {
     services.remoteLuksUnlock = {
       enable = lib.mkEnableOption "Boot-time remote LUKS decrypt unlock service";
+      unlockOnly = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        example = false;
+        description = "Only allow unlocking of the root filesystem as opposed to general SSH access";
+      };
       ssh = lib.mkOption {
         type = lib.types.submodule {
           options = {
@@ -150,48 +154,87 @@ in
               |> map (user: config.users.users.${user}.openssh.authorizedKeys.keys)
               |> lib.concatLists;
             hostKeys = [ "/etc/secrets/initrd/ssh_host_ed25519_key" ];
+            extraConfig = ''
+              PrintMotd yes
+            '';
           };
         };
 
         systemd = {
           enable = true;
-          # emergencyAccess = true;
-          users.root.shell = "/bin/systemd-tty-ask-password-agent";
-        }
-        # Optionally dispatch email when system enters remote unlock state
-        //
-          lib.optionalAttrs cfg.notify.enable
+          emergencyAccess = cfg.unlockOnly;
+          contents."/etc/motd".text = ''
+            Use systemd-tty-ask-password-agent
+          '';
+          users.root.shell = if cfg.unlockOnly then "/bin/systemd-tty-ask-password-agent" else "/bin/bash";
 
-            {
-              extraBin = {
-                msmtp = "${pkgs.msmtp}/bin/msmtp";
-                luks-ready-notify = luksReadyScript;
+          extraBin =
+            lib.optionalAttrs (!cfg.unlockOnly) {
+              ip = lib.getExe' pkgs.iproute2 "ip";
+              ping = lib.getExe' pkgs.iptuils "ping";
+            }
+            // lib.optionalAttrs cfg.notify.enable {
+              msmtp = lib.getExe' pkgs.msmtp "msmtp";
+              luks-ready-notify = luksReadyScript;
+            };
+
+          # Configure system to auto-reboot instead of hang on emergency
+          # this allows retrying if passphrase was pasted incorrectly
+          targets.emergency.wants = [
+            "initrd-reboot.timer"
+          ];
+
+          timers = {
+            initrd-reboot = {
+              unitConfig.DefaultDependencies = false;
+              timerConfig = {
+                OnActiveSec = "10";
+                Unit = "initrd-reboot.service";
               };
+              conflicts = [ "shutdown.target" ];
+              before = [
+                "timers.target"
+                "shutdown.target"
+              ];
+            };
+          };
 
-              services.luks-ready-notify = {
-                description = "Email notification when LUKS unlock via SSH is ready";
-                unitConfig.DefaultDependencies = false;
-                after = [
-                  "network-online.target"
-                  "initrd-nixos-copy-secrets.service"
-                ];
-                before = [
-                  "sshd.service"
-                ];
-                wants = [
-                  "network-online.target"
-                  "initrd-nixos-copy-secrets.service"
-                ];
-                wantedBy = [ "sshd.service" ];
-
-                serviceConfig = {
-                  Type = "oneshot";
-                  ExecStart = "${luksReadyScript}";
-                  StandardOutput = "journal";
-                  StandardError = "journal";
-                };
+          services = {
+            initrd-reboot = {
+              description = "Reboot device to avoid hang on emergency access";
+              unitConfig.DefaultDependencies = false;
+              serviceConfig = {
+                Type = "oneshot";
+                ExecStart = "systemctl reboot";
               };
             };
+          }
+          // lib.optionalAttrs cfg.notify.enable {
+            luks-ready-notify = {
+              description = "Email notification when LUKS unlock via SSH is ready";
+              unitConfig.DefaultDependencies = false;
+              after = [
+                "network-online.target"
+                "initrd-nixos-copy-secrets.service"
+              ];
+              before = [
+                "sshd.service"
+              ];
+              wants = [
+                "network-online.target"
+                "initrd-nixos-copy-secrets.service"
+              ];
+              wantedBy = [ "sshd.service" ];
+
+              serviceConfig = {
+                Type = "oneshot";
+                ExecStart = "${luksReadyScript}";
+                StandardOutput = "journal";
+                StandardError = "journal";
+              };
+            };
+          };
+        };
       };
   };
 }

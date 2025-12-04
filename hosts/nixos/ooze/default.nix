@@ -68,6 +68,7 @@
   # to unlock
   services.remoteLuksUnlock = {
     enable = true;
+    unlockOnly = true;
     notify.to = config.hostSpec.email.olanAdmins;
   };
 
