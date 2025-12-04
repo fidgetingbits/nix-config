@@ -1,7 +1,7 @@
 # A heavily opinionated starship module
 
-# Reference of how Starship maps to Base24 since it is only apparent when looking at the generated .toml
-# and doesn't make use of the full palette
+# Reference of how Starship maps to Base24 since it is only apparent when
+# looking at the generated .toml and doesn't make use of the full palette
 
 # Base[00] = starship color token
 # -------------------------------
