@@ -8,6 +8,13 @@ let
   homeDirectory = config.home.homeDirectory;
 in
 {
+  # This can alternate between starship and p10k for testing
+  p10k.enable = true;
+  # programs.startship = {
+  #   enable = true;
+  #   package = pkgs.unstable.starship;
+  # };
+
   home.packages = [
     pkgs.bitwarden-cli # for cmd line password generation
     pkgs.rmtrash # temporarily cache deleted files for recovery
@@ -37,12 +44,6 @@ in
       (lib.mkBefore ''
         zmodload zsh/zprof # profiling startup times
 
-        # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-        # Initialization code that may require console input (password prompts, [y/n]
-        # confirmations, etc.) must go above this block; everything else may go below.
-        if [[ -r "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh" ]]; then
-          source "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh"
-        fi
 
         source "${pkgs.fzf-git-sh}/share/fzf-git-sh/fzf-git.sh"
         source ${pkgs.fzf}/share/fzf/key-bindings.zsh
@@ -102,6 +103,7 @@ in
 
     shellAliases = import ./aliases.nix { inherit config pkgs lib; };
   };
+
   programs.zoxide = {
     enable = true;
     enableZshIntegration = true;
