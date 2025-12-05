@@ -1,6 +1,6 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 {
-  home.packages = builtins.attrValues {
+  home.packages = lib.attrValues {
     inherit (pkgs)
       gimp # image editor
       drawio # vector diagram editor

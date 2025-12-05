@@ -78,7 +78,7 @@ let
   );
   # FIXME: This should be a list of various exclude files eventually
   darwinExcludesFile = pkgs.writeText "borg-exclude-macos-core.list" (
-    builtins.readFile ./borg-exclude-macos-core.list
+    lib.readFile ./borg-exclude-macos-core.list
   );
 in
 {
@@ -194,7 +194,7 @@ in
 
   config = lib.mkIf cfg.enable (
     let
-      shellScriptHelpers = builtins.readFile ./backup-helpers.sh;
+      shellScriptHelpers = lib.readFile ./backup-helpers.sh;
       # FIXME(borg): - Should create a help script to actually dump and explain all of these from cli
       shellScriptOptionHandling = ''
         BORG_USER="''${BORG_USER:-${cfg.borgUser}}"

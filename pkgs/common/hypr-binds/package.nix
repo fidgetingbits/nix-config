@@ -18,5 +18,5 @@ writeShellScriptBin "hypr-binds" (
   ''
     export PATH=${lib.makeBinPath dependencies}:$PATH
   ''
-  + (builtins.readFile ./hypr-binds.sh)
+  + (lib.readFile ./hypr-binds.sh)
 )

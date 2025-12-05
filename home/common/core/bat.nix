@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 {
   programs.bat = {
     # https://github.com/sharkdp/bat
@@ -9,7 +9,7 @@
       # Show Git modifications and file header (but no grid)
       style = "changes,header";
     };
-    extraPackages = builtins.attrValues {
+    extraPackages = lib.attrValues {
       inherit (pkgs.bat-extras)
         batgrep # search through and highlight files using ripgrep
         batdiff # Diff a file against the current git index, or display the diff between to files

@@ -81,5 +81,5 @@
       remoteMachines = lib.filter (m: m.hostName != "localhost") config.nix.buildMachines;
       hostNameList = map (machine: machine.hostName) remoteMachines;
     in
-    builtins.concatStringsSep "\n" (map genHostEntry hostNameList);
+    lib.concatStringsSep "\n" (map genHostEntry hostNameList);
 }

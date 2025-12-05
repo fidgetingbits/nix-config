@@ -128,7 +128,7 @@ let
   ];
 
   chineseFonts =
-    builtins.attrValues {
+    lib.attrValues {
       inherit (pkgs)
         noto-fonts-cjk-sans
         source-han-sans
@@ -150,7 +150,7 @@ in
     enableDefaultPackages = true;
     fontDir.enable = true;
     packages = (
-      builtins.attrValues {
+      lib.attrValues {
         inherit (pkgs)
           # icon fonts
           material-design-icons

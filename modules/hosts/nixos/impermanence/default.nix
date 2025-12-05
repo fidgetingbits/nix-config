@@ -45,8 +45,8 @@
     let
       btrfs-diff = pkgs.writeShellApplication {
         name = "btrfs-diff";
-        runtimeInputs = builtins.attrValues { inherit (pkgs) eza fd btrfs-progs; };
-        text = builtins.readFile ./btrfs-diff.sh;
+        runtimeInputs = lib.attrValues { inherit (pkgs) eza fd btrfs-progs; };
+        text = lib.readFile ./btrfs-diff.sh;
       };
     in
     {

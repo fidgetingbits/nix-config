@@ -13,17 +13,17 @@
     settings = {
       fixed-list-mode = true;
       keyid-format = "0xlong";
-      personal-digest-preferences = builtins.concatStringsSep " " [
+      personal-digest-preferences = lib.concatStringsSep " " [
         "SHA512"
         "SHA384"
         "SHA256"
       ];
-      personal-cipher-preferences = builtins.concatStringsSep " " [
+      personal-cipher-preferences = lib.concatStringsSep " " [
         "AES256"
         "AES192"
         "AES"
       ];
-      default-preference-list = builtins.concatStringsSep " " [
+      default-preference-list = lib.concatStringsSep " " [
         "SHA512"
         "SHA384"
         "SHA256"

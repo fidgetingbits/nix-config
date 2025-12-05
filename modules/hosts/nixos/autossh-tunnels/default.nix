@@ -97,7 +97,7 @@ in
     };
   };
 
-  config = lib.mkIf ((builtins.length (builtins.attrNames cfg.sessions)) > 0) {
+  config = lib.mkIf ((lib.length (lib.attrNames cfg.sessions)) > 0) {
     users = {
       users.autossh = {
         isSystemUser = true;
@@ -131,9 +131,9 @@ in
           ++ (map mkTunnel session.tunnels)
         );
       }
-    ) (builtins.attrNames cfg.sessions);
+    ) (lib.attrNames cfg.sessions);
 
-    systemd.services = builtins.listToAttrs (
+    systemd.services = lib.listToAttrs (
       map (name: {
         name = "autossh-${name}";
         value = {
@@ -168,7 +168,7 @@ in
             RestrictSUIDSGID = true;
           };
         };
-      }) (builtins.attrNames cfg.sessions)
+      }) (lib.attrNames cfg.sessions)
     );
   };
 }

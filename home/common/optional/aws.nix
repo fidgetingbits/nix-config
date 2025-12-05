@@ -2,13 +2,14 @@
   inputs,
   config,
   pkgs,
+  lib,
   ...
 }:
 let
   sopsFolder = (builtins.toString inputs.nix-secrets) + "/sops";
 in
 {
-  home.packages = builtins.attrValues { inherit (pkgs) awscli eksctl kubectl; };
+  home.packages = lib.attrValues { inherit (pkgs) awscli eksctl kubectl; };
 
   sops = {
     secrets = {

@@ -8,7 +8,7 @@
   imports = lib.custom.scanPaths ./.;
 
   home.packages = lib.optionals config.hostSpec.isWork (
-    builtins.attrValues {
+    lib.attrValues {
       inherit (pkgs)
         #ida-free
         #ida-pro

@@ -1,6 +1,6 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 {
-  home.packages = builtins.attrValues {
+  home.packages = lib.attrValues {
     inherit (pkgs)
       yubioath-flutter
       yubikey-personalization

@@ -9,8 +9,8 @@ rec {
   # modules
   scanPaths =
     path:
-    builtins.map (f: (path + "/${f}")) (
-      builtins.attrNames (
+    lib.map (f: (path + "/${f}")) (
+      lib.attrNames (
         lib.attrsets.filterAttrs (
           path: _type:
           (_type == "directory") # include directories
@@ -26,6 +26,6 @@ rec {
   scanPathsFilterPlatform =
     path:
     lib.filter (
-      path: builtins.match "nixos.nix|darwin.nix|nixos|darwin" (leaf (builtins.toString path)) == null
+      path: lib.match "nixos.nix|darwin.nix|nixos|darwin" (leaf (builtins.toString path)) == null
     ) (scanPaths path);
 }

@@ -2,6 +2,7 @@
 {
   pkgs,
   checks,
+  lib,
   ...
 }:
 {
@@ -13,7 +14,7 @@
     BOOTSTRAP_SSH_KEY = "~/.ssh/id_yubikey";
     buildInputs = checks.pre-commit-check.enabledPackages;
     nativeBuildInputs =
-      builtins.attrValues {
+      lib.attrValues {
         inherit (pkgs)
           home-manager
           git
@@ -33,7 +34,6 @@
           ssh-to-age # bootstrap script
           gum # shell script ricing
           ;
-
       }
       ++ [
         # New enough to get memory management improvements

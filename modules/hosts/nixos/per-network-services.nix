@@ -65,8 +65,8 @@ in
   };
   config = lib.mkIf cfg.enable (
     let
-      nixArrayToBashArray = list: builtins.concatStringsSep " " (map (x: "\"${x}\"") list);
-      generateTrustedNetworkArray = builtins.concatStringsSep "\n" (
+      nixArrayToBashArray = list: lib.concatStringsSep " " (map (x: "\"${x}\"") list);
+      generateTrustedNetworkArray = lib.concatStringsSep "\n" (
         lib.imap0 (index: set: ''
           declare -A trusted_network_${builtins.toString index}
           trusted_network_${builtins.toString index}[type]="${set.type}"
@@ -77,7 +77,7 @@ in
       );
       trustedNetworkCheck =
         fieldOne: fieldTwo:
-        builtins.concatStringsSep "\n" (
+        lib.concatStringsSep "\n" (
           lib.imap0 (
             index: _:
             let

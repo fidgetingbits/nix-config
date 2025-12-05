@@ -17,7 +17,7 @@
 
 let
   pythonPath = python3.pkgs.makePythonPath (
-    builtins.attrValues {
+    lib.attrValues {
       inherit (python3.pkgs)
         keystone-engine
         unicorn

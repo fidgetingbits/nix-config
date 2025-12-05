@@ -59,7 +59,7 @@ in
         let
           swww-cycle = pkgs.writeShellApplication {
             name = "swww-cycle";
-            runtimeInputs = builtins.attrValues { inherit (pkgs) coreutils; };
+            runtimeInputs = lib.attrValues { inherit (pkgs) coreutils; };
             text = ''
               LAST_IMAGE=""
               function skip() {

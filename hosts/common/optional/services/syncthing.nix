@@ -26,12 +26,12 @@ let
     # "okra"
   ];
   deviceIds = lib.attrsets.mergeAttrsList (
-    builtins.map (device: { ${device}.id = inputs.nix-secrets.syncthing.${device}; }) deviceList
+    lib.map (device: { ${device}.id = inputs.nix-secrets.syncthing.${device}; }) deviceList
   );
 
   cfg = config.networking.granularFirewall;
 
-  hosts = builtins.attrValues {
+  hosts = lib.attrValues {
     inherit (inputs.nix-secrets.networking.subnets.ogre.hosts)
       oedo
       oryx

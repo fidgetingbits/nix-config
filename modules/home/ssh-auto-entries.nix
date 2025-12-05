@@ -117,7 +117,7 @@ in
             |> lib.custom.relativeToRoot
             |> builtins.readDir
             # nixfmt hack
-            |> builtins.attrNames
+            |> lib.attrNames
           )
           # id_drzt.pub -> id_drzt
           (key: lib.substring 0 (lib.stringLength key - lib.stringLength ".pub") key);

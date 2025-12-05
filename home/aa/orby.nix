@@ -33,7 +33,7 @@
 
   settings.work.enable = true;
 
-  home.packages = builtins.attrValues {
+  home.packages = lib.attrValues {
     inherit (pkgs)
       # darwin-specific stuff
       duti # default app handler for macos

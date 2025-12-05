@@ -5,7 +5,7 @@ let
   lib = import <nixpkgs/lib>;
   testString = "TWFueSBoYW5kcyBtYWtlIGxpZ2h0IHdvcmsu";
 
-  base64Table = builtins.listToAttrs (
+  base64Table = lib.listToAttrs (
     lib.imap0 (i: c: lib.nameValuePair c i) (
       lib.stringToCharacters "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
     )
@@ -13,7 +13,7 @@ let
 
   # Generated using python3:
   # print(''.join([ chr(n) for n in range(1, 256) ]), file=open('ascii', 'w'))
-  ascii = builtins.readFile ./ascii;
+  ascii = lib.readFile ./ascii;
 
   #encode =
   #  str:

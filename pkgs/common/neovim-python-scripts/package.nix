@@ -1,10 +1,13 @@
-{ stdenv, pkgs, ... }:
+{
+  stdenv,
+  pkgs,
+  lib,
+  ...
+}:
 stdenv.mkDerivation {
   name = "neovim-python-scripts";
   buildInputs = [
-    (pkgs.python312.withPackages (
-      pythonPackages: builtins.attrValues { inherit (pythonPackages) pynvim; }
-    ))
+    (pkgs.python312.withPackages (pythonPackages: lib.attrValues { inherit (pythonPackages) pynvim; }))
   ];
   dontUnpack = true;
   installPhase = ''

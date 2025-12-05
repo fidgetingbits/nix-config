@@ -152,7 +152,7 @@ in
             watchdogScript = pkgs.writeShellApplication {
               name = "talon-watchdog";
               runtimeInputs = lib.flatten [
-                (builtins.attrValues {
+                (lib.attrValues {
                   inherit (pkgs)
                     inotify-tools # inotifywait
                     coreutils # cut
@@ -160,7 +160,7 @@ in
                 })
                 talon-notify
               ];
-              text = builtins.readFile ./talon-watchdog.sh;
+              text = lib.readFile ./talon-watchdog.sh;
             };
           in
           {

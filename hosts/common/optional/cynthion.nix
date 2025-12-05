@@ -65,7 +65,7 @@ in
     })
   ];
   environment.systemPackages =
-    builtins.attrValues {
+    lib.attrValues {
       inherit (pkgs.unstable.python312Packages)
         facedancer
         greatfet

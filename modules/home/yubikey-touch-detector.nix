@@ -65,7 +65,7 @@ in
         file = cfg.notificationSoundFile;
         yubikey-play-sound = pkgs.writeShellApplication {
           name = "yubikey-play-sound";
-          runtimeInputs = builtins.attrValues { inherit (pkgs) coreutils mpv netcat; };
+          runtimeInputs = lib.attrValues { inherit (pkgs) coreutils mpv netcat; };
           text = ''
             socket="''${XDG_RUNTIME_DIR:-/run/user/$UID}/yubikey-touch-detector.socket"
 

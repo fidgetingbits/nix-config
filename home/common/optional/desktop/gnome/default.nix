@@ -48,7 +48,7 @@
   };
 
   home.packages =
-    builtins.attrValues {
+    lib.attrValues {
       inherit (pkgs)
         chromium
         gnome-browser-connector # Allow gnome extension installation from chrome

@@ -1,9 +1,10 @@
 {
   pkgs,
+  lib,
   ...
 }:
 {
-  home.packages = builtins.attrValues {
+  home.packages = lib.attrValues {
     inherit (pkgs)
       copyq
       ;

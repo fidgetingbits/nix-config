@@ -10,7 +10,7 @@ let
   port = toString config.hostSpec.networking.ports.tcp.ssh;
   mirror-backups = pkgs.writeShellApplication {
     name = "mirror-backups";
-    runtimeInputs = builtins.attrValues {
+    runtimeInputs = lib.attrValues {
       inherit (pkgs)
         msmtp
         coreutils

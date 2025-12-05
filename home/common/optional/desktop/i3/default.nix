@@ -19,7 +19,7 @@ in
       windowManager.i3 = {
         enable = true;
         config = lib.mkForce null; # ignores all home-manager's default i3 config
-        extraConfig = builtins.readFile ./i3-config;
+        extraConfig = lib.readFile ./i3-config;
       };
       # Path, relative to HOME, where Home Manager should write the X session script.
       # and NixOS will use it to start xorg session when system boot up

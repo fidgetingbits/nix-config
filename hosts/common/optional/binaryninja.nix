@@ -35,7 +35,7 @@ let
     targetPkgs =
       pkgs:
       (
-        builtins.attrValues {
+        lib.attrValues {
           inherit (pkgs)
             dbus
             fontconfig
@@ -57,7 +57,7 @@ let
             xcbutilwm
             ;
         }
-        ++ [ (pkgs.python311.withPackages (ps: builtins.attrValues { inherit (ps) pypresence; })) ]
+        ++ [ (pkgs.python311.withPackages (ps: lib.attrValues { inherit (ps) pypresence; })) ]
       );
     runScript = pkgs.writeScript "binaryninja.sh" ''
       set -e
@@ -76,15 +76,14 @@ let
 
 in
 {
-  environment =
-    {
-      systemPackages = [ binaryninja ];
-    }
-    // lib.optionalAttrs config.system.impermanence.enable {
-      persistence = {
-        "${config.hostSpec.persistFolder}".directories = [ "/opt/binaryninja" ];
-      };
+  environment = {
+    systemPackages = [ binaryninja ];
+  }
+  // lib.optionalAttrs config.system.impermanence.enable {
+    persistence = {
+      "${config.hostSpec.persistFolder}".directories = [ "/opt/binaryninja" ];
     };
+  };
   sops.secrets = {
     "licenses/binaryninja" = {
       sopsFile = "${sopsFolder}/development.yaml";

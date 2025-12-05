@@ -15,7 +15,7 @@
     (lib.custom.scanPathsFilterPlatform ./.)
   ];
 
-  home.packages = builtins.attrValues (
+  home.packages = lib.attrValues (
     {
       inherit (pkgs)
         jq5 # json5-capable jq

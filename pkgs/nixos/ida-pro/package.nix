@@ -36,11 +36,11 @@
   pythonEnv ? python3,
 }:
 
-#   srcs = builtins.fromJSON (builtins.readFile ./srcs.json);
+#   srcs = lib.strings.fromJSON (lib.readFile ./srcs.json);
 let
   dummyFile = builtins.toFile "dummy-ida.run" "dummy file for CI";
   idaFile = "${builtins.getEnv "REPO_PATH"}/pkgs/nixos/ida-pro/ida-pro_90_x64linux.run";
-  isDummyBuild = builtins.getEnv "REPO_PATH" == "" || (!builtins.pathExists idaFile);
+  isDummyBuild = builtins.getEnv "REPO_PATH" == "" || (!lib.pathExists idaFile);
 in
 stdenv.mkDerivation rec {
   pname = "ida-pro";

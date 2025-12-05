@@ -3,7 +3,7 @@
   isNormalUser = true;
   extraGroups =
     let
-      ifTheyExist = groups: builtins.filter (group: builtins.hasAttr group config.users.groups) groups;
+      ifTheyExist = groups: lib.filter (group: lib.hasAttr group config.users.groups) groups;
     in
     lib.flatten [
       (ifTheyExist [

@@ -45,7 +45,7 @@ in
         in
         pkgs.writeShellApplication {
           name = "yubikey-up";
-          runtimeInputs = builtins.attrValues { inherit (pkgs) gawk yubikey-manager; };
+          runtimeInputs = lib.attrValues { inherit (pkgs) gawk yubikey-manager; };
           text = ''
             #!/usr/bin/env bash
             set -euo pipefail
@@ -88,7 +88,7 @@ in
     in
     lib.mkIf config.yubikey.enable {
       environment.systemPackages = lib.flatten [
-        (builtins.attrValues {
+        (lib.attrValues {
           inherit (pkgs)
             gnupg
             pam_u2f # for yubikey with sudo

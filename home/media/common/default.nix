@@ -9,7 +9,7 @@
     )
   );
 
-  home.packages = builtins.attrValues {
+  home.packages = lib.attrValues {
 
   };
 

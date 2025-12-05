@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 {
-  home.packages = builtins.attrValues { inherit (pkgs) shellcheck shfmt; };
+  home.packages = lib.attrValues { inherit (pkgs) shellcheck shfmt; };
 }

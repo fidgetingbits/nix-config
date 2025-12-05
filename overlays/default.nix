@@ -38,7 +38,7 @@ let
             in
             prev.talon-unwrapped.overrideAttrs (oldAttrs: {
               inherit version;
-              src = builtins.fetchurl {
+              src = prev.fetchurl {
                 inherit (beta) url sha256;
               };
             });

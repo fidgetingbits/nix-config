@@ -36,7 +36,7 @@ After a fresh build we can see that the nix settings:
                     in
                     {
                       # Add a section sign (§) to the beginning of each trusted site
-                      policy.sites.trusted = builtins.map (site: "§:" + site) trusted;
+                      policy.sites.trusted = lib.map (site: "§:" + site) trusted;
                     };
 ```
 

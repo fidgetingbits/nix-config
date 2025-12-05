@@ -5,5 +5,5 @@
     enable = true;
     package = pkgs.usbmuxd2; # Failing to connect to iphone 15
   };
-  environment.systemPackages = builtins.attrValues { inherit (pkgs) ifuse libimobiledevice; };
+  environment.systemPackages = lib.attrValues { inherit (pkgs) ifuse libimobiledevice; };
 }

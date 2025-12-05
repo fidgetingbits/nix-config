@@ -87,7 +87,7 @@
   boot = {
     # Cooling / RGB
     # FIXME: probably remove liquidtux since it's for different models
-    extraModulePackages = builtins.attrValues {
+    extraModulePackages = lib.attrValues {
       inherit (config.boot.kernelPackages) liquidtux;
     };
     kernelModules = [
@@ -151,7 +151,7 @@
   # Keyring, required for auth even without gnome
   security.pam.services.sddm.enableGnomeKeyring = true;
 
-  environment.systemPackages = builtins.attrValues {
+  environment.systemPackages = lib.attrValues {
     inherit (pkgs)
       # gnupg - see yubikey.nix
       paperkey # printed gpg key backup utilitie
@@ -228,7 +228,7 @@
 
   services.udev.extraRules = ''
     SUBSYSTEM=="net", ACTION=="add", ATTRS{idVendor}=="0b95", ATTRS{idProduct}=="7720", NAME="usb-eth"
-    ${builtins.readFile "${pkgs.liquidctl}/lib/udev/rules.d/71-liquidctl.rules"}
+    ${lib.readFile "${pkgs.liquidctl}/lib/udev/rules.d/71-liquidctl.rules"}
   '';
 
   tunnels.cakes.enable = true;

@@ -40,7 +40,7 @@
     )
   );
 
-  home.packages = builtins.attrValues {
+  home.packages = lib.attrValues {
     inherit (pkgs)
       openrgb-with-all-plugins # for controlling RGB devices
       ffmpeg # mp4 -> gif conversion, etc

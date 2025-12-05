@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 {
-  home.packages = builtins.attrValues { inherit (pkgs) obs-studio audacity; };
+  home.packages = lib.attrValues { inherit (pkgs) obs-studio audacity; };
 }

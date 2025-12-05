@@ -5,7 +5,7 @@
 }:
 {
   home = {
-    packages = builtins.attrValues (
+    packages = lib.attrValues (
       {
         inherit (pkgs)
           clang-tools # Provides clangd lsp

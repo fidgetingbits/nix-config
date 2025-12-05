@@ -55,7 +55,14 @@
             callPackage = lib.callPackageWith pkgs;
             directory = ./pkgs/common;
           };
-          checks = import ./checks { inherit inputs pkgs system; };
+          checks = import ./checks {
+            inherit
+              inputs
+              pkgs
+              system
+              lib
+              ;
+          };
           formatter = pkgs.nixfmt;
           devShells = import ./shell.nix {
             inherit
@@ -63,6 +70,7 @@
               inputs
               system
               pkgs
+              lib
               ;
           };
         };

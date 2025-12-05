@@ -5,7 +5,7 @@
   ...
 }:
 {
-  environment.systemPackages = builtins.attrValues { inherit (pkgs) s3fs; };
+  environment.systemPackages = lib.attrValues { inherit (pkgs) s3fs; };
   fileSystems."s3fs" = {
     # trim tailing newline or the system will crash :/
     device = inputs.nix-secrets.work.mounts.s3fs.path;

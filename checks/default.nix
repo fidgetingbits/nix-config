@@ -2,6 +2,7 @@
   inputs,
   system,
   pkgs,
+  lib,
   ...
 }:
 {
@@ -9,7 +10,7 @@
     pkgs.runCommand "bats-test"
       {
         src = ../.;
-        buildInputs = builtins.attrValues { inherit (pkgs) bats yq-go inetutils; };
+        buildInputs = lib.attrValues { inherit (pkgs) bats yq-go inetutils; };
       }
       ''
         cd $src
@@ -97,6 +98,15 @@
         enable = true;
         name = "git-crypt encryption check";
         entry = "${./git-crypt-check.sh}";
+        files = ".*"; # or whatever pattern matches your encrypted files
+        language = "script";
+        #pass_on_error = false;
+      };
+
+      unwanted-builtins = {
+        enable = true;
+        name = "unwanted builtins function calls";
+        entry = "${./unwanted-builtins.sh}";
         files = ".*"; # or whatever pattern matches your encrypted files
         language = "script";
         #pass_on_error = false;

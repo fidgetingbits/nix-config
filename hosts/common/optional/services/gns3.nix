@@ -1,8 +1,13 @@
 # https://github.com/johnrizzo1/nixalt/blob/1c654b8c01c4ae3a2c90c4e48f75b4a4af30979b/modules/nixos/virt/gns3.nix#L17
-{ config, pkgs, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 {
 
-  environment.systemPackages = builtins.attrValues {
+  environment.systemPackages = lib.attrValues {
     inherit (pkgs)
       gns3-gui
       gns3-server

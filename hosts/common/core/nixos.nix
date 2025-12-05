@@ -14,7 +14,7 @@
   time.timeZone = lib.mkDefault config.hostSpec.timeZone;
 
   # Core packages not available on darwin
-  environment.systemPackages = builtins.attrValues {
+  environment.systemPackages = lib.attrValues {
     inherit (pkgs)
       cntr # derivation debugging
       # editing
@@ -39,8 +39,8 @@
     let
       pinned = lib.custom.relativeToRoot "hosts/nixos/${config.hostSpec.hostName}/pinned-boot-entry.conf";
     in
-    lib.optionalAttrs (config.boot.loader.systemd-boot.enable && builtins.pathExists pinned) {
-      "pinned-stable.conf" = builtins.readFile pinned;
+    lib.optionalAttrs (config.boot.loader.systemd-boot.enable && lib.pathExists pinned) {
+      "pinned-stable.conf" = lib.readFile pinned;
     };
 
   # FIXME(networking): Some IPs will be different depending on if we are on

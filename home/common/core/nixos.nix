@@ -12,7 +12,7 @@
   ];
   home = {
     packages = lib.optionals (config.hostSpec.isProduction) (
-      builtins.attrValues {
+      lib.attrValues {
         inherit (pkgs)
           e2fsprogs # lsattr, chattr
           cntr # nixpkgs sandbox debugging

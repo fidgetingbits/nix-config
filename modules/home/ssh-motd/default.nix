@@ -9,7 +9,7 @@
 let
   motd = pkgs.writeShellApplication {
     name = "motd";
-    runtimeInputs = builtins.attrValues {
+    runtimeInputs = lib.attrValues {
       inherit (pkgs)
         coreutils
         terminaltexteffects

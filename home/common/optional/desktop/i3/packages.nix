@@ -1,6 +1,6 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 {
-  home.packages = builtins.attrValues {
+  home.packages = lib.attrValues {
     inherit (pkgs)
       # required by https://github.com/adi1090x/polybar-themes
       #rofi # application launcher, the same as dmenu

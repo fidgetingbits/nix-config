@@ -246,7 +246,7 @@
           message = "Talon, which is used for voice coding, does not support Wayland. See https://github.com/splondike/wayland-accessibility-notes";
         }
         {
-          assertion = builtins.elem config.hostSpec.primaryUsername config.hostSpec.users;
+          assertion = lib.elem config.hostSpec.primaryUsername config.hostSpec.users;
           message = "primaryUsername doesn't exist in list of users";
         }
       ];

@@ -3,7 +3,7 @@ let
   exts =
     inputs.nix-vscode-extensions.extensions.${pkgs.stdenv.hostPlatform.system}.vscode-marketplace;
 in
-builtins.attrValues {
+lib.attrValues {
   # Git
   #inherit (exts.eamodio) gitlens; # Fancy git
   #inherit (exts.mhutchie) git-graph; # Git graph

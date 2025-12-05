@@ -8,7 +8,7 @@
 let
   ghidra_pkg = pkgs.unstable.ghidra.withExtensions (
     exts:
-    builtins.attrValues {
+    lib.attrValues {
       inherit (exts) ret-sync;
     }
   );

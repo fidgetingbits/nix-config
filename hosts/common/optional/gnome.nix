@@ -1,9 +1,9 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 {
   services.desktopManager.gnome.enable = true;
   services.gnome.gnome-keyring.enable = true;
 
-  environment.gnome.excludePackages = builtins.attrValues {
+  environment.gnome.excludePackages = lib.attrValues {
     inherit (pkgs)
       gnome-photos
       gnome-tour
@@ -31,7 +31,7 @@
 
   };
   programs.dconf.enable = true;
-  environment.systemPackages = builtins.attrValues {
+  environment.systemPackages = lib.attrValues {
   };
   #services.touchegg.enable = true;
 

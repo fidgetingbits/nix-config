@@ -1,6 +1,7 @@
 {
   inputs,
   pkgs,
+  lib,
   ...
 }:
 {
@@ -54,7 +55,7 @@
         policy = {
           sites = {
             # Noscript adds the section sign "§" to the beginning of the site name
-            trusted = builtins.map (site: "§:" + site) trustedSites;
+            trusted = lib.map (site: "§:" + site) trustedSites;
             untrusted = [ ];
             custom = { };
           };

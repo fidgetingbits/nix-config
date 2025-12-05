@@ -23,7 +23,7 @@ let
     targetPkgs =
       pkgs:
       lib.flatten [
-        (builtins.attrValues {
+        (lib.attrValues {
           inherit (pkgs)
             python3
             pkg-config
@@ -57,7 +57,7 @@ let
       rev = "d5159550ef15d25e7a502aefb50d9cf2b6f25a01";
       sha256 = "sha256-HiXMz7PU5glMkSNt/POY/2mpMiQv2Nnm68V/U8cmbB4=";
     };
-    #src = builtins.fetchGit {
+    #src = pkgs.fetchGit {
     #url = "file:///home/aa/dev/easylkb";  # Path to your local repo
 
     patchPhase = ''
@@ -82,7 +82,7 @@ in
 pkgs.writeShellApplication {
   name = "easylkb";
   runtimeInputs = lib.flatten [
-    (builtins.attrValues {
+    (lib.attrValues {
       inherit (pkgs)
         e2fsprogs # mkfs.ext4
         curl
@@ -92,7 +92,7 @@ pkgs.writeShellApplication {
     pkgs.unstable.debootstrap # unstable important for zstd support
     pkgs.linux.nativeBuildInputs
   ];
-  # propagatedBuildInputs =  builtins.attrValues {inherit (pkgs) gdb;};
+  # propagatedBuildInputs =  lib.attrValues {inherit (pkgs) gdb;};
   text = ''
     #!/usr/bin/env bash
 

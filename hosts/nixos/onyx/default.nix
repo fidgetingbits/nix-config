@@ -143,7 +143,7 @@ rec {
   # Keyring, required for auth even without gnome
   security.pam.services.sddm.enableGnomeKeyring = true;
 
-  environment.systemPackages = builtins.attrValues {
+  environment.systemPackages = lib.attrValues {
     inherit (pkgs)
       # gnupg - see yubikey.nix
       paperkey # printed gpg key backup utilitie
@@ -242,7 +242,7 @@ rec {
     #    FIXME: unrecognized option '--prefer '^(.firefox-wrappe|java)$''
     #    extraArgs =
     #      let
-    #        catPatterns = patterns: builtins.concatStringsSep "|" patterns;
+    #        catPatterns = patterns: lib.concatStringsSep "|" patterns;
     #        preferPatterns = [
     #          ".firefox-wrapped"
     #          "java" # If it's written in java it's uninmportant enough it's ok to kill it

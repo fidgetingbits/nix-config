@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 let
   # FIXME: I currently get the following warnings:
   # svn: warning: cannot set LC_CTYPE locale
@@ -7,56 +7,56 @@ let
   copy-github-subfolder = pkgs.writeShellApplication {
     name = "copy-github-subfolder";
     runtimeInputs = [ pkgs.subversion ];
-    text = builtins.readFile ./copy-github-subfolder.sh;
+    text = lib.readFile ./copy-github-subfolder.sh;
   };
   linktree = pkgs.writeShellApplication {
     name = "linktree";
     runtimeInputs = [ ];
-    text = builtins.readFile ./linktree.sh;
+    text = lib.readFile ./linktree.sh;
   };
   build-cursorless-pr-bundle = pkgs.writeShellApplication {
     name = "build-cursorless-pr-bundle";
-    runtimeInputs = builtins.attrValues { inherit (pkgs) git direnv; };
-    text = builtins.readFile ./build-cursorless-pr-bundle.sh;
+    runtimeInputs = lib.attrValues { inherit (pkgs) git direnv; };
+    text = lib.readFile ./build-cursorless-pr-bundle.sh;
   };
   build-command-server-pr-bundle = pkgs.writeShellApplication {
     name = "build-command-server-pr-bundle";
-    runtimeInputs = builtins.attrValues { inherit (pkgs) git direnv; };
-    text = builtins.readFile ./build-command-server-pr-bundle.sh;
+    runtimeInputs = lib.attrValues { inherit (pkgs) git direnv; };
+    text = lib.readFile ./build-command-server-pr-bundle.sh;
   };
   calculate-flac-hours = pkgs.writeShellApplication {
     name = "calculate-flac-hours";
-    runtimeInputs = builtins.attrValues { inherit (pkgs) sox; };
-    text = builtins.readFile ./calculate-flac-hours.sh;
+    runtimeInputs = lib.attrValues { inherit (pkgs) sox; };
+    text = lib.readFile ./calculate-flac-hours.sh;
   };
   update-core-repos = pkgs.writeShellApplication {
     name = "update-core-repos";
-    runtimeInputs = builtins.attrValues { inherit (pkgs) git; };
-    text = builtins.readFile ./update-core-repos.sh;
+    runtimeInputs = lib.attrValues { inherit (pkgs) git; };
+    text = lib.readFile ./update-core-repos.sh;
   };
   dockertags = pkgs.writeShellApplication {
     name = "dockertags";
-    runtimeInputs = builtins.attrValues { inherit (pkgs) wget jq; };
-    text = builtins.readFile ./dockertags.sh;
+    runtimeInputs = lib.attrValues { inherit (pkgs) wget jq; };
+    text = lib.readFile ./dockertags.sh;
   };
   nixvim-plugins-dir = pkgs.writeShellApplication {
     name = "nixvim-plugins-dir";
     runtimeInputs = [ pkgs.coreutils ];
-    text = builtins.readFile ./nixvim-plugins-dir.sh;
+    text = lib.readFile ./nixvim-plugins-dir.sh;
   };
   populate-cursorless-neovim-node = pkgs.writeShellApplication {
     name = "populate-cursorless-neovim-node";
-    runtimeInputs = builtins.attrValues { inherit (pkgs) git corepack; };
-    text = builtins.readFile ./populate-cursorless-neovim-node.sh;
+    runtimeInputs = lib.attrValues { inherit (pkgs) git corepack; };
+    text = lib.readFile ./populate-cursorless-neovim-node.sh;
   };
   neovim-reload-all = pkgs.writeShellApplication {
     name = "neovim-reload-all";
     runtimeInputs = [ pkgs.neovim ];
-    text = builtins.readFile ./neovim-reload-all.sh;
+    text = lib.readFile ./neovim-reload-all.sh;
   };
   generate-private-git-repos = pkgs.writeShellApplication {
     name = "generate-private-git-repos";
-    runtimeInputs = builtins.attrValues {
+    runtimeInputs = lib.attrValues {
       inherit (pkgs)
         git
         jq
@@ -65,12 +65,12 @@ let
         glab
         ;
     };
-    text = builtins.readFile ./generate-private-git-repos.sh;
+    text = lib.readFile ./generate-private-git-repos.sh;
   };
   git-submodules-ignoreuntracked = pkgs.writeShellApplication {
     name = "git-submodules-ignore-untracked";
-    runtimeInputs = builtins.attrValues { inherit (pkgs) git gnugrep gawk; };
-    text = builtins.readFile ./git-submodules-ignore-untracked.sh;
+    runtimeInputs = lib.attrValues { inherit (pkgs) git gnugrep gawk; };
+    text = lib.readFile ./git-submodules-ignore-untracked.sh;
   };
 in
 {

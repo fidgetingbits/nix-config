@@ -16,7 +16,7 @@ let
   workGitConfig = "${config.home.homeDirectory}/.config/git/gitconfig.work";
 
   #  workGitUrlsTable = lib.optionalAttrs config.hostSpec.isWork (
-  #    builtins.listToAttrs (
+  #    lib.listToAttrs (
   #      map (url: {
   #        name = "ssh://git@${url}";
   #        value = {
@@ -32,7 +32,7 @@ in
   # FIXME: Some of the reversing stuff, etc can likely be moved
   home.packages = lib.flatten [
     (
-      builtins.attrValues {
+      lib.attrValues {
         inherit (pkgs)
           # Development
           direnv
@@ -71,7 +71,7 @@ in
     )
 
     (lib.optionals pkgs.stdenv.isLinux (
-      builtins.attrValues {
+      lib.attrValues {
         inherit (pkgs)
           gdb
           #pwndbg

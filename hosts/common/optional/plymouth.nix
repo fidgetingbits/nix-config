@@ -1,6 +1,6 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 {
-  environment.systemPackages = builtins.attrValues {
+  environment.systemPackages = lib.attrValues {
     inherit (pkgs)
       plymouth # bootscreen
       adi1090x-plymouth-themes # https://github.com/adi1090x/plymouth-themes

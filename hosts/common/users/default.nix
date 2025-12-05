@@ -14,8 +14,8 @@ let
     let
       keyPath = (lib.custom.relativeToRoot "hosts/common/users/${user}/keys/");
     in
-    if (builtins.pathExists keyPath) then
-      lib.lists.forEach (lib.filesystem.listFilesRecursive keyPath) (key: builtins.readFile key)
+    if (lib.pathExists keyPath) then
+      lib.lists.forEach (lib.filesystem.listFilesRecursive keyPath) (key: lib.readFile key)
     else
       [ ];
 

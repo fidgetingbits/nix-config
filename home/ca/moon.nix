@@ -26,7 +26,7 @@
     )
   );
 
-  home.packages = builtins.attrValues {
+  home.packages = lib.attrValues {
     inherit (pkgs)
       google-chrome
       ;

@@ -30,7 +30,7 @@ let
     pkgs.runCommand "${getWLAN file}-ap-names.txt" { } ''
       ${pkgs.yq}/bin/yq -r '.wifi | keys[]' ${sopsFolder}/${file}> "$out"
     ''
-    |> builtins.readFile
+    |> lib.readFile
     |> lib.splitString "\n";
 
   # The WLAN name 'foo' part of a file name such as 'wifi.foo.yaml'
@@ -40,7 +40,7 @@ let
   allWLANFiles =
     builtins.readDir sopsFolder
     |> lib.attrNames
-    |> lib.filter (name: builtins.match "wifi\..*\.yaml" name != null);
+    |> lib.filter (name: lib.match "wifi\..*\.yaml" name != null);
 
   allWLANs = allWLANFiles |> map (file: getWLAN file);
 
@@ -68,7 +68,7 @@ let
       |> lib.filter (name: name != "")
       |> map (name: connectionEntry (getWLAN file) name)
     )
-    |> builtins.concatLists
+    |> lib.concatLists
     |> lib.mergeAttrsList;
 in
 {

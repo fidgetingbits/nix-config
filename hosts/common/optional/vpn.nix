@@ -11,28 +11,27 @@ let
   vpnProfiles = inputs.nix-secrets.work.vpn.profiles;
 in
 {
-  sops.secrets =
-    {
-      "vpn/client.crt" = {
-        owner = config.users.users.${config.hostSpec.username}.name;
-        inherit (config.users.users.${config.hostSpec.username}) group;
+  sops.secrets = {
+    "vpn/client.crt" = {
+      owner = config.users.users.${config.hostSpec.username}.name;
+      inherit (config.users.users.${config.hostSpec.username}) group;
+      sopsFile = "${workSecrets}";
+    };
+    "vpn/client.key" = {
+      owner = config.users.users.${config.hostSpec.username}.name;
+      inherit (config.users.users.${config.hostSpec.username}) group;
+      sopsFile = "${workSecrets}";
+    };
+  }
+  // lib.attrsets.mergeAttrsList (
+    lib.map (vpn: {
+      # IMPORTANT: These must be root owned
+      "vpn/${vpn}" = {
+        path = "/etc/NetworkManager/system-connections/${vpn}.nmconnection";
         sopsFile = "${workSecrets}";
       };
-      "vpn/client.key" = {
-        owner = config.users.users.${config.hostSpec.username}.name;
-        inherit (config.users.users.${config.hostSpec.username}) group;
-        sopsFile = "${workSecrets}";
-      };
-    }
-    // lib.attrsets.mergeAttrsList (
-      builtins.map (vpn: {
-        # IMPORTANT: These must be root owned
-        "vpn/${vpn}" = {
-          path = "/etc/NetworkManager/system-connections/${vpn}.nmconnection";
-          sopsFile = "${workSecrets}";
-        };
-      }) vpnProfiles
-    );
+    }) vpnProfiles
+  );
 
   # FIXME: This should be a dispatcher script started when the VPN is connected...
   systemd.services.vpn-monitor = {
