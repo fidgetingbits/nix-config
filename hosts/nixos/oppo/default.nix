@@ -86,12 +86,7 @@
   };
   boot = {
     # Cooling / RGB
-    # FIXME: probably remove liquidtux since it's for different models
-    extraModulePackages = lib.attrValues {
-      inherit (config.boot.kernelPackages) liquidtux;
-    };
     kernelModules = [
-      "liquidtux"
       "i2c-dev"
       "i2c-piix4"
       "amdgpu-i2c"

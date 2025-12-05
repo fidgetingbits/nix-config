@@ -15,15 +15,12 @@
         # Optional common modules
         (map (f: "home/common/optional/${f}") [
           "sops.nix"
-          "ssh/"
 
           "audio-tools.nix"
           "development"
           "helper-scripts"
           "xdg.nix"
           "gpg.nix"
-          #"kitty.nix"
-          #"wezterm.nix"
           "ghostty.nix"
           "media.nix"
           "networking/protonvpn.nix"
