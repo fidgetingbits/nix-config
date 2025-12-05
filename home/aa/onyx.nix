@@ -100,8 +100,11 @@
   # Allows to show talon icon in system tray.
   # NOTE: Important this doesn't run if using wayland, as conflicts with waybar
   services.snixembed.enable = config.hostSpec.voiceCoding;
-  services.yubikey-touch-detector.enable = true;
-  services.yubikey-touch-detector.notificationSound = true;
+
+  services.yubikey-touch-detector = {
+    enable = true;
+    notificationSound = true;
+  };
 
   # FIXME: Make this part of a module
   services.copyq.enable = true;

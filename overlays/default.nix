@@ -91,6 +91,7 @@ let
           sha256 = "sha256-l6qGSxj/lZ+jUaAFC2LYMwARwQpXmKdvii4jbVR1Kqo=";
         };
       });
+
     };
     unstable-packages = final: _prev: {
       unstable = import inputs.nixpkgs-unstable {
