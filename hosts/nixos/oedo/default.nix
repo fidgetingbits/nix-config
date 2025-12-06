@@ -43,15 +43,17 @@
           # "vpn.nix"
 
           # Window Manager
-          "gnome.nix"
+          #"gnome.nix"
+          "sddm.nix"
 
           "binaryninja.nix"
           # "cynthion.nix"
           "saleae.nix"
 
           # Services
-          # "mounts/oath-cifs.nix"
-          # "mounts/onus-cifs.nix"
+          "mounts/oath-cifs.nix"
+          "mounts/onus-cifs.nix"
+
           # "mounts/s3fs.nix"
           "services/openssh.nix"
           "services/syncthing.nix"
@@ -81,8 +83,14 @@
     isAutoStyled = lib.mkForce true;
     isDevelopment = lib.mkForce true;
     isAdmin = lib.mkForce true;
+
+    # FIXME: We should have like "desktop" = "hyprland" and have that auto enable the rest?
+    defaultDesktop = "hyprland-uwsm";
+    useWayland = true;
   };
   system.impermanence.enable = true;
+
+  desktops.hyprland.enable = true;
   voiceCoding.enable = config.hostSpec.voiceCoding;
 
   # FIXME: Re-enable after pinning the most recent after device switch
