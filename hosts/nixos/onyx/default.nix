@@ -9,8 +9,6 @@
 rec {
   imports = lib.flatten [
     #inputs.nixos-hardware.nixosModules.asus-zenbook-ux371
-    # NOTE: I still use this because I have the hardcoded disks, which should move out I guess
-    ./hardware-configuration.nix
     inputs.nixos-facter-modules.nixosModules.facter
     { config.facter.reportPath = ./facter.json; }
     ./disks.nix
@@ -19,8 +17,6 @@ rec {
       [
         "hosts/common/core"
         "hosts/common/core/nixos.nix"
-        # FIXME: Make this an enable
-        "modules/hosts/common/hyprland.nix"
       ]
       ++
         # Optional common modules
@@ -103,6 +99,9 @@ rec {
     persistFolder = lib.mkForce "";
   };
 
+  # FIXME: Further tweak this
+  desktops.hyprland.enable = true;
+
   wifi = {
     enable = true;
     roaming = config.hostSpec.isRoaming;
@@ -115,7 +114,7 @@ rec {
   # Bootloader
   boot.loader.systemd-boot = {
     enable = true;
-    configurationLimit = lib.mkDefault 10;
+    configurationLimit = lib.mkDefault 5;
     consoleMode = "1";
   };
 
