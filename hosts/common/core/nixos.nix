@@ -27,11 +27,15 @@
   # enable firmware with a license allowing redistribution
   hardware.enableRedistributableFirmware = true;
 
-  boot.kernelPackages = pkgs.linuxPackages_6_18;
+  boot.kernelPackages =
+    if config.hostSpec.isServer then
+      pkgs.linuxPackages_6_12 # LTS
+    else
+      pkgs.linuxPackages_latest;
 
-  # Pin a boot entry if it exists. In order to generate the
-  # pinned-boot-entry.conf for a "stable" generation run: 'just pin' and then
-  # rebuild. See the pin recipe in justfile for more information
+  # Pin a stable boot entry. In order to generate the pinned-boot-entry.conf
+  # for a "stable" generation run 'just pin'.
+  # See the pin recipe in justfile for more information
   boot.loader.systemd-boot.extraEntries =
     let
       pinned = lib.custom.relativeToRoot "hosts/nixos/${config.hostSpec.hostName}/pinned-boot-entry.conf";
