@@ -243,6 +243,7 @@ talon OS URL:
 pin HOST=`hostname`:
     #!/usr/bin/env bash
     shopt -u expand_aliases
+    set -eu
 
     cmd_prefix=''
     cp_cmd='cp '
@@ -271,7 +272,7 @@ pin HOST=`hostname`:
 
     # Set the new root to prevent garbage collection
     PINNED_ROOT=/nix/var/nix/gcroots/pinned-{{ HOST }}
-    $exec_prefix sudo nix-store --add-root $PINNED_ROOT -r /nix/var/nix/profiles/system >/dev/null
+    $cmd_prefix sudo nix-store --add-root $PINNED_ROOT -r /nix/var/nix/profiles/system >/dev/null
     git add $PINNED
     git commit -m "chore: pin {{ HOST }} boot entry for generation $CURRENT"
     echo "Pinned generation $CURRENT to $PINNED_ROOT"
