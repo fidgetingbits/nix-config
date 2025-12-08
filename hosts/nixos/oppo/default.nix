@@ -122,6 +122,7 @@
   #console.font = lib.mkDefault "${pkgs.terminus_font}/share/consolefonts/ter-v32n.psf.gz";
   console.earlySetup = lib.mkDefault true;
 
+  systemd.network.wait-online.enable = false;
   networking.networkmanager.enable = true;
   networking.useDHCP = lib.mkDefault true;
 
