@@ -121,29 +121,24 @@ in
         luks.forceLuksSupportInInitrd = true;
         # Setup the host key as a secret in initrd, so it's not exposed in the /nix/store
         # this is all too earlier for sops
-        secrets = lib.mkForce (
-          {
-            "/etc/secrets/initrd/ssh_host_ed25519_key" = cfg.ssh.key;
-          }
-          // lib.optionalAttrs cfg.notify.enable {
-            "/etc/msmtprc" = pkgs.writeText "msmtprc" ''
-              defaults
-              syslog on
+        secrets = lib.optionalAttrs cfg.notify.enable {
+          "/etc/msmtprc" = pkgs.writeText "msmtprc" ''
+            defaults
+            syslog on
 
-              account default
-              auth on
-              from ${cfg.notify.from}
-              host ${cfg.notify.server}
-              password ${cfg.notify.password}
-              port ${toString cfg.notify.port}
-              syslog LOG_MAIL
-              tls on
-              tls_starttls on
-              tls_certcheck off
-              user ${cfg.notify.user}
-            '';
-          }
-        );
+            account default
+            auth on
+            from ${cfg.notify.from}
+            host ${cfg.notify.server}
+            password ${cfg.notify.password}
+            port ${toString cfg.notify.port}
+            syslog LOG_MAIL
+            tls on
+            tls_starttls on
+            tls_certcheck off
+            user ${cfg.notify.user}
+          '';
+        };
         network = {
           enable = true;
           ssh = {
@@ -153,7 +148,7 @@ in
               cfg.ssh.users
               |> map (user: config.users.users.${user}.openssh.authorizedKeys.keys)
               |> lib.concatLists;
-            hostKeys = [ "/etc/secrets/initrd/ssh_host_ed25519_key" ];
+            hostKeys = [ cfg.ssh.key ];
             extraConfig = ''
               PrintMotd yes
             '';
