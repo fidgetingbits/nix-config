@@ -50,8 +50,9 @@
       # ========== Monitor ==========
       #
       # parse the monitor spec defined in nix-config/home/<user>/<host>.nix
-      monitor = (
-        lib.mapAttrsToList (
+      monitor =
+        config.monitors
+        |> lib.mapAttrsToList (
           name: value:
           "${name},${
             if value.enabled then
@@ -63,8 +64,7 @@
             else
               "disable"
           }"
-        ) (config.monitors)
-      );
+        );
 
       # Mouse/Touchpad
       input = {
