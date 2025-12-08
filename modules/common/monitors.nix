@@ -1,9 +1,5 @@
-# The options set using this module are intended for use with logic defined in
-# specific workspace management configurations. For example, see
-# nix-config/home/ta/common/optional/hyprland/
 { config, lib, ... }:
 {
-  # These can then be handled independently by kanshi, etc
   options.monitors = lib.mkOption {
     description = "List of monitors for use by hyprland, kanshi, etc";
     type = lib.types.attrsOf (
@@ -31,7 +27,7 @@
             example = 1080;
           };
           refreshRate = lib.mkOption {
-            type = lib.types.int;
+            type = lib.types.float;
             default = 60;
           };
           x = lib.mkOption {
@@ -43,7 +39,7 @@
             default = 0;
           };
           scale = lib.mkOption {
-            type = lib.types.number;
+            type = lib.types.float;
             default = 1.0;
           };
           transform = lib.mkOption {
