@@ -117,8 +117,8 @@ in
               (lib.optional (!hostSpec.isMinimal) (
                 map (fullPathIfExists) [
                   "home/${user}/${hostSpec.hostName}.nix"
-                  "home/${user}/common/core"
-                  "home/${user}/common/core/${platform}.nix"
+                  "home/${user}/common/"
+                  "home/${user}/common/${platform}.nix"
                 ]
               ))
               # Static module with common values avoids duplicate file per user
@@ -133,7 +133,7 @@ in
                   };
                 }
               )
-              #sharedModules
+              # sharedModules
             ];
           }) config.hostSpec.users
         ))
