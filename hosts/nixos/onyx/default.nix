@@ -270,4 +270,21 @@ rec {
   # FIXME: Make this a module? hardware should be enabled by facter...
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
+
+  #
+  # ========== Host-specific Monitor Spec ==========
+  #
+  # This uses the nix-config/modules/home/monitors.nix module
+  # Your nix-config/home/<user>/common/optional/desktops/foo.nix WM config should parse and apply these values to it's monitor settings
+  # If on hyprland, use `hyprctl monitors` to get monitor info.
+  # https://wiki.hyprland.org/Configuring/Monitors/
+  monitors = {
+    "eDP-1" = {
+      width = 3840;
+      height = 2160;
+      refreshRate = 60;
+      #transform = 2;
+      scale = 2;
+    };
+  };
 }

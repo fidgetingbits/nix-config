@@ -51,15 +51,15 @@
       #
       # parse the monitor spec defined in nix-config/home/<user>/<host>.nix
       monitor = (
-        map (
-          m:
-          "${m.name},${
-            if m.enabled then
-              "${toString m.width}x${toString m.height}@${toString m.refreshRate}"
-              + ",${toString m.x}x${toString m.y}"
-              + ",${toString m.scale}"
-              + ",transform,${toString m.transform}"
-              + ",vrr,${toString m.vrr}"
+        lib.mapAttrsToList (
+          name: value:
+          "${name},${
+            if value.enabled then
+              "${toString value.width}x${toString value.height}@${toString value.refreshRate}"
+              + ",${toString value.x}x${toString value.y}"
+              + ",${toString value.scale}"
+              + ",transform,${toString value.transform}"
+              + ",vrr,${toString value.vrr}"
             else
               "disable"
           }"

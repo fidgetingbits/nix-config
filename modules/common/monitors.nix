@@ -1,17 +1,18 @@
 # The options set using this module are intended for use with logic defined in
 # specific workspace management configurations. For example, see
 # nix-config/home/ta/common/optional/hyprland/
-{ lib, ... }:
+{ config, lib, ... }:
 {
-  # FIXME: There should be a type "monitor" and monitors should be a list of named monitors.
   # These can then be handled independently by kanshi, etc
   options.monitors = lib.mkOption {
-    type = lib.types.listOf (
+    description = "List of monitors for use by hyprland, kanshi, etc";
+    type = lib.types.attrsOf (
       lib.types.submodule {
         options = {
           name = lib.mkOption {
             type = lib.types.str;
             example = "DP-1";
+            default = config._module.args.name;
           };
           primary = lib.mkOption {
             type = lib.types.bool;
@@ -67,7 +68,7 @@
         };
       }
     );
-    default = [ ];
+    default = { };
   };
   # FIXME: This assert is only relevant if using something that uses the
   # monitors module for now, like hyprland, so should move
