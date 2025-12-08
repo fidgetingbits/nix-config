@@ -41,8 +41,8 @@
       ];
 
     shellHook = checks.pre-commit-check.shellHook or "" + ''
-      # If we don't already have a .git-crypt.key file and have a git-crypt secret exposed via sops,
-      # then decode a copy and place it in the repo
+      # If we don't already have a .git-crypt.key file and have a git-crypt
+      # secret exposed via sops, then decode a copy and place it in the repo
       if [ ! -f .git-crypt.key ] && [ -f ~/.config/sops-nix/secrets/keys/git-crypt ]; then
           base64 -d ~/.config/sops-nix/secrets/keys/git-crypt > .git-crypt.key
           git-crypt unlock .git-crypt.key

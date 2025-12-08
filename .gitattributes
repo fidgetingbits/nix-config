@@ -1,6 +1,7 @@
 **/initrd_ed25519_key filter=git-crypt .git-crypt.key diff=git-crypt .git-crypt.key
 /flake.lock filter=git-crypt .git-crypt.key diff=git-crypt .git-crypt.key
 locks/**   filter=git-crypt .git-crypt.key diff=git-crypt .git-crypt.key
-**/facter.json filter=git-crypt .git-crypt.key diff=git-crypt .git-crypt.key
+**/facter*.json filter=git-crypt .git-crypt.key diff=git-crypt .git-crypt.key
 **/*.pub filter=git-crypt .git-crypt.key diff=git-crypt .git-crypt.key
 **/secret filter=git-crypt .git-crypt.key diff=git-crypt .git-crypt.key
+secrets/** filter=git-crypt .git-crypt.key diff=git-crypt .git-crypt.key

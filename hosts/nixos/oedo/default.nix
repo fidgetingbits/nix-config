@@ -118,14 +118,23 @@
     notify.to = config.hostSpec.email.olanAdmins;
   };
 
-  # FIXME: Confirm network still works after dropping this
-  # boot.initrd.availableKernelModules = [
-  #   "ixgbe" # Not auto-loaded by facter for some reason
-  # ];
+  system.initrd-wifi = {
+    enable = true;
+    interface = "wlp193s0";
+    drivers = [
+      "mt7925e"
+    ];
+    configFile = lib.custom.relativeToRoot "secrets/wpa_supplicant-olan.conf";
+  };
 
   # Stop blocking on network interfaces not needed for boot
   systemd.network.wait-online.enable = false;
   services.gnome.gnome-keyring.enable = true;
+
+  networking.networkmanager.enable = true;
+  networking.networkmanager.wifi.powersave = false;
+  # FIXME:double check this
+  networking.dhcpcd.wait = "background";
 
   # ooze checks for all other hosts, so we just check ooze
   services.heartbeat-check = {
@@ -141,7 +150,15 @@
   services.fwupd.enable = true;
   environment.systemPackages = [
     pkgs.unstable.lshw
+    pkgs.nixos-extract-initrd
   ];
+
+  # FIXME: This could all be automated in a module with hostSpec isWifi and
+  # isRoaming and isRemote
+  wifi = {
+    enable = true;
+    wlans = [ "olan" ];
+  };
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   system.stateVersion = "23.05";
