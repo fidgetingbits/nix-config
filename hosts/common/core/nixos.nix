@@ -31,7 +31,7 @@
     if config.hostSpec.isServer then
       pkgs.linuxPackages_6_12 # LTS
     else
-      pkgs.linuxPackages_latest;
+      pkgs.linuxPackages_6_18;
 
   # Pin a stable boot entry. In order to generate the pinned-boot-entry.conf
   # for a "stable" generation run 'just pin'.
