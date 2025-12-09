@@ -19,7 +19,7 @@
               mode = "${toString value.width}x${toString value.height}@${toString value.refreshRate}Hz";
               scale = value.scale;
               adaptiveSync = value.vrr != 0;
-              position = "${value.x},${value.y}";
+              position = "${toString value.x},${toString value.y}";
             }
           );
       }
