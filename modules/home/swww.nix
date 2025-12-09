@@ -47,7 +47,9 @@ in
     stylix.targets.hyprpaper.enable = lib.mkForce false;
 
     # Skip current wallpaper with:
-    # systemctl --user kill --signal SIGUSR1 swww-cycle.service
+    programs.zsh.shellAliases = {
+      swww-next = "systemctl --user kill --signal SIGUSR1 swww-cycle.service";
+    };
     systemd.user.services.swww-cycle = mkIf (cfg.wallpaperDir != "") {
       Unit = {
         Description = "Cycle wallpaper images using swww";
