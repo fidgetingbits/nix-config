@@ -11,6 +11,7 @@
     inputs.nixos-facter-modules.nixosModules.facter
     { config.facter.reportPath = ./facter.json; }
     ./disks.nix
+    ./monitors.nix
 
     (map lib.custom.relativeToRoot (
       [
