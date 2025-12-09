@@ -55,7 +55,6 @@
           "mounts/onus-cifs.nix"
 
           # "mounts/s3fs.nix"
-          "services/openssh.nix"
           "services/syncthing.nix"
           "services/gns3.nix"
 

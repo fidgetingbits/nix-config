@@ -37,7 +37,6 @@
         "libvirt.nix"
         "cli.nix"
         "yubikey.nix"
-        "services/openssh.nix"
 
         # Network management
         "systemd-resolved.nix"

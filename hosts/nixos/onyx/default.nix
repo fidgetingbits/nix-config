@@ -44,7 +44,6 @@ rec {
           "cli.nix"
           "yubikey.nix"
           "tobii.nix"
-          "services/openssh.nix"
           #"iphone-backup.nix"
 
           # Binary analysis tools

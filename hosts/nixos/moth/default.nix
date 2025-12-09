@@ -20,9 +20,6 @@
       ++
         # Optional common modules
         (map (f: "hosts/common/optional/${f}") [
-          # Services
-          "services/openssh.nix"
-
           # Network management
           "systemd-resolved.nix"
 

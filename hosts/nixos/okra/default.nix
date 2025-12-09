@@ -23,7 +23,6 @@
           "gnome.nix"
           "cli.nix"
           "yubikey.nix"
-          "services/openssh.nix"
         ])
     ))
   ];

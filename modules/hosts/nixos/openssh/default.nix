@@ -25,13 +25,13 @@ let
 in
 {
   # FIXME(sshguard): Setup per-network whitelists, etc
+  # FIXME(sshguard): There was a delay on reboot due to this service
   imports = [ ./sshguard.nix ];
 }
 //
 
   lib.mkMerge [
     {
-
       # FIXME: Drop older key types and stuff since we should never be using them anyway
       services.openssh = {
         enable = true;

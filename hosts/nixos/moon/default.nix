@@ -24,7 +24,6 @@
           "gnome.nix"
 
           # Services
-          "services/openssh.nix"
           "services/blocky.nix" # Ad Blocking DNS
           "services/unifi.nix" # Unifi Controller
           "services/xrdp.nix" # Remote Desktop
