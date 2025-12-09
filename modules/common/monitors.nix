@@ -1,3 +1,7 @@
+# You can monitor details using:
+# - hyprland: hyprctl monitors
+# - gnome: gdctl show
+
 { config, lib, ... }:
 {
   options.monitors = lib.mkOption {
@@ -72,7 +76,7 @@
   #   assertions = [
   #     {
   #       assertion =
-  #         ((lib.length config.monitors) != 0)
+  #         ((lib.length config.monitors) != 0 && programs.hyprland.enable)
   #         -> ((lib.length (lib.filter (m: m.primary) config.monitors)) == 1);
   #       message = "Exactly one monitor must be set to primary.";
   #     }
