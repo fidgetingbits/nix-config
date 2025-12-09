@@ -100,8 +100,7 @@
   };
   programs.firefox.nativeMessagingHosts = [ pkgs.tridactyl-native ];
 
-  # Allows to show talon icon in system tray.
-  # NOTE: Important this doesn't run if using wayland, as conflicts with waybar
+  # Allows to show talon icon in system tray on X11
   services.snixembed.enable = config.hostSpec.voiceCoding;
 
   services.yubikey-touch-detector = {
