@@ -51,7 +51,6 @@ lib.mkIf cfg.isAdmin {
       # NOTE: These 2 are nixos config hosts, but still have dedicated entries
       # because of the local forward. Not sure how to deal with that yet.
       "moon" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-        host = "moon";
         localForwards =
           let
             unifi = cfg.networking.ports.tcp.unifi-controller;
@@ -68,7 +67,6 @@ lib.mkIf cfg.isAdmin {
       };
 
       "ooze" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-        host = "ooze";
         # Serial consoles are attached to the server, so use socat to forward
         # them as needed
         localForwards = lib.flatten (
