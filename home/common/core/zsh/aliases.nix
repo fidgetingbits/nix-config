@@ -1,6 +1,5 @@
 {
   lib,
-  pkgs,
   config,
   ...
 }:
@@ -202,9 +201,9 @@ in
   # Sometimes touchpad stops working and it seems like cycling this option fixes it
   kb-reset = "sudo modprobe -r hid_multitouch && sudo modprobe hid_multitouch";
 
-  wake-oppo =
-    let
-      oppo = config.hostSpec.networking.subnets.ogre.hosts.oppo;
-    in
-    "${lib.getExe' pkgs.wakeonlan "wakeonlan"} ${oppo.mac} -i ${oppo.ip}";
+}
+// lib.optionalAttrs (config.hostSpec.hostName != "ooze") {
+  # The WoL packet has to come from a box that is on the same wired network as oppo
+  # so proxy through one
+  wake-oppo = "ssh ooze 'wake-oppo'";
 }

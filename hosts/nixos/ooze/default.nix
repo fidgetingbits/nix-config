@@ -2,6 +2,7 @@
   inputs,
   lib,
   config,
+  pkgs,
   ...
 }:
 {
@@ -108,6 +109,18 @@
   '';
 
   mail-delivery.useRelay = true; # Use o-lan postfix-relay
+
+  environment.systemPackages = [
+    (pkgs.writeShellApplication {
+      name = "wake-oppo";
+      runtimeInputs = [ pkgs.wakeonlan ];
+      text =
+        let
+          oppo = config.hostSpec.networking.subnets.ogre.hosts.oppo;
+        in
+        "wakeonlan ${oppo.mac} -i ${oppo.ip}";
+    })
+  ];
 
   system.stateVersion = "23.05";
 }
