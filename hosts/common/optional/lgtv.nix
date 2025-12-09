@@ -1,27 +1,43 @@
 {
   config,
   pkgs,
+  lib,
   ...
 }:
 let
-  lgtv-on = pkgs.writeShellScript "lgtv-on" ''
-    MAC=${config.hostSpec.networking.subnets.tv.hosts.ogle.mac}
-    IP=${config.hostSpec.networking.subnets.tv.hosts.ogle.ip}
-    # Sometimes takes a really long time for TV to wake up, so try many times
-    for i in {1..10}; do
-      ${pkgs.wakeonlan}/bin/wakeonlan $MAC -i $IP
-      sleep 5
-    done
-    exit 0
-  '';
-  lgtv-off = pkgs.writeShellScript "lgtv-off" ''
-    KEY=$(cat ${config.sops.secrets."keys/lgtv".path})
-    MAC=${config.hostSpec.networking.subnets.tv.hosts.ogle.mac}
-    IP=${config.hostSpec.networking.subnets.tv.hosts.ogle.ip}
-    ${pkgs.lgtv-ip-control}/bin/lgtv-ip-control --host $IP --mac $MAC --keycode ''$KEY power off
-  '';
+  lgtv-on = pkgs.writeShellApplication {
+    name = "lgtv-on";
+    runtimeInputs = [ pkgs.wakeonlan ];
+    text = ''
+      MAC=${config.hostSpec.networking.subnets.tv.hosts.ogle.mac}
+      IP=${config.hostSpec.networking.subnets.tv.hosts.ogle.ip}
+      # Sometimes takes a really long time for TV to wake up, so try many times
+      for _ in {1..10}; do
+        wakeonlan "$MAC" -i "$IP"
+        sleep 5
+      done
+      exit 0
+    '';
+  };
+
+  lgtv-off = pkgs.writeShellApplication {
+    name = "lgtv-off";
+    runtimeInputs = [
+      pkgs.lgtv-ip-control
+    ];
+    text = ''
+      KEY=$(cat ${config.sops.secrets."keys/lgtv".path})
+      MAC=${config.hostSpec.networking.subnets.tv.hosts.ogle.mac}
+      IP=${config.hostSpec.networking.subnets.tv.hosts.ogle.ip}
+      lgtv-ip-control --host "$IP" --mac "$MAC" --keycode "$KEY" power off
+    '';
+  };
 in
 {
+  environment.systemPackages = [
+    lgtv-on
+    lgtv-off
+  ];
   systemd.services.lgtv-suspend = {
     description = "Turn off LG TV before suspend";
     wantedBy = [
@@ -34,7 +50,7 @@ in
     ];
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = lgtv-off;
+      ExecStart = lib.getExe' lgtv-off "lgtv-off";
     };
   };
 
@@ -54,7 +70,7 @@ in
     ];
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = lgtv-on;
+      ExecStart = lib.getExe' lgtv-on "lgtv-on";
     };
   };
 
