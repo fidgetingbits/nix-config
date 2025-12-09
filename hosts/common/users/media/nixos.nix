@@ -1,5 +1,11 @@
-{ lib, config, ... }:
 {
+  lib,
+  config,
+  inputs,
+  ...
+}:
+{
+
   isNormalUser = true;
   extraGroups =
     let
@@ -11,4 +17,7 @@
         "video"
       ])
     ];
+
+  # Avatar used by login managers like SDDM (must be PNG)
+  icon = "${inputs.nix-assets}/images/avatars/corgi-boba.png";
 }

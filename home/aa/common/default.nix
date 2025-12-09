@@ -1,5 +1,4 @@
 {
-  inputs,
   config,
   lib,
   ...
@@ -7,8 +6,6 @@
 {
   # NOTE: Some folders are handled in hosts/common/core/nixos.nix via xdg user dirs
   home.file = {
-    # Avatar used by login managers like SDDM (must be PNG)
-    ".face.icon".source = "${inputs.nix-assets}/images/avatars/multi-arm.png";
   }
   # Create some empty place holder folders no matter what
   // lib.mergeAttrsList (

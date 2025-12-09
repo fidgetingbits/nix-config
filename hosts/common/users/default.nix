@@ -63,7 +63,7 @@ in
               # Add in platform-specific user values if they exist
               // lib.optionalAttrs (lib.pathExists platformPath) (
                 import platformPath {
-                  inherit config lib;
+                  inherit config lib inputs;
                 }
               );
           }) config.hostSpec.users

@@ -1,4 +1,4 @@
-{ inputs, lib, ... }:
+{ lib, ... }:
 {
   imports = (
     map lib.custom.relativeToRoot (
@@ -11,10 +11,5 @@
 
   home.packages = lib.attrValues {
 
-  };
-
-  home.file = {
-    # Avatar used by login managers like SDDM (must be PNG)
-    ".face.icon".source = "${inputs.nix-assets}/images/avatars/corgi-boba.png";
   };
 }

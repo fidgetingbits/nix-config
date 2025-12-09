@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  inputs,
   ...
 }:
 # Define the users.users.<username> attrset here ONLY
@@ -21,4 +22,7 @@
         "networkmanager"
       ])
     ];
+
+  # Avatar used by login managers like SDDM (must be PNG)
+  icon = "${inputs.nix-assets}/images/avatars/multi-arm.png";
 }

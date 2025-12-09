@@ -1,35 +1,44 @@
+# https://github.com/NixOS/nixpkgs/issues/163080#issuecomment-1722465663
 {
   config,
   lib,
+  pkgs,
   ...
 }:
-{
+let
+  inherit (lib) types;
 
-  # Links per-user ~/.face.icon files to /var/lib/AccountsService/icons
-  #
-  # This seems way nicer:
-  # https://github.com/NixOS/nixpkgs/issues/163080#issuecomment-1722465663
-  # But the caveat is you'd need to set the per-user icon from nixos not hm, so
-  # not bothering yet.
-  #
-  # May get changed by https://github.com/NixOS/nixpkgs/issues/73976
-  # or https://github.com/NixOS/nixpkgs/issues/163080
-  #
-  # WARNING: I clobber /var/lib/AccountsService/users/${user}, but gdm
-  # also uses this, so may actually cause issues. Tested with sddm only
-  systemd.tmpfiles.rules =
-    let
-      users = config.home-manager.users;
-    in
-    lib.attrNames users
-    |> builtins.filter (user: users.${user}.home.file ? ".face.icon")
-    |> builtins.map (user: [
-      "d /var/lib/AccountsService/users 0755 root root -"
-      "d /var/lib/AccountsService/icons 0755 root root -"
-      "f+ /var/lib/AccountsService/users/${user}  0600 root root -  [User]\\nIcon=/var/lib/AccountsService/icons/${user}\\n"
-      "L+ /var/lib/AccountsService/icons/${user}  -    -    -    -  ${
-        users.${user}.home.file.".face.icon".source
-      }"
-    ])
-    |> lib.flatten;
+  iconOptions.options.icon = lib.mkOption {
+    type = types.nullOr types.path;
+    default = null;
+  };
+
+  users = lib.filterAttrs (_: value: value.icon != null) config.users.users;
+  iconLinks = lib.mapAttrsToList (name: value: "ln -s ${value.icon} ${name}") users;
+  icons = pkgs.runCommand "user-icons" { } ''
+    mkdir $out
+    cd $out
+    ${builtins.concatStringsSep "\n" iconLinks}
+  '';
+
+  templateText = lib.generators.toINI { } {
+    User.Icon = "${icons}/\${USER}";
+  };
+  templateFile = pkgs.writeText "user-template" templateText;
+  templateDir = "share/accountsservice/user-templates";
+
+  templates = pkgs.runCommand "user-templates" { meta.priority = 0; } ''
+    mkdir -p $out/${templateDir}
+    cd $out/${templateDir}
+
+    ln -s ${templateFile} administrator
+    ln -s ${templateFile} standard
+  '';
+in
+{
+  options.users.users = lib.mkOption {
+    type = types.attrsOf (types.submodule iconOptions);
+  };
+
+  config.environment.systemPackages = [ templates ];
 }
