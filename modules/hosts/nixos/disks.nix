@@ -7,7 +7,7 @@
 #
 # NOTE use of mdadm and raid5 will automatically trigger a resync during
 # initial installation, which can impact nixos-anywhere's ability to reboot.
-# You can see with systemd-inhibit that udiskd is running an operation See the
+# You can see with systemd-inhibit that udiskd is running an operation. See the
 # progress with cat /proc/mdstat (takes about 2 hours with 6TB) You can stop
 # the resync by using the following:
 
