@@ -64,9 +64,8 @@
       ;
   };
 
-  services.swww = {
+  services.awww = {
     enable = true;
-    # FIXME: Setup a dualup specific folder
     wallpaperDir = "${config.home.homeDirectory}/images/walls-catppuccin-mocha";
   };
 

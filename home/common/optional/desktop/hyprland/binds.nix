@@ -102,7 +102,7 @@
           #
           # FIXME: This should be a waybar widget really...
           # Cycle to the next wallaper
-          "${mainMod}, equals, exec, systemctl --user kill --signal SIGUSR1 swww-cycle.service"
+          "${mainMod}, equals, exec, awww-next"
           # Set the primary wallpaper
           "${mainMod} SHIFT, equals, exec, swww img ${config.hostSpec.wallpaper}"
 

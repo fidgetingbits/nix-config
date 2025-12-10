@@ -95,7 +95,7 @@
 
       exec-once = [
       ]
-      ++ lib.optional config.services.swww.enable "swww img ${config.hostSpec.wallpaper}";
+      ++ lib.optional config.services.awww.enable "swww img ${config.hostSpec.wallpaper}";
 
       # Plugins
       general.layout = "hy3";

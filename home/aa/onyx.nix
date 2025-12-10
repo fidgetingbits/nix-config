@@ -86,7 +86,7 @@
 
   # FIXME: Move this
   programs.yazi.enable = true;
-  services.swww = {
+  services.awww = {
     enable = true;
     wallpaperDir = "${config.home.homeDirectory}/images/walls-catppuccin-mocha";
   };
