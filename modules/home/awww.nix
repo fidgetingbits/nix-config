@@ -49,32 +49,7 @@ in
 
     transitionAngles = mkOption {
       type = types.listOf types.int;
-      default = [
-        0
-        15
-        30
-        45
-        60
-        75
-        90
-        105
-        120
-        135
-        150
-        165
-        180
-        195
-        210
-        225
-        240
-        255
-        270
-        285
-        300
-        315
-        330
-        345
-      ];
+      default = lib.genList (x: x * 15) (builtins.div 360 15);
       description = "Angle of transition for specific animations";
     };
 
@@ -91,7 +66,7 @@ in
     stylix.targets.hyprpaper.enable = lib.mkForce false;
 
     programs.zsh.shellAliases = {
-      # Skip current wallpaper with this
+      # Skip current wallpaper
       awww-cycle = "systemctl --user kill --signal SIGUSR1 awww-cycle.service";
     };
     systemd.user.services.awww-cycle = mkIf (cfg.wallpaperDir != "") {
@@ -130,7 +105,6 @@ in
                 done
                 echo "awww daemon is accessible"
               }
-
 
               # Any args passed to set_image are passed directly to awww img
               function cycle_image() {
