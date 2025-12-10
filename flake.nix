@@ -1,5 +1,5 @@
 {
-  description = "Fidgetingbits Nix Flake";
+  description = "Fidgeting Nix";
   outputs =
     {
       self,
@@ -81,7 +81,7 @@
     #################### Core Nix Sources ####################
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    #nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.05";
+    #nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.11";
 
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
@@ -188,15 +188,16 @@
     #  inputs.nixpkgs.follows = "nixpkgs";
     #};
     nixcats-flake = {
-      url = "github:fidgetingbits/neovim?shallow=1?ref=main&shallow=1";
+      url = "github:fidgetingbits/neovim?ref=main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     nix-assets = {
       url = "github:fidgetingbits/nix-assets?shallow=1";
     };
 
-    #    introdus = {
+    #introdus = {
     #      url = "github:emergentmind/introdus?shallow=1";
-    #    };
+    # url = "git+file:///home/aa/dev/nix/introdus?ref=aa";
+    #};
   };
 }
