@@ -1,11 +1,14 @@
 # Qemu VM for deployment testing
 {
+  #inputs,
   lib,
   pkgs,
   ...
 }:
 {
   imports = lib.flatten [
+    #inputs.nixos-facter-modules.nixosModules.facter
+    #{ config.facter.reportPath = ./facter.json; }
     ./hardware-configuration.nix
     ./disks.nix
     (map lib.custom.relativeToRoot (
@@ -33,13 +36,6 @@
     persistFolder = lib.mkForce "/persist";
   };
   system.impermanence.enable = true;
-
-  boot.loader.systemd-boot = {
-    enable = true;
-    # When using plymouth, initrd can expand by a lot each time, so limit how many we keep around
-    configurationLimit = lib.mkDefault 10;
-  };
-  boot.loader.efi.canTouchEfiVariables = true;
 
   boot.initrd = {
     systemd.enable = true;

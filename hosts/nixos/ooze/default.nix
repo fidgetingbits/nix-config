@@ -55,13 +55,6 @@
   # If we setup postfix, this conflicts
   programs.msmtp.setSendmail = lib.mkForce false;
 
-  # Bootloader.
-  boot.loader.systemd-boot = {
-    enable = true;
-    configurationLimit = lib.mkDefault 8;
-  };
-  boot.loader.efi.canTouchEfiVariables = true;
-
   boot.initrd.availableKernelModules = [ "r8169" ];
 
   # Allow remote luks unlock over ssh and email admins when the system is ready

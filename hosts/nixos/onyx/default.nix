@@ -13,6 +13,7 @@ rec {
     { config.facter.reportPath = ./facter.json; }
     ./disks.nix
     ./monitors.nix
+    ./host-spec.nix
 
     (map lib.custom.relativeToRoot (
       [
@@ -74,31 +75,6 @@ rec {
     ))
   ];
 
-  # Host Specification
-  hostSpec = {
-    hostName = "onyx";
-    isWork = lib.mkForce true;
-    voiceCoding = lib.mkForce false;
-    useYubikey = lib.mkForce true;
-    useWayland = lib.mkForce true;
-    useWindowManager = lib.mkForce true;
-    isAutoStyled = lib.mkForce true;
-    useNeovimTerminal = lib.mkForce true;
-    hdr = lib.mkForce true;
-    scaling = lib.mkForce "2";
-    isProduction = lib.mkForce true;
-    useAtticCache = lib.mkForce true;
-    isDevelopment = lib.mkForce true;
-    isRoaming = lib.mkForce true;
-    isAdmin = lib.mkForce true;
-    users = lib.mkForce [
-      "aa"
-    ];
-    wallpaper = "${inputs.nix-assets}/images/wallpapers/astronaut.webp";
-    defaultDesktop = "hyprland-uwsm";
-    persistFolder = lib.mkForce "";
-  };
-
   # FIXME: Further tweak this
   desktops.hyprland.enable = true;
 
@@ -110,15 +86,6 @@ rec {
   mail-delivery = {
     enable = true;
   };
-
-  # Bootloader
-  boot.loader.systemd-boot = {
-    enable = true;
-    configurationLimit = lib.mkDefault 5;
-    consoleMode = "1";
-  };
-
-  boot.loader.efi.canTouchEfiVariables = true;
 
   # Just set the console font, don't mess with the font settings
   #console.font = lib.mkDefault "${pkgs.terminus_font}/share/consolefonts/ter-v32n.psf.gz";
@@ -134,10 +101,7 @@ rec {
   boot.supportedFilesystems = [ "ntfs" ];
 
   networking.networkmanager.enable = true;
-  networking.networkmanager.wifi.powersave = false;
   networking.useDHCP = lib.mkDefault true;
-  # We need IPv6 in order to access hetzner cloud systems
-  #networking.enableIPv6 = true;
 
   # Keyring, required for auth even without gnome
   security.pam.services.sddm.enableGnomeKeyring = true;
@@ -151,7 +115,7 @@ rec {
       ;
   };
   services.fwupd.enable = true;
-  voiceCoding.enable = false;
+  voiceCoding.enable = config.hostSpec.voiceCoding;
   services.backup = {
     enable = true;
     borgBackupStartTime = "09:00:00";
@@ -188,8 +152,6 @@ rec {
       ];
     };
   networking.granularFirewall.enable = true;
-
-  system.stateVersion = "23.05";
 
   # For explanations of these options, see
   # https://github.com/CryoByte33/steam-deck-utilities/blob/main/docs/tweak-explanation.md
@@ -269,4 +231,5 @@ rec {
   # Bluetooth
   services.blueman.enable = true;
 
+  system.stateVersion = "23.05";
 }

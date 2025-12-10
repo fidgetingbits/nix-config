@@ -88,22 +88,12 @@
 
   system.impermanence.enable = true;
 
-  # Bootloader.
-  boot.loader.systemd-boot = {
-    enable = true;
-    # When using plymouth, initrd can expand by a lot each time, so limit how
-    # many we keep around
-    configurationLimit = lib.mkDefault 10;
-    consoleMode = "1";
-  };
-  boot.loader.efi.canTouchEfiVariables = true;
   boot.initrd.systemd.enable = true;
 
   networking.networkmanager.enable = true;
   networking.networkmanager.wifi.powersave = false;
   networking.useDHCP = lib.mkDefault true;
   networking.dhcpcd.wait = "background";
-  systemd.network.wait-online.enable = false;
   services.gnome.gnome-keyring.enable = true;
 
   # Keyring, required for auth even without gnome
@@ -144,20 +134,6 @@
   };
 
   tunnels.cakes.enable = true;
-  # services.autosshTunnels.sessions = {
-  #   freshcakes = {
-  #     user = "tunnel";
-  #     host = config.hostSpec.networking.hosts.freshcakes;
-  #     port = 22;
-  #     secretKey = "/etc/ssh/id_ed25519";
-  #     tunnels = [
-  #       {
-  #         localPort = config.hostSpec.networking.ports.tcp.jellyfin;
-  #         remotePort = config.hostSpec.networking.ports.tcp.jellyfin;
-  #       }
-  #     ];
-  #   };
-  # };
 
   services.keyd = {
     enable = true;
@@ -176,6 +152,5 @@
   # Add ad-blocking to hosts file
   networking.stevenBlackHosts.enable = true;
 
-  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   system.stateVersion = "23.05";
 }

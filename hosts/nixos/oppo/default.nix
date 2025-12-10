@@ -7,11 +7,14 @@
 }:
 {
   imports = lib.flatten [
-
+    # Common
     inputs.nixos-facter-modules.nixosModules.facter
     { config.facter.reportPath = ./facter.json; }
     ./disks.nix
     ./monitors.nix
+
+    # Extra
+    ./openrgb.nix
 
     (map lib.custom.relativeToRoot (
       [
@@ -49,9 +52,7 @@
 
         "fonts.nix"
 
-        "lgtv.nix"
         "nzxt.nix"
-
       ])
     ))
   ];
@@ -80,6 +81,16 @@
     wallpaper = "${inputs.nix-assets}/images/wallpapers/spirited_away_reflection.webp";
   };
 
+  services.lgtv-control =
+    let
+      ogle = config.hostSpec.networking.subnets.tv.hosts.ogle;
+    in
+    {
+      enable = true;
+      ip = ogle.ip;
+      mac = ogle.mac;
+    };
+
   system.impermanence = {
     enable = true;
     autoPersistHomes = true;
@@ -91,13 +102,6 @@
       "i2c-piix4"
       "amdgpu-i2c"
     ];
-
-    # Bootloader.
-    loader.systemd-boot = {
-      enable = true;
-      configurationLimit = lib.mkDefault 8;
-    };
-    loader.efi.canTouchEfiVariables = true;
 
     initrd.kernelModules = [ "amdgpu" ];
     kernelParams = [
@@ -122,7 +126,6 @@
   #console.font = lib.mkDefault "${pkgs.terminus_font}/share/consolefonts/ter-v32n.psf.gz";
   console.earlySetup = lib.mkDefault true;
 
-  systemd.network.wait-online.enable = false;
   networking.networkmanager.enable = true;
   networking.useDHCP = lib.mkDefault true;
 
@@ -149,13 +152,10 @@
 
   environment.systemPackages = lib.attrValues {
     inherit (pkgs)
-      # gnupg - see yubikey.nix
-      paperkey # printed gpg key backup utilitie
-      pinentry-curses # for gpg-agent
-      pinentry-gtk2 # for gpg-agent
       liquidctl # control nxzt kraken rgb, not in home-manager because of udev rules
       ;
   };
+
   services.fwupd.enable = true;
   services.backup = {
     enable = true;
@@ -169,57 +169,6 @@
   services.remoteLuksUnlock = {
     enable = true;
     notify.to = config.hostSpec.email.olanAdmins;
-  };
-
-  # openrgb
-  # FIXME: Move all this
-  services.udev.packages = [ pkgs.openrgb-with-all-plugins ];
-  hardware.i2c.enable = true;
-  services.hardware.openrgb = {
-    enable = true;
-    package = pkgs.openrgb-with-all-plugins;
-    motherboard = "amd";
-    server = {
-      port = 6742;
-    };
-  };
-  systemd.services.openrgb-pre-suspend = {
-    description = "Set OpenRGB to off before suspend";
-    wantedBy = [
-      "halt.target"
-      "sleep.target"
-      "suspend.target"
-    ];
-    before = [
-      "sleep.target"
-      "suspend.target"
-    ];
-    partOf = [ "openrgb.service" ];
-    requires = [ "openrgb.service" ];
-    serviceConfig = {
-      Type = "oneshot";
-      TimeoutStartSec = "20s";
-      ExecStart = "${pkgs.openrgb}/bin/openrgb --mode off";
-    };
-  };
-  systemd.services.openrgb-post-resume = {
-    description = "Reload OpenRGB profile after resume";
-    wantedBy = [
-      "post-resume.target"
-      "suspend.target"
-    ];
-    after = [
-      "openrgb.service"
-      "suspend.target"
-    ];
-    requires = [ "openrgb.service" ];
-    partOf = [ "openrgb.service" ];
-    serviceConfig = {
-      Type = "oneshot";
-      TimeoutStartSec = "10s";
-      ExecStart = "${pkgs.openrgb}/bin/openrgb -m static --color FFFFFF";
-      # ExecStart = "${pkgs.openrgb}/bin/openrgb --profile ${./oppo.orp}";
-    };
   };
 
   services.udev.extraRules = ''

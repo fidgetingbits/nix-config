@@ -68,13 +68,6 @@
   services.dyndns.enable = true;
 
   environment.systemPackages = [ pkgs.borgbackup ];
-  # Bootloader
-  boot.loader.systemd-boot = {
-    enable = true;
-    configurationLimit = lib.mkDefault 8;
-    consoleMode = "1";
-  };
-  boot.loader.efi.canTouchEfiVariables = true;
 
   services.remoteLuksUnlock = {
     enable = true;
@@ -130,6 +123,5 @@
   #   borgBackupStartTime = "09:00:00";
   # };
 
-  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   system.stateVersion = "23.05";
 }

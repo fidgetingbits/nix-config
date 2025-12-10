@@ -8,6 +8,14 @@
 }:
 {
   imports = lib.flatten [
+    inputs.nixos-facter-modules.nixosModules.facter
+    { config.facter.reportPath = ./facter.json; }
+    ./disks.nix
+    ./monitors.nix
+    ./network.nix
+    # lanzaboote
+    #./secureboot.nix
+
     (map lib.custom.relativeToRoot (
       [
         ##
@@ -16,59 +24,51 @@
         "hosts/common/core"
         "hosts/common/core/nixos.nix"
       ]
-      ++
-        # Optional common modules
-        (map (f: "hosts/common/optional/${f}") [
-          ##
-          # Optional
-          ##
-          "keyd.nix"
+      ++ (map (f: "hosts/common/optional/${f}") [
+        ##
+        # Optional
+        ##
+        "keyd.nix"
 
-          # Host-specific stuff
-          "mail.nix"
-          "plymouth.nix"
-          "printing.nix"
-          "locale.nix"
-          "x11.nix"
-          "sound.nix"
-          "podman.nix"
-          "cli.nix"
-          "yubikey.nix"
-          "tobii.nix"
-          "libvirt.nix"
+        # Host-specific stuff
+        "mail.nix"
+        "plymouth.nix"
+        "printing.nix"
+        "locale.nix"
+        "x11.nix"
+        "sound.nix"
+        "podman.nix"
+        "cli.nix"
+        "yubikey.nix"
+        "tobii.nix"
+        "libvirt.nix"
 
-          "wireshark.nix"
+        "wireshark.nix"
 
-          "systemd-resolved.nix"
-          # "vpn.nix"
+        "systemd-resolved.nix"
+        # "vpn.nix"
 
-          # Window Manager
-          #"gnome.nix"
-          "sddm.nix"
+        # Window Manager
+        #"gnome.nix"
+        "sddm.nix"
 
-          "binaryninja.nix"
-          # "cynthion.nix"
-          "saleae.nix"
+        "binaryninja.nix"
+        # "cynthion.nix"
+        "saleae.nix"
 
-          # Services
-          "mounts/oath-cifs.nix"
-          "mounts/onus-cifs.nix"
+        # Mounts
+        "mounts/oath-cifs.nix"
+        "mounts/onus-cifs.nix"
+        # "mounts/s3fs.nix"
 
-          # "mounts/s3fs.nix"
-          "services/syncthing.nix"
-          "services/gns3.nix"
+        # Services
+        "services/syncthing.nix"
+        "services/gns3.nix"
 
-          "remote-builder.nix"
-        ])
+        "remote-builder.nix"
+      ])
     ))
 
-    inputs.nixos-facter-modules.nixosModules.facter
-    { config.facter.reportPath = ./facter.json; }
-    ./disks.nix
-    ./monitors.nix
-    ./network.nix
-    # lanzaboote
-    #./secureboot.nix
   ];
 
   hostSpec = {
@@ -100,11 +100,6 @@
   # };
 
   # Bootloader.
-  boot.loader.systemd-boot = {
-    enable = true;
-    configurationLimit = lib.mkDefault 8;
-  };
-  boot.loader.efi.canTouchEfiVariables = true;
   boot.supportedFilesystems = [ "ntfs" ];
   boot.initrd.systemd.enable = true;
 
@@ -127,8 +122,6 @@
     configFile = lib.custom.relativeToRoot "secrets/wpa_supplicant-olan.conf";
   };
 
-  # Stop blocking on network interfaces not needed for boot
-  systemd.network.wait-online.enable = false;
   services.gnome.gnome-keyring.enable = true;
 
   networking.networkmanager.enable = true;
@@ -160,6 +153,5 @@
     wlans = [ "olan" ];
   };
 
-  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   system.stateVersion = "23.05";
 }

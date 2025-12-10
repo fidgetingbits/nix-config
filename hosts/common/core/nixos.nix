@@ -33,16 +33,21 @@
     else
       pkgs.linuxPackages_6_18;
 
-  # Pin a stable boot entry. In order to generate the pinned-boot-entry.conf
-  # for a "stable" generation run 'just pin'.
-  # See the pin recipe in justfile for more information
-  boot.loader.systemd-boot.extraEntries =
-    let
-      pinned = lib.custom.relativeToRoot "hosts/nixos/${config.hostSpec.hostName}/pinned-boot-entry.conf";
-    in
-    lib.optionalAttrs (config.boot.loader.systemd-boot.enable && lib.pathExists pinned) {
-      "pinned-stable.conf" = lib.readFile pinned;
-    };
+  boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader.systemd-boot = {
+    enable = true;
+    configurationLimit = lib.mkDefault 8;
+    # Pin a stable boot entry. In order to generate the pinned-boot-entry.conf
+    # for a "stable" generation run 'just pin'.
+    # See the pin recipe in justfile for more information
+    extraEntries =
+      let
+        pinned = lib.custom.relativeToRoot "hosts/nixos/${config.hostSpec.hostName}/pinned-boot-entry.conf";
+      in
+      lib.optionalAttrs (config.boot.loader.systemd-boot.enable && lib.pathExists pinned) {
+        "pinned-stable.conf" = lib.readFile pinned;
+      };
+  };
 
   # FIXME(networking): Some IPs will be different depending on if we are on
   # there network or not. This needs per-network dispatcher scripts likely,
@@ -60,6 +65,10 @@
       "${network.subnets.vm-lan.hosts.okra.ip}" = [ "okra.${config.hostSpec.domain}" ];
     }
     // lib.optionalAttrs config.hostSpec.isWork network.work.hosts;
+
+  # Stop blocking on network interfaces not needed for boot
+  systemd.network.wait-online.enable = false;
+  systemd.services.NetworkManager-wait-online.enable = false;
 
   environment = {
     localBinInPath = true;

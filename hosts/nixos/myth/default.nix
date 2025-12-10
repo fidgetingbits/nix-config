@@ -68,13 +68,6 @@
   system.impermanence.enable = true;
 
   environment.systemPackages = [ pkgs.borgbackup ];
-  # Bootloader
-  boot.loader.systemd-boot = {
-    enable = true;
-    configurationLimit = lib.mkDefault 8; # NOTE: 10 ran out of disk space
-    consoleMode = "1";
-  };
-  boot.loader.efi.canTouchEfiVariables = true;
 
   # wlo1 boot delay
   #
@@ -136,6 +129,5 @@
     powerDownTimeOut = (60 * 30); # 30m. UPS reports ~45min
   };
 
-  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   system.stateVersion = "23.05";
 }
