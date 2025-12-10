@@ -62,7 +62,6 @@
     # Read current directory to get the host name
     hostName = "oppo";
     isWork = lib.mkForce false;
-    voiceCoding = lib.mkForce false;
     useYubikey = lib.mkForce true;
     isAutoStyled = lib.mkForce true;
     wifi = lib.mkForce false;

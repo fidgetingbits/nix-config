@@ -83,7 +83,6 @@
     isAutoStyled = lib.mkForce true;
     isDevelopment = lib.mkForce true;
     isAdmin = lib.mkForce true;
-
     # FIXME: We should have like "desktop" = "hyprland" and have that auto enable the rest?
     defaultDesktop = "hyprland-uwsm";
     useWayland = true;
@@ -91,7 +90,6 @@
   system.impermanence.enable = true;
 
   desktops.hyprland.enable = true;
-  voiceCoding.enable = config.hostSpec.voiceCoding;
 
   # FIXME: Re-enable after pinning the most recent after device switch
   # services.backup = {

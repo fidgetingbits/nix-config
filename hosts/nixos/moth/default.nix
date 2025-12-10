@@ -51,7 +51,6 @@
     useWindowManager = lib.mkForce false;
 
     # Functionality
-    voiceCoding = lib.mkForce false;
     useYubikey = lib.mkForce false;
     useNeovimTerminal = lib.mkForce false;
     useAtticCache = lib.mkForce false;

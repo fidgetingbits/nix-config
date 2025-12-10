@@ -64,7 +64,6 @@
     isRemote = lib.mkForce true;
 
     # Functionality
-    voiceCoding = lib.mkForce false;
     # FIXME: Separate this out to allow yubikey for incoming auth but not physical yubikey plugged in
     useYubikey = lib.mkForce false;
     useNeovimTerminal = lib.mkForce true;
