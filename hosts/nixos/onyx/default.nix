@@ -47,7 +47,6 @@ rec {
           "wireshark.nix"
           "cli.nix"
           "yubikey.nix"
-          "tobii.nix"
           #"iphone-backup.nix"
 
           # Binary analysis tools

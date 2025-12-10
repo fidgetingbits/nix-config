@@ -40,7 +40,6 @@
         "podman.nix"
         "cli.nix"
         "yubikey.nix"
-        "tobii.nix"
         "libvirt.nix"
 
         "wireshark.nix"
