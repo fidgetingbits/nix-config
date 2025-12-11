@@ -206,4 +206,6 @@ in
   # The WoL packet has to come from a box that is on the same wired network as oppo
   # so proxy through one
   wake-oppo = "ssh ooze 'wake-oppo'";
+
+  count-extensions = "find . -type f | sed 's/.*\.//' | sort | uniq -c | sort -nr";
 }
