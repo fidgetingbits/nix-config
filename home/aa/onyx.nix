@@ -33,6 +33,7 @@
           "networking/protonvpn.nix"
           "atuin.nix"
           "remmina.nix"
+          "yazi.nix"
 
           # === Window Managers ===
           # FIXME: This should only be if not wayland
@@ -84,11 +85,9 @@
     MESA_LOG_FILE = "/dev/null";
   };
 
-  # FIXME: Move this
-  programs.yazi.enable = true;
   services.awww = {
     enable = true;
-    wallpaperDir = "${config.home.homeDirectory}/images/walls-catppuccin-mocha";
+    wallpaperDir = "${config.home.homeDirectory}/images/wallpaper/catppuccin-mocha";
   };
 
   # FIXME: Move this to tridactyl location

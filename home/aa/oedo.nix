@@ -25,6 +25,7 @@
           "media.nix"
 
           "graphics.nix"
+          "yazi.nix"
 
           "atuin.nix"
 
@@ -66,7 +67,7 @@
 
   services.awww = {
     enable = true;
-    wallpaperDir = "${config.home.homeDirectory}/images/walls-catppuccin-mocha";
+    wallpaperDir = "${config.home.homeDirectory}/images/wallpaper/catppuccin-mocha";
   };
 
   services.yubikey-touch-detector.enable = true;
