@@ -27,8 +27,8 @@ copy-lock-out HOST=`hostname`:
 [private]
 rebuild-pre HOST=`hostname`:
     just update-nix-secrets {{ HOST }} && \
-    just update-nix-assets {{ HOST }} && \
-    just update-neovim-flake {{ HOST }} && \
+    just update {{ HOST }} nix-assets && \
+    just update {{ HOST }} nixcats-flake && \
     just update {{ HOST }} nix-index-database
     @git add --intent-to-add .
 
@@ -54,14 +54,14 @@ _rebuild HOST=`hostname`:
 [group("building")]
 rebuild HOST=`hostname`: && rebuild-post
     @just _rebuild {{ HOST }}
-    just rebuild-extensions-lite
+    # just rebuild-extensions-lite
 
 # Rebuild the system and run a flake check
 [group("building")]
 rebuild-full HOST=`hostname`: && rebuild-post
     @just _rebuild {{ HOST }}
     just check {{ HOST }}
-    just rebuild-extensions
+    # just rebuild-extensions
 
 # Rebuild the system with tshow trace
 #ebuild-trace: rebuild-pre && rebuild-post
@@ -94,16 +94,6 @@ check-sops:
 update-nix-secrets HOST=`hostname`:
     @(cd ../nix-secrets 2>/dev/null && git fetch && git rebase > /dev/null || echo "Push your nix-secrets changes") || true
     @just update {{ HOST }} nix-secrets
-
-# Update nix-assets
-[group("update")]
-update-nix-assets HOST=`hostname`:
-    @just update {{ HOST }} nix-assets
-
-# Update neovim flake
-[group("update")]
-update-neovim-flake HOST=`hostname`:
-    @just update {{ HOST }} nixcats-flake
 
 # Rebuild vscode extensions that update regularly
 [group("building")]
