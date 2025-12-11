@@ -133,7 +133,7 @@ in
   ccl = "cd ${devTalon}/cursorless";
   ## nix
   cnc = "cd ${devNix}/nix-config";
-  cnn = "cd ${devNix}/nixCats-example";
+  cnn = "cd ${devNix}/neovim";
   cns = "cd ${devNix}/nix-secrets";
   cnh = "cd ${devNix}/nixos-hardware";
   cnp = "cd ${devNix}/nixpkgs";
