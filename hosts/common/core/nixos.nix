@@ -157,4 +157,5 @@
     defaultSession = config.hostSpec.defaultDesktop;
   };
 
+  system.stateVersion = "23.05";
 }
