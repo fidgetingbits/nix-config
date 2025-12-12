@@ -1,5 +1,8 @@
 # FIXME(network): Revisit this now that oedo has changed
-{ ... }:
+{
+  #lib,
+  ...
+}:
 {
 
   # FIXME(network): Ideally this should be done using the networking.interfaces approach, but doesn't seem to work...

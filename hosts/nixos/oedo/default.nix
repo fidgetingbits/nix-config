@@ -150,5 +150,5 @@
     wlans = [ "olan" ];
   };
 
-  system.stateVersion = "23.05";
+  services.llama.enable = true;
 }
