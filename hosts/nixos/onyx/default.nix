@@ -14,6 +14,7 @@ rec {
     ./disks.nix
     ./monitors.nix
     ./host-spec.nix
+    ./network.nix
 
     ./oom.nix
 
@@ -59,8 +60,8 @@ rec {
           "systemd-resolved.nix"
 
           # Remote network mounts and syncing
-          "mounts/oath-cifs.nix"
-          "mounts/onus-cifs.nix"
+          # "mounts/oath-cifs.nix"
+          # "mounts/onus-cifs.nix"
           "services/syncthing.nix"
 
           "startpage.nix"
@@ -99,10 +100,8 @@ rec {
   boot.initrd.systemd.enable = true;
   boot.supportedFilesystems = [ "ntfs" ];
 
-  networking.networkmanager.enable = true;
-  networking.useDHCP = lib.mkDefault true;
-
   # Keyring, required for auth even without gnome
+  # FIXME: double check this
   security.pam.services.sddm.enableGnomeKeyring = true;
 
   environment.systemPackages = lib.attrValues {
@@ -120,36 +119,6 @@ rec {
     # This is only relevant while I'm not using btrfs subvolume backup
     borgExcludes = [ "${config.hostSpec.home}/movies" ];
   };
-
-  services.per-network-services =
-    let
-      # Define what trusted networks looks like for this system
-      oryx = {
-        type = "wireless";
-        ssid = "oryx";
-        interface = "wlo1";
-        gateway = inputs.nix-secrets.networking.subnets.ogre.hosts.oryx.ip;
-        mac = inputs.nix-secrets.networking.subnets.ogre.hosts.oryx.mac;
-      };
-      ogre = {
-        type = "wired";
-        domain = inputs.nix-secrets.domain;
-        interface = "";
-        gateway = inputs.nix-secrets.networking.subnets.ogre.hosts.ogre.ip;
-        mac = inputs.nix-secrets.networking.subnets.ogre.hosts.ogre.mac;
-      };
-    in
-    {
-      enable = true;
-      debug = true; # FIXME(onyx): Remove this
-      # FIXME: This should be synchronized with the code that renames it
-      networkDevices = [ "wlo1" ];
-      trustedNetworks = [
-        oryx
-        ogre
-      ];
-    };
-  networking.granularFirewall.enable = true;
 
   # For explanations of these options, see
   # https://github.com/CryoByte33/steam-deck-utilities/blob/main/docs/tweak-explanation.md
@@ -178,6 +147,4 @@ rec {
 
   # Bluetooth
   services.blueman.enable = true;
-
-  system.stateVersion = "23.05";
 }
