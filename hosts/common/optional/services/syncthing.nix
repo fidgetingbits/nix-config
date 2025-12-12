@@ -1,5 +1,3 @@
-# NOTE: There is no way to actually set your own device id in Syncthing as it's derived from the .pem files
-# so the list need to get updated if the configurations can't be restored from backup...
 {
   inputs,
   lib,
@@ -7,44 +5,34 @@
   ...
 }:
 let
+  time = lib.custom.time;
   homeDirectory = config.hostSpec.home;
+  firewallCfg = config.networking.granularFirewall;
 
   desktops = [
     "onyx"
     "oedo"
-    # "okra"
   ];
   mobiles = [
     "opia"
-    "opal"
   ];
-  deviceList = [
-    "onyx"
-    "oedo"
-    "opal"
-    "opia"
-    # "okra"
-  ];
-  deviceIds = lib.attrsets.mergeAttrsList (
-    lib.map (device: { ${device}.id = inputs.nix-secrets.syncthing.${device}; }) deviceList
-  );
+  devices = desktops ++ mobiles;
+  deviceIds =
+    devices
+    |> lib.map (device: {
+      ${device}.id = inputs.nix-secrets.syncthing.${device};
+    })
+    |> lib.attrsets.mergeAttrsList;
 
-  cfg = config.networking.granularFirewall;
+  hosts = lib.map (d: inputs.nix-secrets.networking.subnets.ogre.hosts.${d}) devices;
 
-  hosts = lib.attrValues {
-    inherit (inputs.nix-secrets.networking.subnets.ogre.hosts)
-      oedo
-      oryx
-      opia
-      opal
-      ;
-  };
   # Syncthing ports: 8384 for remote access to GUI
   # 22000 TCP and/or UDP for sync traffic
   # 21027/UDP for discovery
   # source: https://docs.syncthing.net/users/firewall.html
   ports = config.hostSpec.networking.ports;
-  granularFirewallRules = lib.mkIf cfg.enable {
+
+  granularFirewallRules = lib.mkIf firewallCfg.enable {
     networking.granularFirewall.allowedRules = [
       {
         serviceName = "syncthing";
@@ -63,7 +51,7 @@ let
       }
     ];
   };
-  regularFirewallRules = lib.mkIf (cfg.enable == false) {
+  regularFirewallRules = lib.mkIf (firewallCfg.enable == false) {
     networking.firewall.allowedTCPPorts = [ ports.tcp.syncthing.sync ];
     networking.firewall.allowedUDPPorts = [
       ports.udp.syncthing.sync
@@ -80,67 +68,52 @@ lib.mkMerge [
         # inherit (config.users.users.${config.hostSpec.username}) group;
         overrideDevices = true;
         overrideFolders = true;
-        dataDir = "${homeDirectory}/sync/"; # Default folder for new synced folders
-        configDir = "${homeDirectory}/.config/syncthing"; # Folder for Syncthing's settings and keys
+        dataDir = "${homeDirectory}/sync/"; # synced folders
+        configDir = "${homeDirectory}/.config/syncthing"; # settings and keys
         guiAddress = "127.0.0.1:${builtins.toString ports.tcp.syncthing.gui}";
+        relay.enable = false; # Don't start the local relay service
 
         settings = {
           options = {
-            localAnnounceEnabled = false;
+            # localAnnounceEnabled = false;
             urAccepted = -1; # Don't send anonymous stats
+            # Don't use public relay. Change this if we setup our own
+            relaysEnabled = false;
           };
           devices = deviceIds;
 
-          folders = {
-            images = {
-              #id = "u5gmt-htjya";
-              path = "${homeDirectory}/images";
-              devices = desktops;
-
+          folders =
+            let
               # See https://wes.today/nixos-syncthing/
               versioning = {
                 type = "staggered";
                 params = {
-                  cleanInterval = "3600"; # 1 hour in seconds
-                  maxAge = "15552000"; # 180 days in seconds
+                  cleanInterval = "${toString (time.hours 1)}";
+                  maxAge = "${toString (time.days 180)}";
                 };
               };
-            };
-            wiki = {
-              #id = "u5gmt-htjya";
-              path = "${homeDirectory}/wiki/";
-              devices = desktops ++ mobiles;
-
-              # See https://wes.today/nixos-syncthing/
-              versioning = {
-                type = "staggered";
-                params = {
-                  cleanInterval = "3600"; # 1 hour in seconds
-                  maxAge = "15552000"; # 180 days in seconds
-                };
+            in
+            {
+              images = {
+                path = "${homeDirectory}/images/";
+                devices = desktops;
+                inherit versioning;
+              };
+              wiki = {
+                path = "${homeDirectory}/wiki/";
+                devices = desktops ++ mobiles;
+                inherit versioning;
+              };
+              scripts = {
+                path = "${homeDirectory}/scripts/";
+                devices = desktops;
+                inherit versioning;
               };
             };
-            scripts = {
-              #id = "u5gmt-htjya";
-              path = "${homeDirectory}/scripts/";
-              devices = desktops;
-
-              # See https://wes.today/nixos-syncthing/
-              versioning = {
-                type = "staggered";
-                params = {
-                  cleanInterval = "3600"; # 1 hour in seconds
-                  maxAge = "15552000"; # 180 days in seconds
-                };
-              };
-            };
-          };
         };
       };
     };
-
     services.per-network-services.trustedNetworkServices = [ "syncthing" ];
-
   }
   granularFirewallRules
   regularFirewallRules
