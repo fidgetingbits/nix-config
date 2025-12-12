@@ -24,7 +24,6 @@
           "kitty.nix"
           "wezterm.nix"
           "media.nix"
-          "networking/syncthing.nix"
           "atuin.nix"
           "remmina.nix"
         ])
