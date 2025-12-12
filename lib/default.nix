@@ -2,6 +2,7 @@
 rec {
   # use path relative to the root of the project
   relativeToRoot = lib.path.append ../.;
+  time = import ./time.nix;
 
   # Imports any .nix file in the specific directory, and any folder. Note this
   # means that a folder containing `default.nix` and other *.nix files is expected
