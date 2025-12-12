@@ -127,6 +127,4 @@
     ip = config.hostSpec.networking.subnets.myth.hosts.synology.ip;
     powerDownTimeOut = (60 * 30); # 30m. UPS reports ~45min
   };
-
-  system.stateVersion = "23.05";
 }

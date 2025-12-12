@@ -150,6 +150,4 @@
 
   # Add ad-blocking to hosts file
   networking.stevenBlackHosts.enable = true;
-
-  system.stateVersion = "23.05";
 }

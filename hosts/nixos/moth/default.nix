@@ -121,6 +121,4 @@
   #   enable = true;
   #   borgBackupStartTime = "09:00:00";
   # };
-
-  system.stateVersion = "23.05";
 }

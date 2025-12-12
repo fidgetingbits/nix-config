@@ -113,6 +113,4 @@
         "wakeonlan ${oppo.mac} -i ${oppo.ip}";
     })
   ];
-
-  system.stateVersion = "23.05";
 }

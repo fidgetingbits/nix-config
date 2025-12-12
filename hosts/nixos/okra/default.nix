@@ -87,6 +87,4 @@
       pinentry-gtk2 # for gpg-agent
       ;
   };
-
-  system.stateVersion = "23.05";
 }

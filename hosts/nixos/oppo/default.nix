@@ -210,6 +210,4 @@
   networking.interfaces.ens3 = {
     wakeOnLan.enable = true;
   };
-
-  system.stateVersion = "23.05";
 }
