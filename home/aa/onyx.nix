@@ -67,6 +67,8 @@
     #  gaze-ocr = true;
   };
 
+  llm-tools.enable = true;
+
   home.packages = lib.attrValues {
     inherit (pkgs)
       cyberpower-pdu
