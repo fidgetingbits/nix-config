@@ -71,7 +71,7 @@ in
     };
     systemd.user.services.awww-cycle = mkIf (cfg.wallpaperDir != "") {
       Unit = {
-        ConditionEnvironment = "WAYLAND_DISPLAY";
+        #ConditionEnvironment = "WAYLAND_DISPLAY";
         Description = "Cycle wallpaper images using awww";
         After = [ "swww.service" ];
         PartOf = [ "swww.service" ];
