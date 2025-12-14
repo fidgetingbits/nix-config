@@ -7,6 +7,7 @@ rec {
   secondsPerWeek = 7 * secondsPerDay;
   secondsPerYear = 365 * secondsPerDay;
 
-  days = n: secondsPerDay * n;
+  minutes = n: secondsPerMin * n;
   hours = n: secondsPerHour * n;
+  days = n: secondsPerDay * n;
 }
