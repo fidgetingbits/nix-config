@@ -227,7 +227,7 @@
     # FIXME: Add an assertion that the wifi category has a corresponding wifi.<cat>.yaml file in nix-secerts/sops/
     assertions =
       let
-        # We import these options to HM and NixOS, so need to not fail on HM
+        # We import these options to both HM and NixOS, so need to not fail on HM
         isImpermanent =
           config ? "system" && config.system ? "impermanence" && config.system.impermanence.enable;
       in
