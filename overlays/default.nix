@@ -4,19 +4,25 @@ let
     # Add custom packages
     additions =
       final: prev:
-      (prev.lib.packagesFromDirectoryRecursive {
-        callPackage = prev.lib.callPackageWith final;
-        directory = ../pkgs/common;
-      }
+      let
+        system = prev.stdenv.hostPlatform.system;
+      in
+      (
+        prev.lib.packagesFromDirectoryRecursive {
+          callPackage = prev.lib.callPackageWith final;
+          directory = ../pkgs/common;
+        }
         # Any nixpkgs PRs that aren't upstream yet
-        # https://github.com/NixOS/nixpkgs/pull/355232
+        // {
+        }
       )
       # Other external inputs
       // {
-        #neovim = inputs.nixvim-flake.packages.${final.stdenv.hostPlatform.system}.default;
-        neovim = inputs.nixcats-flake.packages.${final.stdenv.hostPlatform.system}.default;
-        nixcats = inputs.nixcats-flake.packages.${final.stdenv.hostPlatform.system}.default;
-        nix-sweep = inputs.nix-sweep.packages.${prev.stdenv.hostPlatform.system}.default;
+        #neovim = inputs.nixvim-flake.packages.${system}.default;
+        neovim = inputs.nixcats-flake.packages.${system}.default;
+        nixcats = inputs.nixcats-flake.packages.${system}.default;
+        nix-sweep = inputs.nix-sweep.packages.${system}.default;
+        pwndbg = inputs.pwndbg.packages.${system}.default;
       };
 
     linuxModifications =
@@ -61,7 +67,6 @@ let
                 inherit (beta) url sha256;
               };
             });
-
         }
         // lib.optionalAttrs (prev ? "linuxPackages_6_18") {
           linuxPackages_6_18 = prev.linuxPackages_6_18.extend (
@@ -94,5 +99,8 @@ in
 {
   default =
     final: prev:
-    lib.attrNames overlays |> map (name: (overlays.${name} final prev)) |> lib.mergeAttrsList;
+    lib.attrNames overlays
+    |> map (name: (overlays.${name} final prev))
+    # nixfmt hack
+    |> lib.mergeAttrsList;
 }
