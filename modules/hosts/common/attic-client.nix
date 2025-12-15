@@ -103,5 +103,9 @@ in
 
     services.per-network-services.trustedNetworkServices = [ "attic-watch-store" ];
 
+    environment.systemPackages = [
+      pkgs.attic-client
+    ];
+
   };
 }
