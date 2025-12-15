@@ -13,6 +13,7 @@
     ./disks.nix
     ./monitors.nix
     ./network.nix
+    ./overlays.nix
     # lanzaboote
     #./secureboot.nix
 
@@ -151,4 +152,6 @@
   };
 
   services.llama.enable = true;
+
+  modules.hardware.radeon.enable = true;
 }
