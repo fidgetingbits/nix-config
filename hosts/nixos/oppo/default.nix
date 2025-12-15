@@ -69,7 +69,6 @@
     hdr = lib.mkForce true;
     scaling = lib.mkForce "2";
     isProduction = lib.mkForce true;
-    useAtticCache = lib.mkForce false;
     isDevelopment = lib.mkForce true;
     persistFolder = lib.mkForce "/persist";
     useWayland = lib.mkForce true;
@@ -210,4 +209,6 @@
   networking.interfaces.ens3 = {
     wakeOnLan.enable = true;
   };
+
+  modules.hardware.radeon.enable = true;
 }
