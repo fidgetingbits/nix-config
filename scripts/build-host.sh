@@ -13,4 +13,4 @@ if [[ $# -ne 1 ]]; then
 fi
 
 HOST="$1"
-NIX_SSHOPTS="-p10022" nixos-rebuild --target-host "$HOST" --sudo --show-trace --impure --flake .#"$HOST" switch
+NIXPKGS_ALLOW_BROKEN=1 NIX_SSHOPTS="-p10022" nixos-rebuild --target-host "$HOST" --sudo --show-trace --impure --flake .#"$HOST" switch
