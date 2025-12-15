@@ -81,6 +81,7 @@
     #################### Core Nix Sources ####################
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-rocm7.url = "github:NixOS/nixpkgs?ref=pull/469378/merge&shallow=1";
     #nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.11";
 
     flake-parts = {
@@ -194,6 +195,7 @@
     nix-assets = {
       url = "github:fidgetingbits/nix-assets?shallow=1";
     };
+    pwndbg.url = "github:pwndbg/pwndbg";
 
     #introdus = {
     #      url = "github:emergentmind/introdus?shallow=1";
