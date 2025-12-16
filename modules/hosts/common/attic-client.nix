@@ -3,77 +3,147 @@
   pkgs,
   inputs,
   lib,
+  namespace,
   ...
 }:
 let
-  # attic = pkgs.attic-client;
-  attic_token = config.sops.secrets."tokens/attic-client".path;
-  attic_server = "https://atticd.ooze.${config.hostSpec.domain}";
-  sopsFolder = (builtins.toString inputs.nix-secrets) + "/sops";
+  cfg = config.${namespace}.attic-client;
 in
 {
-  options = {
-    attic-client = {
-      cache-name = lib.mkOption {
-        type = lib.types.str;
-        default = "o-cache";
-        description = "The name of the attic cache";
+  options.${namespace}.attic-client = {
+    enable = lib.mkEnableOption "Enable attic cache client logic";
+    package = lib.mkOption {
+      type = lib.types.package;
+      default = pkgs.attic-client;
+      description = "attic-client to use";
+    };
+    server = lib.mkOption {
+      type = lib.types.str;
+      default = "https://atticd.ooze.${config.hostSpec.domain}";
+      description = "attic cache URL";
+    };
+
+    pubKey = lib.mkOption {
+      type = lib.types.str;
+      default = "o-cache:GRHaMHaWAzG3B6oTridUh8hA1GeCPuAlkRFAmICR7sw=";
+      description = "attic cache's public key found via attic cache info <cache>";
+    };
+
+    tokenPath = lib.mkOption {
+      type = lib.types.path;
+      default = config.sops.secrets."tokens/attic-client".path;
+      description = "attic access token path";
+    };
+
+    cache-name = lib.mkOption {
+      type = lib.types.str;
+      default = "o-cache";
+      description = "Name of the attic cache";
+    };
+
+    sopsFile = lib.mkOption {
+      type = lib.types.path;
+      default = (builtins.toString inputs.nix-secrets) + "/sops/olan.yaml";
+      description = "sops file containing attic cache access token";
+    };
+
+    # FIXME: This may be some sort of custom type candidate, since we use it all over
+    notify = lib.mkOption {
+      type = lib.types.submodule {
+        options = {
+          to = lib.mkOption {
+            type = lib.types.listOf lib.types.str;
+            default = [ config.hostSpec.email.admin ];
+            example = [ "admin@example.com" ];
+            description = "List of emails to send notifications from";
+          };
+          from = lib.mkOption {
+            type = lib.types.str;
+            default = config.hostSpec.email.notifier;
+            example = "notifications@example.com";
+            description = "Email address to send UPS notifications to";
+          };
+        };
       };
+      default = { };
     };
   };
 
-  config = lib.mkIf config.hostSpec.useAtticCache {
+  config = lib.mkIf cfg.enable {
     nix.settings = {
-      extra-substituters = [ "${attic_server}/${config.attic-client.cache-name}" ];
+      extra-substituters = [ "${cfg.server}/${cfg.cache-name}" ];
       extra-trusted-public-keys = [
-        # Following key comes from: attic cache info <cache>
-        "o-cache:GRHaMHaWAzG3B6oTridUh8hA1GeCPuAlkRFAmICR7sw="
+        cfg.pubKey
       ];
     };
 
-    sops.secrets."tokens/attic-client" = {
-      sopsFile = "${sopsFolder}/shared.yaml";
-    };
+    sops.secrets."tokens/attic-client".sopsFile = cfg.sopsFile;
 
-    systemd.services.attic-token-check = {
-      description = "Check attic token expiration";
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = pkgs.writeShellScript "check-attic-token" ''
-          #!/bin/bash
-          set -euo pipefail
+    systemd.services.attic-token-check =
+      let
+        # FIXME: We should just use a builder function for this, since we use it often
+        token-expiry-notify = pkgs.writeShellApplication {
+          name = "token-expiry-notify";
+          runtimeInputs = [
+            pkgs.msmtp
+          ];
+          text =
+            let
+              recipients = lib.concatStringsSep ", " cfg.notify.to;
+            in
+            # bash
+            ''
+              exec msmtp -t <<EOF
+              To: ${recipients}
+              From: ${cfg.notify.from}
+              Subject: [${config.networking.hostName}: attic] Attic Token Expiry Notice
+              The attic token for ${cfg.cache-name} is expiring soon.
+                $2
+              EOF
+            '';
+        };
 
-          ATTIC_TOKEN=$(cat ${attic_token})
+        check-attic-token = pkgs.writeShellApplication {
+          name = "check-attic-token";
+          runtimeInputs = lib.attrValues {
+            inherit (pkgs)
+              coreutils
+              jq
+              msmtp
+              ;
+          };
+          text =
+            # bash
+            ''
+              set -euo pipefail
 
-          # Decode JWT payload
-          PAYLOAD=$(echo "$ATTIC_TOKEN" | cut -d. -f2 | base64 -d)
-          EXP=$(echo "$PAYLOAD" | ${pkgs.jq}/bin/jq -r '.exp')
+              ATTIC_TOKEN=$(cat ${cfg.tokenPath})
 
-          # Calculate days until expiry
-          NOW=$(date +%s)
-          DAYS_LEFT=$(( (EXP - NOW) / 86400 ))
+              # Decode JWT payload
+              PAYLOAD=$(echo "$ATTIC_TOKEN" | cut -d. -f2 | base64 -d)
+              EXP=$(echo "$PAYLOAD" | jq -r '.exp')
 
-          if [ "$DAYS_LEFT" -lt 30 ]; then
-            echo "WARNING: Attic token expires in $DAYS_LEFT days"
-            # Send email if configured
-            if command -v mail >/dev/null; then
-                    TMPDIR=$(mktemp -d)
-            cat >"$TMPDIR"/expiry.txt <<-EOF
-          From:box@${config.hostSpec.domain}
-          Subject: [${config.networking.hostName}: attic] $(date) Attic Token Expiry Notice
-          The attic token for ${config.attic-client.cache-name} is expiring soon.
-            $2
-          EOF
-              ${lib.getBin pkgs.msmtp}/bin/msmtp -t admin@${config.hostSpec.domain} <"$TMPDIR"/expiry.txt
-              rm -rf "$TMPDIR"
-            fi
-            exit 1
-          else
-            echo "Attic token valid for $DAYS_LEFT more days"
-          fi
-        '';
+              # Calculate days until expiry
+              NOW=$(date +%s)
+              DAYS_LEFT=$(( (EXP - NOW) / 86400 ))
+
+              if [ "$DAYS_LEFT" -lt 30 ]; then
+                echo "WARNING: Attic token expires in $DAYS_LEFT days"
+                ${lib.getExe' token-expiry-notify "token-expiry-notify"}
+              else
+                echo "Attic token valid for $DAYS_LEFT more days"
+              fi
+            '';
+        };
+      in
+      {
+        description = "Check attic token expiration";
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = lib.getExe' check-attic-token "check-attic-token";
+        };
       };
-    };
+
     systemd.timers.attic-token-check = {
       description = "Check attic token expiration daily";
       wantedBy = [ "timers.target" ];
@@ -84,27 +154,39 @@ in
       };
     };
 
-    # FIXME: Disable for now due to some bug on oedo
-    # systemd.services.attic-watch-store = {
-    #   description = "Attic client watch-store service";
-    #   after = [ "network.target" ];
-    #   wantedBy = [ "default.target" ];
-    #   serviceConfig = {
-    #     ExecStart = "${pkgs.writeShellScript "watch-store" ''
-    #       #!/run/current-system/sw/bin/bash
-    #       ATTIC_TOKEN=$(cat ${attic_token})
-    #       ${attic}/bin/attic login ${config.attic-client.cache-name} ${attic_server} $ATTIC_TOKEN
-    #       ${attic}/bin/attic watch-store ${config.attic-client.cache-name}
-    #     ''}";
-    #     Restart = "on-failure";
-    #     RestartSec = "5s";
-    #   };
-    # };
+    systemd.services.attic-watch-store =
+      let
+        attic-watch-store = pkgs.writeShellApplication {
+          name = "attic-watch-store";
+          runtimeInputs = [
+            cfg.package
+          ];
+          text =
+            # bash
+            ''
+              ATTIC_TOKEN=$(cat ${cfg.tokenPath})
+              attic login ${cfg.cache-name} ${cfg.server} "$ATTIC_TOKEN"
+              attic watch-store ${cfg.cache-name}
+            '';
+        };
+      in
+      {
+        description = "Attic client watch-store service";
+        after = [ "network.target" ];
+        wantedBy = [ "default.target" ];
+        serviceConfig = {
+          ExecStart = lib.getExe' attic-watch-store "attic-watch-store";
+          Restart = "on-failure";
+          RestartSec = "5s";
+        };
+      };
 
     services.per-network-services.trustedNetworkServices = [ "attic-watch-store" ];
 
+    # Client is added system-wide for manual debugging. Keeps the version the same as the
+    # option (vs using a shell.nix version)
     environment.systemPackages = [
-      pkgs.attic-client
+      cfg.package
     ];
 
   };

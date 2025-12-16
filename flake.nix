@@ -10,6 +10,7 @@
     let
       inherit (self) outputs;
       inherit (nixpkgs) lib;
+      namespace = "fidgetingbits"; # namespace for our custom modules. Snowfall lib style
 
       mkHost = host: isDarwin: {
         ${host} =
@@ -19,7 +20,7 @@
           in
           systemFunc {
             specialArgs = {
-              inherit inputs outputs;
+              inherit inputs outputs namespace;
               # Propagate lib.custom into hm
               # see: https://github.com/nix-community/home-manager/pull/3454
               lib = nixpkgs.lib.extend (self: super: { custom = import ./lib { inherit (nixpkgs) lib; }; });
