@@ -74,8 +74,8 @@ in
       lib.attrValues {
         inherit (pkgs)
           gdb
-          #pwndbg
-          gef
+          pwndbg
+          # gef
           #bata24-gef
           pe-bear
           #binexport
