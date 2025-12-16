@@ -45,7 +45,7 @@ let
         exec msmtp -t <<EOF
         To: ${recipients}
         From: ${cfg.notify.from}
-        Subject: $HOSTNAME UPS status: $*
+        Subject: [${config.networking.hostName}: UPS] Status: $*
 
         $HOSTNAME UPS status: $*
         EOF
