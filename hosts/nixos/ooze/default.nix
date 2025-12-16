@@ -6,44 +6,38 @@
   ...
 }:
 {
-  imports = [
-    inputs.nixos-facter-modules.nixosModules.facter
-    { config.facter.reportPath = ./facter.json; }
-    ./disks.nix
-  ]
-  ++ (map lib.custom.relativeToRoot (
-    [
-      ##
-      # Core
-      ##
-      "hosts/common/core"
-      "hosts/common/core/nixos.nix"
+  imports =
+    lib.flatten [
+      inputs.nixos-facter-modules.nixosModules.facter
+      { config.facter.reportPath = ./facter.json; }
+      (lib.custom.scanPaths ./.) # Load all extra host-specific *.nix files
     ]
-    ++
-      # Optional common modules
-      (map (f: "hosts/common/optional/${f}") [
-        "keyd.nix"
-        "cli.nix"
-        "services/atuin.nix"
-        "services/atticd.nix"
-        "services/postfix-proton-relay.nix"
-        "services/unifi.nix" # Unifi Controller
-        # For sending mail via backup scripts. Not sure if should just use postfix locally in this case
-        "mail.nix"
+    ++ (map lib.custom.relativeToRoot (
+      [
+        ##
+        # Core
+        ##
+        "hosts/common/core"
+        "hosts/common/core/nixos.nix"
+      ]
+      ++
+        # Optional common modules
+        (map (f: "hosts/common/optional/${f}") [
+          "keyd.nix"
+          "cli.nix"
+          "services/atuin.nix"
+          "services/atticd.nix"
+          "services/postfix-proton-relay.nix"
+          "services/unifi.nix" # Unifi Controller
+          # For sending mail via backup scripts. Not sure if should just use postfix locally in this case
+          "mail.nix"
 
-        "acme.nix"
-        "remote-builder.nix"
+          "acme.nix"
+          "remote-builder.nix"
 
-      ])
-  ));
+        ])
+    ));
 
-  hostSpec = {
-    hostName = "ooze";
-    isProduction = lib.mkForce true;
-    isServer = lib.mkForce true;
-    persistFolder = lib.mkForce "/persist";
-    useWindowManager = lib.mkForce false;
-  };
   system.impermanence.enable = true;
 
   nixpkgs.config.nvidia.acceptLicense = true;

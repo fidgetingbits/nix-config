@@ -10,12 +10,7 @@
   imports = lib.flatten [
     inputs.nixos-facter-modules.nixosModules.facter
     { config.facter.reportPath = ./facter.json; }
-    ./disks.nix
-    ./monitors.nix
-    ./network.nix
-    ./overlays.nix
-    # lanzaboote
-    #./secureboot.nix
+    (lib.custom.scanPaths ./.) # Load all extra host-specific *.nix files
 
     (map lib.custom.relativeToRoot (
       [
@@ -71,22 +66,6 @@
 
   ];
 
-  hostSpec = {
-    hostName = "oedo";
-    isWork = lib.mkForce false;
-    voiceCoding = lib.mkForce false;
-    useYubikey = lib.mkForce true;
-    wifi = lib.mkForce true;
-    useNeovimTerminal = lib.mkForce false;
-    persistFolder = lib.mkForce "/persist";
-    isProduction = lib.mkForce true;
-    isAutoStyled = lib.mkForce true;
-    isDevelopment = lib.mkForce true;
-    isAdmin = lib.mkForce true;
-    # FIXME: We should have like "desktop" = "hyprland" and have that auto enable the rest?
-    defaultDesktop = "hyprland-uwsm";
-    useWayland = true;
-  };
   system.impermanence.enable = true;
 
   desktops.hyprland.enable = true;

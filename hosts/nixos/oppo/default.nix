@@ -10,11 +10,7 @@
     # Common
     inputs.nixos-facter-modules.nixosModules.facter
     { config.facter.reportPath = ./facter.json; }
-    ./disks.nix
-    ./monitors.nix
-
-    # Extra
-    ./openrgb.nix
+    (lib.custom.scanPaths ./.) # Load all extra host-specific *.nix files
 
     (map lib.custom.relativeToRoot (
       [
@@ -56,28 +52,6 @@
       ])
     ))
   ];
-
-  # Host Specification
-  hostSpec = {
-    # Read current directory to get the host name
-    hostName = "oppo";
-    isWork = lib.mkForce false;
-    useYubikey = lib.mkForce true;
-    isAutoStyled = lib.mkForce true;
-    wifi = lib.mkForce false;
-    useNeovimTerminal = lib.mkForce true;
-    hdr = lib.mkForce true;
-    scaling = lib.mkForce "2";
-    isProduction = lib.mkForce true;
-    isDevelopment = lib.mkForce true;
-    persistFolder = lib.mkForce "/persist";
-    useWayland = lib.mkForce true;
-    users = lib.mkForce [
-      "aa"
-      "media"
-    ];
-    wallpaper = "${inputs.nix-assets}/images/wallpapers/spirited_away_reflection.webp";
-  };
 
   services.lgtv-control =
     let

@@ -9,8 +9,7 @@
   imports = lib.flatten [
     #inputs.nixos-facter-modules.nixosModules.facter
     #{ config.facter.reportPath = ./facter.json; }
-    ./hardware-configuration.nix
-    ./disks.nix
+    (lib.custom.scanPaths ./.) # Load all extra host-specific *.nix files
     (map lib.custom.relativeToRoot (
       [
         "hosts/common/core"
@@ -30,11 +29,6 @@
     ))
   ];
 
-  hostSpec = {
-    hostName = "okra";
-    isProduction = lib.mkForce false;
-    persistFolder = lib.mkForce "/persist";
-  };
   system.impermanence.enable = true;
 
   boot.initrd = {

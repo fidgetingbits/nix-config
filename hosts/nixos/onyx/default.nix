@@ -11,12 +11,7 @@ rec {
     #inputs.nixos-hardware.nixosModules.asus-zenbook-ux371
     inputs.nixos-facter-modules.nixosModules.facter
     { config.facter.reportPath = ./facter.json; }
-    ./disks.nix
-    ./monitors.nix
-    ./host-spec.nix
-    ./network.nix
-
-    ./oom.nix
+    (lib.custom.scanPaths ./.) # Load all extra host-specific *.nix files
 
     (map lib.custom.relativeToRoot (
       [

@@ -11,6 +11,7 @@ rec {
     "${inputs.nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-gnome.nix"
     "${inputs.nixpkgs}/nixos/modules/installer/cd-dvd/channel.nix"
     inputs.home-manager.nixosModules.home-manager
+    (lib.custom.scanPaths ./.) # Load all extra host-specific *.nix files
     (map lib.custom.relativeToRoot [
       # FIXME: Switch this to just import hosts/common/core (though have to be careful to purposefully not add platform file..
       "hosts/common/optional/minimal-user.nix"
@@ -19,19 +20,12 @@ rec {
     ])
     (
       let
-        path = lib.custom.relativeToRoot "hosts/common/users/${hostSpec.username}/default.nix";
+        # FIXME: Infinite recursion if we use config.hostSpec.username
+        path = lib.custom.relativeToRoot "hosts/common/users/aa/default.nix";
       in
       lib.optional (lib.pathExists path) path
     )
   ];
-
-  hostSpec = {
-    primaryUsername = "aa";
-    username = "aa";
-    hostName = "iso";
-    isProduction = lib.mkForce false;
-    networking = inputs.nix-secrets.networking; # Needed because we don't use host/common/core for iso
-  };
 
   environment.etc = {
     isoBuildTime = {
