@@ -54,7 +54,6 @@
           "chat.nix"
           "reversing"
           "wine.nix"
-          "llm.nix"
         ])
     )
   );
