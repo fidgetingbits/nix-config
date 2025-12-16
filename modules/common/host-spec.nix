@@ -190,7 +190,12 @@
         useWayland = lib.mkOption {
           type = lib.types.bool;
           default = false;
-          description = "Indicate a host that uses Wayland";
+          description = "Indicate a host that uses Wayland. Both useWayland and useX11 can be true";
+        };
+        useX11 = lib.mkOption {
+          type = lib.types.bool;
+          default = (!config.hostSpec.useWayland);
+          description = "Indicate a host that uses X11. Both useWayland and useX11 can be true";
         };
         defaultBrowser = lib.mkOption {
           type = lib.types.str;
