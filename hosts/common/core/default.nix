@@ -53,7 +53,7 @@ in
   # If there is a conflict file that is backed up, use this extension
   home-manager.backupFileExtension = "bk";
 
-  # FIXME: This doesn't all apply if system is remotely managed, so need to
+  # FIXME: This isn't always accurate info if system is remotely managed, so need to
   # rework it. Ideally want to check something like isRemotelyManaged, but
   # will have to be like isDarwin outside of host-spec
   hostSpec = {
