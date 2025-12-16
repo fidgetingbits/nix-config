@@ -25,6 +25,11 @@ in
   options = {
     services.llama = {
       enable = lib.mkEnableOption "Run llama AI services";
+      ttl = lib.mkOption {
+        type = lib.types.int;
+        default = 0; # Persist
+        description = "How long to wait before auto-unloading model from VRAM";
+      };
     };
   };
 
@@ -50,8 +55,6 @@ in
 
       environment.systemPackages = [
         llama-cpp # manual llama-server/llama-cli tests
-        # FIXME: currently problen in 7.x PR: https://github.com/NixOS/nixpkgs/pull/469378
-        # pkgs.rocmPackages.amdsmi
       ];
 
       # Good example of settings here:
@@ -67,38 +70,47 @@ in
         settings =
           let
             llama-server = lib.getExe' llama-cpp "llama-server";
-            ttl = 300; # How long the model stays in VRAM after last request
+            ttl = cfg.ttl;
           in
           {
-            # Timeout to download deepseek-r1:70b at ~50MB/s was ~15m, but I sometimes get
-            # more like ~25MB/s depending on time of day, so double that to about ~60m
             # Pre-download larger models and use -m if you don't want massive stalls
+            # high health check timeout prevents it dying mid-download
             healthCheckTimeout = (time.minutes 60);
             macros = {
               # Systems using this atm are using AMD AI Max 395+ or AMD Ryzen AI 300
-              # Justifications for flags:
               #   --jinja:    improve prompt correctness with marked-up prompt templates
-              #   --fa:       VRAM is especially slow HBM, so flash attention is a win
-              #   --no-webui: don't use it
+              #   --fa:       flash attention should speed up inference
               "server" = "${llama-server} --port \${PORT} -fa on --jinja --no-webui";
             };
 
             # NOTE: models cmds use the "server" macro defined above
-            # -m is already downloaded model
+            # -m is local gguf file
             # -hf is direct download: <user>/<model>[:quant]
+            # --no-mmap : Model is larger than remaining system RAM
             models = {
-              #-hf unsloth/DeepSeek-R1-Distill-Llama-70B-GGUF:Q6_K_XL
-              "deepseek-r1:70b" = {
+              "deepseek-r1:30b" = {
                 inherit ttl;
-                # --no-mmap : Model is larger than remaining system RAM
                 cmd = ''
                   \''${server}
-                  -m ${modelsPath}/DeepSeek-R1-Distill-Llama-70B-UD-Q6_K_XL-00001-of-00002.gguf
+                  -m ${modelsPath}/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf
                   --ctx-size 32768
                   --no-mmap
                 '';
                 aliases = [
                   "ds-big"
+                  "agent"
+                ];
+              };
+              "deepseek-r1:8b" = {
+                inherit ttl;
+                cmd = ''
+                  \''${server}
+                  -m ${modelsPath}/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf
+                  --ctx-size 8192
+                '';
+                aliases = [
+                  "ds-small"
+                  "completion"
                 ];
               };
             };
