@@ -4,6 +4,7 @@
   inputs,
   pkgs,
   lib,
+  namespace,
   ...
 }:
 {
@@ -14,13 +15,19 @@
   time.timeZone = lib.mkDefault config.hostSpec.timeZone;
 
   # Core packages not available on darwin
-  environment.systemPackages = lib.attrValues {
-    inherit (pkgs)
-      cntr # derivation debugging
-      # editing
-      xclip # required for clipboard with vim (FIXME: this is only if not using wayland, so maybe check)
-      ;
-  };
+  environment.systemPackages = lib.attrValues (
+    {
+      inherit (pkgs)
+        cntr # derivation debugging
+        ;
+    }
+    # X11 packages
+    // lib.optionalAttrs (config.hostSpec.useX11) {
+      inherit (pkgs)
+        xclip # required for clipboard with vim on x11
+        ;
+    }
+  );
 
   # Database for aiding terminal-based programs
   environment.enableAllTerminfo = true;
@@ -155,6 +162,10 @@
     autoLogin.enable = true;
     autoLogin.user = config.hostSpec.primaryDesktopUsername;
     defaultSession = config.hostSpec.defaultDesktop;
+  };
+
+  "${namespace}" = {
+    attic-client.enable = config.hostSpec.useAtticCache;
   };
 
   system.stateVersion = "23.05";
