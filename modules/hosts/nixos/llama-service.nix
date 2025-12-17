@@ -123,7 +123,7 @@ in
       };
     })
 
-    {
+    (lib.mkIf cfg.enable {
       environment = lib.optionalAttrs isImpermanent {
         persistence.${persistFolder}.directories = [
           "/var/lib/ollama"
@@ -131,6 +131,6 @@ in
           modelsPath
         ];
       };
-    }
+    })
   ];
 }
