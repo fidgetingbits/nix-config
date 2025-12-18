@@ -1,9 +1,26 @@
 # FIXME(network): Revisit this now that oedo has changed
 {
+  inputs,
+  namespace,
   #lib,
   ...
 }:
 {
+
+  ${namespace} = {
+    cifs-mounts = {
+      enable = true;
+      sopsFile = (builtins.toString inputs.nix-secrets) + "/sops/olan.yaml";
+      mounts = [
+        {
+          name = "onus";
+        }
+        {
+          name = "oath";
+        }
+      ];
+    };
+  };
 
   # FIXME(network): Ideally this should be done using the networking.interfaces approach, but doesn't seem to work...
   # In the interfaces change due to me using usb dongles, we should explicitly test if they interface being used is
