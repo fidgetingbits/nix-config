@@ -1,6 +1,7 @@
 {
   lib,
   config,
+  namespace,
   ...
 }:
 let
@@ -56,7 +57,7 @@ in
         ];
       };
 
-      services.per-network-services.trustedNetworkServices = [ "sshd" ];
+      ${namespace}.services.per-network-services.trustedNetworkServices = [ "sshd" ];
 
       # Allow sudo over ssh with yubikey
       security.pam = {

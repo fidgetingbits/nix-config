@@ -165,6 +165,8 @@ in
             # bash
             ''
               ATTIC_TOKEN=$(cat ${cfg.tokenPath})
+              # FIXME: Add a check that the expected cache exists first and
+              # exit/create if not?
               attic login ${cfg.cache-name} ${cfg.server} "$ATTIC_TOKEN"
               attic watch-store ${cfg.cache-name}
             '';
@@ -181,7 +183,7 @@ in
         };
       };
 
-    services.per-network-services.trustedNetworkServices = [ "attic-watch-store" ];
+    ${namespace}.services.per-network-services.trustedNetworkServices = [ "attic-watch-store" ];
 
     # Client is added system-wide for manual debugging. Keeps the version the same as the
     # option (vs using a shell.nix version)

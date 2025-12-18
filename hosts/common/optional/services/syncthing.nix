@@ -2,6 +2,7 @@
   inputs,
   lib,
   config,
+  namespace,
   ...
 }:
 let
@@ -113,7 +114,7 @@ lib.mkMerge [
         };
       };
     };
-    services.per-network-services.trustedNetworkServices = [ "syncthing" ];
+    ${namespace}.services.per-network-services.trustedNetworkServices = [ "syncthing" ];
   }
   granularFirewallRules
   regularFirewallRules
