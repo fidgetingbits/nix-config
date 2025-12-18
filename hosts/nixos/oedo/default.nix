@@ -52,8 +52,6 @@
         "saleae.nix"
 
         # Mounts
-        "mounts/oath-cifs.nix"
-        "mounts/onus-cifs.nix"
         # "mounts/s3fs.nix"
 
         # Services

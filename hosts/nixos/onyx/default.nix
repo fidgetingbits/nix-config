@@ -55,8 +55,6 @@ rec {
           "systemd-resolved.nix"
 
           # Remote network mounts and syncing
-          # "mounts/oath-cifs.nix"
-          # "mounts/onus-cifs.nix"
           "services/syncthing.nix"
 
           "startpage.nix"

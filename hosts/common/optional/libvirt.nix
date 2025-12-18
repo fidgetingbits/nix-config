@@ -14,7 +14,8 @@ in
   ];
   boot.kernelModules = [ "vfio-pci" ];
 
-  # Enable yubikey, and other usb, redirection into a QEMU image https://github.com/NixOS/nixpkgs/issues/39618
+  # Enable yubikey, and other usb, redirection into a QEMU image
+  # https://github.com/NixOS/nixpkgs/issues/39618
   virtualisation.spiceUSBRedirection.enable = true;
 
   virtualisation.libvirtd = {
@@ -70,8 +71,19 @@ in
                     start = "${subnet.triplet}.100";
                     end = "${subnet.triplet}.254";
                   };
-                  # Static IP addresses
-                  host = lib.attrValues subnet.hosts;
+                  # Static IP addresses. Some hosts need lists of mac addresses
+                  # elsewhere, so here we just pop first mac for the virt host,
+                  # as those won't have multiple macs I think
+                  host =
+                    lib.attrValues subnet.hosts
+                    # nixfmt hack
+                    |> lib.map (
+                      host:
+                      if builtins.isList host.mac then
+                        lib.mapAttrs (name: value: if name == "mac" then lib.elemAt value 0 else value) host
+                      else
+                        host
+                    );
                 };
               };
           };

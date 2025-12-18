@@ -7,6 +7,7 @@
 #    mac = "aa:bb:cc:dd:ee:ff";
 #  };
 {
+  lib,
   inputs,
   namespace,
   ...
@@ -32,7 +33,7 @@
       debug = true; # FIXME(onyx): Remove this
       # FIXME: This should be synchronized with the code that renames it
       networkDevices = [ "wlo1" ];
-      trustedNetworks = [
+      trustedNetworks = lib.flatten [
         inputs.nix-secrets.networking.trusted.homeWifi
         inputs.nix-secrets.networking.trusted.homeWired
       ];

@@ -60,7 +60,7 @@
     {
       enable = true;
       ip = ogle.ip;
-      mac = ogle.mac;
+      mac = lib.elemAt ogle.mac 0;
     };
 
   system.impermanence = {

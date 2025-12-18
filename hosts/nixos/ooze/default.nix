@@ -104,7 +104,7 @@
         let
           oppo = config.hostSpec.networking.subnets.ogre.hosts.oppo;
         in
-        "wakeonlan ${oppo.mac} -i ${oppo.ip}";
+        "wakeonlan ${lib.elemAt oppo.mac 0} -i ${oppo.ip}";
     })
   ];
 }

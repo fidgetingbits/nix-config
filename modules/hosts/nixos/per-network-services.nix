@@ -21,6 +21,13 @@ in
         when you're at home.
       '';
     };
+    debug = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = ''
+        Enable set -x debugging in dispatcher script
+      '';
+    };
     mounts = lib.mkOption {
       default = [ ];
       description = ''
@@ -58,12 +65,6 @@ in
         Mounts to enable on trusted network. Currently must have a corresponding /etc/fstab entry
       '';
     };
-    debug = lib.mkOption {
-      default = false;
-      description = ''
-        Enable set -x debugging in dispatcher script
-      '';
-    };
   };
 
   config = lib.mkIf cfg.enable (
@@ -75,7 +76,7 @@ in
           index: set: ''
             declare -A trusted_network_${toString index}
             trusted_network_${toString index}[type]="${set.type}"
-            trusted_network_${toString index}[ssid]="${if set ? ssid then set.ssid else ""}"
+            trusted_network_${toString index}[ssid]="${lib.optionalString (set ? ssid) set.ssid}"
             trusted_network_${toString index}[mac]="${set.mac}"
             trusted_network_${toString index}[gateway]="${set.gateway}"
           ''
@@ -91,8 +92,8 @@ in
             i = toString index;
           in
           ''
-            if [ "''$${lib.toUpper fieldOne}" = "''${trusted_network_${i}[${fieldOne}]}" ] && \
-               [ "''$${lib.toUpper fieldTwo}" = "''${trusted_network_${i}[${fieldTwo}]}" ];
+            if [ "''${${lib.toUpper fieldOne},,}" = "''${trusted_network_${i}[${fieldOne}],,}" ] && \
+               [ "''${${lib.toUpper fieldTwo},,}" = "''${trusted_network_${i}[${fieldTwo}],,}" ];
             then
               return 0
             fi
@@ -217,8 +218,7 @@ in
             STATE_FILE="$STATE_DIR/trusted_interfaces_up"
             LOCK_FILE="$STATE_DIR/trusted_interfaces_up.lock"
 
-            logmsg "Interface $IFACE $ACTION"
-            logmsg "''${MONITORED_INTERFACES[@]}"
+            logmsg "Checking action \"$ACTION\" on interface $IFACE against monitored ''${MONITORED_INTERFACES[*]}"
             for monitored in "''${MONITORED_INTERFACES[@]}"; do
               if [ "$IFACE" = "$monitored" ]; then
               (
@@ -238,7 +238,7 @@ in
                       fi
                       echo $((count + 1)) > "$STATE_FILE"
                     else
-                      #$notify-send "Connected to untrusted network"
+                      notify-send "Connected to untrusted network"
                       start_untrusted_network_services
                       stop_trusted_network_services
                       unmount_trusted_network_mounts
@@ -266,8 +266,7 @@ in
     {
       networking.networkmanager.dispatcherScripts = [
         {
-          type = "basic";
-          source = dispatcherScript;
+          source = lib.getExe' dispatcherScript "per-network-services.sh";
         }
       ];
 
