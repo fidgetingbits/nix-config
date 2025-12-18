@@ -53,16 +53,6 @@ in
           # See later activation script for folder permission sanitization
           path = "${config.hostSpec.home}/.config/sops/age/keys.txt";
         };
-
-        # NOTE: These two entries are duplicated in home sops as well, and here because nix.nix can't
-        # directly check for sops usage due to recursion in some situations
-        # formatted as extra-access-tokens = github.com=<PAT token>
-        "tokens/nix-access-tokens" = {
-          sopsFile = "${sopsFolder}/shared.yaml";
-        };
-        "passwords/netrc" = {
-          sopsFile = "${sopsFolder}/shared.yaml";
-        };
       }
 
       (lib.mkIf config.services.backup.enable {

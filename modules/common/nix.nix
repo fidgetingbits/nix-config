@@ -4,72 +4,108 @@
   config,
   lib,
   pkgs,
+  namespace,
   ...
 }:
+let
+  cfg = config.${namespace}.nix;
+in
 {
-  nixpkgs.config = {
-    allowBroken = true;
-    allowUnfree = true;
+  options.${namespace}.nix = {
+    withSecrets = lib.mkOption {
+      type = lib.types.bool;
+      default = config.hostSpec.isLocal;
+      example = false;
+      description = "Include netrc and github token secrets used by trusted systems on local networks";
+    };
+    sopsFile = lib.mkOption {
+      type = lib.types.path;
+      default = (builtins.toString inputs.nix-secrets) + "/sops/olan.yaml";
+      description = "sops file containing nix access token and netrc contents";
+    };
   };
 
-  nix = {
-    # We want at least 2.30 to get the memory management improvements
-    # https://discourse.nixos.org/t/nix-2-30-0-released/66449/4
-    package = lib.mkForce pkgs.unstable.nixVersions.git;
-    settings = {
-      # See https://jackson.dev/post/nix-reasonable-defaults/
-      connect-timeout = 5;
-      log-lines = 25;
-      min-free = 128000000; # 128MB
-      max-free = 1000000000; # 1GB
-      experimental-features = [
-        "nix-command"
-        "flakes"
-        "pipe-operators"
-      ];
-      warn-dirty = false;
-      allow-import-from-derivation = true;
-      trusted-users = [ "@wheel" ];
-      builders-use-substitutes = true;
-      fallback = true; # Don't hard fail if a binary cache isn't available, since some systems roam
-      substituters = lib.flatten [
-        (lib.optional (lib.substring 0 4 config.hostSpec.timeZone == "Asia") [
-          "https://mirror.sjtu.edu.cn/nix-channels/store" # Shanghai Jiao Tong University
-          "https://mirrors.ustc.edu.cn/nix-channels/store" # USTC backup mirror
-        ])
-        [
-          "https://cache.nixos.org" # Official global cache
-          "https://nix-community.cachix.org" # Community packages
-        ]
-      ];
-      extra-trusted-public-keys = [
-        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-      ];
-      netrc-file = if config ? "sops" then "${config.sops.secrets."passwords/netrc".path}" else null;
+  config = {
+    nixpkgs.config = {
+      allowBroken = true;
+      allowUnfree = true;
     };
 
-    # Access token prevents github rate limiting if you have to nix flake update a bunch
-    extraOptions =
-      if config ? "sops" then "!include ${config.sops.secrets."tokens/nix-access-tokens".path}" else "";
+    nix = {
+      # We want at least 2.30 to get the memory management improvements
+      # https://discourse.nixos.org/t/nix-2-30-0-released/66449/4
+      package = lib.mkForce pkgs.unstable.nixVersions.git;
+      settings = {
+        # See https://jackson.dev/post/nix-reasonable-defaults/
+        connect-timeout = 5;
+        log-lines = 25;
+        min-free = 128000000; # 128MB
+        max-free = 1000000000; # 1GB
+        experimental-features = [
+          "nix-command"
+          "flakes"
+          "pipe-operators"
+        ];
+        warn-dirty = false;
+        allow-import-from-derivation = true;
+        trusted-users = [ "@wheel" ];
+        builders-use-substitutes = true;
+        fallback = true; # Don't hard fail if a binary cache isn't available, since some systems roam
+        substituters = lib.flatten [
+          (lib.optional (lib.substring 0 4 config.hostSpec.timeZone == "Asia") [
+            "https://mirror.sjtu.edu.cn/nix-channels/store" # Shanghai Jiao Tong University
+            "https://mirrors.ustc.edu.cn/nix-channels/store" # USTC backup mirror
+          ])
+          [
+            "https://cache.nixos.org" # Official global cache
+            "https://nix-community.cachix.org" # Community packages
+          ]
+        ];
+        extra-trusted-public-keys = [
+          "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+        ];
 
-    # Disabled because I am using nh
-    # gc = {
-    #   automatic = true;
-    #   options = "--delete-older-than 10d";
-    # };
-  }
-  // (lib.optionalAttrs pkgs.stdenv.isLinux {
-    # This will add each flake input as a registry
-    # To make nix3 commands consistent with your flake
-    registry = lib.mapAttrs (_: value: { flake = value; }) inputs;
+        # FIXME: This might not only contain attic-related entries in the future
+        netrc-file =
+          if ((config ? "sops") && (config.hostSpec.useAtticCache)) then
+            "${config.sops.secrets."passwords/netrc".path}"
+          else
+            null;
+      };
 
-    # This will add your inputs to the system's legacy channels
-    # Making legacy nix commands consistent as well
-    # NOTE: on darwin I was getting:
-    # error: The option `nix.registry.nixpkgs.to.path' has conflicting definition values:
-    #   - In `/nix/store/3m75mdiiq4bkzm5qpx6arapz042na0vh-source/modules/nix': "/nix/store/m1g5a7agja7si7y9l1lzwhp3capbv7x9-source"
-    #   - In `/nix/store/3m75mdiiq4bkzm5qpx6arapz042na0vh-source/modules/nix/nixpkgs-flake.nix': "/nix/store/fj58bk5dvyaxqfrsrncfg3bn1pmdj8q2-source"
-    #   Use `lib.mkForce value` or `lib.mkDefault value` to change the priority on any of these definitions.
-    nixPath = lib.mapAttrsToList (key: value: "${key}=${value.to.path}") config.nix.registry;
-  });
+      # Access token prevents github rate limiting if you have to nix flake update a bunch
+      # Only local systems are used to build anything, so only include there
+      extraOptions =
+        lib.optionalString ((config ? "sops") && (config.hostSpec.isLocal))
+          "!include ${config.sops.secrets."tokens/nix-access-tokens".path}";
+
+      # Disabled because I am using nh
+      # gc = {
+      #   automatic = true;
+      #   options = "--delete-older-than 10d";
+      # };
+
+      # This will add each flake input as a registry
+      # To make nix3 commands consistent with your flake
+      registry = lib.mapAttrs (_: value: { flake = value; }) inputs;
+
+      # This will add your inputs to the system's legacy channels
+      # Making legacy nix commands consistent as well
+      nixPath =
+        config.nix.registry
+        # nixfmt hack
+        |> lib.mapAttrsToList (key: value: "${key}=${value.to.path}");
+
+    };
+
+    sops.secrets = lib.optionalAttrs cfg.withSecrets {
+      # formatted as extra-access-tokens = github.com=<PAT token>
+      "tokens/nix-access-tokens" = {
+        inherit (cfg) sopsFile;
+      };
+      "passwords/netrc" = {
+        inherit (cfg) sopsFile;
+      };
+    };
+  };
 }
