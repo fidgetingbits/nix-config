@@ -5,6 +5,7 @@
   lib,
   isDarwin,
   namespace,
+  secrets,
   ...
 }:
 
@@ -100,7 +101,12 @@ in
     in
     rec {
       extraSpecialArgs = {
-        inherit pkgs inputs namespace;
+        inherit
+          pkgs
+          inputs
+          namespace
+          secrets
+          ;
       };
       # FIXME: Common for all users (will include root too!)
       # sharedModules = map (module: (import module)) (

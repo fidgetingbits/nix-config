@@ -2,6 +2,7 @@
   lib,
   inputs,
   config,
+  secrets,
   ...
 }:
 let
@@ -36,7 +37,7 @@ let
 
   workSecrets = "${sopsFolder}/work.yaml";
   workSopsSecrets = lib.optionalAttrs config.hostSpec.isWork (
-    inputs.nix-secrets.work.sops workSecrets homeDirectory sopsFolder
+    secrets.work.sops workSecrets homeDirectory sopsFolder
   );
 in
 {

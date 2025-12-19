@@ -3,6 +3,7 @@
   pkgs,
   config,
   lib,
+  secrets,
   ...
 }:
 let
@@ -61,7 +62,7 @@ in
             ipv6 = false;
             ip =
               let
-                subnet = inputs.nix-secrets.networking.subnets.vm-lan;
+                subnet = secrets.networking.subnets.vm-lan;
               in
               {
                 address = subnet.gateway;

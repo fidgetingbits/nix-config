@@ -2,7 +2,7 @@
 {
   config,
   lib,
-  inputs,
+  secrets,
   ...
 }:
 let
@@ -24,7 +24,7 @@ lib.mkIf cfg.isAdmin {
       "oath_gitlab"
       cfg.networking.subnets.ogre.wildcard
     ]
-    ++ lib.optional cfg.isWork inputs.nix-secrets.work.git.servers;
+    ++ lib.optional cfg.isWork secrets.work.git.servers;
   };
   programs.ssh.matchBlocks =
     let

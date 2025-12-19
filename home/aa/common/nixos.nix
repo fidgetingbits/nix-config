@@ -1,8 +1,8 @@
 # Core home functionality that will only work on Linux
 {
   config,
-  inputs,
   lib,
+  secrets,
   ...
 }:
 let
@@ -15,7 +15,7 @@ in
         "${homeDirectory}/scripts/"
       ]
       ++ lib.optional config.hostSpec.voiceCoding [ "${homeDirectory}/scripts/talon/" ]
-      ++ lib.optional config.hostSpec.isWork inputs.nix-secrets.work.extraPaths
+      ++ lib.optional config.hostSpec.isWork secrets.work.extraPaths
     );
   };
 }

@@ -2,6 +2,7 @@
 rec {
   # sub libs
   time = import ./time.nix;
+  network = import ./network.nix { inherit lib; };
 
   # use path relative to the root of the project
   relativeToRoot = lib.path.append ../.;

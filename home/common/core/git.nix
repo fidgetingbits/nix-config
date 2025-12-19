@@ -1,8 +1,8 @@
 {
-  inputs,
   pkgs,
   lib,
   config,
+  secrets,
   ...
 }:
 {
@@ -35,8 +35,8 @@
     # actions that require auth.
     settings =
       let
-        privateRepos = inputs.nix-secrets.git.repos;
-        privateWorkRepos = inputs.nix-secrets.git.work.repos;
+        privateRepos = secrets.git.repos;
+        privateWorkRepos = secrets.git.work.repos;
         insteadOfList =
           domain: urls:
           lib.map (url: {

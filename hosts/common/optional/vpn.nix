@@ -3,12 +3,13 @@
   config,
   inputs,
   lib,
+  secrets,
   ...
 }:
 let
   sopsFolder = (builtins.toString inputs.nix-secrets) + "/sops";
   workSecrets = "${sopsFolder}/work.yaml";
-  vpnProfiles = inputs.nix-secrets.work.vpn.profiles;
+  vpnProfiles = secrets.work.vpn.profiles;
 in
 {
   sops.secrets = {

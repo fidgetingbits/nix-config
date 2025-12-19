@@ -10,6 +10,7 @@
   lib,
   inputs,
   namespace,
+  secrets,
   ...
 }:
 {
@@ -34,8 +35,8 @@
       # FIXME: This should be synchronized with the code that renames it
       networkDevices = [ "wlo1" ];
       trustedNetworks = lib.flatten [
-        inputs.nix-secrets.networking.trusted.homeWifi
-        inputs.nix-secrets.networking.trusted.homeWired
+        secrets.networking.trusted.homeWifi
+        secrets.networking.trusted.homeWired
       ];
     };
   };

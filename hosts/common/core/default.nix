@@ -8,6 +8,7 @@
   lib,
   pkgs,
   isDarwin,
+  secrets,
   ...
 }:
 let
@@ -61,7 +62,7 @@ in
     username = "aa"; # FIXME: deprecate
     users = [ "aa" ];
     handle = "fidgetingbits";
-    inherit (inputs.nix-secrets)
+    inherit (secrets)
       domain
       email
       userFullName
@@ -76,6 +77,6 @@ in
   };
 
   security.pki.certificates = lib.flatten (
-    lib.optional config.hostSpec.isWork inputs.nix-secrets.work.certificates
+    lib.optional config.hostSpec.isWork secrets.work.certificates
   );
 }

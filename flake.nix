@@ -5,6 +5,7 @@
       self,
       nixpkgs,
       flake-parts,
+      nix-secrets,
       ...
     }@inputs:
     let
@@ -12,18 +13,26 @@
       inherit (nixpkgs) lib;
       namespace = "fidgetingbits"; # namespace for our custom modules. Snowfall lib style
 
+      customLib = nixpkgs.lib.extend (self: super: { custom = import ./lib { inherit (nixpkgs) lib; }; });
+      secrets = nix-secrets.mkSecrets nixpkgs customLib;
+
       mkHost = host: isDarwin: {
         ${host} =
           let
             func = if isDarwin then inputs.nix-darwin.lib.darwinSystem else lib.nixosSystem;
             systemFunc = func;
+            # Propagate lib.custom into hm
+            # see: https://github.com/nix-community/home-manager/pull/3454
           in
           systemFunc {
-            specialArgs = {
-              inherit inputs outputs namespace;
-              # Propagate lib.custom into hm
-              # see: https://github.com/nix-community/home-manager/pull/3454
-              lib = nixpkgs.lib.extend (self: super: { custom = import ./lib { inherit (nixpkgs) lib; }; });
+            specialArgs = rec {
+              inherit
+                inputs
+                outputs
+                namespace
+                secrets
+                ;
+              lib = customLib;
               inherit isDarwin;
             };
             modules = [ ./hosts/${if isDarwin then "darwin" else "nixos"}/${host} ];
@@ -35,7 +44,7 @@
     in
     flake-parts.lib.mkFlake { inherit inputs; } {
       flake = {
-        overlays = import ./overlays { inherit inputs lib; };
+        overlays = import ./overlays { inherit inputs lib secrets; };
         nixosConfigurations = mkHostConfigs (readHosts "nixos") false;
         darwinConfigurations = mkHostConfigs (readHosts "darwin") true;
       };

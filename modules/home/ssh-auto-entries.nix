@@ -2,6 +2,7 @@
   inputs,
   config,
   lib,
+  secrets,
   ...
 }:
 let
@@ -51,8 +52,8 @@ in
         type = lib.types.anything;
         default =
           # FIXME: Maybe revisit this
-          (inputs.nix-secrets.networking.ssh.matchBlocks lib)
-          // lib.optionalAttrs config.hostSpec.isWork (inputs.nix-secrets.work.ssh.matchBlocks lib);
+          (secrets.networking.ssh.matchBlocks lib)
+          // lib.optionalAttrs config.hostSpec.isWork (secrets.work.ssh.matchBlocks lib);
         description = "Matchblocks from nix-secrets repo that won't be shown in plaintext in the reoo.";
       };
     };
@@ -81,11 +82,11 @@ in
       ykDomainHosts =
         cfg.ykDomainHosts # Configured entries
         ++ nixosHostNames # Auto-generated entries
-        ++ inputs.nix-secrets.networking.ssh.ykDomainHosts; # Secret entries
+        ++ secrets.networking.ssh.ykDomainHosts; # Secret entries
       ykNoDomainHosts =
         cfg.ykDomainHosts # Configured entries
         ++ nixosHostsUnlockableNames # Auto-generated unlock entries
-        ++ inputs.nix-secrets.networking.ssh.ykNoDomainHosts; # Secret entries
+        ++ secrets.networking.ssh.ykNoDomainHosts; # Secret entries
 
       # Add domain to each host name
       genDomains = lib.map (h: "${h}.${cfg.domain}");
@@ -97,7 +98,7 @@ in
 
       # Only a subset of hosts are trusted enough to allow agent forwarding
       forwardAgentHosts =
-        inputs.nix-secrets.networking.ssh.forwardAgentUntrusted
+        secrets.networking.ssh.forwardAgentUntrusted
         |> lib.foldl' (acc: b: lib.filter (a: a != b) acc) ykDomainHosts;
 
       forwardAgentHostsString =

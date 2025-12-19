@@ -2,6 +2,7 @@
 {
   inputs,
   namespace,
+  #secrets,
   #lib,
   ...
 }:
@@ -29,7 +30,7 @@
   # networking.dhcpcd.wait = "background";
   #  networking.dhcpcd.runHook =
   #    let
-  #      network = inputs.nix-secrets.networking;
+  #      network = secrets.networking;
   #    in
   #    ''
   #      if [ "$reason" = "BOUND" ]; then
@@ -56,9 +57,9 @@
   #        "wlp0s20f3"
   #      ];
   #      labRoute = {
-  #        address = inputs.nix-secrets.networking.subnets.lab.ip;
-  #        prefixLength = inputs.nix-secrets.networking.subnets.lab.prefixLength;
-  #        via = inputs.nix-secrets.networking.subnets.ogre.hosts.ottr.ip;
+  #        address = secrets.networking.subnets.lab.ip;
+  #        prefixLength = secrets.networking.subnets.lab.prefixLength;
+  #        via = secrets.networking.subnets.ogre.hosts.ottr.ip;
   #      };
   #      interfaceRoutes = lib.attrsets.mergeAttrsList (
   #        lib.map (name: { ${name}.ipv4.routes = [ labRoute ]; }) interfaceNames
@@ -69,17 +70,17 @@
   # FIXME: Double check these after
   #  networking.interfaces.enp196s0f0.ipv4.routes = [
   #    {
-  #      address = inputs.nix-secrets.networking.subnets.lab.ip;
-  #      prefixLength = inputs.nix-secrets.networking.subnets.lab.prefixLength;
-  #      via = inputs.nix-secrets.networking.subnets.ogre.hosts.ottr.ip;
+  #      address = secrets.networking.subnets.lab.ip;
+  #      prefixLength = secrets.networking.subnets.lab.prefixLength;
+  #      via = secrets.networking.subnets.ogre.hosts.ottr.ip;
   #    }
   #  ];
   #
   #  networking.interfaces.wlp193s0.ipv4.routes = [
   #    {
-  #      address = inputs.nix-secrets.networking.subnets.lab.ip;
-  #      prefixLength = inputs.nix-secrets.networking.subnets.lab.prefixLength;
-  #      via = inputs.nix-secrets.networking.subnets.ogre.hosts.ottr.ip;
+  #      address = secrets.networking.subnets.lab.ip;
+  #      prefixLength = secrets.networking.subnets.lab.prefixLength;
+  #      via = secrets.networking.subnets.ogre.hosts.ottr.ip;
   #    }
   #  ];
 

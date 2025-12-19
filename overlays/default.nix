@@ -1,4 +1,9 @@
-{ inputs, lib, ... }:
+{
+  inputs,
+  lib,
+  secrets,
+  ...
+}:
 let
   overlays = {
     # Add custom packages
@@ -58,7 +63,7 @@ let
             let
               # Pull out the 0.4.0-411-g6d1e version part from
               # talon-linux-115-0.4.0-411-g6d1e.tar.xz in beta-url
-              beta = inputs.nix-secrets.talon-linux-beta;
+              beta = secrets.talon-linux-beta;
               version = prev.lib.elemAt (prev.lib.match ".*talon-linux-[0-9]+-(.*).tar.xz" beta.url) 0;
             in
             prev.talon-unwrapped.overrideAttrs (oldAttrs: {

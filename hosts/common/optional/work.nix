@@ -1,4 +1,4 @@
-{ inputs, lib, ... }:
+{ secrets, lib, ... }:
 {
-  security.pki.certificateFiles = lib.attrValues inputs.nix-secrets.work.certs;
+  security.pki.certificateFiles = lib.attrValues secrets.work.certs;
 }
