@@ -13,7 +13,14 @@
       inherit (nixpkgs) lib;
       namespace = "fidgetingbits"; # namespace for our custom modules. Snowfall lib style
 
-      customLib = nixpkgs.lib.extend (self: super: { custom = import ./lib { inherit (nixpkgs) lib; }; });
+      customLib = nixpkgs.lib.extend (
+        self: super: {
+          custom = import ./lib {
+            inherit (nixpkgs) lib;
+            ports = nix-secrets.ports; # Some lib functions rely on secret data
+          };
+        }
+      );
       secrets = nix-secrets.mkSecrets nixpkgs customLib;
 
       mkHost = host: isDarwin: {
