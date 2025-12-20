@@ -20,7 +20,6 @@
           git
           just
           pre-commit
-          alejandra
           sops
           deadnix
           statix
