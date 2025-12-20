@@ -5,14 +5,6 @@
   ...
 }:
 {
-  # How to enter setup mode - Dell precision laptop
-  ## 1. enter BIOS via F12 Key, and then select <Setup>
-  ## 2. <Advance mode> => <Settings> => <Security> => <Secure Boot>
-  ## 3. enable <Secure Boot>
-  ## 4. set <Secure Boot Mode> to <Custom>
-  ## 5. enter <Key Management>
-  ## 6. select <Delete All Secure Boot Variables>, and then select <No> for <Reboot Without Saving>
-  ## 7. Press F10 to saving and reboot.
   imports = [ lanzaboote.nixosModules.lanzaboote ];
 
   environment.systemPackages = [
