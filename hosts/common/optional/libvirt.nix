@@ -75,6 +75,8 @@ in
                   # Static IP addresses. Some hosts need lists of mac addresses
                   # elsewhere, so here we just pop first mac for the virt host,
                   # as those won't have multiple macs I think
+                  # FIXME: The host from subnet.hosts has way more fields than what
+                  # https://libvirt.org/formatnetwork.html#addressing needs, so we need to filter them out
                   host =
                     lib.attrValues subnet.hosts
                     # nixfmt hack
