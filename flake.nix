@@ -5,6 +5,7 @@
       self,
       nixpkgs,
       flake-parts,
+      introdus,
       nix-secrets,
       ...
     }@inputs:
@@ -13,12 +14,16 @@
       inherit (nixpkgs) lib;
       namespace = "fidgetingbits"; # namespace for our custom modules. Snowfall lib style
 
+      introdusLib = introdus.mkLib nixpkgs.lib nix-secrets;
       customLib = nixpkgs.lib.extend (
         self: super: {
-          custom = import ./lib {
-            inherit (nixpkgs) lib;
-            ports = nix-secrets.ports; # Some lib functions rely on secret data
-          };
+          custom =
+            introdusLib
+            # NOTE: This overrides introdusLib entries with local changes via
+            # '//' in case I want to test something
+            // (import ./lib {
+              inherit (nixpkgs) lib;
+            });
         }
       );
       secrets = nix-secrets.mkSecrets nixpkgs customLib;
@@ -214,9 +219,10 @@
     };
     pwndbg.url = "github:pwndbg/pwndbg";
 
-    #introdus = {
-    #      url = "github:emergentmind/introdus?shallow=1";
-    # url = "git+file:///home/aa/dev/nix/introdus?ref=aa";
-    #};
+    introdus = {
+      # url = "github:emergentmind/introdus?shallow=1";
+      # url = "git+file://////home/aa/persist/source/nix/introdus?ref=aa";
+      url = "path:///home/aa/persist/source/nix/introdus";
+    };
   };
 }
