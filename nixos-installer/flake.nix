@@ -91,6 +91,7 @@
           impermanence = true;
           facter = true;
         };
+
         ooze = newConfig {
           name = "ooze";
           impermanence = true;
@@ -105,6 +106,12 @@
 
         onyx = newConfig {
           name = "onyx";
+          impermanence = true;
+          facter = true;
+        };
+
+        ossa = newConfig {
+          name = "ossa";
           impermanence = true;
           facter = true;
         };
