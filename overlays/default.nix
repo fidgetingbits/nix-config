@@ -10,7 +10,7 @@ let
     additions =
       final: prev:
       let
-        system = prev.stdenv.hostPlatform.system;
+        system = final.stdenv.hostPlatform.system;
       in
       (
         prev.lib.packagesFromDirectoryRecursive {
