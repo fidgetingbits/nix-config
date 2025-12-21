@@ -14,7 +14,7 @@
       inherit (nixpkgs) lib;
       namespace = "fidgetingbits"; # namespace for our custom modules. Snowfall lib style
 
-      introdusLib = introdus.mkLib nixpkgs.lib nix-secrets;
+      introdusLib = introdus.lib.mkLib nixpkgs.lib nix-secrets;
       customLib = nixpkgs.lib.extend (
         self: super: {
           custom =

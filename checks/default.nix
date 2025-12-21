@@ -22,7 +22,7 @@
     src = ./.;
     default_stages = [ "pre-commit" ];
     # NOTE: Hooks are run in alphabetical order
-    hooks = {
+    hooks = lib.recursiveUpdate inputs.introdus.lib.preCommitHooks {
       # Ensure this runs first
       aaa-check-flake-lock = {
         # NOTE: This is a hack because of a pre-commit bug interaction with my per-host flake locking and the need
@@ -51,16 +51,7 @@
         language = "script";
         #pass_on_error = false;
       };
-      # General
-      check-added-large-files.enable = true;
-      check-case-conflicts.enable = true;
-      check-executables-have-shebangs.enable = true;
-      check-shebang-scripts-are-executable.enable = false;
-      check-merge-conflicts.enable = true;
-      # detect-private-keys.enable = true; # NOTE: This conflicts with us using git-crypt now, as the key will be encrypted
-      fix-byte-order-marker.enable = true;
-      mixed-line-endings.enable = true;
-      trim-trailing-whitespace.enable = true;
+
       destroyed-symlinks = {
         enable = true;
         name = "destroyed-symlinks";
@@ -70,43 +61,10 @@
         types = [ "symlink" ];
       };
 
-      # nix
-      nixfmt-rfc-style.enable = true;
-      deadnix = {
-        enable = true;
-        settings = {
-          noLambdaArg = true;
-        };
-      };
-      # statix.enable = true;
-
-      # shellscripts
-      shfmt.enable = true;
-      shellcheck.enable = true;
-
-      # python
-      ruff.enable = true;
-
-      # rust
-      rustfmt.enable = true;
-      clippy.enable = true;
-      cargo-check.enable = true;
-
-      end-of-file-fixer.enable = true;
-
       git-crypt-check = {
         enable = true;
         name = "git-crypt encryption check";
         entry = "${./git-crypt-check.sh}";
-        files = ".*"; # or whatever pattern matches your encrypted files
-        language = "script";
-        #pass_on_error = false;
-      };
-
-      unwanted-builtins = {
-        enable = true;
-        name = "unwanted builtins function calls";
-        entry = "${./unwanted-builtins.sh}";
         files = ".*"; # or whatever pattern matches your encrypted files
         language = "script";
         #pass_on_error = false;
