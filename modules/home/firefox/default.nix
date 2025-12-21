@@ -9,8 +9,8 @@ let
   homeDir = config.home.homeDirectory;
 in
 {
-  config =
-    lib.mkIf config.hostSpec.useWindowManager {
+  config = lib.mkMerge [
+    (lib.mkIf config.hostSpec.useWindowManager {
       programs.firefox = {
         enable = true;
         # Refer to https://mozilla.github.io/policy-templates or `about:policies#documentation` in firefox
@@ -109,8 +109,8 @@ in
             };
           };
       };
-    }
-    // (lib.optionalAttrs pkgs.stdenv.isLinux {
+    })
+    (lib.mkIf pkgs.stdenv.isLinux {
       # FIXME: This should become config.hostSpec.defaultBrowser and not just if you import firefox
       xdg.mimeApps.defaultApplications = {
         "text/html" = [ "firefox.desktop" ];
@@ -126,6 +126,6 @@ in
       #        "default"
       #      ];
       #    })
-    );
-
+    )
+  ];
 }

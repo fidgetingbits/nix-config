@@ -47,7 +47,9 @@
               lib = customLib;
               inherit isDarwin;
             };
-            modules = [ ./hosts/${if isDarwin then "darwin" else "nixos"}/${host} ];
+            modules = [
+              ./hosts/${if isDarwin then "darwin" else "nixos"}/${host}
+            ];
           };
       };
       mkHostConfigs =
@@ -56,7 +58,11 @@
     in
     flake-parts.lib.mkFlake { inherit inputs; } {
       flake = {
-        overlays = import ./overlays { inherit inputs lib secrets; };
+        overlays = (
+          import ./overlays {
+            inherit inputs lib secrets;
+          }
+        );
         nixosConfigurations = mkHostConfigs (readHosts "nixos") false;
         darwinConfigurations = mkHostConfigs (readHosts "darwin") true;
       };
@@ -65,14 +71,17 @@
       ];
       perSystem =
         { system, ... }:
-
         let
           pkgs = import nixpkgs {
             inherit system;
-            overlays = [ self.overlays.default ];
+            overlays = [
+              introdus.overlays.default
+              self.overlays.default
+            ];
           };
         in
         rec {
+          _module.args.pkgs = pkgs;
           packages = lib.packagesFromDirectoryRecursive {
             callPackage = lib.callPackageWith pkgs;
             directory = ./pkgs/common;

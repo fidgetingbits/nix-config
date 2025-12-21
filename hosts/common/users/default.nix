@@ -25,8 +25,7 @@ let
   superPubKeys = genPubKeyList "super";
 
   platform = if isDarwin then "darwin" else "nixos";
-  hostSpec = config.hostSpec;
-  monitors = config.monitors;
+  inherit (config) hostSpec monitors;
 in
 {
   # No matter what environment we are in we want these tools for root, and the user(s)
@@ -100,9 +99,10 @@ in
         lib.optional (lib.pathExists fullPath) fullPath;
     in
     rec {
+      useGlobalPkgs = true;
+      useUserPackages = true;
       extraSpecialArgs = {
         inherit
-          pkgs
           inputs
           namespace
           secrets

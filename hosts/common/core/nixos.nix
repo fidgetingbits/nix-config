@@ -10,6 +10,7 @@
 {
   imports = [
     inputs.nixcats-flake.nixosModules.default
+    inputs.introdus.nixosModules.default
   ];
 
   time.timeZone = lib.mkDefault config.hostSpec.timeZone;

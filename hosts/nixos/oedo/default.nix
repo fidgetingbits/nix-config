@@ -88,7 +88,7 @@
     notify.to = config.hostSpec.email.olanAdmins;
   };
 
-  system.initrd-wifi = {
+  introdus.system.initrd-wifi = {
     enable = true;
     interface = "wlp193s0";
     drivers = [

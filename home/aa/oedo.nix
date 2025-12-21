@@ -65,7 +65,7 @@
       ;
   };
 
-  services.awww = {
+  introdus.services.awww = {
     enable = true;
     wallpaperDir = "${config.home.homeDirectory}/images/wallpaper/catppuccin-mocha";
   };

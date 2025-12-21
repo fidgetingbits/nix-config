@@ -1,6 +1,6 @@
-# This file (and the global directory) holds config that I use on all hosts except nixos-installer.
-# It imports foundation.nix as a base (which is used by nixos-installer) and builds on that for all hosts.
-# IMPORTANT: This is used by NixOS and nix-darwin so options must exist in both!
+# This file (and the global directory) holds config that I use on all hosts
+# except nixos-installer. IMPORTANT: This is used by NixOS and nix-darwin so
+# options must exist in both!
 {
   inputs,
   outputs,
@@ -39,10 +39,12 @@ in
   nixpkgs = {
     config = {
       allowUnfree = true;
+      allowBroken = true;
     };
     overlays = [
+      outputs.overlays.default # our own flake overlays
       inputs.talon-nix.overlays.default
-      outputs.overlays.default
+      inputs.introdus.overlays.default
     ];
   };
 

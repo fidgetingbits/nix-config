@@ -18,6 +18,8 @@
             type = lib.types.bool;
             default = false;
           };
+          # FIXME: This should move somewhere more abstract that specifies per
+          # monitor name, that's like a set of "layout" options?
           noBar = lib.mkOption {
             type = lib.types.bool;
             default = false;

@@ -1,4 +1,8 @@
-{ pkgs, lib, ... }:
+{
+  pkgs,
+  lib,
+  ...
+}:
 let
   videoPlayers = if pkgs.stdenv.isDarwin then [ pkgs.mpv ] else [ pkgs.vlc ];
 in
