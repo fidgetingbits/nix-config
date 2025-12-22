@@ -84,7 +84,7 @@
           _module.args.pkgs = pkgs;
           packages = lib.packagesFromDirectoryRecursive {
             callPackage = lib.callPackageWith pkgs;
-            directory = ./pkgs/common;
+            directory = ./pkgs;
           };
           checks = import ./checks {
             inherit
@@ -229,7 +229,7 @@
     pwndbg.url = "github:pwndbg/pwndbg";
 
     introdus = {
-      # url = "github:emergentmind/introdus?shallow=1";
+      # url = "codeberg:fidgetingbits/introdus?shallow=1";
       # url = "git+file://////home/aa/persist/source/nix/introdus?ref=aa";
       url = "path:///home/aa/persist/source/nix/introdus";
     };
