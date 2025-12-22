@@ -12,7 +12,7 @@ let
   time = lib.custom.time;
   isImpermanent = config.system ? "impermanence" && config.system.impermanence.enable;
   modelsPath = "/var/lib/llm/models";
-  cachePath = "/var/cache/llama-swap";
+  cachePath = "/var/cache/private/llama-swap";
   user = config.users.users.${config.hostSpec.primaryUsername}.name;
   group = config.users.users.${config.hostSpec.primaryUsername}.group;
   persistFolder = config.hostSpec.persistFolder;
@@ -127,8 +127,13 @@ in
       environment = lib.optionalAttrs isImpermanent {
         persistence.${persistFolder}.directories = [
           "/var/lib/ollama"
-          cachePath
           modelsPath
+          {
+            # DynamicUser requires /var/cache/private
+            directory = cachePath;
+            user = "nobody";
+            group = "nogroup";
+          }
         ];
       };
     })
