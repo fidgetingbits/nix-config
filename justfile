@@ -1,8 +1,4 @@
-SOPS_FILE := "../nix-secrets/.sops.yaml"
-
-# Define path to helpers
-
-export HELPERS_PATH := justfile_directory() + "/scripts/helpers.sh"
+export HELPERS_PATH := justfile_directory() + "../introdus/pkgs/introdus-helpers/helpers.sh"
 
 [private]
 default:
@@ -40,8 +36,17 @@ rebuild-post: check-sops
 # Run a flake check on the config and installer
 [group("checks")]
 check HOST=`hostname` ARGS="":
-    NIXPKGS_ALLOW_UNFREE=1 REPO_PATH=$(pwd) nix flake check --impure --keep-going --show-trace{{ ARGS }}
-    cd nixos-installer && NIXPKGS_ALLOW_UNFREE=1 REPO_PATH=$(pwd) nix flake check --impure --keep-going --show-trace {{ ARGS }}
+    NIXPKGS_ALLOW_UNFREE=1 REPO_PATH=$(pwd) nix flake check \
+        --impure \
+        --keep-going \
+        --show-trace \
+        {{ ARGS }}
+    cd nixos-installer && \
+        NIXPKGS_ALLOW_UNFREE=1 REPO_PATH=$(pwd) nix flake check \
+        --impure \
+        --keep-going \
+        --show-trace \
+        {{ ARGS }}
 
 [private]
 _rebuild HOST=`hostname`:

@@ -7,11 +7,16 @@
 }:
 {
   default = pkgs.mkShell {
+    # Nix utility settings
     NIX_CONFIG = "extra-experimental-features = nix-command flakes pipe-operators";
     NIXPKGS_ALLOW_BROKEN = "1";
+
+    # Bootstrap script settings
     BOOTSTRAP_USER = "aa";
     BOOTSTRAP_SSH_PORT = "10022";
     BOOTSTRAP_SSH_KEY = "~/.ssh/id_yubikey";
+    NIX_SECRETS_DIR = "~/dev/nix/nix-secrets";
+
     buildInputs = checks.pre-commit-check.enabledPackages;
     nativeBuildInputs =
       # FIXME: Some of these can go away because of the helpers.sh moving and

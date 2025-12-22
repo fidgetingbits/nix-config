@@ -7,7 +7,7 @@
 # arguments, so we want the splitting to happen
 
 # shellcheck disable=SC1091
-source "$(dirname "${BASH_SOURCE[0]}")/helpers.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../../introdus/pkgs/introdus-helpers/helpers.sh"
 
 BUILD_LOG=$(mktemp)
 
