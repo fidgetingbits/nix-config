@@ -45,7 +45,7 @@
             };
           }) urls;
 
-        # FIXME: At the moment this requires personal and work sets to maintian lists fo git servers, even if
+        # FIXME: At the moment this requires personal and work sets to maintain lists fo git servers, even if
         # unneeded, so could also check if domain list actually exists in the set first.
         alwaysSshRepos = lib.foldl' lib.recursiveUpdate { } (
           lib.concatLists (
@@ -70,8 +70,14 @@
             "ssh://git@github.com" = {
               pushInsteadOf = [ "https://github.com" ];
             };
+            "ssh://git@gist.github.com" = {
+              pushInsteadOf = [ "https://gist.github.com" ];
+            };
             "ssh://git@gitlab.com" = {
               pushInsteadOf = [ "https://gitlab.com" ];
+            };
+            "ssh://git@codeberg.org" = {
+              pushInsteadOf = [ "https://codeberg.org" ];
             };
           };
         core.excludeFiles = builtins.toFile "global-gitignore" ''
