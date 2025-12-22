@@ -229,9 +229,8 @@
     pwndbg.url = "github:pwndbg/pwndbg";
 
     introdus = {
-      # url = "codeberg:fidgetingbits/introdus?shallow=1";
-      # url = "git+file://////home/aa/persist/source/nix/introdus?ref=aa";
-      url = "path:///home/aa/persist/source/nix/introdus";
+      url = "git+ssh://git@codeberg.org/fidgetingbits/introdus?shallow=1&ref=aa";
+      #url = "path:///home/aa/dev/nix/introdus";
     };
   };
 }
