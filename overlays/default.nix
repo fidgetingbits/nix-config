@@ -33,6 +33,7 @@ let
     linuxModifications =
       final: prev:
       lib.optionalAttrs prev.stdenv.isLinux ({
+        # FIXME: note why I overlayed this
         zsh-edit = prev.zsh-edit.overrideAttrs (oldAttrs: {
           src = prev.fetchFromGitHub {
             owner = "marlonrichert/";
