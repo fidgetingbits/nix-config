@@ -19,7 +19,11 @@ in
       identifiers = lib.mkOption {
         default = { };
         type = lib.types.attrsOf (lib.types.either lib.types.int lib.types.str);
-        description = "Attrset of Yubikey serial numbers. NOTE: Yubico's 'Security Key' products do not use unique serial number therefore, the scripts in this module are unable to distinguish between multiple 'Security Key' devices and instead will detect a Security Key serial number as the string \"[FIDO]\". This means you can only use a single Security Key but can still mix it with YubiKey 4 and 5 devices.";
+        description = ''
+          Attrset of Yubikey serial numbers.
+
+          NOTE: Yubico's 'Security Key' products do not use unique serial number therefore, the scripts in this module are unable to distinguish between multiple 'Security Key' devices and instead will detect a Security Key serial number as the string "[FIDO]". This means you can only use a single Security Key but can still mix it with YubiKey 4 and 5 devices.
+        '';
         example = lib.literalExample ''
           {
             foo = 12345678;
@@ -84,7 +88,6 @@ in
       yubikey-down = pkgs.writeShellApplication {
         name = "yubikey-down";
         text = ''
-          #!/usr/bin/env bash
           set -euo pipefail
 
           rm ${homeDirectory}/.ssh/id_yubikey
