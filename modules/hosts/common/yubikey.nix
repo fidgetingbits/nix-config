@@ -1,3 +1,8 @@
+# This module supports multiple YubiKey 4 and/or 5 devices as well as a single Yubico Security Key device.
+# The limitation to a single Security Key is because they do not have serial numbers and therefore the
+# scripts in this module cannot uniquely identify them. See options.yubikey.identifies.description below
+# for information on how to add a 'mock' serial number for a single Security key. Additional context is
+# available in Issue 14 https://github.com/EmergentMind/nix-config/issues/14
 {
   config,
   pkgs,
@@ -14,11 +19,12 @@ in
       identifiers = lib.mkOption {
         default = { };
         type = lib.types.attrsOf (lib.types.either lib.types.int lib.types.str);
-        description = "Attrset of Yubikey IDs";
+        description = "Attrset of Yubikey serial numbers. NOTE: Yubico's 'Security Key' products do not use unique serial number therefore, the scripts in this module are unable to distinguish between multiple 'Security Key' devices and instead will detect a Security Key serial number as the string \"[FIDO]\". This means you can only use a single Security Key but can still mix it with YubiKey 4 and 5 devices.";
         example = lib.literalExample ''
           {
             foo = 12345678;
             bar = 87654321;
+            baz = "[FIDO]";
           }
         '';
       };
@@ -47,12 +53,12 @@ in
           name = "yubikey-up";
           runtimeInputs = lib.attrValues { inherit (pkgs) gawk yubikey-manager; };
           text = ''
-            #!/usr/bin/env bash
             set -euo pipefail
 
             serial=$(ykman list | awk '{print $NF}')
             # If it got unplugged before we ran, just don't bother
             if [ -z "$serial" ]; then
+              # FIXME(yubikey): Warn probably
               exit 0
             fi
 
@@ -92,7 +98,7 @@ in
           inherit (pkgs)
             gnupg
             pam_u2f # for yubikey with sudo
-            yubikey-manager # For ykman
+            yubikey-manager # cli-based authenticator tool. accessed via `ykman`
             ;
         })
         yubikey-up
