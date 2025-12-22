@@ -14,8 +14,9 @@ setup_sops() {
 	mv "$TEST_TEMP/sops.yaml" "$TEST_TEMP/.sops.yaml"
 	NIX_SECRETS_DIR="$TEST_TEMP"
 	export NIX_SECRETS_DIR
+	# FIXME: Change this so the path is sane eventually
 	# shellcheck disable=SC1091
-	source "$BATS_TEST_DIRNAME/../scripts/helpers.sh"
+	source "$BATS_TEST_DIRNAME/../../introdus/pkgs/introdus-helpers/helpers.sh"
 }
 
 @test "add sops user anchor" {

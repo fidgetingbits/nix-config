@@ -14,6 +14,8 @@
     BOOTSTRAP_SSH_KEY = "~/.ssh/id_yubikey";
     buildInputs = checks.pre-commit-check.enabledPackages;
     nativeBuildInputs =
+      # FIXME: Some of these can go away because of the helpers.sh moving and
+      # becoming selve-contained?
       lib.attrValues {
         inherit (pkgs)
           home-manager
@@ -32,6 +34,7 @@
           age # bootstrap script
           ssh-to-age # bootstrap script
           gum # shell script ricing
+          bootstrap-nixos # introdus script for bootstrapping new hosts
           ;
       }
       ++ [

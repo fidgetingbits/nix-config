@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
-# This script is used to build a remote host. It's it's own script because of the
-# need for the cleanup trap to avoid the pre-commit bug with per-host flake locks.
 
 # shellcheck disable=SC1091
-source "$(dirname "${BASH_SOURCE[0]}")/helpers.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../../introdus/pkgs/introdus-helpers/helpers.sh"
 
 trap cleanup_flake_lock EXIT HUP INT QUIT TERM
 
@@ -13,4 +11,11 @@ if [[ $# -ne 1 ]]; then
 fi
 
 HOST="$1"
-NIXPKGS_ALLOW_BROKEN=1 NIX_SSHOPTS="-p10022" nixos-rebuild --target-host "$HOST" --sudo --show-trace --impure --flake .#"$HOST" switch
+
+NIXPKGS_ALLOW_BROKEN=1 NIX_SSHOPTS="-p10022" nixos-rebuild \
+	--target-host "$HOST" \
+	--sudo \
+	--show-trace \
+	--impure \
+	--flake .#"$HOST" \
+	switch

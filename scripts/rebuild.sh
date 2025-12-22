@@ -3,7 +3,8 @@
 #
 # This script is used to rebuild the system configuration for the current host.
 #
-# SC2086 is ignored because we purposefully pass some values as a set of arguments, so we want the splitting to happen
+# SC2086 is ignored because we purposefully pass some values as a set of
+# arguments, so we want the splitting to happen
 
 # shellcheck disable=SC1091
 source "$(dirname "${BASH_SOURCE[0]}")/helpers.sh"
