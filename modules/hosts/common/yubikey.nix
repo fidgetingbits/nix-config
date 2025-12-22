@@ -2,7 +2,6 @@
   config,
   pkgs,
   lib,
-  isDarwin,
   ...
 }:
 let
@@ -39,9 +38,10 @@ in
     let
       yubikey-up =
         let
-          yubikeyIds = lib.concatStringsSep " " (
-            lib.mapAttrsToList (name: id: "[${name}]=\"${builtins.toString id}\"") config.yubikey.identifiers
-          );
+          yubikeyIds =
+            config.yubikey.identifiers
+            |> lib.mapAttrsToList (name: id: "[${name}]=\"${builtins.toString id}\"")
+            |> lib.concatStringsSep " ";
         in
         pkgs.writeShellApplication {
           name = "yubikey-up";
@@ -101,9 +101,7 @@ in
 
       # Yubikey required services and config. See Dr. Duh NixOS config for
       # reference
-      services = lib.optionalAttrs (!isDarwin) {
-        #yubikey-agent.enable = true;
-
+      services = {
         udev.extraRules =
           lib.optionalString pkgs.stdenv.isLinux ''
             # Link/unlink ssh key on yubikey add/remove
@@ -148,15 +146,6 @@ in
           sudo = {
             u2fAuth = true;
           };
-          # Attempt to auto-unlock gnome-keyring using u2f
-          # NOTE: apps like vscode/signal uses gnome-keyring even if we aren't using gnome, which is why it's still here
-          # This doesn't work
-          #gnome-keyring = {
-          #  text = ''
-          #    session    include                     login
-          #    session optional ${pkgs.gnome.gnome-keyring}/lib/security/pam_gnome_keyring.so auto_start
-          #  '';
-          #};
         };
       };
     };
