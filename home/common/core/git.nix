@@ -47,7 +47,7 @@
 
         # FIXME: At the moment this requires personal and work sets to maintain lists fo git servers, even if
         # unneeded, so could also check if domain list actually exists in the set first.
-        alwaysSshRepos = lib.foldl' lib.recursiveUpdate { } (
+        privateAlwaysSshRepos = lib.foldl' lib.recursiveUpdate { } (
           lib.concatLists (
             lib.map
               (
@@ -63,23 +63,7 @@
         );
       in
       {
-        # Only force ssh if it's not an iso
-        url =
-          alwaysSshRepos
-          // lib.optionalAttrs (!config.hostSpec.isMinimal) {
-            "ssh://git@github.com" = {
-              pushInsteadOf = [ "https://github.com" ];
-            };
-            "ssh://git@gist.github.com" = {
-              pushInsteadOf = [ "https://gist.github.com" ];
-            };
-            "ssh://git@gitlab.com" = {
-              pushInsteadOf = [ "https://gitlab.com" ];
-            };
-            "ssh://git@codeberg.org" = {
-              pushInsteadOf = [ "https://codeberg.org" ];
-            };
-          };
+        url = privateAlwaysSshRepos; # NOTE: See introdus/modules/home/git.nix for more
         core.excludeFiles = builtins.toFile "global-gitignore" ''
           .DS_Store
           .DS_Store?
