@@ -6,7 +6,7 @@
   ...
 }:
 let
-  introdusLib = inputs.introdus.lib.mkIntrodusLib lib { };
+  introdusLib = inputs.introdus.lib.mkIntrodusLib { inherit lib; };
 in
 {
   bats-test =
