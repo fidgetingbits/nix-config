@@ -137,6 +137,7 @@ in
   cns = "cd ${devNix}/nix-secrets";
   cnh = "cd ${devNix}/nixos-hardware";
   cnp = "cd ${devNix}/nixpkgs";
+  cni = "cd ${devNix}/introdus";
 
   ## rust cargo
   cr = "cargo run";
