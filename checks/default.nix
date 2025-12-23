@@ -5,6 +5,9 @@
   lib,
   ...
 }:
+let
+  introdusLib = inputs.introdus.lib.mkIntrodusLib lib { };
+in
 {
   bats-test =
     pkgs.runCommand "bats-test"
@@ -22,7 +25,7 @@
     src = ./.;
     default_stages = [ "pre-commit" ];
     # NOTE: Hooks are run in alphabetical order
-    hooks = lib.recursiveUpdate inputs.introdus.lib.preCommitHooks {
+    hooks = lib.recursiveUpdate (introdusLib.mkPreCommitHooks pkgs) {
       # Ensure this runs first
       aaa-check-flake-lock = {
         # NOTE: This is a hack because of a pre-commit bug interaction with my per-host flake locking and the need
