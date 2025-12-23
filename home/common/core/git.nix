@@ -30,37 +30,37 @@
       ".direnv/"
     ];
 
-    # Anytime I use auth, I want to use my yubikey. But I don't want to always be having to touch it
-    # for things that don't need it. So I have to hardcode repos that require auth, and default to ssh for
-    # actions that require auth.
+    # When using auth a yubikey should be used. But also, touching shouldn't be
+    # required for repos that don't actually need auth. Solution is to hardcode
+    # repos that require auth and default to ssh those only
     settings =
       let
         privateRepos = secrets.git.repos;
         privateWorkRepos = secrets.git.work.repos;
+
         insteadOfList =
           domain: urls:
-          lib.map (url: {
+          urls
+          |> lib.map (url: {
             "ssh://git@${domain}/${url}" = {
               insteadOf = "https://${domain}/${url}";
             };
-          }) urls;
+          });
 
-        # FIXME: At the moment this requires personal and work sets to maintain lists fo git servers, even if
-        # unneeded, so could also check if domain list actually exists in the set first.
-        privateAlwaysSshRepos = lib.foldl' lib.recursiveUpdate { } (
-          lib.concatLists (
-            lib.map
-              (
-                domain:
-                insteadOfList domain (
-                  privateRepos.${domain} ++ (lib.optionals config.hostSpec.isWork privateWorkRepos.${domain})
-                )
-              )
-              (
-                lib.attrNames privateRepos ++ lib.optionals config.hostSpec.isWork (lib.attrNames privateWorkRepos)
-              )
-          )
-        );
+        workRepoNames =
+          lib.attrNames privateWorkRepos
+          # nixfmt hack
+          |> lib.optionals config.hostSpec.isWork;
+
+        workDomain =
+          domain:
+          lib.optionals (config.hostSpec.isWork && (privateWorkRepos ? ${domain})) privateWorkRepos.${domain};
+
+        privateAlwaysSshRepos =
+          (lib.attrNames privateRepos) ++ workRepoNames
+          |> lib.map (domain: insteadOfList domain (privateRepos.${domain} ++ (workDomain domain)))
+          |> lib.concatLists
+          |> lib.foldl' lib.recursiveUpdate { };
       in
       {
         url = privateAlwaysSshRepos; # NOTE: See introdus/modules/home/git.nix for more
