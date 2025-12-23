@@ -230,7 +230,7 @@
 
     introdus = {
       url = "git+ssh://git@codeberg.org/fidgetingbits/introdus?shallow=1&ref=aa";
-      #url = "path:///home/aa/dev/nix/introdus";
+      # url = "path:///home/aa/dev/nix/introdus";
     };
   };
 }
