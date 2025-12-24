@@ -38,6 +38,7 @@
               str
               (listOf str)
               int
+              (attrsOf str)
             ]);
           description = "The email of the user";
         };
