@@ -6,7 +6,8 @@
   ...
 }:
 {
-  # All users get git no matter, what but additional settings may be added by eg: development.nix, introdus
+  # All users get git no matter, what but additional settings may be added by
+  # eg: development/git.nix, introdus
   home.packages = [
     pkgs.git-crypt # Needs to be global so talon dynamic lists work in repos with filters. FIXME: add a conditional?
     pkgs.delta # git diff tool
@@ -31,7 +32,7 @@
     ];
 
     # When using auth a yubikey should be used. But also, touching shouldn't be
-    # required for repos that don't actually need auth. Solution is to hardcode
+    # required for repos that don't actually need auth. Solution is to ha sgrdcode
     # repos that require auth and default to ssh those only
     settings =
       let
