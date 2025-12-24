@@ -1,31 +1,8 @@
-# Development utilities I want across all systems
 {
-  config,
   lib,
   pkgs,
-  secrets,
   ...
 }:
-let
-  publicGitEmail = config.hostSpec.email.git;
-  sshFolder = "${config.home.homeDirectory}/.ssh";
-  publicKey =
-    if config.hostSpec.useYubikey then "${sshFolder}/id_yubikey.pub" else "${sshFolder}/id_ed25519.pub";
-  privateGitConfig = "${config.home.homeDirectory}/.config/git/gitconfig.private";
-  workEmail = secrets.email.work;
-  workGitConfig = "${config.home.homeDirectory}/.config/git/gitconfig.work";
-
-  #  workGitUrlsTable = lib.optionalAttrs config.hostSpec.isWork (
-  #    lib.listToAttrs (
-  #      map (url: {
-  #        name = "ssh://git@${url}";
-  #        value = {
-  #          insteadOf = "https://${url}";
-  #        };
-  #      }) (lib.splitString " " secrets.work.git.servers)
-  #    )
-  #  );
-in
 {
   imports = lib.custom.scanPaths ./.;
 
@@ -91,89 +68,6 @@ in
       # ]
     ))
   ];
-
-  programs.git = {
-    settings = {
-      user.name = config.hostSpec.handle;
-      user.email = config.hostSpec.email.git;
-      # NOTE: This is way too spammy when looking at repo logs with untrusted keys
-      # log.showSignature = "true";
-      init.defaultBranch = "main";
-      pull.rebase = "true";
-
-      # Don't warn on empty git add calls. Because of "git re-commit" automation
-      advice.addEmptyPathspec = false;
-
-      # Re-enable when applicable
-      #      url = lib.optionalAttrs config.hostSpec.isWork (
-      #        lib.recursiveUpdate {
-      #          "ssh://git@${secrets.work.git.serverMain}" = {
-      #            insteadOf = "https://${secrets.work.git.serverMain}";
-      #          };
-      #        } workGitUrlsTable
-      #      );
-
-      includeIf."gitdir:${config.home.homeDirectory}/dev/".path = privateGitConfig;
-      includeIf."gitdir:${config.home.homeDirectory}/source/".path = privateGitConfig;
-      includeIf."gitdir:${config.home.homeDirectory}/work/".path = workGitConfig;
-      includeIf."gitdir:${config.home.homeDirectory}/persist/work/".path = workGitConfig;
-      diff.tool = "difftastic";
-      difftool = {
-        prompt = "false";
-        difftastic.cmd = "difft \"$LOCAL\" \"$REMOTE\"";
-      };
-      commit.gpgsign = "true";
-
-      user.signingkey = "${publicKey}";
-      gpg = {
-        format = "ssh";
-        # NOTE: git doesn't support parsing sk-ssh keys, see https://github.com/maxgoedjen/secretive/issues/262
-        # See 'alias git' creation in zshrc for how I get around that, while still using signing.key later on
-        # sshKeyCommand = "ssh-add -L";
-        ssh.allowedSignersFile = "${config.home.homeDirectory}/.ssh/allowed_signers";
-      };
-    };
-    signing = {
-      signByDefault = true;
-      key = publicKey;
-    };
-    ignores = [
-      ".direnv"
-      "result"
-    ];
-  };
-
-  home.file.".ssh/allowed_signers".text =
-    let
-      # FIXME: This would need to change if we ever have multiple developer accounts on the same box or we have work keys that aren't our own yubikeys, etc
-      keypath = "hosts/common/users/super/keys/";
-      genEmailKeys =
-        email: keys:
-        lib.concatMapStringsSep "\n" (
-          key: "${email} ${lib.fileContents (lib.custom.relativeToRoot "${keypath}/${key}")}\n"
-        ) keys;
-    in
-    ''
-      ${genEmailKeys publicGitEmail [
-        "id_dade.pub"
-        "id_dark.pub"
-        "id_drzt.pub"
-      ]}
-      ${genEmailKeys workEmail [
-        "id_dark.pub"
-        "id_drzt.pub"
-      ]}
-    '';
-  home.file."${privateGitConfig}".text = ''
-    [user]
-      name = "${config.hostSpec.handle}"
-      email = ${publicGitEmail}
-  '';
-  home.file."${workGitConfig}".text = ''
-    [user]
-      name = "${config.hostSpec.userFullName}"
-      email = "${workEmail}"
-  '';
 
   home.file.".editorconfig".text = ''
     root = true
