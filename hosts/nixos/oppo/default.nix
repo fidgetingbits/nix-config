@@ -21,7 +21,7 @@
 
         # Host-specific stuff
         "keyd.nix"
-        "mail.nix"
+        "mail-delivery.nix"
         # WARNING: Blocks on boot on both gpus atm (Granite Ridge and 9070XT)
         #"plymouth.nix"
         "locale.nix"
@@ -172,8 +172,6 @@
       fi
     '';
   };
-
-  mail-delivery.useRelay = true; # Use o-lan postfix-relay
 
   # Enable WoL port
   networking.firewall = {

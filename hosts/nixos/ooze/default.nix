@@ -30,7 +30,7 @@
           "services/postfix-proton-relay.nix"
           "services/unifi.nix" # Unifi Controller
           # For sending mail via backup scripts. Not sure if should just use postfix locally in this case
-          "mail.nix"
+          "mail-delivery.nix"
 
           "acme.nix"
           "remote-builder.nix"
@@ -93,8 +93,6 @@
     # ttyUSB3
     ACTION=="add", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", ATTRS{serial}=="A9IPH6E8", SYMLINK+="ttyUSB-frby"
   '';
-
-  mail-delivery.useRelay = true; # Use o-lan postfix-relay
 
   environment.systemPackages = [
     (pkgs.writeShellApplication {

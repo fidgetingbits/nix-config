@@ -32,7 +32,7 @@
           "systemd-resolved.nix"
 
           # Misc
-          "mail.nix"
+          "mail-delivery.nix"
           "plymouth.nix" # Boot graphics
           "sound.nix"
           "cli.nix"

@@ -184,8 +184,7 @@ in
     };
 
     # modules/hosts/nixos/mail-delivery module
-    mail-delivery.users = [
-      config.hostSpec.primaryUsername
+    mail-delivery.extraUsers = [
       config.power.ups.upsmon.user
     ];
 

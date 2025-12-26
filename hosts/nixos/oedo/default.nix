@@ -27,7 +27,7 @@
         "keyd.nix"
 
         # Host-specific stuff
-        "mail.nix"
+        "mail-delivery.nix"
         "plymouth.nix"
         "printing.nix"
         "locale.nix"

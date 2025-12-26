@@ -130,7 +130,7 @@
         isLocal = lib.mkOption {
           type = lib.types.bool;
           default = (!config.hostSpec.isRemote);
-          description = "Used to indicate a host that is remotely managed";
+          description = "Used to indicate a host that is locally managed";
         };
         isAdmin = lib.mkOption {
           type = lib.types.bool;

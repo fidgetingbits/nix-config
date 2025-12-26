@@ -18,10 +18,16 @@ in
       description = "Email address from which to send notifications";
     };
 
-    users = lib.mkOption {
-      default = [ config.hostSpec.primaryUsername ];
+    user = lib.mkOption {
+      type = lib.types.str;
+      default = config.hostSpec.primaryUsername;
+      description = "Main user with access for testing/sending emails with msmtp";
+    };
+
+    extraUsers = lib.mkOption {
+      default = [ ];
       type = lib.types.listOf lib.types.str;
-      description = "Users added to the group with mail delivery password access";
+      description = "Extra users added to the group with mail delivery password access";
     };
 
     group = lib.mkOption {
@@ -50,7 +56,7 @@ in
 
   config = lib.mkIf cfg.enable {
     users.groups.${cfg.group} = {
-      members = cfg.users;
+      members = [ cfg.user ] ++ cfg.extraUsers;
     };
     sops.secrets."${secret}" = {
       group = cfg.group;
