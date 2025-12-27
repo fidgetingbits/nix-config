@@ -17,6 +17,9 @@
     BOOTSTRAP_SSH_KEY = "~/.ssh/id_yubikey";
     NIX_SECRETS_DIR = "~/dev/nix/nix-secrets";
 
+    # This is needed in case we manually run bats tests and similar
+    HELPERS_PATH = "${pkgs.introdus-helpers}/share/introdus-helpers/helpers.sh";
+
     buildInputs = checks.pre-commit-check.enabledPackages;
     nativeBuildInputs =
       # FIXME: Some of these can go away because of the helpers.sh moving and

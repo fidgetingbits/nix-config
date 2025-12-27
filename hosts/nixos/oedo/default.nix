@@ -47,7 +47,7 @@
         #"gnome.nix"
         "sddm.nix"
 
-        "binaryninja.nix"
+        # "binaryninja.nix"
         # "cynthion.nix"
         "saleae.nix"
 

@@ -13,10 +13,17 @@ in
     pkgs.runCommand "bats-test"
       {
         src = ../.;
-        buildInputs = lib.attrValues { inherit (pkgs) bats yq-go inetutils; };
+        buildInputs = lib.attrValues {
+          inherit (pkgs)
+            bats
+            yq-go
+            inetutils
+            ;
+        };
       }
       ''
         cd $src
+        export HELPERS_PATH="${pkgs.introdus-helpers}/share/introdus-helpers/helpers.sh"
         bats tests
         touch $out
       '';

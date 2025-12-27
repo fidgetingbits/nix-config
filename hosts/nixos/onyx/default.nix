@@ -46,7 +46,7 @@ rec {
           #"iphone-backup.nix"
 
           # Binary analysis tools
-          "binaryninja.nix"
+          # "binaryninja.nix"
           # FIXME: Temporary to work around build error on update
           #"cynthion.nix"
           "saleae.nix"

@@ -100,7 +100,7 @@ in
     in
     rec {
       useGlobalPkgs = true;
-      useUserPackages = true;
+      # useUserPackages = true;
       extraSpecialArgs = {
         inherit
           inputs

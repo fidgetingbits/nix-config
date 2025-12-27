@@ -36,6 +36,7 @@ rebuild-post: check-sops
 # Run a flake check on the config and installer
 [group("checks")]
 check HOST=`hostname` ARGS="":
+    @just copy-lock-in {{ HOST }}
     NIXPKGS_ALLOW_UNFREE=1 REPO_PATH=$(pwd) nix flake check \
         --impure \
         --keep-going \
@@ -47,6 +48,7 @@ check HOST=`hostname` ARGS="":
         --keep-going \
         --show-trace \
         {{ ARGS }}
+    @just copy-lock-out {{ HOST }}
 
 [private]
 _rebuild HOST=`hostname`:
