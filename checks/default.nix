@@ -22,10 +22,10 @@ in
       '';
 
   pre-commit-check = inputs.pre-commit-hooks.lib.${system}.run {
-    src = ./.;
+    src = ../.;
     default_stages = [ "pre-commit" ];
     # NOTE: Hooks are run in alphabetical order
-    hooks = lib.recursiveUpdate (introdusLib.mkPreCommitHooks pkgs) {
+    hooks = lib.recursiveUpdate (introdusLib.checks.mkPreCommitHooks pkgs) {
       # Ensure this runs first
       aaa-check-flake-lock = {
         # NOTE: This is a hack because of a pre-commit bug interaction with my per-host flake locking and the need
