@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  osConfig,
   ...
 }:
 {
@@ -72,9 +73,9 @@
 
   services.yubikey-touch-detector.enable = true;
   services.yubikey-touch-detector.notificationSound = true;
-  services.snixembed.enable = config.hostSpec.voiceCoding;
+  services.snixembed.enable = osConfig.hostSpec.voiceCoding;
   system.ssh-motd.enable = true;
-  settings.work.enable = config.hostSpec.isWork;
+  settings.work.enable = osConfig.hostSpec.isWork;
 
   # talon = {
   #   enable = true;

@@ -1,5 +1,6 @@
 {
   config,
+  osConfig,
   lib,
   ...
 }:
@@ -16,7 +17,7 @@
         "images/screenshots"
         "public/source"
       ]
-      ++ lib.optional config.hostSpec.isWork "work"
+      ++ lib.optional osConfig.hostSpec.isWork "work"
     )
   );
   home.activation.setupHomeLinks = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''

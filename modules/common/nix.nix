@@ -5,16 +5,18 @@
   lib,
   pkgs,
   namespace,
+  osConfig ? { },
   ...
 }:
-# let
-# cfg = config.${namespace}.nix;
-# in
+let
+  # FIXME: This allows us to access the settings from HM
+  hostSpec = if (config ? hostSpec) then config.hostSpec else osConfig.hotsSpec;
+in
 {
   options.${namespace}.nix = {
     withSecrets = lib.mkOption {
       type = lib.types.bool;
-      default = config.hostSpec.isLocal;
+      default = hostSpec.isLocal;
       example = false;
       description = "Include netrc and github token secrets used by trusted systems on local networks";
     };
@@ -48,7 +50,7 @@
           builders-use-substitutes = true;
           fallback = true; # Don't hard fail if a binary cache isn't available, since some systems roam
           substituters = lib.flatten [
-            (lib.optional (lib.substring 0 4 config.hostSpec.timeZone == "Asia") [
+            (lib.optional (lib.substring 0 4 hostSpec.timeZone == "Asia") [
               "https://mirror.sjtu.edu.cn/nix-channels/store" # Shanghai Jiao Tong University
               "https://mirrors.ustc.edu.cn/nix-channels/store" # USTC backup mirror
             ])
@@ -63,7 +65,7 @@
 
           # FIXME: This might not only contain attic-related entries in the future
           #          netrc-file =
-          #            if ((config ? "sops") && (config.hostSpec.useAtticCache)) then
+          #            if ((config ? "sops") && (hostSpec.useAtticCache)) then
           #              "${config.sops.secrets."passwords/netrc".path}"
           #            else
           #              null;
@@ -72,7 +74,7 @@
         # Access token prevents github rate limiting if you have to nix flake update a bunch
         # Only local systems are used to build anything, so only include there
         #        extraOptions =
-        #          lib.optionalString ((config ? "sops") && (config.hostSpec.isLocal))
+        #          lib.optionalString ((config ? "sops") && (hostSpec.isLocal))
         #            "!include ${config.sops.secrets."tokens/nix-access-tokens".path}";
 
         # Disabled because I am using nh

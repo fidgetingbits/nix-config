@@ -1,7 +1,7 @@
 {
   pkgs,
   lib,
-  config,
+  osConfig,
   secrets,
   ...
 }:
@@ -51,11 +51,13 @@
         workRepoNames =
           lib.attrNames privateWorkRepos
           # nixfmt hack
-          |> lib.optionals config.hostSpec.isWork;
+          |> lib.optionals osConfig.hostSpec.isWork;
 
         workDomain =
           domain:
-          lib.optionals (config.hostSpec.isWork && (privateWorkRepos ? ${domain})) privateWorkRepos.${domain};
+          lib.optionals (
+            osConfig.hostSpec.isWork && (privateWorkRepos ? ${domain})
+          ) privateWorkRepos.${domain};
 
         privateAlwaysSshRepos =
           (lib.attrNames privateRepos) ++ workRepoNames
@@ -131,5 +133,5 @@
       };
   };
 
-  home.sessionVariables.GIT_EDITOR = config.hostSpec.defaultEditor;
+  home.sessionVariables.GIT_EDITOR = osConfig.hostSpec.defaultEditor;
 }

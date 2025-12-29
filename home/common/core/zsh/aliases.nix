@@ -1,6 +1,6 @@
 {
   lib,
-  config,
+  osConfig,
   ...
 }:
 let
@@ -204,7 +204,7 @@ in
   kb-reset = "sudo modprobe -r hid_multitouch && sudo modprobe hid_multitouch";
 
 }
-// lib.optionalAttrs (config.hostSpec.hostName != "ooze") {
+// lib.optionalAttrs (osConfig.hostSpec.hostName != "ooze") {
   # The WoL packet has to come from a box that is on the same wired network as oppo
   # so proxy through one
   wake-oppo = "ssh ooze 'wake-oppo'";

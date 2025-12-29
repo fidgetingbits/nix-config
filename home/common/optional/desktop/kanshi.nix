@@ -1,5 +1,5 @@
 {
-  config,
+  osConfig,
   lib,
   ...
 }:
@@ -11,7 +11,7 @@
       {
         profile.name = "default";
         profile.outputs =
-          config.monitors
+          osConfig.monitors
           |> lib.mapAttrsToList (
             name: value: {
               criteria = name;

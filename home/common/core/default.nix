@@ -1,6 +1,6 @@
 {
   inputs,
-  config,
+  osConfig,
   lib,
   pkgs,
   ...
@@ -10,7 +10,7 @@
     inputs.impermanence.nixosModules.home-manager.impermanence
     inputs.introdus.homeManagerModules.default
     (map lib.custom.relativeToRoot [
-      "modules/common/"
+      #"modules/common/"
       "modules/home/"
     ])
     (lib.custom.scanPathsFilterPlatform ./.)
@@ -61,12 +61,12 @@
         ;
 
     }
-    // lib.optionalAttrs (config.hostSpec.isProduction) {
+    // lib.optionalAttrs (osConfig.hostSpec.isProduction) {
       inherit (pkgs.llvmPackages)
         bintools # strings, etc
         ;
     }
-    // lib.optionalAttrs (config.hostSpec.isProduction && (!config.hostSpec.isServer)) {
+    // lib.optionalAttrs (osConfig.hostSpec.isProduction && (!osConfig.hostSpec.isServer)) {
       inherit (pkgs)
         ##
         # Core GUI Utilities

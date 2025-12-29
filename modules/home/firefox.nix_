@@ -2,6 +2,7 @@
   lib,
   config,
   pkgs,
+  osConfig,
   ...
 }:
 let
@@ -9,7 +10,7 @@ let
 in
 {
   config =
-    lib.mkIf config.hostSpec.useWindowManager {
+    lib.mkIf osConfig.hostSpec.useWindowManager {
       # https://mozilla.github.io/policy-templates/
       # Inspiration:
       # - https://github.com/mrjones2014/dotfiles/blob/4ec33c26d4d1c86524006bcd3948a1ca9564ed4e/home-manager/modules/arkenfox.nix#L53

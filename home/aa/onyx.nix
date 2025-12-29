@@ -2,6 +2,7 @@
   config,
   pkgs,
   lib,
+  osConfig,
   ...
 }:
 {
@@ -101,7 +102,7 @@
   programs.firefox.nativeMessagingHosts = [ pkgs.tridactyl-native ];
 
   # Allows to show talon icon in system tray on X11
-  services.snixembed.enable = config.hostSpec.voiceCoding;
+  services.snixembed.enable = osConfig.hostSpec.voiceCoding;
 
   services.yubikey-touch-detector = {
     enable = true;

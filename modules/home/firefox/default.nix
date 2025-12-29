@@ -1,6 +1,7 @@
 {
   lib,
   config,
+  osConfig,
   pkgs,
   inputs,
   ...
@@ -10,7 +11,7 @@ let
 in
 {
   config = lib.mkMerge [
-    (lib.mkIf config.hostSpec.useWindowManager {
+    (lib.mkIf osConfig.hostSpec.useWindowManager {
       programs.firefox = {
         enable = true;
         # Refer to https://mozilla.github.io/policy-templates or `about:policies#documentation` in firefox
@@ -111,7 +112,7 @@ in
       };
     })
     (lib.mkIf pkgs.stdenv.isLinux {
-      # FIXME: This should become config.hostSpec.defaultBrowser and not just if you import firefox
+      # FIXME: This should become osConfig.hostSpec.defaultBrowser and not just if you import firefox
       xdg.mimeApps.defaultApplications = {
         "text/html" = [ "firefox.desktop" ];
         "text/xml" = [ "firefox.desktop" ];
@@ -120,7 +121,7 @@ in
       };
     }
       # WARNING: This uninstalled firefox for some reason
-      #    // (lib.mkIf config.hostSpec.isAutoStyled {
+      #    // (lib.mkIf osConfig.hostSpec.isAutoStyled {
       #      # FIXME(firefox): Combine this with the profile name above automatically
       #      stylix.targets.firefox.profileNames = [
       #        "default"

@@ -1,5 +1,6 @@
 {
   config,
+  osConfig,
   lib,
   pkgs,
   ...
@@ -92,7 +93,7 @@ in
     };
 
     sessionVariables = {
-      #EDITOR = config.hostSpec.defaultEditor; FIXME: Why does this set nano when we have it set to nvim? :/
+      #EDITOR = osConfig.hostSpec.defaultEditor; FIXME: Why does this set nano when we have it set to nvim? :/
       EDITOR = "nvim";
       # FIXME: File a PR for this
       #BAT_THEME = "Dracula"; # Stylix bug, they use "dracula" instead of "Dracula"
@@ -105,11 +106,18 @@ in
       FZF_CTRL_T_COMMAND = "fd --type f --exclude .git";
       FZF_CTRL_T_OPTS = "--preview '(highlight -O ansi -l {} 2> /dev/null || cat {} || tree -C {}) 2> /dev/null | head -200'";
     }
-    // lib.optionalAttrs config.hostSpec.isDevelopment {
+    // lib.optionalAttrs osConfig.hostSpec.isDevelopment {
       # OPENAI_API_KEY = "$(cat ${homeDirectory}/.config/openai/token)";
     };
 
-    shellAliases = import ./aliases.nix { inherit config pkgs lib; };
+    shellAliases = import ./aliases.nix {
+      inherit
+        osConfig
+        config
+        pkgs
+        lib
+        ;
+    };
   };
 
   programs.zoxide = {

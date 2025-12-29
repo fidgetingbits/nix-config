@@ -3,6 +3,7 @@
 # expects them to be explicit key names
 {
   config,
+  osConfig,
   lib,
   pkgs,
 }:
@@ -242,7 +243,7 @@ in
     largeFileOptimizations = false;
     lineNumbers = "relative";
     linkedEditing = true;
-    lineHeight = if config.hostSpec.voiceCoding then 1.8 else 0;
+    lineHeight = if osConfig.hostSpec.voiceCoding then 1.8 else 0;
     maxTokenizationLineLength = 60000;
     minimap.enabled = false;
     overviewRulerBorder = false;
@@ -522,7 +523,7 @@ in
   "workbench.editor.tabActionLocation" = "left";
 
   "workbench" = {
-    externalBrowser = config.hostSpec.defaultBrowser;
+    externalBrowser = osConfig.hostSpec.defaultBrowser;
     startupEditor = "none";
 
     # Theming manage globally by stylix
@@ -549,7 +550,7 @@ in
     hideTabs = false;
     hideLineNumbers = false;
   };
-  "rust-analyzer.links.preferredBrowser" = config.hostSpec.defaultBrowser;
+  "rust-analyzer.links.preferredBrowser" = osConfig.hostSpec.defaultBrowser;
 
   # FIXME(vscode): This variable escaping is busted, so I'm just ignoring for now
   # "workbench.editor.customLabels.patterns" = {

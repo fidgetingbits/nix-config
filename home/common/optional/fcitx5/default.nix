@@ -1,4 +1,4 @@
-{ pkgs, config, ... }:
+{ pkgs, osConfig, ... }:
 {
 
   home.file = {
@@ -46,7 +46,7 @@
         fcitx5-gtk
         libsForQt5.fcitx5-qt
       ];
-      waylandFrontend = config.hostSpec.useWayland;
+      waylandFrontend = osConfig.hostSpec.useWayland;
     };
   };
 }

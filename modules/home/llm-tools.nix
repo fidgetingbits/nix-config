@@ -1,5 +1,6 @@
 {
   config,
+  osConfig,
   lib,
   pkgs,
   ...
@@ -7,8 +8,8 @@
 let
   cfg = config.llm-tools;
   zshCfg = config.programs.zsh;
-  server = "oedo.${config.hostSpec.domain}";
-  port = config.hostSpec.networking.ports.tcp.llama-swap;
+  server = "oedo.${osConfig.hostSpec.domain}";
+  port = osConfig.hostSpec.networking.ports.tcp.llama-swap;
 in
 {
   options = {

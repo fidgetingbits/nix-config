@@ -2,6 +2,7 @@
   lib,
   pkgs,
   config,
+  osConfig,
   ...
 }:
 {
@@ -16,7 +17,7 @@
 
     settings = {
       auto_sync = true;
-      sync_address = "https://atuin.ooze.${config.hostSpec.domain}";
+      sync_address = "https://atuin.ooze.${osConfig.hostSpec.domain}";
       sync_frequency = "30m";
       update_check = false;
       filter_mode = "global";

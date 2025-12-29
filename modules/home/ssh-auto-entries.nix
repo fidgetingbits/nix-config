@@ -1,6 +1,7 @@
 {
   inputs,
   config,
+  osConfig,
   lib,
   secrets,
   ...
@@ -29,13 +30,13 @@ in
       };
       domain = lib.mkOption {
         type = lib.types.str;
-        default = config.hostSpec.domain;
+        default = osConfig.hostSpec.domain;
         description = "Common domain of hosts in this config and those administrated by the owner";
         example = "example.com";
       };
       useYubikey = lib.mkOption {
         type = lib.types.bool;
-        default = config.hostSpec.useYubikey;
+        default = osConfig.hostSpec.useYubikey;
         description = "Whether the host has yubikeys available";
       };
       ykDomainHosts = lib.mkOption {
@@ -53,7 +54,7 @@ in
         default =
           # FIXME: Maybe revisit this
           (secrets.networking.ssh.matchBlocks lib)
-          // lib.optionalAttrs config.hostSpec.isWork (secrets.work.ssh.matchBlocks lib);
+          // lib.optionalAttrs osConfig.hostSpec.isWork (secrets.work.ssh.matchBlocks lib);
         description = "Matchblocks from nix-secrets repo that won't be shown in plaintext in the reoo.";
       };
     };
@@ -62,10 +63,21 @@ in
   config =
     let
       nixosHostNames =
+        # FIXME: Make this a set of optional suffixes to ignore
+        let
+          isMinimal =
+            host:
+            let
+              suffixLen = lib.stringLength "Minimal";
+              hostLen = lib.stringLength host;
+              prefixLen = hostLen - suffixLen;
+              prefix = lib.substring prefixLen suffixLen host;
+            in
+            if (hostLen > suffixLen && prefix != "Minimal") then prefix else null;
+        in
         inputs.self.nixosConfigurations
         |> lib.attrNames
-        # nixfmt hack
-        |> lib.filter (name: name != "iso");
+        |> lib.filter (name: name != "iso" && (isMinimal name) != null);
 
       nixosHostsUnlockable =
         (
@@ -129,11 +141,11 @@ in
         vanillaHosts
         |> lib.lists.map (host: {
           "${host}" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            match = "host ${host},${host}.${config.hostSpec.domain}";
-            hostname = "${host}.${config.hostSpec.domain}";
-            port = config.hostSpec.networking.ports.tcp.ssh;
+            match = "host ${host},${host}.${osConfig.hostSpec.domain}";
+            hostname = "${host}.${osConfig.hostSpec.domain}";
+            port = osConfig.hostSpec.networking.ports.tcp.ssh;
             # FIXME: Fix the default name later
-            user = inputs.self.nixosConfigurations.${host}.config.hostSpec.primaryUsername or "aa";
+            user = inputs.self.nixosConfigurations.${host}.osConfig.hostSpec.primaryUsername or "aa";
           };
         })
         |> lib.attrsets.mergeAttrsList;
@@ -144,9 +156,9 @@ in
         |> lib.lists.map (host: {
           "${host}-unlock" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
             host = "${host}-unlock";
-            hostname = "${host}.${config.hostSpec.domain}";
+            hostname = "${host}.${osConfig.hostSpec.domain}";
             user = "root";
-            port = config.hostSpec.networking.ports.tcp.ssh;
+            port = osConfig.hostSpec.networking.ports.tcp.ssh;
             extraOptions = {
               UserKnownHostsFile = "/dev/null";
               StrictHostKeyChecking = "no";

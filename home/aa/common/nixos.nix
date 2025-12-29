@@ -1,6 +1,7 @@
 # Core home functionality that will only work on Linux
 {
   config,
+  osConfig,
   lib,
   secrets,
   ...
@@ -14,8 +15,8 @@ in
       [
         "${homeDirectory}/scripts/"
       ]
-      ++ lib.optional config.hostSpec.voiceCoding [ "${homeDirectory}/scripts/talon/" ]
-      ++ lib.optional config.hostSpec.isWork secrets.work.extraPaths
+      ++ lib.optional osConfig.hostSpec.voiceCoding [ "${homeDirectory}/scripts/talon/" ]
+      ++ lib.optional osConfig.hostSpec.isWork secrets.work.extraPaths
     );
   };
 }

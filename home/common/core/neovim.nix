@@ -1,7 +1,7 @@
 {
   lib,
   pkgs,
-  config,
+  osConfig,
   ...
 }:
 
@@ -17,7 +17,7 @@
       # vim = "nixCats";
       # vi = "vim";
     }
-    // lib.optionalAttrs config.hostSpec.useNeovimTerminal {
+    // lib.optionalAttrs osConfig.hostSpec.useNeovimTerminal {
       # This is so we don't spawn embedded neovim if already in a neovim terminal
       # FIXME: Maybe look into vimception plugin to fix this eventually
       neovim = "${pkgs.neovim-wrapped}/bin/neovim.sh";

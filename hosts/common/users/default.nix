@@ -25,7 +25,7 @@ let
   superPubKeys = genPubKeyList "super";
 
   platform = if isDarwin then "darwin" else "nixos";
-  inherit (config) hostSpec monitors;
+  inherit (config) hostSpec;
 in
 {
   # No matter what environment we are in we want these tools for root, and the user(s)
@@ -132,7 +132,9 @@ in
               (
                 { ... }:
                 {
-                  inherit hostSpec monitors; # Bring nixos option values into hm copy
+                  #inherit hostSpec monitors; # Bring nixos option values into hm copy
+
+                  # User just replicates system nix settings
                   home = {
                     stateVersion = "23.05";
                     homeDirectory = if isDarwin then "/Users/${user}" else "/home/${user}";

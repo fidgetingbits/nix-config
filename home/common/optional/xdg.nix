@@ -1,13 +1,13 @@
 {
-  config,
   pkgs,
   lib,
+  osConfig,
   ...
 }:
 let
-  browser = [ "${config.hostSpec.defaultBrowser}.desktop" ];
-  editor = [ "${config.hostSpec.defaultEditor}.desktop" ];
-  media = [ "${config.hostSpec.defaultEditor}.desktop" ];
+  browser = [ "${osConfig.hostSpec.defaultBrowser}.desktop" ];
+  editor = [ "${osConfig.hostSpec.defaultEditor}.desktop" ];
+  media = [ "${osConfig.hostSpec.defaultEditor}.desktop" ];
   # Extensive list of assocations here:
   # https://github.com/iggut/GamiNiX/blob/8070528de419703e13b4d234ef39f05966a7fafb/system/desktop/home-main.nix#L77
   associations = {

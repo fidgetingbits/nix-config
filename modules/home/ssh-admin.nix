@@ -1,12 +1,12 @@
 # FIXME(roles): This eventually should get slotted into some sort of 'role' thing
 {
-  config,
+  osConfig,
   lib,
   secrets,
   ...
 }:
 let
-  cfg = config.hostSpec;
+  cfg = osConfig.hostSpec;
 in
 lib.mkIf cfg.isAdmin {
   sshAutoEntries = {
@@ -39,10 +39,10 @@ lib.mkIf cfg.isAdmin {
         hosts
         |> lib.lists.map (host: {
           "${host}" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            match = "host ${host},${host}.${config.hostSpec.domain}";
-            hostname = "${host}.${config.hostSpec.domain}";
-            user = config.hostSpec.networking.subnets.${subnet}.hosts.${host}.user;
-            port = config.hostSpec.networking.subnets.${subnet}.hosts.${host}.sshPort;
+            match = "host ${host},${host}.${osConfig.hostSpec.domain}";
+            hostname = "${host}.${osConfig.hostSpec.domain}";
+            user = osConfig.hostSpec.networking.subnets.${subnet}.hosts.${host}.user;
+            port = osConfig.hostSpec.networking.subnets.${subnet}.hosts.${host}.sshPort;
           };
         })
         |> lib.attrsets.mergeAttrsList;

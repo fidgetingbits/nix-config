@@ -1,6 +1,6 @@
 # Core home functionality that will only work on Linux
 {
-  config,
+  osConfig,
   pkgs,
   lib,
   ...
@@ -11,7 +11,7 @@
     ./timers/trash-empty.nix
   ];
   home = {
-    packages = lib.optionals (config.hostSpec.isProduction) (
+    packages = lib.optionals (osConfig.hostSpec.isProduction) (
       lib.attrValues {
         inherit (pkgs)
           e2fsprogs # lsattr, chattr
@@ -34,7 +34,7 @@
     sessionVariables = {
 
     }
-    // lib.optionalAttrs config.hostSpec.useWayland {
+    // lib.optionalAttrs osConfig.hostSpec.useWayland {
       QT_QPA_PLATFORM = "wayland";
       GDK_BACKEND = "wayland";
       CLUTTER_BACKEND = "wayland"; # for gnome-shell

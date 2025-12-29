@@ -58,7 +58,7 @@
     )
   );
 
-  # FIXME: this should be tied to hostSpec.voiceCoding
+  # FIXME: this should be tied to osConfig.hostSpec.voiceCoding
   talon = {
     enable = false;
     autostart = false;

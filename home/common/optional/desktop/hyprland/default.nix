@@ -1,5 +1,6 @@
 {
   config,
+  osConfig,
   pkgs,
   lib,
   ...
@@ -51,7 +52,7 @@
       #
       # parse the monitor spec defined in nix-config/home/<user>/<host>.nix
       monitor =
-        config.monitors
+        osConfig.monitors
         |> lib.mapAttrsToList (
           name: value:
           "${name},${
@@ -95,7 +96,7 @@
 
       exec-once = [
       ]
-      ++ lib.optional config.introdus.services.awww.enable "swww img ${config.hostSpec.wallpaper}";
+      ++ lib.optional config.introdus.services.awww.enable "swww img ${osConfig.hostSpec.wallpaper}";
 
       # Plugins
       general.layout = "hy3";

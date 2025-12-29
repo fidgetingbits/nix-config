@@ -1,16 +1,20 @@
 {
   config,
+  osConfig,
   lib,
   ...
 }:
 let
-  email = config.hostSpec.email;
+  email = osConfig.hostSpec.email;
   sshFolder = "${home}/.ssh";
   home = config.home.homeDirectory;
   publicKey =
-    if config.hostSpec.useYubikey then "${sshFolder}/id_yubikey.pub" else "${sshFolder}/id_ed25519.pub";
+    if osConfig.hostSpec.useYubikey then
+      "${sshFolder}/id_yubikey.pub"
+    else
+      "${sshFolder}/id_ed25519.pub";
 
-  handle = config.hostSpec.handle;
+  handle = osConfig.hostSpec.handle;
   forges = {
     "codeberg.org" = "noreply";
     "github.com" = "users.noreply";
@@ -18,7 +22,7 @@ let
   };
   forgeEmail = forge: prefix: "${handle}@${prefix}.${forge}";
 
-  #  workGitUrlsTable = lib.optionalAttrs config.hostSpec.isWork (
+  #  workGitUrlsTable = lib.optionalAttrs osConfig.hostSpec.isWork (
   #    lib.listToAttrs (
   #      map (url: {
   #        name = "ssh://git@${url}";
@@ -44,7 +48,7 @@ in
       advice.addEmptyPathspec = false;
 
       # Re-enable when applicable
-      #      url = lib.optionalAttrs config.hostSpec.isWork (
+      #      url = lib.optionalAttrs osConfig.hostSpec.isWork (
       #        lib.recursiveUpdate {
       #          "ssh://git@${secrets.work.git.serverMain}" = {
       #            insteadOf = "https://${secrets.work.git.serverMain}";
@@ -78,7 +82,7 @@ in
         };
         workGitConfig = {
           user = {
-            name = config.hostSpec.userFullName;
+            name = osConfig.hostSpec.userFullName;
             email = if (builtins.isList email.work) then lib.elem 0 email.work else email.work;
           };
         };

@@ -1,6 +1,6 @@
 # NOTE: Actions prepended with `hy3;` are specific to the hy3 hyprland plugin
 {
-  config,
+  osConfig,
   lib,
   pkgs,
   ...
@@ -104,7 +104,7 @@
           # Cycle to the next wallaper
           "${mainMod}, equals, exec, awww-next"
           # Set the primary wallpaper
-          "${mainMod} SHIFT, equals, exec, swww img ${config.hostSpec.wallpaper}"
+          "${mainMod} SHIFT, equals, exec, swww img ${osConfig.hostSpec.wallpaper}"
 
           #
           # ========== Media Controls ==========

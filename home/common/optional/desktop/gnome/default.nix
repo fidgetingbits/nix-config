@@ -1,5 +1,5 @@
 {
-  config,
+  osConfig,
   pkgs,
   lib,
   ...
@@ -43,7 +43,7 @@
     };
     # FIXME: Not sure how this works if monitors differ
     "org/gnome/desktop/interface" = {
-      scaling-factor = lib.hm.gvariant.mkUint32 config.hostSpec.scaling;
+      scaling-factor = lib.hm.gvariant.mkUint32 osConfig.hostSpec.scaling;
     };
   };
 
