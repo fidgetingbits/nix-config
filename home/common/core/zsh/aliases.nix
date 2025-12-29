@@ -156,6 +156,7 @@ in
   jup = "just update";
   jug = "just upgrade";
   jb = "just build-host";
+  d = "just dev";
 
   # direnv
   da = "direnv allow";
