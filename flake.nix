@@ -55,8 +55,66 @@
             ];
           };
       };
+
+      # FIXME: Move this
+      # Bare minimum configuration for a host for faster initial install testing
+      mkMinimalHost = host: {
+        "${host}Minimal" = (
+          lib.nixosSystem {
+            # FIXME: This will break when we add aarch64, so set it via in hostSpec maybe?
+            system = "x86_64-linux";
+            # FIXME:This should merge with the above specialArgs
+            specialArgs = {
+              inherit
+                inputs
+                outputs
+                namespace
+                secrets
+                ;
+              lib = customLib;
+              isDarwin = false;
+            };
+            modules = [
+              # FIXME: See if we can lift this from elsewhere now that we aren't standalone
+              {
+                nixpkgs.overlays = [
+                  (final: prev: {
+                    unstable = import inputs.nixpkgs-unstable {
+                      system = final.stdenv.hostPlatform.system;
+                      config.allowUnfree = true;
+                    };
+                  })
+                ];
+              }
+              inputs.home-manager.nixosModules.home-manager
+              inputs.nixos-facter-modules.nixosModules.facter
+              {
+                config.facter.reportPath = (customLib.custom.relativeToRoot "hosts/nixos/${host}/facter.json");
+              }
+            ]
+            ++
+              # FIXME: If this moves to introdus, the hosts path need to become relative to the caller
+              # not introdus
+              (map customLib.custom.relativeToRoot [
+                # Minimal modules for quick setup
+                "modules/common/host-spec.nix"
+                "modules/hosts/nixos/disks.nix"
+                "modules/hosts/nixos/impermanence"
+
+                "hosts/nixos/${host}/host-spec.nix"
+                "hosts/nixos/${host}/disks.nix"
+
+                "hosts/common/optional/minimal-configuration.nix"
+              ]);
+          }
+        );
+      };
+
       mkHostConfigs =
-        hosts: isDarwin: lib.foldl (acc: set: acc // set) { } (lib.map (host: mkHost host isDarwin) hosts);
+        hosts: isDarwin:
+        lib.foldl (acc: set: acc // set) { } (
+          (lib.map (host: mkHost host isDarwin) hosts) ++ (lib.map (host: mkMinimalHost host) hosts)
+        );
       readHosts = folder: lib.attrNames (builtins.readDir ./hosts/${folder});
     in
     flake-parts.lib.mkFlake { inherit inputs; } {
@@ -232,8 +290,8 @@
     pwndbg.url = "github:pwndbg/pwndbg";
 
     introdus = {
-      url = "git+ssh://git@codeberg.org/fidgetingbits/introdus?shallow=1&ref=aa";
-      # url = "path:///home/aa/dev/nix/introdus";
+      # url = "git+ssh://git@codeberg.org/fidgetingbits/introdus?shallow=1&ref=aa";
+      url = "path:///home/aa/dev/nix/introdus";
     };
   };
 }

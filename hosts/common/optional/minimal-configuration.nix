@@ -14,8 +14,7 @@
   # Note, users will already be set by flake.nix
   hostSpec = {
     hostName = "installer";
-    #primaryUsername = "aa";
-    #username = "aa";
+    primaryUsername = "aa";
     persistFolder = "/persist";
     isMinimal = lib.mkForce true;
     domain = "local"; # Temporary domain for the installer
