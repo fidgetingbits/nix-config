@@ -71,8 +71,8 @@ rebuild-full HOST=`hostname`: && rebuild-post
     just check {{ HOST }}
     # just rebuild-extensions
 
-# Rebuild the system with tshow trace
-#ebuild-trace: rebuild-pre && rebuild-post
+# Rebuild the system with show trace
+#rebuild-trace: rebuild-pre && rebuild-post
 #scripts/rebuild.sh trace
 #	just rebuild-extensions-lite
 
@@ -316,3 +316,9 @@ facter HOST:
             git add hosts/nixos/{{ HOST }}/facter.json
         fi
     fi
+
+# Refresh dev environment with updated inputs
+[group("dev")]
+dev:
+    @just rebuild-pre
+    direnv reload
