@@ -14,8 +14,8 @@
     # Bootstrap script settings
     BOOTSTRAP_USER = "aa";
     BOOTSTRAP_SSH_PORT = "10022";
-    BOOTSTRAP_SSH_KEY = "~/.ssh/id_yubikey";
-    NIX_SECRETS_DIR = "~/dev/nix/nix-secrets";
+    BOOTSTRAP_SSH_KEY = "/home/aa/.ssh/id_yubikey";
+    NIX_SECRETS_DIR = "/home/aa/dev/nix/nix-secrets";
 
     # This is needed in case we manually run bats tests and similar
     HELPERS_PATH = "${pkgs.introdus-helpers}/share/introdus-helpers/helpers.sh";
