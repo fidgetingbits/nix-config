@@ -14,7 +14,7 @@ lib.mkIf cfg.isAdmin {
     ykDomainHosts = [
       "ogre"
       "oxid"
-      "oedo-wifi" # FIXME: Generate these based on some setting in nixosConfigurations
+      "oedo-wifi" # FIXME: Generate these wifi-based on some setting in nixosConfigurations
       "oath"
       "onus"
       "omen"

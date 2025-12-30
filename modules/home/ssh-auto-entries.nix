@@ -71,13 +71,13 @@ in
               suffixLen = lib.stringLength "Minimal";
               hostLen = lib.stringLength host;
               prefixLen = hostLen - suffixLen;
-              prefix = lib.substring prefixLen suffixLen host;
+              suffix = lib.substring prefixLen suffixLen host;
             in
-            if (hostLen > suffixLen && prefix != "Minimal") then prefix else null;
+            if ((hostLen < suffixLen) || (suffix != "Minimal")) then false else true;
         in
         inputs.self.nixosConfigurations
         |> lib.attrNames
-        |> lib.filter (name: name != "iso" && (isMinimal name) != null);
+        |> lib.filter (name: (name != "iso") && (!(isMinimal name)));
 
       nixosHostsUnlockable =
         (
