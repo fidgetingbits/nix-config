@@ -2,179 +2,119 @@
   config,
   osConfig,
   lib,
+  secrets,
   ...
 }:
 let
-  email = osConfig.hostSpec.email;
-  sshFolder = "${home}/.ssh";
   home = config.home.homeDirectory;
-  publicKey =
-    if osConfig.hostSpec.useYubikey then
-      "${sshFolder}/id_yubikey.pub"
-    else
-      "${sshFolder}/id_ed25519.pub";
-
-  handle = osConfig.hostSpec.handle;
-  forges = {
-    "codeberg.org" = "noreply";
-    "github.com" = "users.noreply";
-    "gitlab.com" = "users.noreply";
-  };
-  forgeEmail = forge: prefix: "${handle}@${prefix}.${forge}";
-
-  #  workGitUrlsTable = lib.optionalAttrs osConfig.hostSpec.isWork (
-  #    lib.listToAttrs (
-  #      map (url: {
-  #        name = "ssh://git@${url}";
-  #        value = {
-  #          insteadOf = "https://${url}";
-  #        };
-  #      }) (lib.splitString " " secrets.work.git.servers)
-  #    )
-  #  );
 in
 {
+  introdus.gitDev = {
+    enable = true;
+    keysPath = "hosts/common/users/super/keys/";
+    # personal
+    devFolders = [
+      "${home}/dev/"
+      "${home}/source/"
+    ];
+    devKeys = [
+      "id_dade.pub"
+      "id_dark.pub"
+      "id_drzt.pub"
+    ];
+    devRepos = secrets.git.repos;
+
+  }
+  // lib.optionalAttrs osConfig.hostSpec.isWork {
+    # work
+    workKeys = [
+      "id_dark.pub"
+      "id_drzt.pub"
+    ];
+    workFolders = [
+      "${home}/work/"
+      "${home}/persist/work/"
+    ];
+    workServers = secrets.work.git.servers;
+    workRepos = secrets.git.work.repos;
+  };
+
   programs.git = {
+    enable = true;
+    ignores = [
+      # nix
+      "*.drv"
+      "result"
+      # rust
+      "target/"
+      # python
+      "*.py?"
+      "__pycache__/"
+      ".venv/"
+      # direnv
+      ".direnv/"
+    ];
+
     settings = {
-      user = {
-        # email = email.git.github;
-        name = handle;
-        signingkey = "${publicKey}";
-      };
-      init.defaultBranch = "main";
-      pull.rebase = "true";
+      core.excludeFiles = builtins.toFile "global-gitignore" ''
+        .DS_Store
+        .DS_Store?
+        ._*
+        .Spotlight-V100
+        .Trashes
+        ehthumbs.db
+        Thumbs.db
+        node_modules
+      '';
+      core.attributesfile = builtins.toFile "global-gitattributes" ''
+        Cargo.lock -diff
+        flake.lock -diff
+        *.drawio -diff
+        *.svg -diff
+        *.json diff=json
+        *.bin diff=hex difftool=hex
+        *.dat diff=hex difftool=hex
+        *aarch64.bin diff=objdump-aarch64 difftool=objdump-aarch64
+        *arm.bin diff=objdump-arm difftool=objdump-arm
+        *x64.bin diff=objdump-x86_64 difftool=objdump-x64
+        *x86.bin diff=objdump-x86 difftool=objdump-x86
+      '';
 
-      # Don't warn on empty git add calls. Because of "git re-commit" automation
-      advice.addEmptyPathspec = false;
-
-      # Re-enable when applicable
-      #      url = lib.optionalAttrs osConfig.hostSpec.isWork (
-      #        lib.recursiveUpdate {
-      #          "ssh://git@${secrets.work.git.serverMain}" = {
-      #            insteadOf = "https://${secrets.work.git.serverMain}";
-      #          };
-      #        } workGitUrlsTable
-      #      );
-
+      # FIXME: revisit this vs use of delta in common/core/git.nix
       diff.tool = "difftastic";
       difftool = {
         prompt = "false";
         difftastic.cmd = "difft \"$LOCAL\" \"$REMOTE\"";
       };
 
-      commit.gpgsign = "true";
-      gpg = {
-        format = "ssh";
-        # NOTE: git doesn't support parsing sk-ssh keys, see https://github.com/maxgoedjen/secretive/issues/262
-        # See 'alias git' creation in zshrc for how I get around that, while still using signing.key later on
-        # sshKeyCommand = "ssh-add -L";
-        ssh.allowedSignersFile = "${home}/.ssh/allowed_signers";
-      };
-    };
-    includes =
-      let
-        privateGitConfig = {
-          user = {
-            name = handle;
-            # Email used for any repo when no conditional includes fire
-            email = email.git.primary;
-          };
-        };
-        workGitConfig = {
-          user = {
-            name = osConfig.hostSpec.userFullName;
-            email = if (builtins.isList email.work) then lib.elem 0 email.work else email.work;
-          };
-        };
-        devFolders = [
-          "${home}/dev/"
-          "${home}/source/"
-        ];
-        workFolders = [
-          "${home}/work/"
-          "${home}/persist/work/"
-        ];
-        mapFolders =
-          paths: contents:
-          lib.map (f: {
-            condition = "gitdir:${f}";
-            inherit contents;
-          }) paths;
-        mapRemotes =
-          remotes:
-          lib.mapAttrsToList (name: value: {
-            condition = "hasconfig:remote.*.url:**/*${name}/**";
-            contents = {
-              user.email = (forgeEmail name value);
-            };
-          }) remotes;
+      # Makes single line json diffs easier to read
+      diff.json.textconv = "jq --sort-keys .";
+      # Makes binary diffs easier to read
+      # Use --diff-algorithm=hex to override with hex if needed
+      diff.hex.textconv = "hexyl -p";
+      diff.hex.binary = true;
+      diff.objdump-aarch64.textconv = "aarch64-unknown-linux-gnu-objdump -b binary -D -maarch64 | tr -s ' ' | cut -f3- -d ' '";
+      diff.objdump-aarch64.binary = true;
+      diff.objdump-arm.textconv = "armv7l-unknown-linux-gnueabihf-objdump -b binary -D -marm | tr -s ' ' | cut -f3- -d ' '";
+      diff.objdump-arm.binary = true;
+      diff.objdump-x86_64.textconv = "objdump -b binary -D -mi386:x86-64 -M intel | tr -s ' ' | cut -f3- -d ' '";
+      diff.objdump-x86_64.binary = true;
+      diff.objdump-x86.textconv = "objdump -b binary -D -mi386 -M intel | tr -s ' ' | cut -f3- -d ' '";
+      diff.objdump-x86.binary = true;
 
-      in
-      # Order matters. Last match wins, so we want granular email changes last
-      (mapFolders devFolders privateGitConfig)
-      ++ (mapFolders workFolders workGitConfig)
-      ++ (mapRemotes forges);
-
-    signing = {
-      signByDefault = true;
-      key = publicKey;
+      # Colored diff of hex files
+      #difftool.hex.cmd = ''diff -u -w <(hexyl -p "$LOCAL") <(hexyl -p "$REMOTE") | delta --side-by-side'';
+      # FIXME: Abstract this such that it can be used for all architectures
+      #difftool.objdump-aarch64.cmd = ''
+      #  echo "objdump" && temp_file1=$(mktemp) && \
+      #  git show "$1" > "$temp_file1" && \
+      #  temp_file2=$(mktemp) && \
+      #  git show "$2" > "$temp_file2" && \
+      #  diff -u -w \
+      #    <(aarch64-unknown-linux-gnu-objdump -b binary -D -maarch64 "$temp_file1" | tr -s ' ' | cut -f3- -d ' ') \
+      #    <(aarch64-unknown-linux-gnu-objdump -b binary -D -maarch64 "$temp_file2" | tr -s ' ' | cut -f3- -d ' ') | \
+      #  delta --side-by-side; rm -f "$temp_file1" "$temp_file2"
+      #'';
     };
-    ignores = [
-      ".direnv"
-      "result"
-    ];
   };
-
-  # FIXME: This should become something with options probably
-  home.file.".ssh/allowed_signers".text =
-    let
-      # FIXME: This would need to change if we ever have multiple developer
-      # accounts on the same box or we have work keys that aren't our own
-      # yubikeys, etc
-      keypath = "hosts/common/users/super/keys/";
-      devEmails = lib.mapAttrsToList (name: value: forgeEmail name value) forges;
-      # If email.work is set and not set it to "", returns a list of said emails
-      workEmail =
-        if (email ? work) then
-          if (builtins.isList email.work) then
-            email.work
-          else
-            lib.flatten [
-              (lib.filter (n: n != "") [ email.work ])
-            ]
-        else
-          [ ];
-      genGitEmailKeys =
-        emails: keys:
-        lib.concatMapStringsSep "\n" (
-          key:
-          let
-            signers =
-              emails
-              |> lib.filter (s: s != "")
-              # nixfmt hack
-              |> lib.concatStringsSep ",";
-            keyContent =
-              "${keypath}/${key}"
-              |> lib.custom.relativeToRoot
-              # nixfmt hack
-              |> lib.fileContents;
-          in
-          ''${signers} namespaces="git" ${keyContent}\n''
-        ) keys;
-    in
-    ''
-      ${
-        genGitEmailKeys devEmails [
-          "id_dade.pub"
-          "id_dark.pub"
-          "id_drzt.pub"
-        ]
-      };
-      ${genGitEmailKeys workEmail [
-        "id_dark.pub"
-        "id_drzt.pub"
-      ]}
-    '';
-
 }

@@ -61,6 +61,9 @@ in
         ])
         (lib.optional cfg.gaze-ocr pkgs.tesseract)
         (lib.optional cfg.eye-tracking pkgs.v4l-utils)
+
+        # Needs to be global so talon dynamic lists work in repos with filters.
+        pkgs.git-crypt
       ];
 
     # NOTE: If instead you use the git entry in the home.packages list above, you well encounter in error:
