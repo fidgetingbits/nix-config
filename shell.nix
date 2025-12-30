@@ -48,6 +48,7 @@
           ;
       }
       ++ [
+        # introdus script for rebuilding a host
         (pkgs.rebuild-host.overrideAttrs (_: {
           perHostLocks = true;
         }))
