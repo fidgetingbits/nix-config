@@ -71,6 +71,7 @@ keybinds clear-defaults=true {
         }
     }
     shared_except "locked" {
+        bind "f"         { ToggleFocusFullscreen ; }
         bind "Alt g"     { SwitchToMode "Locked" ; }
         bind "Alt q"     { Quit ; }
         // Focus
