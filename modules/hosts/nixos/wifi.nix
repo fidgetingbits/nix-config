@@ -105,6 +105,12 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    # https://community.frame.work/t/framework-nixos-linux-users-self-help/31426/77
+    # Set this for any wifi host, even though it's possibly specific to mediatek drivers only
+    boot.extraModprobeConfig = ''
+      options cfg80211 ieee80211_regdom="TW"
+    '';
+
     sops.secrets = genWifiConnections;
 
     # sops-nix won't clean up old nmconnection files, so this removes any dead links
