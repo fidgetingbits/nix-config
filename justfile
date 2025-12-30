@@ -82,7 +82,7 @@ age-key:
 # Check if sops-nix activated successfully
 [group("checks")]
 check-sops:
-    scripts/check-sops.sh
+    check-sops
 
 # Update nix-secrets flake
 [group("update")]

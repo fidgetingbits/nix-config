@@ -18,12 +18,11 @@
     NIX_SECRETS_DIR = "/home/aa/dev/nix/nix-secrets";
 
     # This is needed in case we manually run bats tests and similar
+    # FIXME: move bats test to introdus to get rid of this
     HELPERS_PATH = "${pkgs.introdus-helpers}/share/introdus-helpers/helpers.sh";
 
     buildInputs = checks.pre-commit-check.enabledPackages;
     nativeBuildInputs =
-      # FIXME: Some of these can go away because of the helpers.sh moving and
-      # becoming selve-contained?
       lib.attrValues {
         inherit (pkgs)
           home-manager
@@ -31,18 +30,28 @@
           just
           pre-commit
           sops
-          deadnix
+          deadnix # FIXME: deprecated?
           statix
           git-crypt # encrypt secrets in git not suited for sops
           attic-client # for attic backup
+
+          # FIXME: Deprecated now that we use rebuild-host
           nh # fancier nix building
+
+          # FIXME: This needs to switch to being supplied by the introdus-helpers itself
           yq-go # jq for yaml, used for build scripts
+
+          # deprecate
           flyctl # for fly.io
+
+          # FIXME: Move to introdus
           bats # for testing
+
           age # bootstrap script
           ssh-to-age # bootstrap script
           gum # shell script ricing
           bootstrap-nixos # introdus script for bootstrapping new hosts
+          check-sops
           ;
       }
       ++ [
