@@ -155,7 +155,6 @@ in
   jl = "just --list";
   jup = "just update";
   jug = "just upgrade";
-  jb = "just build-host";
   d = "just dev";
 
   # direnv
