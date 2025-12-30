@@ -43,9 +43,14 @@
           ssh-to-age # bootstrap script
           gum # shell script ricing
           bootstrap-nixos # introdus script for bootstrapping new hosts
+          # script for building local and remote host,
+          # with per-host locking support
           ;
       }
       ++ [
+        (pkgs.rebuild-host.overrideAttrs (_: {
+          perHostLocks = true;
+        }))
         # New enough to get memory management improvements
         pkgs.unstable.nixVersions.git
       ];

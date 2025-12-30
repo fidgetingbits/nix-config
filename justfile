@@ -19,7 +19,7 @@ copy-lock-out HOST=`hostname`:
     @git rm --cached -f flake.lock > /dev/null || true
     @rm flake.lock || true
 
-# Update commonly changing flakes and prep for a rebuild
+# Update commonly changing flakes and prep for a build
 [private]
 rebuild-pre HOST=`hostname`:
     just update-nix-secrets {{ HOST }} && \
@@ -29,7 +29,7 @@ rebuild-pre HOST=`hostname`:
     just update {{ HOST }} introdus
     @git add --intent-to-add .
 
-# Run post-rebuild checks, like if sops is running properly afterwards
+# Run post-build checks, like if sops is running properly afterwards
 [private]
 rebuild-post: check-sops
 
@@ -50,31 +50,18 @@ check HOST=`hostname` ARGS="":
         {{ ARGS }}
     @just copy-lock-out {{ HOST }}
 
-[private]
-_rebuild HOST=`hostname`:
-    @just rebuild-pre {{ HOST }}
-    @# NOTE: Add --option eval-cache false if you end up caching a failure you cant get around
-    @just copy-lock-in {{ HOST }}
-    @scripts/rebuild.sh {{ HOST }}
-    @just copy-lock-out {{ HOST }}
-
-# Rebuild the system
+# Rebuild specified host
 [group("building")]
 rebuild HOST=`hostname`: && rebuild-post
-    @just _rebuild {{ HOST }}
+    @just rebuild-host {{ HOST }}
     # just rebuild-extensions-lite
 
-# Rebuild the system and run a flake check
+# Rebuild specified host and then run a flake check
 [group("building")]
 rebuild-full HOST=`hostname`: && rebuild-post
-    @just _rebuild {{ HOST }}
+    @just rebuild-host {{ HOST }}
     just check {{ HOST }}
     # just rebuild-extensions
-
-# Rebuild the system with show trace
-#rebuild-trace: rebuild-pre && rebuild-post
-#scripts/rebuild.sh trace
-#	just rebuild-extensions-lite
 
 # Update all flake inputs for the specified host or the current host if none specified
 [group("update")]
@@ -139,10 +126,10 @@ disko DRIVE PASSWORD:
 
 # Run nixos-rebuild on the remote host
 [group("building")]
-build-host HOST:
+rebuild-host HOST=`hostname`:
     @just rebuild-pre {{ HOST }}
     @just copy-lock-in {{ HOST }}
-    @scripts/build-host.sh {{ HOST }}
+    @rebuild-host {{ HOST }}
     @just copy-lock-out {{ HOST }}
 
 #
