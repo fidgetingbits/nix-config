@@ -43,12 +43,11 @@
           ssh-to-age # bootstrap script
           gum # shell script ricing
           bootstrap-nixos # introdus script for bootstrapping new hosts
-          # script for building local and remote host,
-          # with per-host locking support
           ;
       }
       ++ [
-        # introdus script for rebuilding a host
+        # introdus script for rebuilding a remote/local hosts
+        # with optional per-host locking support
         (pkgs.rebuild-host.overrideAttrs (_: {
           perHostLocks = true;
         }))
