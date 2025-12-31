@@ -28,8 +28,8 @@
       );
       default = [ ];
       description = ''
-        List of services to proxy using nginx.virtualhosts, each service has an ACME certificate generated
-              for the subdomain.
+        List of services to proxy using nginx.virtualhosts, each service has an
+        ACME certificate generated for the subdomain.
       '';
     };
   };
