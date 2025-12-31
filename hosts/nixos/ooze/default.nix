@@ -64,6 +64,8 @@
     subDomain = "ogre";
   };
 
+  services.docuseal.enable = true; # Settings in module
+
   networking.useDHCP = lib.mkDefault true;
 
   services.heartbeat-check = {
