@@ -53,6 +53,7 @@ in
       ".venv/"
       # direnv
       ".direnv/"
+      ".envrc"
     ];
 
     settings = {
