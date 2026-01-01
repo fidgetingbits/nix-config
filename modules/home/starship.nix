@@ -31,6 +31,7 @@
 # Base17 = bright-magenta or bright-purple
 
 {
+  pkgs,
   config,
   lib,
   ...
@@ -65,11 +66,7 @@ in
       let
         left_divider = "[${cfg.left_divider_str}](bg:base01 fg:white)";
         right_divider = "[${cfg.right_divider_str}](bg:base01 fg:white)";
-      in
-      {
-        enableZshIntegration = true;
-        enableTransience = true; # NOTE: transcience for zsh isn't support out-of-box but we enable at the end of this file
-        settings = {
+        settings' = {
           add_newline = true;
 
           # some dressing characters for reference
@@ -191,8 +188,17 @@ in
             style_root = "bold bg:base01 fg:red";
           };
         };
-
+      in
+      {
+        enableZshIntegration = true;
+        enableTransience = true; # NOTE: transcience for zsh isn't support out-of-box but we enable at the end of this file
+        settings =
+          "${pkgs.starship}/share/starship/presets/nerd-font-symbols.toml"
+          |> builtins.readFile
+          |> builtins.fromTOML
+          |> lib.recursiveUpdate settings';
       };
+
     # enable transient prompt for Zsh
     programs.zsh.initContent =
       lib.optionalString (config.programs.starship.enable && config.programs.starship.enableTransience)
