@@ -9,25 +9,6 @@ let
   introdusLib = inputs.introdus.lib.mkIntrodusLib { inherit lib; };
 in
 {
-  bats-test =
-    pkgs.runCommand "bats-test"
-      {
-        src = ../.;
-        buildInputs = lib.attrValues {
-          inherit (pkgs)
-            bats
-            yq-go
-            inetutils
-            ;
-        };
-      }
-      ''
-        cd $src
-        export HELPERS_PATH="${pkgs.introdus-helpers}/share/introdus-helpers/helpers.sh"
-        bats tests
-        touch $out
-      '';
-
   pre-commit-check = inputs.pre-commit-hooks.lib.${system}.run {
     src = ../.;
     default_stages = [ "pre-commit" ];
