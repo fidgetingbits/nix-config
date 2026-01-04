@@ -145,6 +145,7 @@
               self.overlays.default
             ];
           };
+          formatter = inputs.introdus.formatter.${system};
         in
         rec {
           _module.args.pkgs = pkgs;
@@ -152,15 +153,17 @@
             callPackage = lib.callPackageWith pkgs;
             directory = ./pkgs;
           };
+          # FIXME: There might be a better way to auto-integrate the introdus formatter
           checks = import ./checks {
             inherit
               inputs
               pkgs
               system
               lib
+              formatter
               ;
           };
-          formatter = pkgs.nixfmt;
+          inherit formatter;
           devShells = import ./shell.nix {
             inherit
               checks
@@ -295,8 +298,8 @@
     pwndbg.url = "github:pwndbg/pwndbg";
 
     introdus = {
-      url = "git+ssh://git@codeberg.org/fidgetingbits/introdus?shallow=1&ref=aa";
-      # url = "path:///home/aa/dev/nix/introdus";
+      # url = "git+ssh://git@codeberg.org/fidgetingbits/introdus?shallow=1&ref=aa";
+      url = "path:///home/aa/dev/nix/introdus/aa";
     };
   };
 }

@@ -309,3 +309,7 @@ facter HOST:
 dev:
     @just rebuild-pre
     direnv reload
+
+[group("dev")]
+fmt:
+    nix fmt --reference-lock-file locks/$(hostname).lock
