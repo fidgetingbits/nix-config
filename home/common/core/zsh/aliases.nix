@@ -151,6 +151,7 @@ in
   j = "just";
   # FIXME: These should be devshell-specific aliases for nix-config
   jr = "just rebuild";
+  jb = "just rebuild"; # FIXME: muscle memory
   jrt = "just rebuild-trace";
   jl = "just --list";
   jup = "just update";

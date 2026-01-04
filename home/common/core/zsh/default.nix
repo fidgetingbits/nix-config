@@ -14,13 +14,11 @@ in
   # programs.starship = {
   #   enable = true;
   #   package = pkgs.unstable.starship;
-  #   right_divider_str = "  ";
-  #   left_divider_str = "  ";
-  #   fill_str = "·";
+  #   fill_str = "░";
   # };
 
   home.packages = [
-    pkgs.bitwarden-cli # for cmd line password generation
+    pkgs.phraze # for cmd line password generation
     pkgs.rmtrash # temporarily cache deleted files for recovery
     pkgs.fzf # fuzzy finder used by initExtra.zsh
     pkgs.gum # ricing cli tools
