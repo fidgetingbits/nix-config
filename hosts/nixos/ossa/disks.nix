@@ -7,5 +7,4 @@
     bootSize = "1G";
     useLuks = true;
   };
-
 }

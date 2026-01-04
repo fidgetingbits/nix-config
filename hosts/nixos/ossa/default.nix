@@ -6,9 +6,8 @@
   config,
   ...
 }:
-rec {
+{
   imports = lib.flatten [
-    #inputs.nixos-hardware.nixosModules.asus-zenbook-ux371
     inputs.nixos-facter-modules.nixosModules.facter
     { config.facter.reportPath = ./facter.json; }
     (lib.custom.scanPaths ./.) # Load all extra host-specific *.nix files
@@ -82,11 +81,6 @@ rec {
   #console.font = lib.mkDefault "${pkgs.terminus_font}/share/consolefonts/ter-v32n.psf.gz";
   console.earlySetup = lib.mkDefault true;
 
-  # Setup keyfile
-  boot.initrd.secrets = {
-    "/crypto_keyfile.bin" = null;
-  };
-
   # Enable swap on luks
   boot.initrd.systemd.enable = true;
   boot.supportedFilesystems = [ "ntfs" ];
@@ -107,8 +101,6 @@ rec {
   services.backup = {
     enable = true;
     borgBackupStartTime = "09:00:00";
-    # This is only relevant while I'm not using btrfs subvolume backup
-    borgExcludes = [ "${config.hostSpec.home}/movies" ];
   };
 
   # For explanations of these options, see

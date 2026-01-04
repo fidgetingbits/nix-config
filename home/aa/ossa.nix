@@ -2,6 +2,7 @@
   config,
   pkgs,
   lib,
+  osConfig,
   ...
 }:
 {
@@ -58,9 +59,8 @@
     )
   );
 
-  # FIXME: this should be tied to osConfig.hostSpec.voiceCoding
-  talon = {
-    enable = false;
+  talon = lib.optionalAttrs osConfig.hostSpec.voiceCoding {
+    enable = true;
     autostart = false;
     pynvim = true;
     #  gaze-ocr = true;
@@ -101,7 +101,7 @@
   programs.firefox.nativeMessagingHosts = [ pkgs.tridactyl-native ];
 
   # Allows to show talon icon in system tray on X11
-  services.snixembed.enable = config.hostSpec.voiceCoding;
+  services.snixembed.enable = osConfig.hostSpec.voiceCoding;
 
   services.yubikey-touch-detector = {
     enable = true;
