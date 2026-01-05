@@ -45,7 +45,7 @@ in
     # supply the full folder path to the plugin in src=. To find the correct path, atm you must check the
     # plugins derivation until PR XXXX (file issue) is fixed
     plugins = import ./plugins.nix {
-      inherit pkgs lib;
+      inherit pkgs;
     };
 
     initContent = lib.mkMerge [

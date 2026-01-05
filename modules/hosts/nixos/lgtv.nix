@@ -23,7 +23,7 @@ let
   lgtv-off = pkgs.writeShellApplication {
     name = "lgtv-off";
     runtimeInputs = [
-      pkgs.lgtv-ip-control
+      pkgs.introdus.lgtv-ip-control
     ];
     text = ''
       KEY=$(cat ${config.sops.secrets."keys/lgtv".path})

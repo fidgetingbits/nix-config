@@ -28,7 +28,7 @@ lib.mkMerge [
           SHOW_TIPS=false
           TIP_INDEX=0
           G_FILE_CHOOSER.ShowDotFiles=true
-          Theme=File\:${pkgs.ghidra-gruvbox-theme}/gruvbox-dark-hard.theme
+          Theme=File\:${pkgs.introdus.ghidra-gruvbox-theme}/gruvbox-dark-hard.theme
           USER_AGREEMENT=ACCEPT
           LastExtensionImportDirectory=${config.home.homeDirectory}/.config/ghidra/scripts/
           LastNewProjectDirectory=${config.home.homeDirectory}/.config/ghidra/repos/

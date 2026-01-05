@@ -71,9 +71,11 @@
 
   home.packages = lib.attrValues {
     inherit (pkgs)
-      cyberpower-pdu
-      easylkb
       ntfs3g
+      ;
+    inherit (pkgs.introdus)
+      easylkb
+      cyberpower-pdu
       ;
     inherit (pkgs.unstable)
       proton-authenticator

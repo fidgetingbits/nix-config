@@ -1,7 +1,7 @@
 { pkgs, ... }:
 {
   home.packages = [
-    pkgs.rofi-copyq
+    pkgs.introdus.rofi-copyq
   ];
   programs.rofi = {
     enable = true;

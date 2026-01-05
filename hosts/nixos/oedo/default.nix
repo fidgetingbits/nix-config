@@ -118,7 +118,7 @@
   services.fwupd.enable = true;
   environment.systemPackages = [
     pkgs.unstable.lshw
-    pkgs.nixos-extract-initrd
+    pkgs.introdus.nixos-extract-initrd
   ];
 
   # FIXME: This could all be automated in a module with hostSpec isWifi and

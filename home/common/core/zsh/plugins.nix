@@ -1,4 +1,4 @@
-{ pkgs, lib }:
+{ pkgs }:
 [
   {
     name = "zhooks";
@@ -23,32 +23,29 @@
       sha256 = "1lzrn0n4fxfcgg65v0qhnj7wnybybqzs4adz7xsrkgmcsr0ii8b7";
     };
   }
-]
-# Some hosts don't use overlays, so don't add custom packages unless they are there
-++ lib.optionals (pkgs ? "zsh-term-title") [
   {
     name = "zsh-term-title";
-    src = "${pkgs.zsh-term-title}/share/zsh/zsh-term-title";
+    src = "${pkgs.introdus.zsh-term-title}/share/zsh/zsh-term-title";
   }
   {
     name = "cd-gitroot";
-    src = "${pkgs.cd-gitroot}/share/zsh/cd-gitroot";
+    src = "${pkgs.introdus.cd-gitroot}/share/zsh/cd-gitroot";
   }
   {
     name = "zsh-deep-autocd";
-    src = "${pkgs.zsh-deep-autocd}/share/zsh/zsh-deep-autocd";
+    src = "${pkgs.introdus.zsh-deep-autocd}/share/zsh/zsh-deep-autocd";
   }
   {
     name = "zsh-autols";
-    src = "${pkgs.zsh-autols}/share/zsh/zsh-autols";
+    src = "${pkgs.introdus.zsh-autols}/share/zsh/zsh-autols";
   }
   # {
   #   name = "zsh-talon-folder-completion";
-  #   src = "${pkgs.zsh-talon-folder-completion}/share/zsh/zsh-talon-folder-completion";
+  #   src = "${pkgs.introdus.zsh-talon-folder-completion}/share/zsh/zsh-talon-folder-completion";
   # }
   {
     name = "zsh-color-ssh-nvim-term";
-    src = "${pkgs.zsh-color-ssh-nvim-term}/share/zsh/zsh-color-ssh-nvim-term";
+    src = "${pkgs.introdus.zsh-color-ssh-nvim-term}/share/zsh/zsh-color-ssh-nvim-term";
   }
   {
     name = "zsh-edit";

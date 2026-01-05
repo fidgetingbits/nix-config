@@ -9,11 +9,8 @@
 
   home.packages = lib.optionals osConfig.hostSpec.isWork (
     lib.attrValues {
-      inherit (pkgs)
-        #ida-free
-        #ida-pro
+      inherit (pkgs.introdus)
         diaphora
-        #  binaryninja
         ;
     }
   );

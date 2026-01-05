@@ -13,7 +13,7 @@
       force = true;
     };
     #"fcitx5/conf/classicui.conf".source = ./classicui.conf;
-    # Disable ctrl-; key for clipboard (probably just disable tthis eventually, since we use rofi-copyq now
+    # Disable ctrl-; key for clipboard (probably just disable this eventually, since we use rofi-copyq now
     "fcitx5/conf/clipboard.conf" = {
       force = true;
       text = ''

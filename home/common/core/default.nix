@@ -19,7 +19,6 @@
   home.packages = lib.attrValues (
     {
       inherit (pkgs)
-        jq5 # json5-capable jq
         eza # ls replacement
         zoxide # cd replacement
         fd # tree-style ls
@@ -58,6 +57,10 @@
 
         # FIXME: This likely isn't needed as core, since we can use dev flake for it
         pre-commit # git hooks
+        ;
+
+      inherit (pkgs.introdus)
+        jq5 # json5-capable jq
         ;
 
     }

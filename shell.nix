@@ -19,7 +19,7 @@
 
     # This is needed in case we manually run bats tests and similar
     # FIXME: move bats test to introdus to get rid of this
-    HELPERS_PATH = "${pkgs.introdus-helpers}/share/introdus-helpers/helpers.sh";
+    HELPERS_PATH = "${pkgs.introdus.introdus-helpers}/share/introdus-helpers/helpers.sh";
 
     buildInputs = checks.pre-commit-check.enabledPackages;
     nativeBuildInputs =
@@ -50,6 +50,8 @@
           age # bootstrap script
           ssh-to-age # bootstrap script
           gum # shell script ricing
+          ;
+        inherit (pkgs.introdus)
           bootstrap-nixos # introdus script for bootstrapping new hosts
           check-sops
           ;
@@ -57,7 +59,7 @@
       ++ [
         # introdus script for rebuilding a remote/local hosts
         # with optional per-host locking support
-        (pkgs.rebuild-host.overrideAttrs (_: {
+        (pkgs.introdus.rebuild-host.overrideAttrs (_: {
           perHostLocks = true;
         }))
         # New enough to get memory management improvements

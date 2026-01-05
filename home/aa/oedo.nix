@@ -59,10 +59,12 @@
 
   home.packages = lib.attrValues {
     inherit (pkgs)
-      cyberpower-pdu
+      burpsuite
+      ;
+    inherit (pkgs.introdus)
       easylkb
       slideshare-downloader
-      burpsuite
+      cyberpower-pdu
       ;
   };
 
