@@ -54,7 +54,8 @@
               locations."/" = {
                 recommendedProxySettings = true;
                 proxyPass = "${uri}://127.0.0.1:${toString service.port}";
-              } // service.extraConfig;
+              }
+              // service.extraConfig;
             };
           }
         ) cfg.services
