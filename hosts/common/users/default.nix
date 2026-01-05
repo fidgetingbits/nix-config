@@ -98,7 +98,7 @@ in
         in
         lib.optional (lib.pathExists fullPath) fullPath;
     in
-    rec {
+    {
       useGlobalPkgs = true;
       # useUserPackages = true;
       extraSpecialArgs = {
@@ -159,9 +159,7 @@ in
             # programs.starship = {
             #   enable = true;
             #   package = pkgs.unstable.starship;
-            #   right_divider_str = "  ";
-            #   left_divider_str = "  ";
-            #   fill_str = "·";
+            #   fill_str = "░";
             # };
 
             programs.zsh = {
