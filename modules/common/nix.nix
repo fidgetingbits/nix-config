@@ -10,7 +10,7 @@
 }:
 let
   # FIXME: This allows us to access the settings from HM
-  hostSpec = if (config ? hostSpec) then config.hostSpec else osConfig.hotsSpec;
+  hostSpec = if (config ? hostSpec) then config.hostSpec else osConfig.hostSpec;
 in
 {
   options.${namespace}.nix = {
@@ -64,18 +64,18 @@ in
           ];
 
           # FIXME: This might not only contain attic-related entries in the future
-          #          netrc-file =
-          #            if ((config ? "sops") && (hostSpec.useAtticCache)) then
-          #              "${config.sops.secrets."passwords/netrc".path}"
-          #            else
-          #              null;
+          netrc-file =
+            if ((config ? "sops") && (hostSpec.useAtticCache)) then
+              "${config.sops.secrets."passwords/netrc".path}"
+            else
+              null;
         };
 
         # Access token prevents github rate limiting if you have to nix flake update a bunch
         # Only local systems are used to build anything, so only include there
-        #        extraOptions =
-        #          lib.optionalString ((config ? "sops") && (hostSpec.isLocal))
-        #            "!include ${config.sops.secrets."tokens/nix-access-tokens".path}";
+        extraOptions =
+          lib.optionalString ((config ? "sops") && (hostSpec.isLocal))
+            "!include ${config.sops.secrets."tokens/nix-access-tokens".path}";
 
         # Disabled because I am using nh
         # gc = {
@@ -96,16 +96,5 @@ in
 
       };
     }
-    (lib.mkIf (config ? "sops") {
-      #      sops.secrets = lib.optionalAttrs cfg.withSecrets {
-      #        # formatted as extra-access-tokens = github.com=<PAT token>
-      #        "tokens/nix-access-tokens" = {
-      #          inherit (cfg) sopsFile;
-      #        };
-      #        "passwords/netrc" = {
-      #          inherit (cfg) sopsFile;
-      #        };
-      #      };
-    })
   ];
 }
