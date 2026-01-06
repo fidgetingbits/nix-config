@@ -113,6 +113,8 @@ iso-install DRIVE HOST=`hostname`:
     just iso {{ HOST }}
     sudo dd if=$(eza --sort changed result/iso/*.iso | tail -n1) of={{ DRIVE }} bs=4M status=progress oflag=sync
 
+# FIXME: This is deprecated now I think
+
 # Configure a drive password using disko
 [group("misc")]
 disko DRIVE PASSWORD:
@@ -232,6 +234,8 @@ pin HOST=`hostname`:
 [group("admin")]
 sync USER HOST PATH:
     rsync -av --filter=':- .gitignore' -e "ssh -l {{ USER }} -oport=10022" . {{ USER }}@{{ HOST }}:{{ PATH }}/nix-config
+
+# FIXME: Deprecated in favor of gen-pass
 
 # Create a new user with a password hash for dovecot, to be placed in ooze.yaml secrets
 [group("admin")]
