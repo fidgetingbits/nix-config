@@ -54,6 +54,7 @@
         inherit (pkgs.introdus)
           bootstrap-nixos # introdus script for bootstrapping new hosts
           check-sops
+          pin-systemd-boot-entry
           ;
       }
       ++ [
