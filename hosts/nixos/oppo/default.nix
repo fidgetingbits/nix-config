@@ -62,6 +62,7 @@
       ip = ogle.ip;
       mac = lib.elemAt ogle.mac 0;
     };
+  services.blueman.enable = true;
 
   system.impermanence = {
     enable = true;
