@@ -83,6 +83,9 @@ in
   # lsusb
   lsusb = "cyme --tree";
 
+  # see where a shell command is linked in the nix-store
+  ltw = "linktree -w";
+
   # nix
   nr = "nix run .";
   nri = "nix run . --impure";
@@ -137,7 +140,7 @@ in
   cns = "cd ${devNix}/nix-secrets";
   cnh = "cd ${devNix}/nixos-hardware";
   cnp = "cd ${devNix}/nixpkgs";
-  cni = "cd ${devNix}/introdus";
+  cni = "cd ${devNix}/introdus/aa";
 
   ## rust cargo
   cr = "cargo run";
