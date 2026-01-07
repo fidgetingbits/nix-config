@@ -28,6 +28,12 @@ in
         default = [ (if cfg.useYubikey then "id_yubikey" else "id_ed25519") ];
         description = "Identity file name to use as default for hosts";
       };
+      defaultUser = lib.mkOption {
+        type = lib.types.str;
+        default = "aa";
+        description = "Default ssh user if the host being built doesn't have a hostSpec primaryUsername";
+        example = "wukong";
+      };
       domain = lib.mkOption {
         type = lib.types.str;
         default = osConfig.hostSpec.domain;
@@ -144,8 +150,7 @@ in
             match = "host ${host},${host}.${osConfig.hostSpec.domain}";
             hostname = "${host}.${osConfig.hostSpec.domain}";
             port = osConfig.hostSpec.networking.ports.tcp.ssh;
-            # FIXME: Fix the default name later
-            user = inputs.self.nixosConfigurations.${host}.osConfig.hostSpec.primaryUsername or "aa";
+            user = inputs.self.nixosConfigurations.${host}.config.hostSpec.primaryUsername or cfg.defaultUser;
           };
         })
         |> lib.attrsets.mergeAttrsList;
