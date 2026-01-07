@@ -102,7 +102,7 @@ rebuild-extensions-lite:
 
 # Build an iso image for installing new systems and create a symlink for qemu usage
 [group("building")]
-iso HOST:
+iso HOST=`hostname`:
     # If we dont remove this folder, libvirtd VM doesnt run with the new iso
     rm -rf result
     nix build --impure .#nixosConfigurations.iso.config.system.build.isoImage --reference-lock-file locks/{{ HOST }}.lock && ln -sf result/iso/*.iso latest_{{ HOST }}.iso
