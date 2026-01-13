@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Host that contains the dovecot secrets for postfix
 
+# Host that contains the dovecot secrets for postfix
 DEFAULT_POSTFIX_SERVER="ooze"
 
 function sops_set {
