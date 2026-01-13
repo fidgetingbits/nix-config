@@ -186,6 +186,8 @@ in
   sr = "systemctl restart";
   sur = "systemctl --user restart";
 
+  scc = "systemctl cat";
+
   # journalctl
   jc = "journalctl";
   jcu = "journalctl --user";
