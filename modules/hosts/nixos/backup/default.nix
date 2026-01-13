@@ -532,7 +532,6 @@ in
         };
       }
       # lib.mkIf needed here to avoid infinite recursion
-      # FIXME: Why does this inner attribute get parsed on darwin?
       (lib.mkIf pkgs.stdenv.isLinux {
         # Linux specific
         systemd =
@@ -547,10 +546,13 @@ in
                 restartIfChanged = false;
                 serviceConfig = {
                   Type = "forking";
-                  ExecStart = pkgs.writeShellScript "borg-backup-forking" ''
-                    ${lib.getBin backupTool}/bin/${backupToolName} &
-                    echo $! > /run/borg-backup.pid
-                  '';
+                  ExecStart =
+                    pkgs.writeShellScript "borg-backup-forking"
+                      # bash
+                      ''
+                        ${lib.getBin backupTool}/bin/${backupToolName} &
+                        echo $! > /run/borg-backup.pid
+                      '';
                   PIDFile = "/run/borg-backup.pid";
                   RemainAfterExit = false;
                 };

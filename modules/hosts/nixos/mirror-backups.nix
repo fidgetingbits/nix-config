@@ -19,26 +19,28 @@ let
         util-linux
         ;
     };
-    text = ''
-      exec {LOCKFD}> /var/lock/mirror-backups.lock
-      if ! flock -n ''${LOCKFD}; then
-        echo "Another backup running; exiting"
-        exit 0
-      fi
-      rsync -e 'ssh -l ${cfg.user} -i ${sshKeyPath} -p ${port}' \
-        -cau --no-p --stats \
-        ${lib.concatStringsSep " " cfg.folders} \
-        ${cfg.server}:${cfg.destinationPath} | tee /root/mirror-log.txt
+    text =
+      # bash
+      ''
+        exec {LOCKFD}> /var/lock/mirror-backups.lock
+        if ! flock -n ''${LOCKFD}; then
+          echo "Another backup running; exiting"
+          exit 0
+        fi
+        rsync -e 'ssh -l ${cfg.user} -i ${sshKeyPath} -p ${port}' \
+          -cau --no-p --stats \
+          ${lib.concatStringsSep " " cfg.folders} \
+          ${cfg.server}:${cfg.destinationPath} | tee /root/mirror-log.txt
 
-      TMPDIR=$(mktemp -d)
-      cat >"$TMPDIR"/mirror.txt <<-EOF
-      From:box@${config.hostSpec.domain}
-      Subject: [${config.networking.hostName}: mirror] Mirroring to ${cfg.server} complete
-      $(cat /root/mirror-log.txt)
-      EOF
-      msmtp -t admin@${config.hostSpec.domain} <"$TMPDIR"/mirror.txt
-      rm -rf "$TMPDIR"
-    '';
+        TMPDIR=$(mktemp -d)
+        cat >"$TMPDIR"/mirror.txt <<-EOF
+        From:box@${config.hostSpec.domain}
+        Subject: [${config.networking.hostName}: mirror] Mirroring to ${cfg.server} complete
+        $(cat /root/mirror-log.txt)
+        EOF
+        msmtp -t admin@${config.hostSpec.domain} <"$TMPDIR"/mirror.txt
+        rm -rf "$TMPDIR"
+      '';
   };
 in
 {
