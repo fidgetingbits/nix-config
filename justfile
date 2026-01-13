@@ -129,10 +129,17 @@ disko DRIVE PASSWORD:
 # Run nixos-rebuild on the remote host
 [group("building")]
 rebuild-host HOST=`hostname`:
-    @just rebuild-pre {{ HOST }}
-    @just copy-lock-in {{ HOST }}
-    @rebuild-host {{ HOST }}
-    @just copy-lock-out {{ HOST }}
+    #!/usr/bin/env bash
+    just rebuild-pre {{ HOST }}
+    BUILD_FOLDER=$(mktemp -d)
+    echo "Prepping build folder: $BUILD_FOLDER"
+    cp -R . "$BUILD_FOLDER"
+    trap 'rm -rf $BUILD_FOLDER' EXIT
+    cd $BUILD_FOLDER
+    just copy-lock-in {{ HOST }}
+    rebuild-host {{ HOST }}
+    just copy-lock-out {{ HOST }}
+    cd -
 
 #
 # ========== Nix-Secrets manipulation recipes ==========
