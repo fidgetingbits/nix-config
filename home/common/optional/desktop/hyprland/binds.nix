@@ -125,7 +125,7 @@
           #NOTE: window resizing is under "Repeat Binds" above
 
           # Close the focused/active window
-          "${mainMod} SHIFT, q, hy3:killactive"
+          "${mainMod} SHIFT, q, killactive"
 
           # Fullscreen
           #"ALT, f, fullscreen, 0" # 0 - fullscreen (takes your entire screen), 1 - maximize (keeps gaps and bar(s))
@@ -135,14 +135,7 @@
           # Pin Active Floating window
           "${mainMod} SHIFT, p, pin, active" # pins a floating window (i.e. show it on all workspaces)
 
-          # Splits groups
-          "${mainMod}, v, hy3:makegroup, v" # make a vertical split
-          "${mainMod} SHIFT, v, hy3:makegroup, h" # make a horizontal split
-          "${mainMod}, x, hy3:changegroup, opposite" # toggle btwn splits if untabbed
-          "${mainMod}, s, togglesplit"
-
           # Tab groups
-          "${mainMod}, g, hy3:changegroup, toggletab" # tab or untab the group
           #"ALT, t, lockactivegroup, toggle"
           "${mainMod}, apostrophe, changegroupactive, f"
           "${mainMod} SHIFT, apostrophe, changegroupactive, b"
@@ -166,21 +159,21 @@
           (map (
             n:
             if n == "10" then
-              "${mainMod} SHIFT, 0, hy3:movetoworkspace, name:10"
+              "${mainMod} SHIFT, 0, movetoworkspace, name:10"
             else
-              "${mainMod} SHIFT, ${n}, hy3:movetoworkspace, name:${n}"
+              "${mainMod} SHIFT, ${n}, movetoworkspace, name:${n}"
           ) workspaces)
 
           # Move focus from active window to window in specified direction
           #(lib.mapAttrsToList (key: direction: "${mainMod}, ${key}, exec, customMoveFocus ${direction}") directions)
           (lib.mapAttrsToList (
-            key: direction: "${mainMod}, ${key}, hy3:movefocus, ${direction}, warp"
+            key: direction: "${mainMod}, ${key}, movefocus, ${direction}, warp"
           ) directions)
 
           # Move windows
           #(lib.mapAttrsToList (key: direction: "${mainMod} SHIFT, ${key}, exec, customMoveWindow ${direction}") directions)
           (lib.mapAttrsToList (
-            key: direction: "${mainMod} SHIFT, ${key}, hy3:movewindow, ${direction}"
+            key: direction: "${mainMod} SHIFT, ${key}, movewindow, ${direction}"
           ) directions)
 
           # Move workspace to monitor in specified direction

@@ -1,7 +1,6 @@
 {
   config,
   osConfig,
-  pkgs,
   lib,
   ...
 }:
@@ -34,7 +33,6 @@
       variables = [ "--all" ];
     };
     plugins = [
-      pkgs.unstable.hyprlandPlugins.hy3
     ];
     settings = {
       debug = {
@@ -98,11 +96,6 @@
       ]
       ++ lib.optional config.introdus.services.awww.enable "swww img ${osConfig.hostSpec.wallpaper}";
 
-      # Plugins
-      general.layout = "hy3";
-      plugin = {
-        hy3 = { };
-      };
     };
 
     # FIXME: Implement a smarter window focus for single monitor where moving right/left will swap workspaces if already on the edge. There is something similar ish here:
