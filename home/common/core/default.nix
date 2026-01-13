@@ -7,7 +7,6 @@
 }:
 {
   imports = lib.flatten [
-    inputs.impermanence.nixosModules.home-manager.impermanence
     inputs.introdus.homeManagerModules.default
     (map lib.custom.relativeToRoot [
       #"modules/common/"
