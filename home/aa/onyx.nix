@@ -69,18 +69,25 @@
 
   llm-tools.enable = true;
 
-  home.packages = lib.attrValues {
-    inherit (pkgs)
-      ntfs3g
-      ;
-    inherit (pkgs.introdus)
-      easylkb
-      cyberpower-pdu
-      ;
-    inherit (pkgs.unstable)
-      proton-authenticator
-      ;
-  };
+  home.packages =
+    lib.attrValues {
+      inherit (pkgs)
+        ntfs3g
+        ;
+      inherit (pkgs.introdus)
+        easylkb
+        cyberpower-pdu
+        ;
+      inherit (pkgs.unstable)
+        proton-authenticator
+        ;
+    }
+    ++ [
+      (pkgs.long-rsync.overrideAttrs (_: {
+        recipients = osConfig.hostSpec.email.olanAdmins;
+        deliverer = osConfig.hostSpec.email.notifier;
+      }))
+    ];
 
   home.sessionVariables = {
     # This variable prevents the following from being spammed to the console constantly:
