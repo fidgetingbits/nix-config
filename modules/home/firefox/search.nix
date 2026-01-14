@@ -161,15 +161,11 @@ in
       "Noogle" = {
         urls = [
           {
-            template = "https://noogle.dev/";
+            template = "https://noogle.dev/q?";
             params = [
               {
-                name = "q";
-                value = "term={searchTerms}";
-              }
-              {
-                name = "type";
-                value = "code";
+                name = "term";
+                value = "{searchTerms}";
               }
             ];
           }
