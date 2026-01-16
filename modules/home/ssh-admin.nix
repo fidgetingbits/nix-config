@@ -1,5 +1,6 @@
 # FIXME(roles): This eventually should get slotted into some sort of 'role' thing
 {
+  inputs,
   osConfig,
   lib,
   secrets,
@@ -11,6 +12,7 @@ in
 lib.mkIf cfg.isAdmin {
   sshAutoEntries = {
     enable = true;
+    # FIXME: Would be nice if this could be flagged in the subnet attr set instead of manually managed
     ykDomainHosts = [
       "ogre"
       "oxid"
@@ -28,12 +30,20 @@ lib.mkIf cfg.isAdmin {
   };
   programs.ssh.matchBlocks =
     let
-      ogreSubnetHosts = [
-        "ottr"
-        "oryx"
-        "omen"
-        "owls"
-      ];
+      nixosHostNames =
+        inputs.self.nixosConfigurations
+        |> lib.attrNames
+        |> lib.filter (name: (name != "iso") && (!(lib.hasSuffix "Minimal" name)));
+
+      # ssh-auto-entries already auto-handles any systems in the subnet that
+      # have nixosConfigurations entries, so filter out and add an entry for
+      # any other non-nix subnet entries. Caveat is it will create entries for
+      # anything that isn't running ssh, but that's better than listing it all
+      # manually imo
+      ogreSubnetHosts =
+        osConfig.hostSpec.networking.subnets.ogre.hosts
+        |> lib.attrNames
+        |> lib.filter (name: !(lib.elem name nixosHostNames));
       extraSubnetEntries =
         hosts: subnet:
         hosts

@@ -69,21 +69,9 @@ in
   config =
     let
       nixosHostNames =
-        # FIXME: Make this a set of optional suffixes to ignore
-        let
-          isMinimal =
-            host:
-            let
-              suffixLen = lib.stringLength "Minimal";
-              hostLen = lib.stringLength host;
-              prefixLen = hostLen - suffixLen;
-              suffix = lib.substring prefixLen suffixLen host;
-            in
-            if ((hostLen < suffixLen) || (suffix != "Minimal")) then false else true;
-        in
         inputs.self.nixosConfigurations
         |> lib.attrNames
-        |> lib.filter (name: (name != "iso") && (!(isMinimal name)));
+        |> lib.filter (name: (name != "iso") && (!(lib.hasSuffix "Minimal" name)));
 
       nixosHostsUnlockable =
         (
