@@ -9,16 +9,13 @@
       "nvme-EDILOCA_EN705_4TB_AA251809669"
       "nvme-EDILOCA_EN705_4TB_AA251809987"
       "nvme-EDILOCA_EN705_4TB_AA251809895"
-      # FIXME: Uncomment after already created, to test adding drive to array
-      # after initial install/disko run
-      #"nvme-EDILOCA_EN705_4TB_AA251809684"
+      "nvme-EDILOCA_EN705_4TB_AA251809684"
     ];
-    extraDisks = [
-      {
-        name = "encrypted-storage";
-        # NOTE: This UUID changes on a re-install
-        uuid = "64ce59b9-756a-4897-b772-bd5d11f6839a";
-      }
-    ];
+    #extraDisks = [
+    #  {
+    #    name = "encrypted-storage";
+    #    path = "/dev/disk/by-id/md-name-any:raid5";
+    #  }
+    #];
   };
 }

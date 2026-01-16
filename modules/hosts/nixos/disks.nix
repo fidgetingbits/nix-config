@@ -32,7 +32,7 @@ let
   luksContent = {
     type = "luks";
     name = "encrypted-nixos";
-    passwordFile = "/tmp/disko-password"; # populated by bootstrap-nixos.sh
+    passwordFile = "/tmp/disko-password"; # populated by bootstrap-nixos
     settings = {
       allowDiscards = true;
     };
@@ -170,14 +170,15 @@ in
         default = [
           {
             name = "encrypted-storage";
-            uuid = "TBD";
+            # FIXME: Should check how to control the name-any-raid5 parts in disko
+            path = "/dev/disks/by-id/md-name-any:raid5";
           }
         ];
-        description = "Names and UUIDs of non-primary luks-encrypted disks, used for automatic boot-time LUKS unlocking";
+        description = "Names and labels of non-primary luks-encrypted disks, used for automatic boot-time LUKS unlocking.";
         example = [
           {
             name = "encrypted-storage";
-            uuid = "ff3207ca-0af8-4dc3-a21f-4ec815b57c56";
+            path = "/dev/disks/by-id/md-name-any:raid5";
           }
         ];
       };
@@ -242,6 +243,7 @@ in
             passwordFile = "/tmp/disko-password";
             settings = {
               allowDiscards = true;
+              crypttabExtraOpts = [ "nofail" ];
             };
             # Add a boot.initrd.luks.devices entry to auto-decrypt
             initrdUnlock = if config.hostSpec.isMinimal then true else false;
@@ -288,9 +290,9 @@ in
       etc.crypttab.text = lib.optionalString (!config.hostSpec.isMinimal) (
         lib.concatMapStringsSep "\n" (
           d:
-          # FIXME: noauto doesn't work, so UUID has to be correct or boot fails
+          # FIXME: noauto doesn't work, so path has to be correct or boot fails
           # investigate a way to make this work and just mount from a script after the normal boot proceed, or ideally have x-systemd.automount mount on access for us (but need to test how it fails if UUID is wrong)
-          "${d.name} UUID=${d.uuid} /luks-secondary-unlock.key noauto,nofail,x-systemd.device-timeout=10,x-systemd.automount"
+          "${d.name} ${d.path} /luks-secondary-unlock.key noauto,nofail"
         ) cfg.extraDisks
       );
     }

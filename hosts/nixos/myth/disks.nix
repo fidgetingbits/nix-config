@@ -13,8 +13,7 @@
     extraDisks = [
       {
         name = "encrypted-storage";
-        # NOTE: This UUID changes on a re-install
-        uuid = "ff3207ca-0af8-4dc3-a21f-4ec815b57c56";
+        path = "/dev/disk/by-id/md-name-any:raid5";
       }
     ];
   };
