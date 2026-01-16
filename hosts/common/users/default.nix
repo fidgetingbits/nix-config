@@ -166,7 +166,19 @@ in
               enable = true;
             };
             p10k.enable = true;
-
+            # Borg backup tools run as root, so shut up PQ warning
+            programs.ssh = {
+              enable = true;
+              enableDefaultConfig = false;
+              matchBlocks = {
+                "missing-pq" = {
+                  host = "oath oath.${hostSpec.domain} onus onus.${hostSpec.domain}";
+                  extraOptions = {
+                    WarnWeakCrypto = "no-pq-kex";
+                  };
+                };
+              };
+            };
           };
         };
     };

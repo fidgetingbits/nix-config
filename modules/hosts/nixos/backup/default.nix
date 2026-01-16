@@ -229,7 +229,7 @@ in
             exit 1
           fi
 
-          export BORG_RSH="ssh -i $BORG_SSH_KEY -l$BORG_USER -oport=$BORG_PORT"
+          export BORG_RSH="ssh -i $BORG_SSH_KEY -l$BORG_USER -oport=$BORG_PORT -oUpdateHostKeys=no"
           export BORG_EXPIRY="--keep-daily=${toString cfg.borgBackupExpiryDaily} \
             --keep-weekly=${toString cfg.borgBackupExpiryWeekly} \
             --keep-monthly=${toString cfg.borgBackupExpiryMonthly} \

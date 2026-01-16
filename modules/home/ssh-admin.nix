@@ -107,6 +107,14 @@ lib.mkIf cfg.isAdmin {
         port = cfg.networking.ports.tcp.gitlab;
       };
 
+      # Systems stuck on older version of ssh, so avoid PQ warning
+      "missing-pq" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
+        host = "oath oath.${cfg.domain} onus onus.${cfg.domain}";
+        extraOptions = {
+          WarnWeakCrypto = "no-pq-kex";
+        };
+      };
+
       # Isolated lab network, where IPs overlap all the time
       "lab" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
         host = cfg.networking.subnets.lab.wildcard;
