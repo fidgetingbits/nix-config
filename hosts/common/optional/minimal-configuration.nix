@@ -18,6 +18,7 @@
     persistFolder = "/persist";
     isMinimal = lib.mkForce true;
     domain = "local"; # Temporary domain for the installer
+    email.admin = "example@example.com"; # Temporary for hosts using raid
   };
 
   fileSystems."/boot".options = [ "umask=0077" ]; # Removes permissions and security warnings.
