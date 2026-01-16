@@ -68,11 +68,10 @@
 
   desktops.hyprland.enable = true;
 
-  # FIXME: Re-enable after pinning the most recent after device switch
-  # services.backup = {
-  #   enable = true;
-  #   borgBackupStartTime = "22:00:00";
-  # };
+  services.backup = {
+    enable = true;
+    borgBackupStartTime = "22:00:00";
+  };
 
   # Bootloader.
   boot.supportedFilesystems = [ "ntfs" ];
