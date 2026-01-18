@@ -90,6 +90,7 @@
 
   introdus.services.awww = {
     enable = true;
+    interval = lib.custom.time.days 1;
     wallpaperDir = "${config.home.homeDirectory}/images/wallpaper/catppuccin-mocha";
   };
 
