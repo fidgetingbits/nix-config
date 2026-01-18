@@ -195,7 +195,7 @@
         };
         useX11 = lib.mkOption {
           type = lib.types.bool;
-          default = (!config.hostSpec.useWayland);
+          default = config.hostSpec.useWindowManager && (!config.hostSpec.useWayland);
           description = "Indicate a host that uses X11. Both useWayland and useX11 can be true";
         };
         defaultBrowser = lib.mkOption {

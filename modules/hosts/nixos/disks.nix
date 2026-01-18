@@ -257,6 +257,7 @@ in
                   mountOptions = [
                     "compress=zstd"
                     "noatime"
+                    "nofail"
                   ];
                 };
               };

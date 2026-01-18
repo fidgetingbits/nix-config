@@ -111,7 +111,7 @@ in
           };
       };
     })
-    (lib.mkIf pkgs.stdenv.isLinux {
+    (lib.mkIf (pkgs.stdenv.isLinux && osConfig.hostSpec.useWindowManager) {
       # FIXME: This should become osConfig.hostSpec.defaultBrowser and not just if you import firefox
       xdg.mimeApps.defaultApplications = {
         "text/html" = [ "firefox.desktop" ];

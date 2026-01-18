@@ -122,8 +122,11 @@
             )
           )
         );
+
         files = [
           # Essential. If you don't have these for basic setup, you will have a bad time
+          # FIXME: There is some bug where sometimes on first rebuild after
+          # minimal install that it complains these files already exis
           "/etc/machine-id"
           "/etc/ssh/ssh_host_ed25519_key"
           "/etc/ssh/ssh_host_ed25519_key.pub"

@@ -9,7 +9,6 @@
   imports = lib.flatten [
     inputs.introdus.homeManagerModules.default
     (map lib.custom.relativeToRoot [
-      #"modules/common/"
       "modules/home/"
     ])
     (lib.custom.scanPathsFilterPlatform ./.)
@@ -53,9 +52,6 @@
         iputils # ping, traceroute, etc
 
         magic-wormhole # Convenient file transfer
-
-        # FIXME: This likely isn't needed as core, since we can use dev flake for it
-        pre-commit # git hooks
         ;
 
       inherit (pkgs.introdus)
@@ -70,17 +66,18 @@
     }
     // lib.optionalAttrs (osConfig.hostSpec.isProduction && (!osConfig.hostSpec.isServer)) {
       inherit (pkgs)
+        mdcat # Markdown preview in cli
+        ;
+    }
+    // lib.optionalAttrs (osConfig.hostSpec.isProduction && (osConfig.hostSpec.useWindowManager)) {
+      inherit (pkgs)
         ##
         # Core GUI Utilities
         ##
         evince # pdf reader
         zathura # pdf reader
-
-        mdcat # Markdown preview in cli
-
-        xsel # X clipboard manager
-
         ;
+
       inherit (pkgs.unstable)
         ##
         # Core GUI Utilities
@@ -88,14 +85,15 @@
         obsidian # note taking
         ;
     }
+    // lib.optionalAttrs (osConfig.hostSpec.isProduction && (osConfig.hostSpec.useX11)) {
+      inherit (pkgs)
+        xsel # X clipboard manager
+        ;
+    }
   );
 
-  programs.bash.enable = true;
-  programs.home-manager.enable = true;
-  # even better top
-  programs.btop = {
-    enable = true;
-    settings = {
-    };
+  programs = {
+    bash.enable = true;
+    home-manager.enable = true;
   };
 }

@@ -11,18 +11,27 @@
     ./timers/trash-empty.nix
   ];
   home = {
-    packages = lib.optionals (osConfig.hostSpec.isProduction) (
-      lib.attrValues {
-        inherit (pkgs)
-          e2fsprogs # lsattr, chattr
-          cntr # nixpkgs sandbox debugging
-          strace
-          steam-run # run non-NixOS-packaged binaries on Nix
-          trash-cli # tools for managing trash
-          socat # General networking utility, ex: used for serial console forwarding over ssh
-          ;
-      }
-    );
+    packages =
+      (lib.optionals (osConfig.hostSpec.isProduction) (
+        lib.attrValues {
+          inherit (pkgs)
+            e2fsprogs # lsattr, chattr
+            strace
+            trash-cli # tools for managing trash
+            socat # General networking utility, ex: used for serial console forwarding over ssh
+            ;
+        }
+      ))
+      ++ (lib.optionals (!osConfig.hostSpec.isServer) (
+
+        lib.attrValues {
+          inherit (pkgs)
+            steam-run # run non-NixOS-packaged binaries on Nix
+            cntr # nixpkgs sandbox debugging
+            ;
+        }
+      ));
+
     # Reload font cache on rebuild to avoid issues similar to
     # https://www.reddit.com/r/NixOS/comments/1kwogzf/after_moving_to_2505_system_fonts_no_longer/
     activation.reloadFontCache = lib.hm.dag.entryAfter [ "linkActivation" ] ''

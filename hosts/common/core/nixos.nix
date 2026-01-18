@@ -23,7 +23,7 @@
         ;
     }
     # X11 packages
-    // lib.optionalAttrs (config.hostSpec.useX11) {
+    // lib.optionalAttrs (config.hostSpec.useWindowManager && config.hostSpec.useX11) {
       inherit (pkgs)
         xclip # required for clipboard with vim on x11
         ;
