@@ -61,7 +61,7 @@
           # Gaming
           "gaming.nix"
 
-          "distributed-builds.nix"
+          # "distributed-builds.nix"
           "fonts.nix"
 
           "logind.nix"
