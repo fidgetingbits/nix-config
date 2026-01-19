@@ -41,15 +41,13 @@
           # FIXME: This needs to switch to being supplied by the introdus-helpers itself
           yq-go # jq for yaml, used for build scripts
 
-          # deprecate
-          flyctl # for fly.io
-
           # FIXME: Move to introdus
           bats # for testing
 
           age # bootstrap script
           ssh-to-age # bootstrap script
           gum # shell script ricing
+          host-gen-pass # Generate passwords/sops entries for new host
           ;
         inherit (pkgs.introdus)
           bootstrap-nixos # introdus script for bootstrapping new hosts
