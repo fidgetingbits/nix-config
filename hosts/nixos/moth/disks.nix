@@ -11,11 +11,11 @@
       "nvme-EDILOCA_EN705_4TB_AA251809895"
       "nvme-EDILOCA_EN705_4TB_AA251809684"
     ];
-    #extraDisks = [
-    #  {
-    #    name = "encrypted-storage";
-    #    path = "/dev/disk/by-id/md-name-any:raid5";
-    #  }
-    #];
+    extraDisks = [
+      {
+        name = "encrypted-storage";
+        path = "/dev/disk/by-id/md-name-any:raid5";
+      }
+    ];
   };
 }
