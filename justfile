@@ -148,7 +148,7 @@ rebuild-host HOST=`hostname`:
 # Update sops keys in nix-secrets repo
 [group("secrets")]
 sops-rekey:
-    cd ../nix-secrets && for file in $(ls sops/*.yaml); do \
+    cd ../nix-secrets && for file in $(ls sops/*); do \
       sops updatekeys -y $file; \
     done
 
