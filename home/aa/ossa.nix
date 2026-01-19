@@ -118,9 +118,6 @@
 
   sops = {
     secrets = {
-      "tokens/fly" = {
-        path = "${config.home.homeDirectory}/.config/fly.io/token";
-      };
     };
   };
 
