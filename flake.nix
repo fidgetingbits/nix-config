@@ -103,7 +103,7 @@
 
                   "hosts/common/optional/minimal-configuration.nix"
                 ])
-              ++ lib.optional (builtins.pathExists ./hosts/nixos/${host}/facter.json) [
+              ++ lib.optional (lib.pathExists ./hosts/nixos/${host}/facter.json) [
                 inputs.nixos-facter-modules.nixosModules.facter
                 {
                   config.facter.reportPath = (customLib.custom.relativeToRoot "hosts/nixos/${host}/facter.json");
@@ -181,7 +181,7 @@
     #################### Core Nix Sources ####################
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs-rocm7.url = "github:NixOS/nixpkgs?ref=pull/469378/merge&shallow=1";
+    # nixpkgs-rocm7.url = "github:NixOS/nixpkgs?ref=pull/469378/merge&shallow=1";
     #nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.11";
 
     flake-parts = {
