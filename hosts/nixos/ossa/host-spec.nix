@@ -9,7 +9,6 @@
     useWindowManager = lib.mkForce true;
     isAutoStyled = lib.mkForce true;
     useNeovimTerminal = lib.mkForce true;
-    hdr = lib.mkForce true;
     scaling = lib.mkForce "2";
     isProduction = lib.mkForce true;
     useAtticCache = lib.mkForce true;
@@ -21,6 +20,6 @@
     ];
     wallpaper = "${inputs.nix-assets}/images/wallpapers/astronaut.webp";
     defaultDesktop = "hyprland-uwsm";
-    persistFolder = lib.mkForce "";
+    persistFolder = lib.mkForce "/persist";
   };
 }
