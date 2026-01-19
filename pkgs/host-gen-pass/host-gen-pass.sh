@@ -1,7 +1,52 @@
 #!/usr/bin/env bash
+# Generate Passwords For New NixOS Host
+#
+# TODO:
+#  - [ ] Color the outputs (ie: red error, etc)
+#  - [ ] Recolor the choose dialogs defaults?
 
-# Host that contains the dovecot secrets for postfix
-DEFAULT_POSTFIX_SERVER="ooze"
+function help_and_exit() {
+    echo
+    echo "NixOS Host Password Generator Helper"
+    echo
+    echo "USAGE: $(basename "$0") [OPTIONS] <hostname>"
+    echo
+    echo "OPTIONS:"
+    echo "  --debug         Enable debug output"
+    echo "  -h, --help      Show this help message and exit"
+    echo
+    exit 1
+}
+
+parse_args() {
+    local min_args=$1
+    shift
+
+    if [ $# -lt "$min_args" ]; then
+        help_and_exit
+    fi
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+        --debug)
+            if [ $# -lt $((min_args + 1)) ]; then
+                help_and_exit
+            fi
+            set -x
+            ;;
+        -h | --help)
+            help_and_exit
+            ;;
+        *)
+            if [ -z "${POSITIONAL_ARGS-}" ]; then
+                POSITIONAL_ARGS=()
+            fi
+            POSITIONAL_ARGS+=("$1")
+            ;;
+        esac
+        shift
+    done
+}
 
 function sops_set {
     entry=$1
@@ -18,10 +63,6 @@ function gen_pass {
     phraze -ll -s_b -S -t
 }
 
-# NOTE: This doesn't use ssh so assumes the host adding the yubikey
-# is locally running the script. However the devices I use yubikey on
-# are generally development boxes, so it's reasonable to assume that box
-# will have the nix-secrets folder cloned
 function gen_u2f_keys {
     function wait_yubikey {
         # Generate a temporary file that will go into
@@ -59,7 +100,7 @@ function gen_u2f_keys {
 }
 
 function gen_borg {
-    echo "Generating: $(gum style --bold borg passphrase)"
+    echo "Generating: $(gum style --bold "borg passphrase")"
     pass=$(gen_pass)
     sops_set '["passwords"]["borg"] "'"$pass"'"'
 
@@ -88,19 +129,56 @@ function gen_borg {
 }
 
 function gen_postfix {
-    echo "Generating: $(gum style --bold postfix relay passphrase)"
+    echo "Generating: $(gum style --bold "postfix relay passphrase")"
+
+    local pass dove_hash postfix_server sops_file dovecot_existing_hashes
     pass=$(gen_pass)
     sops_set '["passwords"]["postfix-relay"] "'"$pass"'"'
 
-    echo "Generating: $(gum style --bold corresponding dovecot password entry)"
+    echo "Generating: $(gum style --bold "corresponding dovecot password entry")"
     dove_hash=$(
         printf "%s\n%s\n" "$pass" "$pass" |
             doveadm -c /dev/null pw -s SHA512-CRYPT
     )
 
-    dovecot=$(sops --config "$sops_config" -d "${NIX_SECRETS_DIR}/sops/${POST_FIX_SERVER:-$DEFAULT_POSTFIX_SERVER}.yaml" | yq .dovecot)
-    new=$(echo "$dovecot" "$dove_hash" | sed -z 's/\n/\\n/')
-    sops_set "[\"dovecot\"] '$new'" "${NIX_SECRETS_DIR}/sops/ooze.yaml"
+    postfix_server=$(gum input --prompt "Postfix server name: " --placeholder "ooze")
+    sops_file="${NIX_SECRETS_DIR}/sops/${postfix_server}.yaml"
+    # dovecot hashes are stored all in one sops entry, so append new to old ones
+    dovecot_existing_hashes=$(sops --config "$sops_config" -d "$sops_file" | yq .dovecot | tr -d \")
+
+    new="$(printf '%s' "$dovecot_existing_hashes$target_hostname:$dove_hash" | sed -z 's/\n/\\n/')"
+    echo sops_set "[\"dovecot\"] '\"$new\"'" "$sops_file"
+    sops_set "[\"dovecot\"] \"$new\"" "$sops_file"
+}
+
+# Generate an atuin key using pre-existing passphrase
+# Requires:
+# - Already registered user
+# - Access to a remote host that already is authenticated to atuin
+function gen_atuin {
+    echo "$(gum style --bold IMPORTANT:) This function doesn't support unregistered atuin users, for that do it manually"
+
+    local atuin_user atuin_passphrase
+    atuin_user=$(gum input --placeholder "$(id -u -n)" --prompt "Atuin user that is already registered: ")
+    atuin_passphrase=$(atuin key)
+
+    if [ -z "$atuin_passphrase" ]; then
+        echo "$(gum style --bold ERROR:) gen_atuin(): Host $(hostname) doesn't seem to have access to atuin?"
+    fi
+
+    atuin_pass=$(gum input --placeholder "passwrd" --prompt "Atuin user password")
+    ssh -q "$target_hostname" atuin login -u "$atuin_user" -p "$atuin_pass" -k "\"$atuin_passphrase\""
+    local key_path=~/.local/share/atuin/key
+    sops_set '["keys"]["atuin"] "'"$(ssh -q "$target_hostname" cat $key_path)"'"'
+    ssh -q "$target_hostname" rm "$key_path"
+}
+
+function gen_user_pass {
+    echo "$(gum style --bold IMPORTANT:) Don't bother generating if this user already has a password"
+    local pass user
+    pass=$(mkpasswd -m bcrypt -R 12 -s)
+    user=$(gum input --placeholder "$(id -u -n)" --prompt "User to generate password hash: ")
+    sops_set '["passwords"]["'"$user"'"] "'"$(cat "$key_path")"'"'
 }
 
 function choose {
@@ -113,11 +191,9 @@ function choose {
 }
 
 gum style --bold 'NixOS Password Generator'
-if [ "$#" -lt 1 ]; then
-    target_hostname="$(hostname)"
-else
-    target_hostname="$1"
-fi
+
+parse_args "1" "$@"
+target_hostname="${POSITIONAL_ARGS[0]}"
 
 if [ -z "$NIX_SECRETS_DIR" ]; then
     echo "$(gum style --bold ERROR:) NIX_SECRETS_DIR must point to the nix-secrets folder"
@@ -141,6 +217,8 @@ choose "U2F Keys (Must physically insert yubikeys to target host)" gen_u2f_keys
 
 choose "Borg Password" gen_borg
 choose "Postfix Relay Password" gen_postfix
-# FIXME: If they select no, we should tell them to set the manual msmtp?
-# password? Need to revisit how that generation works
-# Add atuin ?
+# FIXME: If they select no to postfix, we should tell them to set the manual msmtp?
+choose "Atuin Key" gen_atuin
+choose "User password" gen_user_pass
+
+gum log "All done!"
