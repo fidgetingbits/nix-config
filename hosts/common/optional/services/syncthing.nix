@@ -93,22 +93,27 @@ lib.mkMerge [
                   maxAge = "${toString (time.days 180)}";
                 };
               };
+              ignorePatterns = [
+                ".git"
+              ];
+              # Avoid conflicts
+              type = if config.networking.hostName == "oedo" then "sendonly" else "receiveonly";
             in
             {
               images = {
                 path = "${homeDirectory}/images/";
                 devices = desktops;
-                inherit versioning;
+                inherit type versioning ignorePatterns;
               };
               wiki = {
                 path = "${homeDirectory}/wiki/";
                 devices = desktops ++ mobiles;
-                inherit versioning;
+                inherit type versioning ignorePatterns;
               };
               scripts = {
                 path = "${homeDirectory}/scripts/";
                 devices = desktops;
-                inherit versioning;
+                inherit type versioning ignorePatterns;
               };
             };
         };
