@@ -25,7 +25,7 @@ in
 
     pubKey = lib.mkOption {
       type = lib.types.str;
-      default = "o-cache:GRHaMHaWAzG3B6oTridUh8hA1GeCPuAlkRFAmICR7sw=";
+      default = "o-cache:InDTfgsYEL5xDqYMa/KFtBK3AM/z0XbBAIgPr44qmdY=";
       description = "attic cache's public key found via attic cache info <cache>";
     };
 
