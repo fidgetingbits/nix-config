@@ -37,46 +37,6 @@ in
   biggest = "find . -printf '%s %p\n'|sort -nr|head";
   myip = "dig +short myip.opendns.com @resolver1.opendns.com";
 
-  # git
-  gcm = "git commit -m";
-  gcmcf = "git commit -m 'chore: update flake.lock'";
-  gca = "git commit --amend";
-  gcan = "git commit --amend --no-edit";
-  gcam = "git commit --amend -m";
-
-  # We use source because we want it to use other aliases, which allow yubikey signing over ssh
-  gsr = "git_smart_rebase";
-  grst = "git reset --soft ";
-
-  gr = "git restore";
-  gra = "git restore :/";
-  grs = "git restore --staged";
-  grsa = "git restore --staged :/";
-
-  ga = "git add";
-  # "git add again" - Re-add changes for anything that was already staged. Useful for pre-commit changes, etc
-  gaa = "git update-index --again";
-  gau = "git add --update";
-  # Only add updates to files that are already staged
-  gas = "git add --update $(git diff --name-only --cached)";
-  gs = "git status --untracked-files=no";
-  gsa = "git status";
-  gst = "git stash";
-  gstp = "git stash pop";
-  gsw = "git switch";
-  gswc = "git switch -c";
-  gco = "git checkout";
-  gf = "git fetch";
-  gfa = "git fetch --all";
-  gfu = "git fetch upstream";
-  gfm = "git fetch origin master";
-  gds = "git diff --staged";
-  gd = "git diff";
-  gp = "git push";
-  gpf = "git push --force-with-lease";
-  gl = "git log";
-  gc = "git clone";
-
   # FIXME: Could be devshell specific for nix-config
   bump = "bump_lock";
 
@@ -141,6 +101,7 @@ in
   cnh = "cd ${devNix}/nixos-hardware";
   cnp = "cd ${devNix}/nixpkgs";
   cni = "cd ${devNix}/introdus/aa";
+  cne = "cd ${devNix}/emergentmind-nix-config";
 
   ## rust cargo
   cr = "cargo run";

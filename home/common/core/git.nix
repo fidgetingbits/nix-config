@@ -2,8 +2,6 @@
 # eg: development/git.nix, introdus
 {
   pkgs,
-  lib,
-  osConfig,
   ...
 }:
 {
@@ -15,9 +13,6 @@
     package = pkgs.gitFull;
     enable = true;
 
-    aliases = {
-      wa = "! ${lib.getExe pkgs.git-worktree-add}";
-    };
     settings = {
       core.pager = "delta";
       delta = {
@@ -34,5 +29,4 @@
     };
   };
 
-  home.sessionVariables.GIT_EDITOR = osConfig.hostSpec.defaultEditor;
 }

@@ -2,17 +2,9 @@
 ## yubikey-agent
 # export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/yubikey-agent/yubikey-agent.sock"
 
-# Override some GUI entries if inside ssh session
 if [[ -n $SSH_CONNECTION ]]; then
-    export GIT_EDITOR="vim"
     export EDITOR="vim"
     export VISUAL="vim"
-
-    # git can't handle ssh-add -L output with a yubikey sk-ssh entry, so we alias git
-    # here to force it to use the ssh-agent output
-    TEMP_KEY=$(mktemp)
-    ssh-add -L | head -n 1 >"$TEMP_KEY"
-    alias git="git -c user.signingKey=$TEMP_KEY"
 fi
 
 unsetopt correct # autocorrect commands
@@ -304,13 +296,6 @@ function nix_log_extract() {
 # FIXME: These should be in aliases.nix
 alias nix='nix_wrapper'
 alias nix-log-last='NIX_PAGER=cat nix log $NIX_LAST_DERIVATION'
-
-function git_smart_rebase() {
-    GIT_STASH_MESSAGE="git_smart_rebase: $RANDOM"
-    git stash push -m "$GIT_STASH_MESSAGE"
-    git fetch && git rebase
-    git stash list | (grep "${GIT_STASH_MESSAGE}" && git stash pop) || true
-}
 
 function git_changed_files() {
     unstaged=$(git diff --name-only)
