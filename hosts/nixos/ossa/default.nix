@@ -8,6 +8,7 @@
 }:
 {
   imports = lib.flatten [
+    inputs.nixos-hardware.nixosModules.framework-16-amd-ai-300-series
     inputs.nixos-facter-modules.nixosModules.facter
     { config.facter.reportPath = ./facter.json; }
     (lib.custom.scanPaths ./.) # Load all extra host-specific *.nix files
