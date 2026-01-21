@@ -42,6 +42,7 @@
       pkgs.linuxPackages_6_18;
 
   boot.loader.efi.canTouchEfiVariables = true;
+
   boot.loader.systemd-boot = {
     enable = true;
     configurationLimit = lib.mkDefault 8;
@@ -164,6 +165,8 @@
     autoLogin.user = config.hostSpec.primaryDesktopUsername;
     defaultSession = config.hostSpec.defaultDesktop;
   };
+
+  services.gnome.gnome-keyring.enable = config.hostSpec.useWindowManager;
 
   "${namespace}" = {
     attic-client.enable = config.hostSpec.useAtticCache;
