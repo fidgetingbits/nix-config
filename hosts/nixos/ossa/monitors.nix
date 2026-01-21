@@ -8,7 +8,7 @@
       height = 1600;
       refreshRate = 165.00;
       #transform = 2;
-      scale = 2.0;
+      scale = 1.33;
     };
   };
 }
