@@ -42,9 +42,9 @@
           "desktop/gnome"
           # FIXME: This should only be if wayland
           "desktop/wayland"
-
-          # These should be linked together somehow
           "desktop/hyprland"
+          "desktop/niri"
+
           "desktop/kanshi.nix"
           "desktop/waybar.nix"
 

@@ -1,0 +1,282 @@
+//
+// ========== Layer Rules ==========
+//
+layer-rule {
+    //FIXME: confirm namespace for dmenu
+	match namespace="drun"
+	shadow {
+        on
+        spread 4
+        // softness 8
+        // offset x= y=
+        draw-behind-window true // required with non-squared corners
+        color "#FF9400"
+	}
+}
+
+// ========== Screen capture & screen share blackout ==========
+// see also layer rule of same name
+layer-rule {
+    // FIXME: CONFIRM NAMESPACEs
+	match namespace=r#"^org\.keepassxc\.KeePassXC$"#
+	match namespace=r#"Proton Pass$"#
+
+	block-out-from "screen-capture"
+}
+layer-rule {
+    // FIXME: CONFIRM NAMESPACEs
+	match namespace=r#"^org\.keepassxc\.KeePassXC$"#
+	match namespace=r#"Proton Pass$"#
+
+	block-out-from "screencast"
+}
+//
+// ========== Layout Rules ==========
+//
+layout {
+	background-color "transparent"
+	always-center-single-column
+
+	gaps 10 // inside & outside
+
+    // FIXME: with this commented out apps will determine their own starting width
+    // Need try it out and decide
+	default-column-width { proportion 0.66667; }
+
+	// Cycled though using `switch-preset-window-column` action
+    preset-column-widths {
+		proportion 0.25
+		proportion 0.33333
+		proportion 0.5
+		proportion 0.66667
+		proportion 0.75
+		proportion 1.0
+    }
+
+	// Cycled though using `switch-preset-window-height` action
+	preset-window-heights {
+		proportion 0.25
+		proportion 0.33333
+		proportion 0.5
+		proportion 0.66667
+		proportion 0.75
+		proportion 1.0
+	}
+
+	tab-indicator {
+		// Set the gap between the tab indicator and the window in pixels.
+		gap 0
+
+		// Length of the indicator.
+		length total-proportion=1.0
+
+		// Whether to put the tab indicator "within" the column, rather than outside.
+		// This will include it in column sizing and avoid overlaying adjacent columns.
+		place-within-column
+
+		// Position of the indicator.
+		position "left"
+
+		// Width of the tab indicator
+		width 8
+
+		active-color "#FF9400"
+		inactive-color "#2D2D30"
+	}
+
+	struts {
+		// Set a negative strut for the top and bottom to minimize wasted space.
+		// Set a 1px wide strut on the sides to allow easy window switching with the mouse.
+		left 0
+		right 0
+		top 0
+		bottom 0
+	}
+}
+
+//
+// ========== Window Rules ==========
+//
+
+// ========== ALL windows ==========
+window-rule {
+    geometry-corner-radius 0 0 15 0
+    clip-to-geometry true
+
+	// focus ring configuration.
+	 focus-ring {
+         off
+		// Width of the focus ring in pixels.
+	 	width 1
+
+		// Color of the active focus ring.
+		active-color "#FF9400"
+
+		// Color of the inactive focus ring.
+		inactive-color "#2D2D30"
+
+		// Color of the focus ring around windows that request your attention.
+		urgent-color "#ff0060"
+	}
+}
+// ========== Active windows ==========
+window-rule {
+    match is-active=true
+shadow {
+        on
+        softness 8
+        spread 5
+        // offset x= y=
+        draw-behind-window true // required with non-squared corners
+        color "#FF9400"
+}
+}
+
+// ========== General transparency ==========
+window-rule {
+    match is-active=false
+    opacity 0.85
+}
+
+
+// ========== Workspace Assignments ==========
+window-rule {
+    match app-id=r#"^[Oo]bsidian$"#
+
+    open-on-workspace "8_l"
+}
+window-rule {
+    match app-id=r#"signal"#
+    match app-id=r#"discord"#
+    match app-id=r#"brave-browser"#
+
+    open-on-workspace "9_u"
+}
+window-rule {
+    match app-id=r#"^[Ss]potify$"#
+    match app-id=r#"com.mitchellh.ghostty"# title="btop"
+
+    open-on-workspace "0_r"
+}
+window-rule {
+    match app-id=r#"steam"#
+
+    open-on-workspace "5_gmz"
+}
+window-rule {
+    match app-id=r#"com.yubico.yubioath"#
+
+    open-on-workspace "Y_qrs"
+}
+
+// ========== Tile on launch ==========
+// FIXME: May want to make this proton vpn specific and specific starting geometry
+window-rule {
+    match app-id=r#"^(Proton VPN)$"#
+    open-floating false
+}
+
+// ========== Float on open ==========
+window-rule {
+    // applications
+	match app-id=r#"galculator$"#
+
+    // dialog windows
+      match title=r#"^(Open File)(.*)$"#
+      match title=r#"^(Select a File)(.*)$"#
+      match title=r#"^(Choose wallpaper)(.*)$"#
+      match title=r#"^(Open Folder)(.*)$"#
+      match title=r#"^(Save As)(.*)$"#
+      match title=r#"^(Library)(.*)$"#
+      match title=r#"^(Accounts)(.*)$"#
+      match title=r#"^(Text Import)(.*)$"#
+      match title=r#"^(File Operation Progress)(.*)$"#
+
+      //may need to swap order of title and app-id for this one
+      match title=r#"^()$"# app-id="^([Ff]irefox)"
+
+    // rules
+	open-floating true
+}
+
+// ========== No Focus on open ==========
+window-rule {
+      match app-id=r#"^([Ff]irefox)"# title="^()$"
+	  open-focused false
+}
+
+// ========== Always opaque ==========
+window-rule {
+    // applications
+      match title=r#"^([Gg]imp)$"#
+      match title=r#"^([Ff]lameshot)$"#
+      match title=r#"^([Ii]nkscape)$"#
+      match title=r#"^([Bb]lender)$"#
+      match title=r#"^([Oo][Bb][Ss])$"#
+      match title=r#"^([Ss]team)$"#
+      match title=r#"^([Ss]team_app_*)$"#
+      match title=r#"^([Vv]lc)$"#
+      match title=r#"^(btop)(.*)$"#
+      match title=r#"^(amdgpu_top)(.*)$"#
+
+    // remove transparency from video
+      match title=r#"^(Dashboard | glass*)(.*)"#
+      match title=r#"^(Live video from*)(.*)$"#
+      match title=r#"^(Netflix)(.*)$"#
+      match title=r#"^(.*YouTube.*)$"#
+      match title=r#"^(Picture-in-Picture)$"#
+
+      // rules
+    opacity 1.0
+}
+
+// ========== Screen capture & screen share blackout ==========
+// see also layer rule of same name
+window-rule {
+	match app-id=r#"^org\.keepassxc\.KeePassXC$"#
+	match app-id=r#"Proton Pass$"#
+
+	block-out-from "screen-capture"
+}
+window-rule {
+	match app-id=r#"^org\.keepassxc\.KeePassXC$"#
+	match app-id=r#"Proton Pass$"#
+    match app-id=r#"com.yubico.yubioath"#
+
+	block-out-from "screencast"
+}
+
+// ========== Open at full width ==========
+// Open certain windows in their full size.
+window-rule {
+	match app-id=r#"^([Gg]imp)$"#
+	match app-id=r#"^([Bb]lender)$"#
+	match app-id=r#"^([Ii]nkscape)$"#
+	match app-id=r#"^([Oo][Bb][Ss])$"#
+	default-column-width { proportion 1.0; }
+}
+
+// ========== Varirable Refresh Rate ==========
+// requires output to have `variable-refresh-rate on-demand=true`
+window-rule {
+	match app-id=r#"^steam_app_.*$"#
+	match app-id=r#"^([Vv]lc)$"#
+
+	variable-refresh-rate true
+	open-fullscreen true
+}
+
+// ========== Steam==========
+window-rule {
+      match title=r#"^()$"# app-id=r#"^([Ss]team)$"#
+      match app-id=r#"^([S]team_app_*)$"#
+
+      open-on-output "DP-1"
+      open-on-workspace "5_gmz"
+  }
+// ========== Signal ==========
+// Resize certain windows to specific sizes.
+window-rule {
+	match app-id=r#"^signal$"#
+	default-column-width { proportion 0.25; }
+}

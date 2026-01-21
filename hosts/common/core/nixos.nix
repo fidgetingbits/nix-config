@@ -172,5 +172,7 @@
     attic-client.enable = config.hostSpec.useAtticCache;
   };
 
+  services.dbus.implementation = "broker";
+
   system.stateVersion = "23.05";
 }

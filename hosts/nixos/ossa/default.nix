@@ -36,6 +36,7 @@
           "sddm.nix"
           "gnome.nix"
           "i3wm.nix"
+          "niri.nix"
 
           # Miscellaneous
           "podman.nix"
@@ -101,7 +102,7 @@
   services.fwupd.enable = true;
   services.backup = {
     enable = true;
-    borgBackupStartTime = "09:00:00";
+    borgBackupStartTime = "03:00:00";
   };
 
   # For explanations of these options, see
@@ -114,8 +115,6 @@
     "vm.swappiness" = 1;
     "vm.page_lock_unfairness" = 1;
     "mm.transparent_hugepage.enabled" = "always";
-    # See https://wiki.archlinux.org/title/Intel_graphics
-    "dev.i915.perf_stream_paranoid" = 0; # Allow non-root users to access i915 perf streams
   };
   # Others noted khugepaged causes issues after the above was disabled, so also disabling that.
   system.activationScripts.sysfs.text = ''

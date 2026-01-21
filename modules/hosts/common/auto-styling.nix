@@ -20,7 +20,7 @@ in
     stylix = {
       enable = true;
       autoEnable = true;
-      opacity.terminal = 0.80;
+      opacity.terminal = 1.0;
       base16Scheme = "${pkgs.base16-schemes}/share/themes/${config.hostSpec.theme}.yaml";
       # FIXME: This needs to be synchronized with fonts.nix
       fonts = rec {

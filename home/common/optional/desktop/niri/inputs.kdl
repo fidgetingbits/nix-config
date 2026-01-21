@@ -1,0 +1,39 @@
+// Input devices configuration.
+input {
+	// Keyboard configuration.
+	keyboard {
+		// Delay in milliseconds before a key is held down.
+		repeat-delay 250
+
+		// Rate in characters per second to repeat when a held-down key is held down.
+		repeat-rate 30
+
+		// Whether to activate the numlock at startup.
+		numlock
+	}
+
+	// Whether to enable tap-to-click on the touchpad.
+	touchpad { tap; }
+
+	// Acceleration profile for the mouse.
+	// [ adaptive | flat ]
+	mouse { accel-profile "flat"; }
+
+	// Acceleration profile for the trackpoint.
+	// [ adaptive | flat ]
+	trackpoint { accel-profile "flat"; }
+
+	// Acceleration profile for trackballs.
+	// [ adaptive | flat ]
+	trackball { accel-profile "flat"; }
+
+	// Whether to disable Niri handling the power button instead of systemd or yourself.
+	disable-power-key-handling
+
+	// Focus windows & outputs automatically when moving the cursor into them.
+	// Setting `max-scroll-amount="0%"` makes it work only on windows already fully on screen.
+	//focus-follows-mouse max-scroll-amount="90%"
+
+	// Whether switching to the same workspace twice will switch back-&-forth between the current & last one.
+	workspace-auto-back-and-forth
+}
