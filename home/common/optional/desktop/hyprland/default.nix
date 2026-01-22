@@ -10,6 +10,7 @@
     (map lib.custom.relativeToRoot (
       map (f: "home/common/optional/${f}") [
         "desktop/rofi.nix"
+        "desktop/wlogout.nix"
       ]
     ))
     ++ [
@@ -18,7 +19,6 @@
       ./rules.nix
 
       # Hyprland utilities
-      ./wlogout.nix
       ./hyprlock.nix
       ./preview-share-picker.nix
       #./pyperland.nix

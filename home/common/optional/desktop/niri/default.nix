@@ -1,5 +1,6 @@
 { lib, pkgs, ... }:
 {
+  imports = [ ../wlogout.nix ];
   home = {
     packages = lib.attrValues {
       inherit (pkgs.unstable)
