@@ -181,12 +181,10 @@
     #################### Core Nix Sources ####################
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    # nixpkgs-rocm7.url = "github:NixOS/nixpkgs?ref=pull/469378/merge&shallow=1";
     #nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.11";
 
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
-      #inputs.nixpkgs.follows = "nixpkgs";
     };
 
     home-manager = {
@@ -274,8 +272,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     silentSDDM = {
-      # FIXME(sddm): Pinned because of https://github.com/uiriansan/SilentSDDM/issues/55
-      url = "github:uiriansan/SilentSDDM?rev=cfb0e3eb380cfc61e73ad4bce90e4dcbb9400291";
+      url = "github:uiriansan/SilentSDDM";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -284,10 +281,6 @@
       url = "git+ssh://git@gitlab.com/fidgetingbits/nix-secrets.git?shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    #nixvim-flake = {
-    #  url = "git+ssh://git@gitlab.com/fidgetingbits/nixvim-flake.git?shallow=1";
-    #  inputs.nixpkgs.follows = "nixpkgs";
-    #};
     nixcats-flake = {
       url = "github:fidgetingbits/neovim?ref=main&shallow=1";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
