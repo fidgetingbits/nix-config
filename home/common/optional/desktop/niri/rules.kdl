@@ -37,7 +37,7 @@ layout {
 	background-color "transparent"
 	always-center-single-column
 
-	gaps 10 // inside & outside
+	gaps 15 // inside & outside
 
     // FIXME: with this commented out apps will determine their own starting width
     // Need try it out and decide
@@ -100,7 +100,7 @@ layout {
 
 // ========== ALL windows ==========
 window-rule {
-    geometry-corner-radius 0 0 15 0
+    geometry-corner-radius 15 15 15 15
     clip-to-geometry true
 
 	// focus ring configuration.
@@ -122,14 +122,14 @@ window-rule {
 // ========== Active windows ==========
 window-rule {
     match is-active=true
-shadow {
+    shadow {
         on
-        softness 8
-        spread 5
-        // offset x= y=
+        softness 5
+        spread 3
+        offset x=0 y=0
         draw-behind-window true // required with non-squared corners
-        color "#FF9400"
-}
+        color "#cba6f7"
+    }
 }
 
 // ========== General transparency ==========

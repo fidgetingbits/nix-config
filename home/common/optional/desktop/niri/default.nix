@@ -6,6 +6,11 @@
       inherit (pkgs.unstable)
         niri
         xwayland-satellite # xwayland support
+
+        # tools used in config
+        brightnessctl
+        playerctl
+        wireplumber
         ;
     };
     file = {

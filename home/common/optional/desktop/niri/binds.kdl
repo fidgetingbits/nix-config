@@ -5,10 +5,10 @@ gestures {
 }
 binds {
 	// Show a list of important bindings.
-	Super+Shift+Slash { show-hotkey-overlay; }
+	Super+Slash { show-hotkey-overlay; }
 
     // logout menu
-    Super+Shift+E   { spawn "wlogout"; }
+    Super+E   { spawn "wlogout"; }
 
     //
     // ========== Overview mode ==========
@@ -59,9 +59,10 @@ binds {
 	Super+Z { switch-focus-between-floating-and-tiling; }
 
 	Super+H { focus-column-or-monitor-left; }
-	Super+J { focus-window-or-monitor-down; }
-	Super+K { focus-window-or-monitor-up; }
+	Super+J { focus-window-or-workspace-down; }
+	Super+K { focus-window-or-workspace-up; }
 	Super+L { focus-column-or-monitor-right; }
+    // FIXME: Change
 	Super+Home { focus-column-first; }
 	Super+End { focus-column-last; }
 
@@ -115,18 +116,19 @@ binds {
 	Super+Ctrl+F { maximize-column; } // Toggle maximized state of the focused column
 	Super+Shift+Ctrl+F { expand-column-to-available-width; } // Expand the focused column to space not taken up by other fully visible columns
 
-	Super+Equal { set-column-width "-1"; }
-	Super+Plus  { set-column-width "+1"; }
+    # FIXME: Revisit these
+	Super+BracketLeft { set-column-width "-1"; }
+	Super+BracketRight  { set-column-width "+1"; }
 	Super+Shift+Equal { set-window-height "-1"; }
-	Super+Shift+Plus  { set-window-height "+1"; }
+	Super+Plus  { set-window-height "+1"; }
 
     //
     // ========== System controls ==========
     //
 
     // ========== Brightness ==========
-	XF86MonBrightnessUp   allow-when-locked=true { spawn "brightnessctl" "set" "0.01+"; }
-	XF86MonBrightnessDown allow-when-locked=true { spawn "brightnessctl" "set" "0.01-"; }
+	XF86MonBrightnessUp   allow-when-locked=true { spawn "brightnessctl" "set" "10%+"; }
+	XF86MonBrightnessDown allow-when-locked=true { spawn "brightnessctl" "set" "10%-"; }
 
     // ========== Media Control==========
 	XF86AudioPlay    allow-when-locked=true { spawn "playerctl" "play-pause" "--ignore-player=firefox,chromium,brave"; }
