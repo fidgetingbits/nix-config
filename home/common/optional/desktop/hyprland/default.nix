@@ -6,23 +6,15 @@
 }:
 {
 
-  imports =
-    (map lib.custom.relativeToRoot (
-      map (f: "home/common/optional/${f}") [
-        "desktop/rofi.nix"
-        "desktop/wlogout.nix"
-      ]
-    ))
-    ++ [
-      # Extra settings
-      ./binds.nix
-      ./rules.nix
+  imports = [
+    # Extra settings
+    ./binds.nix
+    ./rules.nix
 
-      # Hyprland utilities
-      ./hyprlock.nix
-      ./preview-share-picker.nix
-      #./pyperland.nix
-    ];
+    # Hyprland utilities
+    ./preview-share-picker.nix
+    #./pyperland.nix
+  ];
 
   wayland.windowManager.hyprland = {
     enable = true;
