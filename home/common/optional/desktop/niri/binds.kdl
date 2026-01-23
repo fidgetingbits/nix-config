@@ -3,12 +3,18 @@ gestures {
         off
     }
 }
+
 binds {
 	// Show a list of important bindings.
 	Super+Slash { show-hotkey-overlay; }
 
-    // logout menu
-    Super+E   { spawn "wlogout"; }
+    // Shutting up hotkey-overlay defaults. I don't have/use mod5
+	Mod5+Left hotkey-overlay-title=null { focus-column-left; }
+	Mod5+Right hotkey-overlay-title=null { focus-column-right; }
+    Mod5+Q hotkey-overlay-title=null { quit; }
+
+    // Exiting
+    Super+E  hotkey-overlay-title="Logout menu"  { spawn "wlogout"; }
 
     //
     // ========== Overview mode ==========
@@ -41,13 +47,13 @@ binds {
 	Super+0 { focus-workspace 0; }
 	Super+Y { focus-workspace "Y_qrs"; }
 
-    Super+Minus { focus-workspace-previous; }
-    Super+Comma { focus-workspace-up; }
-    Super+Period { focus-workspace-down; }
+    Super+Period { focus-workspace-previous; }
+    Super+M { focus-workspace-up; }
+    Super+N { focus-workspace-down; }
 
     // ==========  Move workspace ==========
-    Super+Shift+Comma { move-workspace-up; }
-    Super+Shift+Period { move-workspace-down; }
+    Super+Shift+M { move-workspace-up; }
+    Super+Shift+N { move-workspace-down; }
 
     //
     // ========== Window and column actions ==========
@@ -87,16 +93,18 @@ binds {
 	Super+Shift+k { move-window-up; }
 	Super+Shift+L { move-column-right; }
 
-	Super+Semicolon { consume-or-expel-window-left; }
-	Super+Apostrophe { consume-or-expel-window-right; }
+	Super+Semicolon hotkey-overlay-title="Move window to column left" { consume-or-expel-window-left; }
+	Super+Apostrophe hotkey-overlay-title="Move window to column right" { consume-or-expel-window-right; }
 
+    // FIXME: laptops no direct home/end key
 	Super+Shift+Home  { move-column-to-first; }
 	Super+Shift+End   { move-column-to-last; }
 
 	Super+Ctrl+Shift+H { move-window-to-monitor-left; }
-	Super+Ctrl+Shift+J { move-window-to-monitor-down; }
-	Super+Ctrl+Shift+K { move-window-to-monitor-up; }
 	Super+Ctrl+Shift+L { move-window-to-monitor-right; }
+
+	Super+Ctrl+Shift+J {move-column-to-workspace-down; }
+	Super+Ctrl+Shift+K { move-column-to-workspace-up; }
 
     // ========== Window Tabs ==========
     // Use `consume-or-expel-...` binds above to add/remove windows to a tabbed column
@@ -116,10 +124,10 @@ binds {
 	Super+Ctrl+F { maximize-column; } // Toggle maximized state of the focused column
 	Super+Shift+Ctrl+F { expand-column-to-available-width; } // Expand the focused column to space not taken up by other fully visible columns
 
-    # FIXME: Revisit these
+    // FIXME: Add higher value Shift options
 	Super+BracketLeft { set-column-width "-1"; }
 	Super+BracketRight  { set-column-width "+1"; }
-	Super+Shift+Equal { set-window-height "-1"; }
+	Super+Minus { set-window-height "-1"; }
 	Super+Plus  { set-window-height "+1"; }
 
     //
@@ -143,15 +151,15 @@ binds {
 	Shift+XF86AudioLowerVolume allow-when-locked=true { spawn "playerctl" "volume" "0.05%-"; }
 
     // ========== Output audio control==========
-	XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.05+"; }
-	XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.05-"; }
-	XF86AudioMute        allow-when-locked=true { spawn "wpctl" "set-mute"   "@DEFAULT_AUDIO_SINK@" "toggle"; }
+	XF86AudioRaiseVolume hotkey-overlay-title="Output volume up" allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.05+"; }
+	XF86AudioLowerVolume hotkey-overlay-title="Output volume down" allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.05-"; }
+	XF86AudioMute      hotkey-overlay-title="Output volume mute"   allow-when-locked=true { spawn "wpctl" "set-mute"   "@DEFAULT_AUDIO_SINK@" "toggle"; }
 
     // ========== Input audio control==========
-	Super+XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SOURCE@" "0.05+"; }
-	Super+XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SOURCE@" "0.05-"; }
-	Super+XF86AudioMute        allow-when-locked=true { spawn "wpctl" "set-mute"   "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
-	XF86AudioMicMute           allow-when-locked=true { spawn "wpctl" "set-mute"   "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
+	Super+XF86AudioRaiseVolume hotkey-overlay-title="Input volume up" allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SOURCE@" "0.05+"; }
+	Super+XF86AudioLowerVolume hotkey-overlay-title="Input volume down" allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SOURCE@" "0.05-"; }
+	Super+XF86AudioMute    hotkey-overlay-title="Input volume mute"     allow-when-locked=true { spawn "wpctl" "set-mute"   "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
+	XF86AudioMicMute        hotkey-overlay-title="Mic mute"    allow-when-locked=true { spawn "wpctl" "set-mute"   "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
 
     // ========== Power menu ==========
     // FIXME(niri): probably disable interrupting power?
@@ -174,18 +182,17 @@ binds {
     // ========== Quick Launch ==========
     //
 	// Open a terminal emulator.
-    //FIXME(niri): hardcoding
-	Super+Return { spawn "ghostty"; }
+	Super+Return hotkey-overlay-title="New shell" { spawn "ghostty"; }
 	// Open drun launcher.
-	Super+Space { spawn "rofi" "-show" "drun"; }
+	Super+Space hotkey-overlay-title="Launcher" { spawn "rofi" "-show" "drun"; }
 	// Open run/program launcher.
-	Super+Shift+Space { spawn "rofi" "-show" "run"; }
+	Super+Shift+Space hotkey-overlay-title="Run shell command" { spawn "rofi" "-show" "run"; }
 	// Show ssh launcher.
-	Super+Shift+S { spawn "rofi" "-show" "ssh"; }
+	Super+Shift+S hotkey-overlay-title="New ssh shell" { spawn "rofi" "-show" "ssh"; }
 	// Show window selector.
-	Super+Tab { spawn "rofi" "-show" "window"; }
+	Super+Tab hotkey-overlay-title="Window selector" { spawn "rofi" "-show" "window"; }
     // Thunar
-	Super+Ctrl+O { spawn "thunar"; }
+	Super+Ctrl+O hotkey-overlay-title="Spawn file explorer" { spawn "thunar"; }
 
     //
     // ========== Clipboard ==========

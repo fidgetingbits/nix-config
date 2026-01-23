@@ -1,4 +1,4 @@
-{ ... }:
+{ pkgs, lib, ... }:
 {
   # FIXME: This should import based on wayland or not if it ever matters
   imports = [
@@ -16,6 +16,13 @@
     ./waybar.nix
   ];
 
-  home.packages = [
-  ];
+  # NOTE: thunar comes from host level atm
+  home.packages = lib.attrValues {
+    inherit (pkgs)
+      # tools used in config
+      brightnessctl
+      playerctl
+      wireplumber
+      ;
+  };
 }

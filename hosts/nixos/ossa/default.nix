@@ -44,6 +44,7 @@
           "wireshark.nix"
           "cli.nix"
           "yubikey.nix"
+          "thunar.nix"
           #"iphone-backup.nix"
 
           # Binary analysis tools
