@@ -4,6 +4,7 @@ gestures {
     }
 }
 
+// FIXME: add something for quick reloading niri config
 binds {
 	// Show a list of important bindings.
 	Super+Slash { show-hotkey-overlay; }
@@ -114,8 +115,8 @@ binds {
     // ========== Window and column size ==========
     //
 
-	Super+R { switch-preset-column-width; } // Presets are defined in rules.kdl
-    Super+Shift+R { switch-preset-window-height; } // Presets are defined in rules.kdl
+	Super+R hotkey-overlay-title="Switch preset column width" { switch-preset-column-width; } // Presets are defined in rules.kdl
+    Super+Shift+R hotkey-overlay-title="Switch preset column height" { switch-preset-window-height; } // Presets are defined in rules.kdl
 
 	Super+F { fullscreen-window; }
 	Super+Alt+F { toggle-windowed-fullscreen; } //tricks the window content into thinking its fullscreen
@@ -191,6 +192,10 @@ binds {
 	Super+Shift+S hotkey-overlay-title="New ssh shell" { spawn "rofi" "-show" "ssh"; }
 	// Show window selector.
 	Super+Tab hotkey-overlay-title="Window selector" { spawn "rofi" "-show" "window"; }
+	// Show window selector.
+	Super+P hotkey-overlay-title="Clipboard" { spawn "rofi-copyq" ; }
+	// Show window selector.
+	Super+w hotkey-overlay-title="Walker" { spawn "walker" ; }
     // Thunar
 	Super+Ctrl+O hotkey-overlay-title="Spawn file explorer" { spawn "thunar"; }
 
