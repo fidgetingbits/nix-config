@@ -18,7 +18,7 @@ let
   icons = pkgs.runCommand "user-icons" { } ''
     mkdir $out
     cd $out
-    ${builtins.concatStringsSep "\n" iconLinks}
+    ${lib.concatStringsSep "\n" iconLinks}
   '';
 
   templateText = lib.generators.toINI { } {

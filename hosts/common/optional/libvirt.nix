@@ -82,7 +82,7 @@ in
                     # nixfmt hack
                     |> lib.map (
                       host:
-                      if builtins.isList host.mac then
+                      if lib.isList host.mac then
                         lib.mapAttrs (name: value: if name == "mac" then lib.elemAt value 0 else value) host
                       else
                         host

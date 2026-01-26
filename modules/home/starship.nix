@@ -194,7 +194,7 @@ in
         enableTransience = true; # NOTE: transcience for zsh isn't support out-of-box but we enable at the end of this file
         settings =
           "${pkgs.starship}/share/starship/presets/nerd-font-symbols.toml"
-          |> builtins.readFile
+          |> lib.readFile
           |> builtins.fromTOML
           |> lib.recursiveUpdate settings';
       };
