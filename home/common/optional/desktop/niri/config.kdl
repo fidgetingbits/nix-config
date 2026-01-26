@@ -50,12 +50,12 @@ overview {
 //
 // ========== Startup ==========
 //
-// FIXME: Confirm if dbus-update-activation-environment is needed
 spawn-at-startup "uwsm finalize NIRI_SOCKET"
-spawn-at-startup "dbus-update-activation-environment --all --systemd"
+// FIXME: Only needed if not using dbus-broker?
+// spawn-at-startup "dbus-update-activation-environment --all --systemd"
 spawn-sh-at-startup "niri msg action focus-workspace 2; firefox; niri msg action focus-workspace 1"
 spawn-sh-at-startup "niri msg action focus-workspace 3; spotify; niri msg action focus-workspace 1"
-spawn-sh-at-startup "ghostty -e "zellij attach nix"
+spawn-sh-at-startup "ghostty -e zellij attach nix"
 
 
 hotkey-overlay { skip-at-startup; }
