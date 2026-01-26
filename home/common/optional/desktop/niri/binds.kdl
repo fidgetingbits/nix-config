@@ -73,8 +73,8 @@ binds {
 	Super+Home { focus-column-first; }
 	Super+End { focus-column-last; }
 
-	Super+C { center-column; } // Center current column on screen
-	Super+Ctrl+C { center-visible-columns; } // Center all fully visible columns on screen
+	Super+C hotkey-overlay-title="Center column on screen" { center-column; }
+	Super+Ctrl+C hotkey-overlay-title="Center all fully visible columns on screen" { center-visible-columns; }
 
     // ========== Move windows/columns ==========
 	Super+Shift+1 { move-window-to-workspace "1_dev"; }
