@@ -3,7 +3,6 @@ include "inputs.kdl"
 include "outputs.kdl"
 include "binds.kdl"
 include "rules.kdl"
-
 //
 // ========== Named Workspaces ==========
 //
@@ -17,36 +16,31 @@ workspace "2_web" {
 workspace "Y_qrs" {
     open-on-output "eDP-1"
 }
-
 //
 // ========== Animations ==========
 //
 animations {
     //FIXME(niri): go through available options
-	// Whether to disable animations.
-	//off
-
-	// Slow down or speed up animations by this factor. Values below 1 speed animations up.
-	slowdown 0.7
+    // Whether to disable animations.
+    //off
+    // Slow down or speed up animations by this factor. Values below 1 speed animations up.
+    slowdown 0.7
 }
-
 //
 // ========== Overview screen ==========
 //
 overview {
     //FIXME(niri): go through available options
-	// Color of the backdrop.
-	// backdrop-color "#17171a"
-
-	// Configuration of shadows around workspaces in the overview.
-	workspace-shadow {
-		softness 40
-		spread 5
-		offset x=0 y=0
-		color "#74c7ec"
-	}
+    // Color of the backdrop.
+    // backdrop-color "#17171a"
+    // Configuration of shadows around workspaces in the overview.
+    workspace-shadow {
+        softness 40
+        spread 5
+        offset x=0 y=0
+        color "#74c7ec"
+    }
 }
-
 //
 // ========== Startup ==========
 //
@@ -56,21 +50,21 @@ spawn-at-startup "uwsm finalize NIRI_SOCKET"
 spawn-sh-at-startup "niri msg action focus-workspace 2; firefox; niri msg action focus-workspace 1"
 spawn-sh-at-startup "niri msg action focus-workspace 3; spotify; niri msg action focus-workspace 1"
 spawn-sh-at-startup "ghostty -e zellij attach nix"
-
-
-hotkey-overlay { skip-at-startup; }
-
+hotkey-overlay {
+    skip-at-startup
+}
 //
 // ========== Miscellaneous ==========
 //
-
 screenshot-path "~/images/screenshots/%Y-%m-%d-%H-%M-%S.png"
-
 // Disable client-side decorations
 // FIXME(niri): test this on or off
 prefer-no-csd
-
 switch-events {
-    lid-close { spawn "notify-send" "The laptop lid is closed."; }
-    lid-open { spawn "notify-send" "The laptop lid is open."; }
+    lid-close {
+        spawn "notify-send" "The laptop lid is closed."
+    }
+    lid-open {
+        spawn "notify-send" "The laptop lid is open."
+    }
 }

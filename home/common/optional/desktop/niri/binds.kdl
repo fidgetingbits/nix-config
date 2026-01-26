@@ -3,203 +3,366 @@ gestures {
         off
     }
 }
-
 // FIXME: add something for quick reloading niri config
 binds {
-	// Show a list of important bindings.
-	Super+Slash { show-hotkey-overlay; }
-
+    // Show a list of important bindings.
+    Super+Slash {
+        show-hotkey-overlay
+    }
     // Shutting up hotkey-overlay defaults. I don't have/use mod5
-	Mod5+Left hotkey-overlay-title=null { focus-column-left; }
-	Mod5+Right hotkey-overlay-title=null { focus-column-right; }
-    Mod5+Q hotkey-overlay-title=null { quit; }
-
+    Mod5+Left hotkey-overlay-title=null {
+        focus-column-left
+    }
+    Mod5+Right hotkey-overlay-title=null {
+        focus-column-right
+    }
+    Mod5+Q hotkey-overlay-title=null {
+        quit
+    }
     // Exiting
-    Super+E  hotkey-overlay-title="Logout menu"  { spawn "wlogout"; }
-
+    Super+E hotkey-overlay-title="Logout menu" {
+        spawn "wlogout"
+    }
     //
     // ========== Overview mode ==========
     //
-	Super+O repeat=false { toggle-overview; }
-
+    Super+O repeat=false {
+        toggle-overview
+    }
     //
     // ========== Monitor actions ==========
     //
-
-	Super+Ctrl+h { focus-monitor-left; }
-	Super+Ctrl+j { focus-monitor-down; }
-	Super+Ctrl+k { focus-monitor-up; }
-	Super+Ctrl+l { focus-monitor-right; }
-
+    Super+Ctrl+h {
+        focus-monitor-left
+    }
+    Super+Ctrl+j {
+        focus-monitor-down
+    }
+    Super+Ctrl+k {
+        focus-monitor-up
+    }
+    Super+Ctrl+l {
+        focus-monitor-right
+    }
     //
     // ========== Workspace actions ==========
     //
-
     // ========== Focus workspace ==========
-	Super+1 { focus-workspace "1_dev"; }
-	Super+2 { focus-workspace "2_web"; }
-	Super+3 { focus-workspace 3; }
-	Super+4 { focus-workspace 4; }
-	Super+5 { focus-workspace 5; }
-	Super+6 { focus-workspace 6; }
-	Super+7 { focus-workspace 7; }
-	Super+8 { focus-workspace 8; }
-	Super+9 { focus-workspace 9; }
-	Super+0 { focus-workspace 0; }
-	Super+Y { focus-workspace "Y_qrs"; }
-
-    Super+Period { focus-workspace-previous; }
-    Super+M { focus-workspace-up; }
-    Super+N { focus-workspace-down; }
-
+    Super+1 {
+        focus-workspace "1_dev"
+    }
+    Super+2 {
+        focus-workspace "2_web"
+    }
+    Super+3 {
+        focus-workspace 3
+    }
+    Super+4 {
+        focus-workspace 4
+    }
+    Super+5 {
+        focus-workspace 5
+    }
+    Super+6 {
+        focus-workspace 6
+    }
+    Super+7 {
+        focus-workspace 7
+    }
+    Super+8 {
+        focus-workspace 8
+    }
+    Super+9 {
+        focus-workspace 9
+    }
+    Super+0 {
+        focus-workspace 0
+    }
+    Super+Y {
+        focus-workspace "Y_qrs"
+    }
+    Super+Period {
+        focus-workspace-previous
+    }
+    Super+M {
+        focus-workspace-up
+    }
+    Super+N {
+        focus-workspace-down
+    }
     // ==========  Move workspace ==========
-    Super+Shift+M { move-workspace-up; }
-    Super+Shift+N { move-workspace-down; }
-
+    Super+Shift+M {
+        move-workspace-up
+    }
+    Super+Shift+N {
+        move-workspace-down
+    }
     //
     // ========== Window and column actions ==========
     //
-
-	Super+Shift+Q { close-window; }
-
+    Super+Shift+Q {
+        close-window
+    }
     // ========== Focus windows/columns ==========
-	Super+Z { switch-focus-between-floating-and-tiling; }
-
-	Super+H { focus-column-or-monitor-left; }
-	Super+J { focus-window-or-workspace-down; }
-	Super+K { focus-window-or-workspace-up; }
-	Super+L { focus-column-or-monitor-right; }
+    Super+Z {
+        switch-focus-between-floating-and-tiling
+    }
+    Super+H {
+        focus-column-or-monitor-left
+    }
+    Super+J {
+        focus-window-or-workspace-down
+    }
+    Super+K {
+        focus-window-or-workspace-up
+    }
+    Super+L {
+        focus-column-or-monitor-right
+    }
     // FIXME: Change
-	Super+Home { focus-column-first; }
-	Super+End { focus-column-last; }
-
-	Super+C hotkey-overlay-title="Center column on screen" { center-column; }
-	Super+Ctrl+C hotkey-overlay-title="Center all fully visible columns on screen" { center-visible-columns; }
-
+    Super+Home {
+        focus-column-first
+    }
+    Super+End {
+        focus-column-last
+    }
+    Super+C hotkey-overlay-title="Center column on screen" {
+        center-column
+    }
+    Super+Ctrl+C hotkey-overlay-title="Center all fully visible columns on screen" {
+        center-visible-columns
+    }
     // ========== Move windows/columns ==========
-	Super+Shift+1 { move-window-to-workspace "1_dev"; }
-	Super+Shift+2 { move-window-to-workspace "2_web"; }
-	Super+Shift+3 { move-window-to-workspace 3; }
-	Super+Shift+4 { move-window-to-workspace 4; }
-	Super+Shift+5 { move-window-to-workspace 5; }
-	Super+Shift+6 { move-window-to-workspace 6; }
-	Super+Shift+7 { move-window-to-workspace 7; }
-	Super+Shift+8 { move-window-to-workspace 8; }
-	Super+Shift+9 { move-window-to-workspace 9; }
-	Super+Shift+0 { move-window-to-workspace 0; }
-	Super+Shift+Y { move-window-to-workspace "Y_qrs"; }
-
-	Super+Shift+H { move-column-left; }
-	Super+Shift+J { move-window-down; }
-	Super+Shift+k { move-window-up; }
-	Super+Shift+L { move-column-right; }
-
-	Super+Semicolon hotkey-overlay-title="Move window to column left" { consume-or-expel-window-left; }
-	Super+Apostrophe hotkey-overlay-title="Move window to column right" { consume-or-expel-window-right; }
-
+    Super+Shift+1 {
+        move-window-to-workspace "1_dev"
+    }
+    Super+Shift+2 {
+        move-window-to-workspace "2_web"
+    }
+    Super+Shift+3 {
+        move-window-to-workspace 3
+    }
+    Super+Shift+4 {
+        move-window-to-workspace 4
+    }
+    Super+Shift+5 {
+        move-window-to-workspace 5
+    }
+    Super+Shift+6 {
+        move-window-to-workspace 6
+    }
+    Super+Shift+7 {
+        move-window-to-workspace 7
+    }
+    Super+Shift+8 {
+        move-window-to-workspace 8
+    }
+    Super+Shift+9 {
+        move-window-to-workspace 9
+    }
+    Super+Shift+0 {
+        move-window-to-workspace 0
+    }
+    Super+Shift+Y {
+        move-window-to-workspace "Y_qrs"
+    }
+    Super+Shift+H {
+        move-column-left
+    }
+    Super+Shift+J {
+        move-window-down
+    }
+    Super+Shift+k {
+        move-window-up
+    }
+    Super+Shift+L {
+        move-column-right
+    }
+    Super+Semicolon hotkey-overlay-title="Move window to column left" {
+        consume-or-expel-window-left
+    }
+    Super+Apostrophe hotkey-overlay-title="Move window to column right" {
+        consume-or-expel-window-right
+    }
     // FIXME: laptops no direct home/end key
-	Super+Shift+Home  { move-column-to-first; }
-	Super+Shift+End   { move-column-to-last; }
-
-	Super+Ctrl+Shift+H { move-window-to-monitor-left; }
-	Super+Ctrl+Shift+L { move-window-to-monitor-right; }
-
-	Super+Ctrl+Shift+J {move-column-to-workspace-down; }
-	Super+Ctrl+Shift+K { move-column-to-workspace-up; }
-
+    Super+Shift+Home {
+        move-column-to-first
+    }
+    Super+Shift+End {
+        move-column-to-last
+    }
+    Super+Ctrl+Shift+H {
+        move-window-to-monitor-left
+    }
+    Super+Ctrl+Shift+L {
+        move-window-to-monitor-right
+    }
+    Super+Ctrl+Shift+J {
+        move-column-to-workspace-down
+    }
+    Super+Ctrl+Shift+K {
+        move-column-to-workspace-up
+    }
     // ========== Window Tabs ==========
     // Use `consume-or-expel-...` binds above to add/remove windows to a tabbed column
-	Super+G { toggle-column-tabbed-display; } // Toggle the focused column between normal and tabbed display
-
-    //
+    Super+G {
+        toggle-column-tabbed-display
+    }
+ // Toggle the focused column between normal and tabbed display    //
     // ========== Window and column size ==========
     //
-
-	Super+R hotkey-overlay-title="Switch preset column width" { switch-preset-column-width; } // Presets are defined in rules.kdl
-    Super+Shift+R hotkey-overlay-title="Switch preset column height" { switch-preset-window-height; } // Presets are defined in rules.kdl
-
-	Super+F { fullscreen-window; }
-	Super+Alt+F { toggle-windowed-fullscreen; } //tricks the window content into thinking its fullscreen
-	Super+Shift+F { toggle-window-floating; }
-
-	Super+Ctrl+F { maximize-column; } // Toggle maximized state of the focused column
-	Super+Shift+Ctrl+F { expand-column-to-available-width; } // Expand the focused column to space not taken up by other fully visible columns
-
+    // Presets are defined in rules.kdl
+    Super+R hotkey-overlay-title="Switch preset column width" {
+        switch-preset-column-width
+    }
+    // Presets are defined in rules.kdl
+    Super+Shift+R hotkey-overlay-title="Switch preset column height" {
+        switch-preset-window-height
+    }
+    Super+F {
+        fullscreen-window
+    }
+    //tricks the window content into thinking its fullscreen
+    Super+Alt+F {
+        toggle-windowed-fullscreen
+    }
+    Super+Shift+F {
+        toggle-window-floating
+    }
+    // Toggle maximized state of the focused column
+    Super+Ctrl+F {
+        maximize-column
+    }
+    // Expand the focused column to space not taken up by other fully visible columns
+    Super+Shift+Ctrl+F {
+        expand-column-to-available-width
+    }
     // FIXME: Add higher value Shift options
-	Super+BracketLeft { set-column-width "-1"; }
-	Super+BracketRight  { set-column-width "+1"; }
-	Super+Minus { set-window-height "-1"; }
-	Super+Plus  { set-window-height "+1"; }
-
+    Super+BracketLeft {
+        set-column-width "-1"
+    }
+    Super+BracketRight {
+        set-column-width "+1"
+    }
+    Super+Minus {
+        set-window-height "-1"
+    }
+    Super+Plus {
+        set-window-height "+1"
+    }
     //
     // ========== System controls ==========
     //
-
     // ========== Brightness ==========
-	XF86MonBrightnessUp   allow-when-locked=true { spawn "brightnessctl" "set" "10%+"; }
-	XF86MonBrightnessDown allow-when-locked=true { spawn "brightnessctl" "set" "10%-"; }
-
+    XF86MonBrightnessUp allow-when-locked=true {
+        spawn "brightnessctl" "set" "10%+"
+    }
+    XF86MonBrightnessDown allow-when-locked=true {
+        spawn "brightnessctl" "set" "10%-"
+    }
     // ========== Media Control==========
-	XF86AudioPlay    allow-when-locked=true { spawn "playerctl" "play-pause" "--ignore-player=firefox,chromium,brave"; }
-	XF86AudioStop    allow-when-locked=true { spawn "playerctl" "stop" "--ignore-player=firefox,chromium,brave"; }
-	XF86AudioPrev    allow-when-locked=true { spawn "playerctl" "previous" "--ignore-player=firefox,chromium,brave"; }
-	XF86AudioNext    allow-when-locked=true { spawn "playerctl" "next" "--ignore-player=firefox,chromium,brave"; }
-	XF86AudioRewind  allow-when-locked=true { spawn "playerctl" "position" "2-" "--ignore-player=firefox,chromium,brave"; }
-	XF86AudioForward allow-when-locked=true { spawn "playerctl" "position" "2+" "--ignore-player=firefox,chromium,brave"; }
-
+    XF86AudioPlay allow-when-locked=true {
+        spawn "playerctl" "play-pause" "--ignore-player=firefox,chromium,brave"
+    }
+    XF86AudioStop allow-when-locked=true {
+        spawn "playerctl" "stop" "--ignore-player=firefox,chromium,brave"
+    }
+    XF86AudioPrev allow-when-locked=true {
+        spawn "playerctl" "previous" "--ignore-player=firefox,chromium,brave"
+    }
+    XF86AudioNext allow-when-locked=true {
+        spawn "playerctl" "next" "--ignore-player=firefox,chromium,brave"
+    }
+    XF86AudioRewind allow-when-locked=true {
+        spawn "playerctl" "position" "2-" "--ignore-player=firefox,chromium,brave"
+    }
+    XF86AudioForward allow-when-locked=true {
+        spawn "playerctl" "position" "2+" "--ignore-player=firefox,chromium,brave"
+    }
     // ========== Media audio control==========
-	Shift+XF86AudioRaiseVolume allow-when-locked=true { spawn "playerctl" "volume" "0.05%+"; }
-	Shift+XF86AudioLowerVolume allow-when-locked=true { spawn "playerctl" "volume" "0.05%-"; }
-
+    Shift+XF86AudioRaiseVolume allow-when-locked=true {
+        spawn "playerctl" "volume" "0.05%+"
+    }
+    Shift+XF86AudioLowerVolume allow-when-locked=true {
+        spawn "playerctl" "volume" "0.05%-"
+    }
     // ========== Output audio control==========
-	XF86AudioRaiseVolume hotkey-overlay-title="Output volume up" allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.05+"; }
-	XF86AudioLowerVolume hotkey-overlay-title="Output volume down" allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.05-"; }
-	XF86AudioMute      hotkey-overlay-title="Output volume mute"   allow-when-locked=true { spawn "wpctl" "set-mute"   "@DEFAULT_AUDIO_SINK@" "toggle"; }
-
+    XF86AudioRaiseVolume hotkey-overlay-title="Output volume up" allow-when-locked=true {
+        spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.05+"
+    }
+    XF86AudioLowerVolume hotkey-overlay-title="Output volume down" allow-when-locked=true {
+        spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.05-"
+    }
+    XF86AudioMute hotkey-overlay-title="Output volume mute" allow-when-locked=true {
+        spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"
+    }
     // ========== Input audio control==========
-	Super+XF86AudioRaiseVolume hotkey-overlay-title="Input volume up" allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SOURCE@" "0.05+"; }
-	Super+XF86AudioLowerVolume hotkey-overlay-title="Input volume down" allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SOURCE@" "0.05-"; }
-	Super+XF86AudioMute    hotkey-overlay-title="Input volume mute"     allow-when-locked=true { spawn "wpctl" "set-mute"   "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
-	XF86AudioMicMute        hotkey-overlay-title="Mic mute"    allow-when-locked=true { spawn "wpctl" "set-mute"   "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
-
+    Super+XF86AudioRaiseVolume hotkey-overlay-title="Input volume up" allow-when-locked=true {
+        spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SOURCE@" "0.05+"
+    }
+    Super+XF86AudioLowerVolume hotkey-overlay-title="Input volume down" allow-when-locked=true {
+        spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SOURCE@" "0.05-"
+    }
+    Super+XF86AudioMute hotkey-overlay-title="Input volume mute" allow-when-locked=true {
+        spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"
+    }
+    XF86AudioMicMute hotkey-overlay-title="Mic mute" allow-when-locked=true {
+        spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"
+    }
     // ========== Power menu ==========
     // FIXME(niri): probably disable interrupting power?
-	// XF86PowerOff allow-when-locked=true { spawn "wlogout"; }
-	// XF86Sleep    allow-when-locked=true { spawn "wlogout"; }
-	// XF86Suspend  allow-when-locked=true { spawn "wlogout"; }
-
+    // XF86PowerOff allow-when-locked=true { spawn "wlogout"; }
+    // XF86Sleep    allow-when-locked=true { spawn "wlogout"; }
+    // XF86Suspend  allow-when-locked=true { spawn "wlogout"; }
     //
     // ========== Screenshots ==========
     //
-
     // NOTE: see config.kdl for screenshot-path
-    Print { screenshot; }
-    Super+Shift+P { screenshot; }
+    Print {
+        screenshot
+    }
+    Super+Shift+P {
+        screenshot
+    }
     // Super+Ctrl+Shift+P { screenshot write-to-disk=true; }
     // Super+Alt+P { screenshot show-pointer=false; }
     // Super+Ctrl+Alt+P { screenshot show-pointer=true; }
-
     //
     // ========== Quick Launch ==========
     //
-	// Open a terminal emulator.
-	Super+Return hotkey-overlay-title="New shell" { spawn "ghostty"; }
-	// Open drun launcher.
-	Super+Space hotkey-overlay-title="Launcher" { spawn "rofi" "-show" "drun"; }
-	// Open run/program launcher.
-	Super+Shift+Space hotkey-overlay-title="Run shell command" { spawn "rofi" "-show" "run"; }
-	// Show ssh launcher.
-	Super+Shift+S hotkey-overlay-title="New ssh shell" { spawn "rofi" "-show" "ssh"; }
-	// Show window selector.
-	Super+Tab hotkey-overlay-title="Window selector" { spawn "rofi" "-show" "window"; }
-	// Show window selector.
-	Super+P hotkey-overlay-title="Clipboard" { spawn "rofi-copyq" ; }
-	// Show window selector.
-	Super+w hotkey-overlay-title="Walker" { spawn "walker" ; }
+    // Open a terminal emulator.
+    Super+Return hotkey-overlay-title="New shell" {
+        spawn "ghostty"
+    }
+    // Open drun launcher.
+    Super+Space hotkey-overlay-title="Launcher" {
+        spawn "rofi" "-show" "drun"
+    }
+    // Open run/program launcher.
+    Super+Shift+Space hotkey-overlay-title="Run shell command" {
+        spawn "rofi" "-show" "run"
+    }
+    // Show ssh launcher.
+    Super+Shift+S hotkey-overlay-title="New ssh shell" {
+        spawn "rofi" "-show" "ssh"
+    }
+    // Show window selector.
+    Super+Tab hotkey-overlay-title="Window selector" {
+        spawn "rofi" "-show" "window"
+    }
+    // Show window selector.
+    Super+P hotkey-overlay-title="Clipboard" {
+        spawn "rofi-copyq"
+    }
+    // Show window selector.
+    Super+w hotkey-overlay-title="Walker" {
+        spawn "walker"
+    }
     // Thunar
-	Super+Ctrl+O hotkey-overlay-title="Spawn file explorer" { spawn "thunar"; }
-
-    //
+    Super+Ctrl+O hotkey-overlay-title="Spawn file explorer" {
+        spawn "thunar"
+    }
+ //
     // ========== Clipboard ==========
     //
     // FIXME(niri): setup with copyq
