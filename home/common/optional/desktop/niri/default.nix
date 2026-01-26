@@ -6,7 +6,6 @@
       inherit (pkgs.unstable)
         niri
         xwayland-satellite # xwayland support
-
         ;
     };
     file = {
