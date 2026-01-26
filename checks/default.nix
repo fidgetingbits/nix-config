@@ -61,6 +61,18 @@ in
         language = "script";
         #pass_on_error = false;
       };
+
+      # FIXME: This will break after we use per-host kdl file linkage
+      # so likely switch to runCommand on all the kdl at build time
+      niri-config-check = {
+        enable = true;
+        name = "niri config validation";
+        entry = "${lib.getExe pkgs.niri} validate --config home/common/optional/desktop/niri/config.kdl";
+        language = "script";
+        pass_filenames = false;
+        files = "\\.kdl$";
+        #pass_on_error = false;
+      };
     };
   };
 }
