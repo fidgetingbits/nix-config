@@ -1,4 +1,9 @@
-{ lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 {
   programs.niri = {
     enable = true;
@@ -15,7 +20,9 @@
       niri = {
         prettyName = "niri";
         comment = "Niri compositor managed by UWSM";
-        binPath = "${pkgs.niri}/bin/niri-session";
+        binPath = pkgs.writeShellScript "niri" ''
+          ${lib.getExe config.programs.niri.package} --session
+        '';
       };
     };
   };
