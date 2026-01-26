@@ -10,15 +10,15 @@ set -euo pipefail
 TMPFILE=$(mktemp)
 nixvim-print-init >"$TMPFILE"
 for PID in $(pgrep nvim); do
-	# Get the socket path for the neovim instance
-	SOCKET_PATH=/run/user/$UID/nvim.${PID}.0
-	if [ -z "$SOCKET_PATH" ]; then
-		echo "No socket path found for PID $PID"
-		continue
-	fi
+    # Get the socket path for the neovim instance
+    SOCKET_PATH=/run/user/$UID/nvim.${PID}.0
+    if [ -z "$SOCKET_PATH" ]; then
+        echo "No socket path found for PID $PID"
+        continue
+    fi
 
-	command nvim --headless --server "$SOCKET_PATH" --remote-send "<C-\><C-N>:luafile $TMPFILE<CR>:echo 'Reloaded nixvim config'<CR>" || true
-	echo "Reloaded neovim instance with PID $PID"
+    command nvim --headless --server "$SOCKET_PATH" --remote-send "<C-\><C-N>:luafile $TMPFILE<CR>:echo 'Reloaded nixvim config'<CR>" || true
+    echo "Reloaded neovim instance with PID $PID"
 done
 
 # We also want to update the plugins by modifying the runtimepath maybe? Otherwise it won't actually reload new versions

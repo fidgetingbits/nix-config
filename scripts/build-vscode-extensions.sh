@@ -11,6 +11,6 @@ set -eo pipefail
 
 root_path=$(git rev-parse --show-toplevel)
 if grep 'voiceCoding.enable = true' "$root_path/hosts/nixos/$(hostname)/default.nix"; then
-	build-cursorless-pr-bundle "$1" || true
-	build-command-server-pr-bundle "$1" || true
+    build-cursorless-pr-bundle "$1" || true
+    build-command-server-pr-bundle "$1" || true
 fi

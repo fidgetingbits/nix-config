@@ -67,7 +67,7 @@ stdenv.mkDerivation rec {
   desktopItem = makeDesktopItem {
     name = "ida-pro";
     # exec = ''env QT_QPA_PLATFORM="xcb;wayland" ida64'';
-    exec = ''ida'';
+    exec = "ida";
     icon = icon;
     comment = meta.description;
     desktopName = "IDA Pro";

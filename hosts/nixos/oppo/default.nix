@@ -83,7 +83,7 @@
       "split_lock_detect=off" # Alleged gaming perf increase
     ];
     # Fix for XBox controller disconnects
-    extraModprobeConfig = ''options bluetooth disable_ertm=1 '';
+    extraModprobeConfig = "options bluetooth disable_ertm=1 ";
   };
 
   hardware = {

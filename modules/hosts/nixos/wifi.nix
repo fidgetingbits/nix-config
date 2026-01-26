@@ -74,7 +74,7 @@ in
 {
   options = {
     wifi = {
-      enable = lib.mkEnableOption (lib.mdDoc ''Wireless LAN Management'');
+      enable = lib.mkEnableOption (lib.mdDoc "Wireless LAN Management");
       roaming = lib.mkOption {
         type = lib.types.bool;
         default = false;

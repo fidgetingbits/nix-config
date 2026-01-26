@@ -38,7 +38,7 @@
   # This is to prevent a bug with extensions being disabled when rebuilding nix with a new extension
   home.file.".vscode/extensions/.obsolete" = {
     force = true;
-    text = ''{}'';
+    text = "{}";
   };
 
   # FIXME(vscode): add an xdg-open override for opening inside the current vscode instance

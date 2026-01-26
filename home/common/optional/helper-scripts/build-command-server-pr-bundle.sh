@@ -6,16 +6,16 @@ set -euo pipefail
 ORIG_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 FOLDER=~/dev/talon/fidgetingbits-command-server
 if [ ! -d "$FOLDER" ]; then
-	echo "WARNING: Cursorless development folders not initialized. Bootstrap them to continue."
-	exit 1
+    echo "WARNING: Cursorless development folders not initialized. Bootstrap them to continue."
+    exit 1
 fi
 cd $FOLDER
 
 # In "lite" mode we just install the extension without rebuilding
 if [ $# -ne 0 ]; then
-	code --force --install-extension result/*.vsix
-	echo "Installed command-server dev build."
-	exit 0
+    code --force --install-extension result/*.vsix
+    echo "Installed command-server dev build."
+    exit 0
 fi
 
 # Deal with any development I was doing

@@ -5,16 +5,16 @@ set -euo pipefail
 ORIG_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 FOLDER=~/dev/talon/fidgetingbits-cursorless-build
 if [ ! -d "$FOLDER" ]; then
-	git clone https://github.com/fidgetingbits/cursorless "$FOLDER"
+    git clone https://github.com/fidgetingbits/cursorless "$FOLDER"
 fi
 cd $FOLDER
 
 # In "lite" mode we just install the extension without rebuilding, we need force because sometimes it thinks
 # the version we built is not ok
 if [ $# -ne 0 ]; then
-	code --install-extension packages/cursorless-vscode/bundle.vsix --force
-	echo "Installed dev build. Be sure to disable cursorless extension if not already using dev build."
-	exit 0
+    code --install-extension packages/cursorless-vscode/bundle.vsix --force
+    echo "Installed dev build. Be sure to disable cursorless extension if not already using dev build."
+    exit 0
 fi
 
 # Deal with any development I was doing
