@@ -5,7 +5,7 @@ layout {
             plugin location="compact-bar"
         }
         pane command="vi" cwd="wiki" {
-            args  "todo.md"
+            args "todo.md"
             start_suspended false
         }
     }
@@ -59,14 +59,12 @@ layout {
             pane cwd="$HOME/dev/nix/emergentmind" size="50%"
         }
     }
-
     tab name="Wiki" hide_floating_panes=true {
         pane size=1 borderless=true {
             plugin location="compact-bar"
         }
         pane cwd="wiki" size="50%"
     }
-
     new_tab_template {
         pane size=1 borderless=true {
             plugin location="compact-bar"
