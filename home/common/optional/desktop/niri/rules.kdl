@@ -122,28 +122,19 @@ window-rule {
     opacity 0.85
 }
 // ========== Workspace Assignments ==========
+// zellij nix session
 window-rule {
-    match app-id="^[Oo]bsidian$"
-    open-on-workspace "8_l"
+    match app-id="com.mitchellh.ghostty" title="^nix |"
+    open-on-workspace "1_dev"
 }
 window-rule {
     match app-id="signal"
-    match app-id="discord"
-    match app-id="brave-browser"
-    open-on-workspace "9_u"
+    open-on-workspace "3_u"
 }
 window-rule {
     match app-id="^[Ss]potify$"
-    match app-id="com.mitchellh.ghostty" title="btop"
-    open-on-workspace "0_r"
-}
-window-rule {
-    match app-id="steam"
-    open-on-workspace "5_gmz"
-}
-window-rule {
-    match app-id="com.yubico.yubioath"
-    open-on-workspace "Y_qrs"
+    // match app-id="com.mitchellh.ghostty" title="btop"
+    open-on-workspace "3_u"
 }
 // ========== Tile on launch ==========
 // FIXME: May want to make this proton vpn specific and specific starting geometry
@@ -186,10 +177,9 @@ window-rule {
     match title="^([Ss]team)$"
     match title="^([Ss]team_app_*)$"
     match title="^([Vv]lc)$"
-    match title="^(btop)(.*)$"
+    match title="^(htop)(.*)$"
     match title="^(amdgpu_top)(.*)$"
     // remove transparency from video
-    match title="^(Dashboard | glass*)(.*)"
     match title="^(Live video from*)(.*)$"
     match title="^(Netflix)(.*)$"
     match title="^(.*YouTube.*)$"
@@ -221,7 +211,7 @@ window-rule {
         proportion 1.0
     }
 }
-// ========== Varirable Refresh Rate ==========
+// ========== Variable Refresh Rate ==========
 // requires output to have `variable-refresh-rate on-demand=true`
 window-rule {
     match app-id="^steam_app_.*$"
@@ -229,17 +219,17 @@ window-rule {
     variable-refresh-rate true
     open-fullscreen true
 }
-// ========== Steam==========
-window-rule {
-    match title="^()$" app-id="^([Ss]team)$"
-    match app-id="^([S]team_app_*)$"
-    open-on-output "DP-1"
-    open-on-workspace "5_gmz"
-}
+// FIXME: Revisit these window sizes
 // ========== Signal ==========
 // Resize certain windows to specific sizes.
 window-rule {
     match app-id="^signal$"
+    default-column-width {
+        proportion 0.25
+    }
+}
+window-rule {
+    match app-id="^[Ss]potify$"
     default-column-width {
         proportion 0.25
     }

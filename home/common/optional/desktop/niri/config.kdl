@@ -12,6 +12,10 @@ workspace "1_dev" {
 workspace "2_web" {
     open-on-output "eDP-1"
 }
+// Music, chat, etc
+workspace "3_u" {
+    open-on-output "eDP-1"
+}
 // Scratch
 workspace "Y_qrs" {
     open-on-output "eDP-1"
@@ -45,11 +49,9 @@ overview {
 // ========== Startup ==========
 //
 spawn-at-startup "uwsm finalize NIRI_SOCKET"
-// FIXME: Only needed if not using dbus-broker?
-// spawn-at-startup "dbus-update-activation-environment --all --systemd"
-spawn-sh-at-startup "niri msg action focus-workspace 2; firefox; niri msg action focus-workspace 1"
-spawn-sh-at-startup "niri msg action focus-workspace 3; spotify; niri msg action focus-workspace 1"
-spawn-sh-at-startup "ghostty -e zellij attach nix"
+spawn-at-startup "firefox"
+spawn-at-startup "spotify"
+spawn-at-startup "ghostty -e zellij attach nix"
 hotkey-overlay {
     skip-at-startup
 }
@@ -60,6 +62,7 @@ screenshot-path "~/images/screenshots/%Y-%m-%d-%H-%M-%S.png"
 // Disable client-side decorations
 // FIXME(niri): test this on or off
 prefer-no-csd
+// FIXME: revisit this on laptops, remove on desktop
 switch-events {
     lid-close {
         spawn "notify-send" "The laptop lid is closed."
