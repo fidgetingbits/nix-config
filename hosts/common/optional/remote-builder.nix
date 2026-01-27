@@ -1,3 +1,5 @@
+# NOTE: Adding a new authorized key here will require the remote build machines
+# to be rebuilt.
 { ... }:
 let
   builderName = "builder";
@@ -11,6 +13,7 @@ in
     description = "Remote Nix Build User";
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJeSBvE5m1RYwCxrlfj/oeYZVcbmKTC0zeSotQepwurl onyx"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFYjvsmKfKgABXqfbOSooKbRt6f3fHyfIJFLuIkFSmyz ossa"
     ];
   };
 

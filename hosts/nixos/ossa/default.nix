@@ -64,7 +64,7 @@
           # Gaming
           "gaming.nix"
 
-          # "distributed-builds.nix"
+          "distributed-builds.nix"
           "fonts.nix"
 
           "logind.nix"
@@ -131,4 +131,34 @@
 
   # Bluetooth
   services.blueman.enable = true;
+
+  # FIXME: Move this to a ccache module
+  programs.ccache.enable = true;
+  nix.settings.extra-sandbox-paths = [ config.programs.ccache.cacheDir ];
+  environment.persistence.${config.hostSpec.persistFolder}.directories = [
+    # CCache
+    (lib.mkIf config.programs.ccache.enable {
+      directory = config.programs.ccache.cacheDir;
+      user = "root";
+      group = "nixbld";
+      mode = "u=,g=rwx,o=";
+    })
+  ];
+
+  #  Framework 16 is super unreliable on 6.18.x it seems (unless it's hardware issues)
+  boot.kernelPackages = lib.mkForce (
+    pkgs.linuxPackagesFor (
+      # Note: the override has to be for a package that exists, thus 6.18
+      pkgs.linux_6_18.override {
+        argsOverride = rec {
+          src = pkgs.fetchurl {
+            url = "mirror://kernel/linux/kernel/v6.x/linux-${version}.tar.xz";
+            sha256 = "sha256-EWgC3DrRZGFjzG/+m926JKgGm1aRNewFI815kGTy7bk=";
+          };
+          version = "6.17.13";
+          modDirVersion = "6.17.13";
+        };
+      }
+    )
+  );
 }
