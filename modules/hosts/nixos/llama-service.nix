@@ -16,7 +16,6 @@ let
   user = config.users.users.${config.hostSpec.primaryUsername}.name;
   group = config.users.users.${config.hostSpec.primaryUsername}.group;
   persistFolder = config.hostSpec.persistFolder;
-  # FIXME: Likely will want to manually re-compile this for our hardware
   # NOTE: AMD AI 395+ with rocm 6 and rocm 7.0.1 (see overlay) both crash loading gguf files
   #llama-cpp = pkgs.llama-cpp.override { rocmSupport = true; };
   llama-cpp = pkgs.llama-cpp.override { vulkanSupport = true; };
@@ -37,6 +36,7 @@ in
     (lib.mkIf cfg.enable {
       services.ollama = {
         enable = false;
+        # FIXME: This should be tied to if the system is using rocm or vulkan
         package = pkgs.unstable.ollama-rocm;
         host = "0.0.0.0";
         openFirewall = true;

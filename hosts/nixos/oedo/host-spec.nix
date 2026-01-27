@@ -15,5 +15,6 @@
     # FIXME: We should have like "desktop" = "hyprland" and have that auto enable the rest?
     defaultDesktop = "hyprland-uwsm";
     useWayland = true;
+    isAmdGpu = true;
   };
 }

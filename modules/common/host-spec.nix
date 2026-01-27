@@ -224,7 +224,21 @@
           default = "Asia/Taipei";
           description = "Timezone the system is in";
         };
-
+        isAMDGpu = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = "Indicate system has a AMD GPUs";
+        };
+        useVulkan = lib.mkOption {
+          type = lib.types.bool;
+          default = config.hostSpec.isAMDGpu;
+          description = "On systems with AMD GPUs indicates if we should use rocm or vulkan";
+        };
+        useRocm = lib.mkOption {
+          type = lib.types.bool;
+          default = config.hostSpec.isAMDGpu && (!config.hostSpec.useVulkan);
+          description = "On systems with AMD GPUs indicates if we should use rocm or vulkan";
+        };
       };
     };
   };

@@ -11,7 +11,7 @@ let
 in
 {
   options.modules.hardware.radeon = {
-    enable = lib.mkEnableOption "System has radeon card";
+    enable = lib.mkEnableOption "System has AMD radeon card";
   };
   config = lib.mkIf cfg.enable {
     environment.systemPackages = lib.attrValues {

@@ -91,6 +91,7 @@
   # Keyring, required for auth even without gnome
   # FIXME: double check this
   security.pam.services.sddm.enableGnomeKeyring = true;
+  modules.hardware.radeon.enable = true;
 
   environment.systemPackages = lib.attrValues {
     inherit (pkgs)
@@ -105,6 +106,8 @@
     enable = true;
     borgBackupStartTime = "03:00:00";
   };
+
+  # system.impermanence.enable = true;
 
   # For explanations of these options, see
   # https://github.com/CryoByte33/steam-deck-utilities/blob/main/docs/tweak-explanation.md
@@ -135,15 +138,17 @@
   # FIXME: Move this to a ccache module
   programs.ccache.enable = true;
   nix.settings.extra-sandbox-paths = [ config.programs.ccache.cacheDir ];
-  environment.persistence.${config.hostSpec.persistFolder}.directories = [
-    # CCache
-    (lib.mkIf config.programs.ccache.enable {
-      directory = config.programs.ccache.cacheDir;
-      user = "root";
-      group = "nixbld";
-      mode = "u=,g=rwx,o=";
-    })
-  ];
+  #  environment.persistence.${config.hostSpec.persistFolder}.directories =
+  #    lib.mkIf config.system.impermanence.enable
+  #      [
+  #        # CCache
+  #        (lib.mkIf config.programs.ccache.enable {
+  #          directory = config.programs.ccache.cacheDir;
+  #          user = "root";
+  #          group = "nixbld";
+  #          mode = "u=,g=rwx,o=";
+  #        })
+  #      ];
 
   #  Framework 16 is super unreliable on 6.18.x it seems (unless it's hardware issues)
   boot.kernelPackages = lib.mkForce (
