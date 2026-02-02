@@ -66,29 +66,31 @@
       ];
 
     shellHook = checks.pre-commit-check.shellHook or "" + ''
-      # If we don't already have a .git-crypt.key file and have a git-crypt
-      # secret exposed via sops, then decode a copy and place it in the repo
-      if [ ! -f .git-crypt.key ] && [ -f ~/.config/sops-nix/secrets/keys/git-crypt ]; then
-          base64 -d ~/.config/sops-nix/secrets/keys/git-crypt > .git-crypt.key
-          git-crypt unlock .git-crypt.key
-      fi
+      # FIXME: This has a chicken and egg problem now because the lock file is encrypted, so we can't use it to
+      # get git-crypt
+        # If we don't already have a .git-crypt.key file and have a git-crypt
+        # secret exposed via sops, then decode a copy and place it in the repo
+        if [ ! -f .git-crypt.key ] && [ -f ~/.config/sops-nix/secrets/keys/git-crypt ]; then
+            base64 -d ~/.config/sops-nix/secrets/keys/git-crypt > .git-crypt.key
+            git-crypt unlock .git-crypt.key
+        fi
 
-      # Setup fly token if the secret exists
-      if [ -f ~/.config/sops-nix/secrets/tokens/fly ]; then
-          export FLY_ACCESS_TOKEN=$(cat ~/.config/fly.io/token)
-      fi
+        # Setup fly token if the secret exists
+        if [ -f ~/.config/sops-nix/secrets/tokens/fly ]; then
+            export FLY_ACCESS_TOKEN=$(cat ~/.config/fly.io/token)
+        fi
 
-      hostname_lock="locks/$(hostname).lock"
-      if [ ! -f $hostname_lock ]; then
-          nix flake update
-          mv flake.lock $hostname_lock
-          git add $hostname_lock
-          echo "Created a new lock file at $hostname_lock"
-      fi
+        hostname_lock="locks/$(hostname).lock"
+        if [ ! -f $hostname_lock ]; then
+            nix flake update
+            mv flake.lock $hostname_lock
+            git add $hostname_lock
+            echo "Created a new lock file at $hostname_lock"
+        fi
 
-      if git remote -v | grep gitlab; then
-          echo "WARNING: Your git remote is still the old gitlab URL, switch to the new public github repo"
-      fi
+        if git remote -v | grep gitlab; then
+            echo "WARNING: Your git remote is still the old gitlab URL, switch to the new public github repo"
+        fi
     '';
   };
 }
