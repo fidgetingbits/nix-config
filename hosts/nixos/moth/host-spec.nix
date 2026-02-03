@@ -15,6 +15,7 @@
     isProduction = lib.mkForce true;
     isRemote = lib.mkForce true;
     isServer = lib.mkForce true;
+    isImpermanent = lib.mkForce true;
     isAutoStyled = lib.mkForce false;
     useWindowManager = lib.mkForce false;
 
@@ -26,7 +27,7 @@
     # Networking
     wifi = lib.mkForce false;
 
-    # Sysystem settings
+    # System settings
     persistFolder = lib.mkForce "/persist";
     timeZone = lib.mkForce "America/Edmonton";
   };

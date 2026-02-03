@@ -82,10 +82,9 @@
         };
         persistFolder = lib.mkOption {
           type = lib.types.nullOr lib.types.str;
-          description = "The folder to persist data if impermenance is enabled";
+          description = "The folder to persist data if impermanence is enabled";
           default = null;
         };
-
         # Configuration Settings
         users = lib.mkOption {
           type = lib.types.listOf lib.types.str;
@@ -96,6 +95,11 @@
           type = lib.types.bool;
           default = false;
           description = "Indicate a minimal host";
+        };
+        isImpermanent = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = "Indicate a host uses impermanence";
         };
         isProduction = lib.mkOption {
           type = lib.types.bool;

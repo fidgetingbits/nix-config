@@ -15,6 +15,7 @@
     isWork = lib.mkForce false;
     isProduction = lib.mkForce true;
     isRemote = lib.mkForce true;
+    isImpermanent = lib.mkForce true;
     isServer = lib.mkForce true;
     isAutoStyled = lib.mkForce false;
     useWindowManager = lib.mkForce false;

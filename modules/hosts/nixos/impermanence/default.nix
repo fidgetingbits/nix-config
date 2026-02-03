@@ -11,7 +11,7 @@
   options.system.impermanence = {
     enable = lib.mkOption {
       type = lib.types.bool;
-      default = false;
+      default = config.hostSpec.isImpermanent;
       description = "Enable impermanence";
     };
     # FIXME: Actually use this in the script, but need to use the substituteAll approach

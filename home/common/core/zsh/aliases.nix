@@ -169,6 +169,12 @@ in
   # Sometimes touchpad stops working and it seems like cycling this option fixes it
   kb-reset = "sudo modprobe -r hid_multitouch && sudo modprobe hid_multitouch";
 
+  # bootstrapping a host without an ethernet port requires manually connecting to the AP
+  # since minimal doesn't have access to sops secrets yet
+  # FIXME: double check that's entirely true, but for sure minimal had to manual connect
+  # to wifi on ossa... maybe just need to add wifi to the manual build on systems that
+  # have wifi set in hostSpec?
+  wifi-connect = "wifi-connect() { nmcli device wifi connect $1 --ask }; wifi-connect";
 }
 // lib.optionalAttrs (osConfig.hostSpec.hostName != "ooze") {
   # The WoL packet has to come from a box that is on the same wired network as oppo

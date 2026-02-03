@@ -15,6 +15,7 @@
     isWork = lib.mkForce false;
     isProduction = lib.mkForce true;
     isRemote = lib.mkForce true;
+    isImpermanent = lib.mkForce true;
 
     # Functionality
     # FIXME: Separate this out to allow yubikey for incoming auth but not physical yubikey plugged in

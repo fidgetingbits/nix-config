@@ -8,6 +8,7 @@
     wifi = lib.mkForce true;
     useNeovimTerminal = lib.mkForce false;
     persistFolder = lib.mkForce "/persist";
+    isImpermanent = lib.mkForce true;
     isProduction = lib.mkForce true;
     isAutoStyled = lib.mkForce true;
     isDevelopment = lib.mkForce true;
