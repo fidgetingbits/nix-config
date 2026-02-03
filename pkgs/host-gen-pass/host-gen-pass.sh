@@ -166,7 +166,7 @@ function gen_atuin {
         echo "$(gum style --bold ERROR:) gen_atuin(): Host $(hostname) doesn't seem to have access to atuin?"
     fi
 
-    atuin_pass=$(gum input --placeholder "passwrd" --prompt "Atuin user password")
+    atuin_pass=$(gum input --placeholder "password" --prompt "Atuin user password")
     ssh -q "$target_hostname" atuin login -u "$atuin_user" -p "$atuin_pass" -k "\"$atuin_passphrase\""
     local key_path=~/.local/share/atuin/key
     sops_set '["keys"]["atuin"] "'"$(ssh -q "$target_hostname" cat $key_path)"'"'
