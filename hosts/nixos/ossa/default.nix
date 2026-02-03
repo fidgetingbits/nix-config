@@ -59,7 +59,7 @@
           # Remote network mounts and syncing
           "services/syncthing.nix"
 
-          "startpage.nix"
+          # "startpage.nix"
 
           # Gaming
           "gaming.nix"
