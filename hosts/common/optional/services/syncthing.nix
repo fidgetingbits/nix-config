@@ -13,6 +13,7 @@ let
   desktops = [
     "onyx"
     "oedo"
+    "ossa"
   ];
   mobiles = [
     "opia"
@@ -71,7 +72,7 @@ lib.mkMerge [
         overrideFolders = true;
         dataDir = "${homeDirectory}/sync/"; # synced folders
         configDir = "${homeDirectory}/.config/syncthing"; # settings and keys
-        guiAddress = "127.0.0.1:${builtins.toString ports.tcp.syncthing.gui}";
+        guiAddress = "127.0.0.1:${toString ports.tcp.syncthing.gui}";
         relay.enable = false; # Don't start the local relay service
 
         settings = {
@@ -97,23 +98,26 @@ lib.mkMerge [
                 ".git"
               ];
               # Avoid conflicts
-              type = if config.networking.hostName == "oedo" then "sendonly" else "receiveonly";
+              restrictedType = if config.networking.hostName == "oedo" then "sendonly" else "receiveonly";
             in
             {
               images = {
                 path = "${homeDirectory}/images/";
                 devices = desktops;
-                inherit type versioning ignorePatterns;
-              };
-              wiki = {
-                path = "${homeDirectory}/wiki/";
-                devices = desktops ++ mobiles;
-                inherit type versioning ignorePatterns;
+                type = restrictedType;
+                inherit versioning ignorePatterns;
               };
               scripts = {
                 path = "${homeDirectory}/scripts/";
                 devices = desktops;
-                inherit type versioning ignorePatterns;
+                type = restrictedType;
+                inherit versioning ignorePatterns;
+              };
+              wiki = {
+                path = "${homeDirectory}/wiki/";
+                devices = desktops ++ mobiles;
+                type = "sendreceive";
+                inherit versioning ignorePatterns;
               };
             };
         };
