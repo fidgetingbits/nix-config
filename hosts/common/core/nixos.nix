@@ -75,6 +75,8 @@
     }
     // lib.optionalAttrs config.hostSpec.isWork network.work.hosts;
 
+  # don't wait for dhcpd on boot
+  networking.dhcpcd.wait = "background";
   # Stop blocking on network interfaces not needed for boot
   systemd.network.wait-online.enable = false;
   systemd.services.NetworkManager-wait-online.enable = false;
