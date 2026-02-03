@@ -50,33 +50,36 @@ in
     defaultSopsFile = "${sopsFolder}/${osConfig.hostSpec.hostName}.yaml";
     validateSopsFiles = false;
 
-    secrets = {
-      "keys/git-crypt" = {
-        sopsFile = "${sopsFolder}/olan.yaml";
-      };
-      # FIXME: De-duplicate this eventually. See note in other sops.nix file
-      "passwords/netrc" = {
-        sopsFile = "${sopsFolder}/olan.yaml";
-      };
-      # formatted as extra-access-tokens = github.com=<PAT token>
-      "tokens/nix-access-tokens" = {
-        sopsFile = "${sopsFolder}/olan.yaml";
-      };
-    }
-    # // lib.optionalAttrs osConfig.hostSpec.isDevelopment {
-    #   "tokens/openai" = {
-    #     sopsFile = "${sopsFolder}/shared.yaml";
-    #     path = "${homeDirectory}/.config/openai/token";
-    #   };
-    # }
-    // lib.optionalAttrs osConfig.hostSpec.isWork {
-      # FIXME(secrets): Need an activation script to build a config.yml using multiple files (ie: work and personal)
-      "config/glab" = {
-        sopsFile = "${sopsFolder}/development.yaml";
-        path = "${homeDirectory}/.config/glab/config.yml";
-      };
-    }
-    // yubikeySecrets
-    // workSopsSecrets;
+    # FIXME: Confirm this prevents the moth warning and if so then rekey
+    # nix-secrets again
+    secrets =
+      lib.optionalAttrs (osConfig.hostSpec.isLocal || osConfig.hostSpec.useAtticCache) {
+        "keys/git-crypt" = {
+          sopsFile = "${sopsFolder}/olan.yaml";
+        };
+        # FIXME: De-duplicate this eventually. See note in other sops.nix file
+        "passwords/netrc" = {
+          sopsFile = "${sopsFolder}/olan.yaml";
+        };
+        # formatted as extra-access-tokens = github.com=<PAT token>
+        "tokens/nix-access-tokens" = {
+          sopsFile = "${sopsFolder}/olan.yaml";
+        };
+      }
+      # // lib.optionalAttrs osConfig.hostSpec.isDevelopment {
+      #   "tokens/openai" = {
+      #     sopsFile = "${sopsFolder}/shared.yaml";
+      #     path = "${homeDirectory}/.config/openai/token";
+      #   };
+      # }
+      // lib.optionalAttrs osConfig.hostSpec.isWork {
+        # FIXME(secrets): Need an activation script to build a config.yml using multiple files (ie: work and personal)
+        "config/glab" = {
+          sopsFile = "${sopsFolder}/development.yaml";
+          path = "${homeDirectory}/.config/glab/config.yml";
+        };
+      }
+      // yubikeySecrets
+      // workSopsSecrets;
   };
 }
