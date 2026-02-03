@@ -34,21 +34,24 @@ Although much of the process is automated, there are still some manual steps.
        #...
     ```
 
-## Brand new host
+## New host setup
 
-- Add `hosts/nixos/<hostname>/default.nix`
+- Add `hosts/nixos/<hostname>/{default, disks, host-spec}.nix`
 - Find disk name from livecd with `lsblk`
 - Find RAM amount form livcd with `free -m`
   - Only relevant if using swap
-- Add `nixos-installer/flake.nix` `newConfig` entry, and relevant options
-- If using backup, add a borg passphrase to nix-secrets or temporarly disable backup from the config
+- If using backup, add a borg passphrase to nix-secrets or temporarly disable
+  backup from the config
 
-## Steps to Deploying this flake
+## Deployment steps
 
-- Run `nix flake update` in the `nixos-installer` folder
-- Run `just iso` to generate the iso file
-- Use the generated `result/iso/*.iso` file to boot into it on the target machine/vm
-- Run `just iso-install <disk>` to generate the iso file automatically copy it onto a USB drive
+- Run `just up <hostname>` to generate a lock file
+- If you need a new liveusb::
+  - run `just iso` to generate an iso file
+  - Use the generated `result/iso/*.iso` file to boot into it on the target
+    machine/vm
+  - Run `just iso-install <disk>` to generate the iso file automatically copy
+    it onto a USB drive
 
 ### 0. VM setup (optional)
 
