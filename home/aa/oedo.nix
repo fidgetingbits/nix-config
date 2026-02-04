@@ -44,15 +44,8 @@
           "ghostty.nix"
 
           # Tied to an enable probably
-
-          "desktop/gnome"
+          "desktop"
           "gnome-terminal.nix"
-
-          # These should be linked together somehow
-          "desktop/wayland"
-          "desktop/hyprland"
-          "desktop/kanshi.nix"
-          "desktop/waybar.nix"
         ])
     )
   );
