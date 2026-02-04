@@ -20,6 +20,9 @@ let
         ;
     };
     text =
+      let
+        recipients = lib.concatStringsSep ", " cfg.notify.to;
+      in
       # bash
       ''
         exec {LOCKFD}> /var/lock/mirror-backups.lock
@@ -27,19 +30,28 @@ let
           echo "Another backup running; exiting"
           exit 0
         fi
+
+        # --chmod ensures the files are group-accessible on host B, even if
+        # they aren't normally on host A. This is needed because we use a
+        # different user to copy the files from host A to B.
+        #
+        # I don't use --checksum since some of our backup servers use nvme. This
+        # technically risks missing disk corruption. But periodic disk validation
+        # on the hosts should notify of this.
         rsync -e 'ssh -l ${cfg.user} -i ${sshKeyPath} -p ${port}' \
-          -cau --no-p --stats \
+          -aHS --stats \
+          --delete \
+          --chmod=Dg+s,ug+rw,o-rwx \
           ${lib.concatStringsSep " " cfg.folders} \
           ${cfg.server}:${cfg.destinationPath} | tee /root/mirror-log.txt
 
-        TMPDIR=$(mktemp -d)
-        cat >"$TMPDIR"/mirror.txt <<-EOF
-        From:box@${config.hostSpec.domain}
+        exec msmtp -t  <<EOF
+        To: ${recipients}
+        From: ${cfg.notify.from}
         Subject: [${config.networking.hostName}: mirror] Mirroring to ${cfg.server} complete
+
         $(cat /root/mirror-log.txt)
         EOF
-        msmtp -t admin@${config.hostSpec.domain} <"$TMPDIR"/mirror.txt
-        rm -rf "$TMPDIR"
       '';
   };
 in
@@ -58,20 +70,39 @@ in
     user = lib.mkOption {
       type = lib.types.str;
       default = "borg";
-      description = "The user to authenticate with to the server";
+      description = "The user to authenticate to the server with";
     };
     folders = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [ "/mnt/storage/backup/" ];
-      description = "List of folders to mirror to the destination host";
+      description = "List of folders to mirror to the destination server";
     };
     time = lib.mkOption {
       type = lib.types.str;
       default = "*-*-* 4:00:00";
       description = "systemd OnCalender time to trigger the mirroring.";
     };
+    notify = lib.mkOption {
+      type = lib.types.submodule {
+        options = {
+          to = lib.mkOption {
+            type = lib.types.listOf lib.types.str;
+            default = [ config.hostSpec.email.admin ];
+            example = [ "admin@example.com" ];
+            description = "List of emails to send notifications to";
+          };
+          from = lib.mkOption {
+            type = lib.types.str;
+            default = config.hostSpec.email.notifier;
+            example = "notifications@example.com";
+            description = "Email address to send notifications from";
+          };
+        };
+
+      };
+      default = { };
+    };
   };
-  # FIXME: Check if the disks are getting too full?
   config = lib.mkIf cfg.enable ({
     systemd = {
       services."mirror-backups" = {
