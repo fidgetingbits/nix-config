@@ -48,10 +48,10 @@ overview {
 //
 // ========== Startup ==========
 //
-spawn-at-startup "uwsm finalize NIRI_SOCKET"
 spawn-at-startup "firefox"
 spawn-at-startup "spotify"
-spawn-at-startup "ghostty -e zellij attach nix"
+spawn-sh-at-startup "uwsm finalize NIRI_SOCKET"
+spawn-sh-at-startup "ghostty -e zellij attach nix"
 hotkey-overlay {
     skip-at-startup
 }
