@@ -1,4 +1,5 @@
 { ... }:
 {
   isNormalUser = true;
+  extraGroups = [ "wheel" ];
 }
