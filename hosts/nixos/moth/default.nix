@@ -39,6 +39,10 @@
   services.remoteLuksUnlock = {
     enable = true;
     notify.to = config.hostSpec.email.mothAdmins;
+    ssh.users = [
+      "aa"
+      "ta"
+    ];
   };
 
   # Override the physical key to reboot on short press
@@ -87,9 +91,13 @@
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICMso7GIZT7pDRxeE8xd+hkwUySI8v8LwvDn1gPJyGFK root@myth"
   ];
 
-  # FIXME:
-  # services.backup = {
-  #   enable = true;
-  #   borgBackupStartTime = "09:00:00";
-  # };
+  services.backup = {
+    enable = true;
+    borgBackupStartTime = "09:00:00";
+
+    borgServer = "myth.${config.hostSpec.domain}";
+    borgRemotePath = "/run/current-system/sw/bin/borg";
+    borgBackupPath = "/mnt/storage/backup/aa";
+    borgNotifyTo = config.hostSpec.email.mothAdmins;
+  };
 }

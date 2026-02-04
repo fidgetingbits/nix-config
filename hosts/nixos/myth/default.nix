@@ -53,6 +53,10 @@
   services.remoteLuksUnlock = {
     enable = true;
     notify.to = config.hostSpec.email.mythAdmins;
+    ssh.users = [
+      "aa"
+      "ta"
+    ];
   };
   services.logind.settings.Login.HandlePowerKey = lib.mkForce "reboot";
   services.dyndns.enable = true;
