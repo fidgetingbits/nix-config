@@ -30,7 +30,7 @@
         }
         {
           label = "logout";
-          action = "hyprctl dispatch exit; niri msg action quit;";
+          action = "uwsm stop";
           text = "[L]ogout";
           keybind = "l";
         }
@@ -42,7 +42,7 @@
         }
         {
           label = "screen off";
-          action = "${lockAction} & hyprctl dispatch dpms off";
+          action = "${lockAction} & niri msg action power-off-monitors";
           text = "Screen Of[f]";
           keybind = "f";
         }
