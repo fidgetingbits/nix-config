@@ -176,5 +176,8 @@
 
   services.dbus.implementation = "broker";
 
+  # backup mirror assumes users is a shared gid across hosts, so hardcode it in case nixos ever changes the default
+  users.groups.users.gid = 100;
+
   system.stateVersion = "23.05";
 }
