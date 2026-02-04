@@ -195,7 +195,6 @@ Here you should have a fully working system, but some stuff you still need to do
   - .mozilla
   - syncthing
 - Log into firefox
-- Log into vscode
 - Re-link signal
 - Setup atuin
   - `atuin login`
