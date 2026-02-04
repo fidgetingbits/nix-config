@@ -299,6 +299,7 @@ in
           pkgs.mount
           pkgs.umount
           pkgs.msmtp
+          borg-backup-init
         ];
         text = ''
           TOOL_DESCRIPTION="Use borg to backup a btrfs subvolume"
@@ -306,8 +307,13 @@ in
           ${shellScriptHelpers}
           ${shellScriptEmail}
           parse_args "0" "$@"
+
           LOGFILE="${cfg.borgBackupLogPath}"
           ${shellScriptCheckLock}
+
+          # Configure a new backup if one doesn't already exist
+          borg-backup-init || true
+
           function borg_backup() {
             MOUNTDIR=$(mktemp -d)
             mount -t btrfs -o subvol=/ "$BORG_BTRFS_VOLUME" "$MOUNTDIR"
@@ -347,6 +353,9 @@ in
           # FIXME: Would be nice if this part could just be generic
           LOGFILE="${cfg.borgBackupLogPath}"
           ${shellScriptCheckLock}
+          # Configure a new backup if one doesn't already exist
+          borg-backup-init || true
+
           function borg_backup() {
               # samba mounts that we want to exclude from the backup
               MOUNT_EXCLUDES=()
@@ -575,7 +584,7 @@ in
                     pkgs.writeShellScript "borg-backup-forking"
                       # bash
                       ''
-                        ${lib.getBin backupTool}/bin/${backupToolName} &
+                        ${lib.getBin backupTool}/bin/${backupToolName} --debug &
                         echo $! > /run/borg-backup.pid
                       '';
                   PIDFile = "/run/borg-backup.pid";
