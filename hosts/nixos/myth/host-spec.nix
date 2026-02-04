@@ -4,6 +4,8 @@
     hostName = "myth";
     users = lib.mkForce [
       "admin"
+      "aa"
+      "ta"
       "pa"
       "borg"
     ];

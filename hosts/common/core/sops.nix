@@ -53,7 +53,11 @@ in
           # See later activation script for folder permission sanitization
           path = "${config.hostSpec.home}/.config/sops/age/keys.txt";
         };
+      }
+
+      (lib.mkIf (config.hostSpec.isLocal || config.hostSpec.useAtticCache) {
         # NOTE: These two entries are duplicated in home sops as well, and here because nix.nix can't
+
         # directly check for sops usage due to recursion in some situations
         # formatted as extra-access-tokens = github.com=<PAT token>
         "tokens/nix-access-tokens" = {
@@ -62,7 +66,7 @@ in
         "passwords/netrc" = {
           sopsFile = "${sopsFolder}/olan.yaml";
         };
-      }
+      })
 
       (lib.mkIf config.services.backup.enable {
         "passwords/borg" = {
