@@ -120,8 +120,8 @@ in
       description = "The email address that msmtp notifications will be sent from";
     };
     borgNotifyTo = lib.mkOption {
-      type = lib.types.str;
-      default = config.hostSpec.email.admin;
+      type = lib.types.listOf lib.types.str;
+      default = [ config.hostSpec.email.admin ];
       description = "The email address that msmtp notifications will be sent to";
     };
     borgRemotePath = lib.mkOption {
@@ -245,18 +245,20 @@ in
         '';
 
       shellScriptEmail =
+        let
+          recipients = lib.concatStringsSep ", " cfg.borgNotifyTo;
+        in
         # bash
         ''
           function email_results() {
-            SUBJECT="${"1:-Backup"}"
-            TMPDIR=$(mktemp -d)
-            cat >"$TMPDIR"/backup-mail.txt <<-EOF
+            SUBJECT="''${1:-Backup}"
+            exec msmtp -t <<EOF
+          To: ${recipients}
           From:${cfg.borgNotifyFrom}
-          Subject: [${config.networking.hostName}: backup] $(date) $SUBJECT"
+          Subject: [${config.networking.hostName}: backup] $(date +%Y-%m-%d_%H-%M) $SUBJECT"
 
           $(cat "$LOGFILE")
           EOF
-            msmtp -t ${cfg.borgNotifyTo} <"$TMPDIR"/backup-mail.txt
           }
         '';
 
