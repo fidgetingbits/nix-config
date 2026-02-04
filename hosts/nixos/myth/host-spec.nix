@@ -28,7 +28,7 @@
     # Networking
     wifi = lib.mkForce false;
 
-    # Sysystem settings
+    # System settings
     persistFolder = lib.mkForce "/persist";
     timeZone = lib.mkForce "America/Edmonton";
   };
