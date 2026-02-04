@@ -46,7 +46,7 @@
 
   # Setup NUT server and corresponding client for USB-attached UPS device
   services.ups = {
-    server.enable = true;
+    server.enable = false;
     username = "nut";
     name = "cyberpower";
     powerDownTimeOut = (2 * 60); # 2m. UPS reports ~10min
