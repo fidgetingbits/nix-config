@@ -2,13 +2,12 @@
 {
   services.sshguard =
     let
-      minute = 60;
-      hour = minute * 60;
+      time = lib.custom.time;
     in
     {
       enable = true;
-      blocktime = hour;
-      detection_time = 8 * hour;
+      blocktime = (time.hours 1);
+      detection_time = (time.days 2);
       blacklist_threshold = 30; # 3 strikes
     };
   systemd.services.sshguard.serviceConfig = {
