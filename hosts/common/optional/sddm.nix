@@ -11,16 +11,15 @@ let
   };
 in
 {
-  #  imports = [
-  #    ./x11.nix # We use X11 because wayland breaks the theme animations
-  #  ];
+  #imports = [
+  #  ./x11.nix # We use X11 because wayland breaks the theme animations
+  #];
   security.pam.services.sddm.enableGnomeKeyring = true;
   environment.systemPackages = [ sddm-theme ];
   qt.enable = true;
   services.displayManager.sddm = {
     package = pkgs.kdePackages.sddm; # use qt6 version of sddm
     enable = true;
-    # NOTE: This breaks the video wallpaper from the silentSDDM theme...
     wayland.enable = config.hostSpec.useWayland;
     theme = sddm-theme.pname;
     extraPackages = sddm-theme.propagatedBuildInputs;
