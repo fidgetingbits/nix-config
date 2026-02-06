@@ -37,8 +37,9 @@
             attrsOf (oneOf [
               str
               (listOf str)
-              int
+              int # for port
               (attrsOf str)
+              (attrsOf (listOf str))
             ]);
           description = "The email of the user";
         };
