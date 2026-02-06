@@ -34,13 +34,16 @@
         email = lib.mkOption {
           type =
             with lib.types;
-            attrsOf (oneOf [
-              str
-              (listOf str)
-              int # for port
-              (attrsOf str)
-              (attrsOf (listOf str))
-            ]);
+            let
+              leafType = oneOf [
+                (listOf str)
+                str
+                int
+              ];
+              # Allow any amount of nested attrs
+              nestedAttrs = either leafType (attrsOf nestedAttrs);
+            in
+            nestedAttrs;
           description = "The email of the user";
         };
         work = lib.mkOption {

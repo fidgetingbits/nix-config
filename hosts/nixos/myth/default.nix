@@ -68,10 +68,10 @@
         group = user: config.users.users.${user}.group;
       in
       [
-        "d /mnt/storage/backup/ 0750 ${name "borg"} ${group "borg"} -"
-        "d /mnt/storage/mirror/ 0750 ${name "borg"} ${group "borg"} -"
-        "d /mnt/storage/share/ 0770 ${name "aa"} ${group "aa"} -"
-        # FIXME: loop over users enabled on this system with the "backup" roll enabled or something
+        "d /mnt/storage/backup/ 2750 ${name "borg"} ${group "borg"} -"
+        "d /mnt/storage/mirror/ 2750 ${name "borg"} ${group "borg"} -"
+        "d /mnt/storage/share/ 2770 ${name "aa"} ${group "aa"} -"
+        # FIXME: loop over users enabled on this system with some "backup" role enabled or something
         "d /mnt/storage/backup/pa 0700 ${name "pa"} ${group "pa"} -"
       ];
   };
