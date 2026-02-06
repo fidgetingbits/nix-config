@@ -37,16 +37,7 @@
           "yazi.nix"
 
           # === Window Managers ===
-          # FIXME: This should only be if not wayland
-          "desktop/i3"
-          "desktop/gnome"
-          # FIXME: This should only be if wayland
-          "desktop/wayland"
-
-          # These should be linked together somehow
-          "desktop/hyprland"
-          "desktop/kanshi.nix"
-          "desktop/waybar.nix"
+          "desktop/"
 
           "fcitx5"
           # Maybe more role-specific stuff
