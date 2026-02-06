@@ -45,7 +45,7 @@
           "gui-utilities.nix" # core for any desktop
           "chat.nix"
           "reversing"
-          "wine.nix"
+          # "wine.nix"
         ])
     )
   );
