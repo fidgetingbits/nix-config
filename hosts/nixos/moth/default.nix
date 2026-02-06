@@ -38,7 +38,7 @@
 
   services.remoteLuksUnlock = {
     enable = true;
-    notify.to = config.hostSpec.email.mothAdmins;
+    notify.to = config.hostSpec.email.moth.alerts;
     ssh.users = [
       "aa"
       "ta"
@@ -81,7 +81,7 @@
 
   services.mirror-backups = {
     enable = true;
-    notify.to = config.hostSpec.email.mothAdmins;
+    notify.to = config.hostSpec.email.moth.backups;
     time = "*-*-* 5:00:00"; # Keep sync with myth times
     server = "myth.${config.hostSpec.domain}";
   };
@@ -98,6 +98,9 @@
     borgServer = "myth.${config.hostSpec.domain}";
     borgRemotePath = "/run/current-system/sw/bin/borg";
     borgBackupPath = "/mnt/storage/backup/aa";
-    borgNotifyTo = config.hostSpec.email.mothAdmins;
+    borgNotifyTo = config.hostSpec.email.moth.backups;
   };
+
+  # Try to avoid bluez package
+  hardware.bluetooth.enable = lib.mkForce false;
 }

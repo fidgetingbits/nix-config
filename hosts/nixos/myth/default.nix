@@ -52,7 +52,7 @@
 
   services.remoteLuksUnlock = {
     enable = true;
-    notify.to = config.hostSpec.email.mythAdmins;
+    notify.to = config.hostSpec.email.myth.alerts;
     ssh.users = [
       "aa"
       "ta"
@@ -80,6 +80,7 @@
     enable = true;
     time = "*-*-* 4:00:00"; # Keep sync with moth times
     server = "moth.${config.hostSpec.domain}";
+    notify.to = config.hostSpec.email.myth.backups;
   };
   # Allow moth to mirror into myth
   users.users.borg.openssh.authorizedKeys.keys = [
