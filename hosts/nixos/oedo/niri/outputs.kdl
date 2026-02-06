@@ -1,0 +1,8 @@
+output "DP-1" {
+    mode "2560x2880@59.96700"
+    scale 1.0
+}
+output "HDMI-A-1" {
+    mode "2560x2880@59.96700"
+    scale 1.0
+}

@@ -14,7 +14,7 @@
     isDevelopment = lib.mkForce true;
     isAdmin = lib.mkForce true;
     # FIXME: We should have like "desktop" = "hyprland" and have that auto enable the rest?
-    defaultDesktop = "hyprland-uwsm";
+    defaultDesktop = "niri-uwsm";
     useWayland = true;
     isAmdGpu = true;
   };

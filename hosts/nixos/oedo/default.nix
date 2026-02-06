@@ -46,6 +46,7 @@
         # Window Manager
         #"gnome.nix"
         "sddm.nix"
+        "niri.nix"
 
         # "binaryninja.nix"
         # "cynthion.nix"

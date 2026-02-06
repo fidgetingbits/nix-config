@@ -26,12 +26,13 @@
           "plymouth.nix"
           "printing.nix"
           "locale.nix"
-          "x11.nix"
           "sound.nix"
           # FIXME: Rename this
           "mail-delivery.nix"
 
           # Desktop environment and login manager
+          # FIXME: This should all move to desktop/ similar to home
+          "x11.nix"
           # "gdm.nix"
           "sddm.nix"
           "gnome.nix"

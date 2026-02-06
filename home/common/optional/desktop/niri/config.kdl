@@ -1,25 +1,9 @@
-//order matters
-include "inputs.kdl"
-include "outputs.kdl"
-include "binds.kdl"
-include "rules.kdl"
-//
-// ========== Named Workspaces ==========
-//
-workspace "1_dev" {
-    open-on-output "eDP-1"
-}
-workspace "2_web" {
-    open-on-output "eDP-1"
-}
-// Music, chat, etc
-workspace "3_u" {
-    open-on-output "eDP-1"
-}
-// Scratch
-workspace "Y_qrs" {
-    open-on-output "eDP-1"
-}
+// NOTE: Includes are automatically added by default.nix to allow per-host
+// values
+// include "inputs.kdl"
+// include "outputs.kdl"
+// include "binds.kdl"
+// include "rules.kdl"
 //
 // ========== Animations ==========
 //

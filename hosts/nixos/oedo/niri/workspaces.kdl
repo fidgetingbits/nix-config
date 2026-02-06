@@ -1,0 +1,17 @@
+//
+// ========== Named Workspaces ==========
+//
+workspace "1_dev" {
+    open-on-output "DP-1"
+}
+workspace "2_web" {
+    open-on-output "HDMI-A-1"
+}
+// Music, chat, etc
+workspace "3_u" {
+    open-on-output "HDMI-A-1"
+}
+// Scratch
+workspace "Y_qrs" {
+    open-on-output "DP-1"
+}
