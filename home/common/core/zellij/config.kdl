@@ -228,16 +228,6 @@ keybinds clear-defaults=true {
         }
  // Console
         //bind "Alt e"     { EditScrollback ; }
-
-        // FIXME: not sure if this is needed
- //       bind "Alt ;" {
- //           MessagePlugin "compact-bar" {
- //               name "toggle_tooltip"
- //               payload "1"
- //               floating false
- //               tooltip "Alt ;"
- //           }
- //       }
     }
     shared_except "normal" "locked" {
         bind "Enter" "Esc" {
@@ -270,7 +260,8 @@ keybinds clear-defaults=true {
 // not 'plugin location="zellij:compact-bar"'
 plugins {
     compact-bar location="zellij:compact-bar" {
-        tooltip "Alt ;"
+        // Alt+/ matches Super+/ in niri
+        tooltip "Alt /"
     }
 }
 ui {
