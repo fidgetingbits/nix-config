@@ -41,7 +41,7 @@ let
         rsync -e 'ssh -l ${cfg.user} -i ${sshKeyPath} -p ${port}' \
           -aHS --stats \
           --delete \
-          --chmod=Dg+srx,Fg+rw,o-rwx \
+          --chmod=Dg+srwx,Fg+rw,o-rwx \
           ${lib.concatStringsSep " " cfg.folders} \
           ${cfg.server}:${cfg.destinationPath} | tee /root/mirror-log.txt
 
