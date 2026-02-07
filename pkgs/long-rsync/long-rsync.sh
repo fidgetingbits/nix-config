@@ -9,15 +9,15 @@
 # At the moment this is ONLY tested on two synology NAS that need to copy between each other.
 # It also partially requires manual authentication to the target servers in order to get going.
 
-set -eou pipefail
 # FIXME:This should add parse_args or similar to add debug
-set -x
+# set -x
 
 if [ $# -lt 4 ]; then
     echo "Usage: $0 <source_ip> <source_folder> <dest_ip> <dest_folder>"
     exit 1
 fi
 
+STARTED=$(date "+%Y-%m-%d %H:%M:%S")
 SOURCE_HOST="${1}"
 SOURCE_FOLDER="${2}"
 # FIXME:This default user should come from nix probably?
@@ -62,7 +62,7 @@ function runScp {
 function cleanup {
     if [ -f "$KEY_FILE" ]; then
         runSshI "$SOURCE_USER@$SOURCE_HOST" sh -- <<EOF
-            rm -f "$SOURCE_TMP/$KEY_FILE" || true
+            rm -rf "$SOURCE_TMP" || true
 EOF
     fi
 
@@ -114,41 +114,41 @@ fi
 runScp "$PWD/$KEY_FILE" "$SOURCE_USER@$SOURCE_HOST:$SOURCE_TMP/$KEY_FILE"
 runSshI "$SOURCE_USER@$SOURCE_HOST" "chmod 600 $SOURCE_TMP/$KEY_FILE"
 
-# FIXME:This --rsync-path may need to get fixed up depending on the target? This is specific to synology atm
-# FIXME:Remove -v from rsync eventually, likely add -H, --stats, -S, maybe chmod since the uid might differ?
+RSYNC_PATH="${RSYNC_PATH:-/bin/rsync}" # /bin/rsync is what's on the synology, but allow override
 FILENAME="rsync.sh"
 cat >>"$tmp_dir"/rsync.sh <<EOF
-set -x
-rsync -avP --rsync-path=/bin/rsync -e "ssh -v ${sshArgs[@]} -i $SOURCE_TMP/$KEY_FILE -o IdentitiesOnly=yes -o BatchMode=yes" "$SOURCE_FOLDER" "$DEST_USER@$DEST_HOST:$DEST_FOLDER"
+rsync -aHSP --stats --rsync-path=/bin/rsync -e "ssh ${sshArgs[@]} -i $SOURCE_TMP/$KEY_FILE -o IdentitiesOnly=yes -o BatchMode=yes" "$SOURCE_FOLDER" "$DEST_USER@$DEST_HOST:$DEST_FOLDER"
 EOF
 
 runScp "$tmp_dir/$FILENAME" "$SOURCE_USER@$SOURCE_HOST:$SOURCE_TMP/$FILENAME"
 runSshI "$SOURCE_USER@$SOURCE_HOST" "chmod +x $SOURCE_TMP/$FILENAME"
 
-# Run the rsync command on the source host in a loop until it completes. Sleep 10 is used
-# to give the disks a chance to cool down
-# FIXME: probably want some sanity escape hatch in case their is a legit error and not a connection loss
-# NOTE:target /tmp may be noexec, so be sure to use sh <
+# Run the rsync command on the source host in a loop until it completes
+# NOTE:target /tmp may be mounted noexec, so we use < sh
 SYNC_LOOP=$(
     cat <<EOF
     until ssh ${sshArgs[@]} -i "$PWD/$KEY_FILE" -o IdentitiesOnly=yes "$SOURCE_USER@$SOURCE_HOST" \
     "sh < $SOURCE_TMP/$FILENAME"; \
     do
         echo "Connection lost, retrying..."
-        sleep 10
+        sleep 10 # Maybe to cool down disks if connection loss was related? Because of moth heat issues...
     done
 EOF
 )
 
-# FIXME: re-enable systemd-inhibit
-#systemd-inhibit --why="Large Data Migration" --who="Rsync Task" --mode=block \
-bash -c "$SYNC_LOOP"
+echo "Running inhibited rsync loop"
+sudo systemd-inhibit --why="Large Data Migration" --who="Rsync Task" --mode=block bash -c "$SYNC_LOOP"
+ENDED=$(date "+%Y-%m-%d %H:%M:%S")
 
 # RECIPIENTS and DELIVERER come from nix package
 msmtp -t <<EOF
 To: ${RECIPIENTS:-}
 From: ${DELIVERER:-}
-Subject: [$(hostname)}: rsync]: Copy from $SOURCE_HOST to $DEST_HOST completed
+Subject: [$(hostname): rsync]: Copy from $SOURCE_HOST to $DEST_HOST completed
 
 Copy from $SOURCE_HOST to $DEST_HOST completed
+
+Ran from $STARTED until $ENDED
 EOF
+
+echo "Copy from $SOURCE_HOST to $DEST_HOST completed"
