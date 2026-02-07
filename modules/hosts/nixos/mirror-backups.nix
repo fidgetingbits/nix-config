@@ -38,12 +38,18 @@ let
         # I don't use --checksum since some of our backup servers use nvme. This
         # technically risks missing disk corruption. But periodic disk validation
         # on the hosts should notify of this.
-        rsync -e 'ssh -l ${cfg.user} -i ${sshKeyPath} -p ${port}' \
+        # FIXME: run this in a loop until it definitely finishes, similar to long-rsync?
+        SYNC_CMD=$(cat <<EOF
+        rsync -e "ssh -l ${cfg.user} -i ${sshKeyPath} -p ${port}" \
           -aHS --stats \
           --delete \
           --chmod=Dg+srwx,Fg+rw,o-rwx \
           ${lib.concatStringsSep " " cfg.folders} \
-          ${cfg.server}:${cfg.destinationPath} | tee /root/mirror-log.txt
+          ${cfg.server}:${cfg.destinationPath} 2>&1 | tee /root/mirror-log.txt
+        EOF
+        )
+
+        systemd-inhibit --why="Backup mirror in progress" --who="Backup Mirror Task" --mode=block ${lib.getExe pkgs.bash} -c "$SYNC_CMD"
 
         exec msmtp -t  <<EOF
         To: ${recipients}
