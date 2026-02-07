@@ -107,11 +107,14 @@ lib.mkIf cfg.isAdmin {
         port = cfg.networking.ports.tcp.gitlab;
       };
 
-      # Systems stuck on older version of ssh, so avoid PQ warning
-      "missing-pq" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
+      "synology-tweaks" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
         host = "oath oath.${cfg.domain} onus onus.${cfg.domain}";
         extraOptions = {
+          # Stuck on older versions of ssh, so avoid PQ warning
           WarnWeakCrypto = "no-pq-kex";
+          # Fix coloring nonsense
+          RemoteCommand = "export LS_COLORS+=':ow=01;34'; /bin/sh -l";
+          RequestTTY = "force";
         };
       };
 
