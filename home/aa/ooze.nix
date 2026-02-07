@@ -2,6 +2,7 @@
   inputs,
   pkgs,
   lib,
+  osConfig,
   ...
 }:
 {
@@ -26,11 +27,20 @@
       inputs.stylix.homeModules.stylix
     ];
 
-  home.packages = lib.attrValues {
-    inherit (pkgs)
-      screen # Needed for serial console attached to server
-      ;
-  };
+  home.packages =
+    (lib.attrValues {
+      inherit (pkgs)
+        screen # Needed for serial console attached to server
+        ;
+    })
+    # FIXME: Define this once in a file each system imports, with other backup utilities
+    ++ [
+      (pkgs.long-rsync.overrideAttrs (_: {
+        recipients = osConfig.hostSpec.email.olanAdmins;
+        deliverer = osConfig.hostSpec.email.notifier;
+        sshPort = osConfig.hostSpec.networking.ports.tcp.ssh;
+      }))
+    ];
 
   system.ssh-motd.enable = true;
 }

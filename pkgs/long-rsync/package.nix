@@ -14,6 +14,7 @@ stdenvNoCC.mkDerivation (finalAttrs: rec {
 
   recipients = recipients;
   deliverer = deliverer;
+  sshPort = sshPort;
 
   installPhase =
     let
@@ -36,13 +37,14 @@ stdenvNoCC.mkDerivation (finalAttrs: rec {
             coreutils
             msmtp
             ;
-
         };
         text =
           lib.seq _check
             # bash
             ''
-              RECIPIENTS=''${RECIPIENTS:-${lib.concatStringsSep ", " finalAttrs.recipients}} DELIVERER=''${DELIVERER:-${finalAttrs.deliverer}}
+              export RECIPIENTS=''${RECIPIENTS:-${lib.concatStringsSep ", " finalAttrs.recipients}}
+              export DELIVERER=''${DELIVERER:-${finalAttrs.deliverer}}
+              export SSH_PORT=''${SSH_PORT:-${toString finalAttrs.sshPort}}
               ${lib.readFile ./long-rsync.sh}
             '';
       };

@@ -77,6 +77,7 @@
       (pkgs.long-rsync.overrideAttrs (_: {
         recipients = osConfig.hostSpec.email.olanAdmins;
         deliverer = osConfig.hostSpec.email.notifier;
+        sshPort = osConfig.hostSpec.networking.ports.tcp.ssh;
       }))
     ];
 

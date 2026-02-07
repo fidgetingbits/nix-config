@@ -50,16 +50,24 @@
     )
   );
 
-  home.packages = lib.attrValues {
-    inherit (pkgs)
-      burpsuite
-      ;
-    inherit (pkgs.introdus)
-      easylkb
-      slideshare-downloader
-      cyberpower-pdu
-      ;
-  };
+  home.packages =
+    (lib.attrValues {
+      inherit (pkgs)
+        burpsuite
+        ;
+      inherit (pkgs.introdus)
+        easylkb
+        slideshare-downloader
+        cyberpower-pdu
+        ;
+    })
+    ++ [
+      (pkgs.long-rsync.overrideAttrs (_: {
+        recipients = osConfig.hostSpec.email.olanAdmins;
+        deliverer = osConfig.hostSpec.email.notifier;
+        sshPort = osConfig.hostSpec.networking.ports.tcp.ssh;
+      }))
+    ];
 
   introdus.services.awww = {
     enable = true;
