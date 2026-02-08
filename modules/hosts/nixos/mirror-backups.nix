@@ -6,7 +6,7 @@
 }:
 let
   cfg = config.services.mirror-backups;
-  sshKeyPath = "/etc/ssh/mirror_ed25519";
+  sshKeyPath = "/root/.ssh/id_borg";
   port = toString config.hostSpec.networking.ports.tcp.ssh;
   # FIXME: This needs to be part of a loop that is per-mirror
   mirror-backups = pkgs.writeShellApplication {
