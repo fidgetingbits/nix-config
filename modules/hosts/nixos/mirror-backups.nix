@@ -8,6 +8,7 @@ let
   cfg = config.services.mirror-backups;
   sshKeyPath = "/etc/ssh/mirror_ed25519";
   port = toString config.hostSpec.networking.ports.tcp.ssh;
+  # FIXME: This needs to be part of a loop that is per-mirror
   mirror-backups = pkgs.writeShellApplication {
     name = "mirror-backups";
     runtimeInputs = lib.attrValues {
@@ -23,6 +24,7 @@ let
       let
         recipients = lib.concatStringsSep ", " cfg.notify.to;
       in
+      # FIXME: lockfd path should be changed to the per-script name when we have multiple mirror scripts
       # bash
       ''
         exec {LOCKFD}> /var/lock/mirror-backups.lock
@@ -49,7 +51,7 @@ let
         EOF
         )
 
-        systemd-inhibit --why="Backup mirror in progress" --who="Backup Mirror Task" --mode=block ${lib.getExe pkgs.bash} -c "$SYNC_CMD"
+        systemd-inhibit --why="Mirror backups to ${cfg.server}" --who="Backup Mirror Task" --mode=block ${lib.getExe pkgs.bash} -c "$SYNC_CMD"
 
         exec msmtp -t  <<EOF
         To: ${recipients}
@@ -133,7 +135,9 @@ in
       };
     };
 
-    sops.secrets."keys/ssh/mirror_ed25519" = {
+    # same borg key used for local backups can be used to mirror other backups
+    # to the same backup server
+    sops.secrets."keys/ssh/borg" = {
       owner = "root";
       mode = "0400";
       path = sshKeyPath;
