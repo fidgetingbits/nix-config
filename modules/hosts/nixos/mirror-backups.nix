@@ -70,6 +70,11 @@ in
       type = lib.types.str;
       description = "The server to mirror to";
     };
+    package = lib.mkOption {
+      type = lib.types.package;
+      description = "Script package to use for the mirroring";
+      default = mirror-backups;
+    };
     destinationPath = lib.mkOption {
       type = lib.types.str;
       default = "/mnt/storage/mirror/";
@@ -118,7 +123,7 @@ in
         after = [ "network-online.target" ];
         wants = [ "network-online.target" ];
         serviceConfig = {
-          ExecStart = "${pkgs.bash}/bin/bash ${lib.getExe' mirror-backups "mirror-backups"}";
+          ExecStart = "${pkgs.bash}/bin/bash ${lib.getExe cfg.package}";
           RemainAfterExit = false;
         };
       };
