@@ -117,7 +117,7 @@ runSshI "$SOURCE_USER@$SOURCE_HOST" "chmod 600 $SOURCE_TMP/$KEY_FILE"
 RSYNC_PATH="${RSYNC_PATH:-/bin/rsync}" # /bin/rsync is what's on the synology, but allow override
 FILENAME="rsync.sh"
 cat >>"$tmp_dir"/rsync.sh <<EOF
-rsync -aHSP --stats --rsync-path=/bin/rsync -e "ssh ${sshArgs[@]} -i $SOURCE_TMP/$KEY_FILE -o IdentitiesOnly=yes -o BatchMode=yes" "$SOURCE_FOLDER" "$DEST_USER@$DEST_HOST:$DEST_FOLDER"
+rsync -aHSP --stats --rsync-path=$RSYNC_PATH -e "ssh ${sshArgs[@]} -i $SOURCE_TMP/$KEY_FILE -o IdentitiesOnly=yes -o BatchMode=yes" "$SOURCE_FOLDER" "$DEST_USER@$DEST_HOST:$DEST_FOLDER"
 EOF
 
 runScp "$tmp_dir/$FILENAME" "$SOURCE_USER@$SOURCE_HOST:$SOURCE_TMP/$FILENAME"
