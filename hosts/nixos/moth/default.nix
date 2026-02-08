@@ -74,6 +74,8 @@
       [
         "d /mnt/storage/backup/ 2770 ${name "borg"} ${group "borg"} -"
         "d /mnt/storage/mirror/ 2770 ${name "borg"} ${group "borg"} -"
+        # Because we mirror from oath, which doesn't already use aa/ prefix
+        "d /mnt/storage/mirror/aa 2770 ${name "borg"} ${group "borg"} -"
         # FIXME: This should loop over users that we've setup with hm?
         "d /mnt/storage/backup/ta 0700 ${name "ta"} ${group "ta"} -"
       ];
