@@ -42,7 +42,7 @@ let
         # on the hosts should notify of this.
         # FIXME: run this in a loop until it definitely finishes, similar to long-rsync?
         SYNC_CMD=$(cat <<EOF
-        rsync -e "ssh -l ${cfg.user} -i ${sshKeyPath} -p ${port}" \
+        rsync -e "ssh -l ${cfg.user} -i ${sshKeyPath} -p ${port} -oIdentitiesOnly=yes" \
           -aHS --stats \
           --delete \
           --chmod=Dg+srwx,Fg+rw,o-rwx \
