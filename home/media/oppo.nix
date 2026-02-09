@@ -1,7 +1,6 @@
 {
-  #pkgs,
   lib,
-  namespace,
+  #  namespace,
   ...
 }:
 {
@@ -19,7 +18,7 @@
       ])
     )
   );
-  ${namespace}.nix.withSecrets = lib.mkForce false;
+  # ${namespace}.nix.withSecrets = lib.mkForce false;
 
   home.packages = lib.attrValues {
 
