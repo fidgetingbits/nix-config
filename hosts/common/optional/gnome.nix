@@ -27,6 +27,7 @@
       yelp # Help view
       gnome-contacts
       gnome-initial-setup
+      papers # pdf viewer
       ;
 
   };
