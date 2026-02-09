@@ -5,6 +5,39 @@
   pkgs,
   ...
 }:
+let
+
+  wake-oppo = pkgs.writeShellApplication {
+    name = "wake-oppo";
+    runtimeInputs = [ pkgs.wakeonlan ];
+    text =
+      let
+        oppo = config.hostSpec.networking.subnets.ogre.hosts.oppo;
+      in
+      "wakeonlan ${lib.elemAt oppo.mac 0} -i ${oppo.ip}";
+  };
+  mirror-oath = pkgs.writeShellApplication {
+    name = "mirror-oath";
+    runtimeInputs = lib.attrValues {
+      inherit (pkgs)
+        rsync
+        openssh
+        gnused
+        coreutils
+        msmtp
+        ;
+    };
+
+    text =
+      # bash
+      ''
+        export RECIPIENTS=${lib.concatStringsSep ", " config.hostSpec.email.olanAdmins};
+        export DELIVERER=${config.hostSpec.email.notifier};
+        export SSH_PORT=${toString config.hostSpec.networking.ports.tcp.ssh};
+        ${lib.readFile ./mirror-oath.sh}
+      '';
+  };
+in
 {
   imports =
     lib.flatten [
@@ -97,14 +130,28 @@
   '';
 
   environment.systemPackages = [
-    (pkgs.writeShellApplication {
-      name = "wake-oppo";
-      runtimeInputs = [ pkgs.wakeonlan ];
-      text =
-        let
-          oppo = config.hostSpec.networking.subnets.ogre.hosts.oppo;
-        in
-        "wakeonlan ${lib.elemAt oppo.mac 0} -i ${oppo.ip}";
-    })
+    mirror-oath
+    wake-oppo
   ];
+
+  fileSystems."/mnt/oath-backups" = {
+    device = "borg@oath.${config.hostSpec.domain}:";
+    fsType = "sshfs";
+    options = [
+      "nodev"
+      "noatime"
+      "IdentityFile=/root/.ssh/id_borg"
+      "Port=${toString config.hostSpec.networking.ports.tcp.ssh}"
+    ];
+  };
+
+  # orchestrate mirror of backups from other hosts backed up onto oath, since oath isn't nix
+  # mirror targets aren't big enough to hold all mirrors, so broken across hosts
+  services.mirror-backups = {
+    enable = false;
+    package = mirror-oath;
+    notify.to = config.hostSpec.email.moth.backups;
+    time = "*-*-* 2:00:00"; # FIXME: Keep sync with other moth/myth times (also tz diff...)
+    server = "moth.${config.hostSpec.domain}";
+  };
 }
