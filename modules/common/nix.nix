@@ -22,7 +22,7 @@ in
     };
     sopsFile = lib.mkOption {
       type = lib.types.path;
-      default = (builtins.toString inputs.nix-secrets) + "/sops/olan.yaml";
+      default = (toString inputs.nix-secrets) + "/sops/olan.yaml";
       description = "sops file containing nix access token and netrc contents";
     };
   };
