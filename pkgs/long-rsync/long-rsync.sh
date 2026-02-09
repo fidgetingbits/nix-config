@@ -1,13 +1,20 @@
 #!/usr/bin/env bash
 #
-# Usage: ./long-rsync.sh <source_ip> <source_folder> <dest_ip> <dest_folder>
+# Usage: ./long-rsync.sh <source_ip> <source_folder> <dest_ip>
+# <dest_folder>
 #
-# This is a script to help with long copies that you want to be running in the
-# background. It should be run inside a zellij session from whatever host won't
-# be rebooted during the process.
+# This script works by running on some host A and orchestrating a long term
+# copy between two other hosts, B and C. Typically you would run on host A in a
+# tmux/zellij session for monitoring, and ensure that host A won't reboot, to
+# ensure that the copy loop will actually terminate.
 #
-# At the moment this is ONLY tested on two synology NAS that need to copy between each other.
-# It also partially requires manual authentication to the target servers in order to get going.
+# Assumes that hosts B and C are ssh-accessible by the admin running the
+# script, such that temporary ssh keys can be planted to facilitate automated
+# copy completion.
+#
+# The original use case was long copies between two synology NAS devices where
+# the author didn't want to have to manually upload scripts or log into the
+# synology to monitor.
 
 # FIXME:This should add parse_args or similar to add debug
 # set -x
