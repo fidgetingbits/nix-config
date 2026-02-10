@@ -4,6 +4,7 @@
   lib,
   pkgs,
   config,
+  namespace,
   ...
 }:
 {
@@ -71,9 +72,10 @@
         "d /mnt/storage/backup/ 2770 ${name "borg"} ${group "borg"} -"
         "d /mnt/storage/mirror/ 2770 ${name "borg"} ${group "borg"} -"
         "d /mnt/storage/share/ 2770 ${name "aa"} ${group "aa"} -"
-        # FIXME: loop over users enabled on this system with some "backup" role enabled or something
-        "d /mnt/storage/backup/pa 0700 ${name "pa"} ${group "pa"} -"
-      ];
+      ]
+      ++ (lib.map (u: "d /mnt/storage/backup/${u} 0700 ${name "${u}"} ${group "${u}"} -") [
+        "pa"
+      ]);
   };
 
   services.mirror-backups = {
@@ -82,16 +84,21 @@
     server = "moth.${config.hostSpec.domain}";
     notify.to = config.hostSpec.email.myth.backups;
   };
+
   # Allow moth to mirror into myth
   users.users.borg.openssh.authorizedKeys.keys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKZp+oB8eZjz/S5Q8T8uFfq2yCt5NQWI3/Mm6q+ToAsA root@moth"
   ];
 
-  # FIXME:
-  # services.backup = {
-  #   enable = true;
-  #   borgBackupStartTime = "09:00:00";
-  # };
+  services.backup = {
+    enable = true;
+    borgBackupStartTime = "04:30:00";
+
+    borgServer = "moth.${config.hostSpec.domain}";
+    borgRemotePath = "/run/current-system/sw/bin/borg";
+    borgBackupPath = "/mnt/storage/backup/aa";
+    borgNotifyTo = config.hostSpec.email.myth.backups;
+  };
 
   # Connect our NUT client to the UPS on the network
   services.ups = {
@@ -101,4 +108,6 @@
     ip = config.hostSpec.networking.subnets.myth.hosts.synology.ip;
     powerDownTimeOut = (60 * 30); # 30m. UPS reports ~45min
   };
+
+  ${namespace}.services.monit.enable = true;
 }
