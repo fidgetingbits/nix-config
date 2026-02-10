@@ -311,10 +311,11 @@ in
           parse_args "0" "$@"
 
           LOGFILE="${cfg.borgBackupLogPath}"
-          ${shellScriptCheckLock}
 
           # Configure a new backup if one doesn't already exist
           borg-backup-init || true
+
+          ${shellScriptCheckLock}
 
           function borg_backup() {
             MOUNTDIR=$(mktemp -d)
@@ -354,9 +355,11 @@ in
           parse_args "0" "$@"
           # FIXME: Would be nice if this part could just be generic
           LOGFILE="${cfg.borgBackupLogPath}"
-          ${shellScriptCheckLock}
+
           # Configure a new backup if one doesn't already exist
           borg-backup-init || true
+
+          ${shellScriptCheckLock}
 
           function borg_backup() {
               # samba mounts that we want to exclude from the backup
