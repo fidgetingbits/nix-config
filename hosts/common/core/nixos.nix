@@ -174,6 +174,8 @@
     attic-client.enable = config.hostSpec.useAtticCache;
   };
 
+  # WARNING:using broker regular breaks switching due to unit not reloading, often
+  # requiring multiple rebuilds.
   services.dbus.implementation = "broker";
 
   # backup mirror assumes users is a shared gid across hosts, so hardcode it in case nixos ever changes the default
