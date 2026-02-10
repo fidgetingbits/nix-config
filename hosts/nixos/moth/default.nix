@@ -50,7 +50,7 @@
 
   # Setup NUT server and corresponding client for USB-attached UPS device
   services.ups = {
-    server.enable = false;
+    server.enable = true;
     username = "nut";
     name = "cyberpower";
     powerDownTimeOut = (2 * 60); # 2m. UPS reports ~10min
@@ -64,7 +64,6 @@
       "productid = 0601"
     ];
   };
-
   systemd = {
     tmpfiles.rules =
       let
@@ -74,11 +73,18 @@
       [
         "d /mnt/storage/backup/ 2770 ${name "borg"} ${group "borg"} -"
         "d /mnt/storage/mirror/ 2770 ${name "borg"} ${group "borg"} -"
-        # Because we mirror from oath, which doesn't already use aa/ prefix
+        # Because we mirror from oath, which doesn't already use aa/ prefix for copying
         "d /mnt/storage/mirror/aa 2770 ${name "borg"} ${group "borg"} -"
-        # FIXME: This should loop over users that we've setup with hm?
-        "d /mnt/storage/backup/ta 0700 ${name "ta"} ${group "ta"} -"
-      ];
+      ]
+      # In some cases borg user is used to backup to these folders, so needs users access
+      ++ (lib.map (u: "d /mnt/storage/backup/${u} 0770 ${name "${u}"} ${group "${u}"} -") [
+        "aa"
+        "ta"
+      ]);
+  };
+  systemd.services.systemd-tmpfiles-setup = {
+    after = [ "mnt-storage.mount" ];
+    requires = [ "mnt-storage.mount" ];
   };
 
   services.mirror-backups = {
