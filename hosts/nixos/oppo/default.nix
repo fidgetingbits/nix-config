@@ -178,10 +178,6 @@
   networking.firewall = {
     allowedUDPPorts = [ 9 ];
   };
-  # Should already be on as per ethtool, but just in case
-  networking.interfaces.ens3 = {
-    wakeOnLan.enable = true;
-  };
 
   modules.hardware.radeon.enable = true;
 }
