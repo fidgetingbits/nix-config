@@ -109,5 +109,20 @@
     powerDownTimeOut = (60 * 30); # 30m. UPS reports ~45min
   };
 
-  ${namespace}.services.monit.enable = true;
+  ${namespace}.services.monit = {
+    enable = true;
+    usage = {
+      filesystem = {
+        enable = true;
+        disks = lib.mkAfter {
+          rootfs = {
+            path = "/";
+          };
+          storage = {
+            path = "/mnt/storage";
+          };
+        };
+      };
+    };
+  };
 }
