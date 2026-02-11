@@ -208,7 +208,7 @@ binds {
     Super+G {
         toggle-column-tabbed-display
     }
- // Toggle the focused column between normal and tabbed display    //
+    // Toggle the focused column between normal and tabbed display    //
     // ========== Window and column size ==========
     //
     // Presets are defined in rules.kdl
