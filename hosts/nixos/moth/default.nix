@@ -4,6 +4,7 @@
   lib,
   pkgs,
   config,
+  namespace,
   ...
 }:
 {
@@ -112,4 +113,52 @@
 
   # Try to avoid bluez package
   hardware.bluetooth.enable = lib.mkForce false;
+
+  # FIXME: Have a btrfs.nix file auto-load of the disks config contains btrfs filesystems, and if so
+  # automatically populate the paths for monit as well
+  services.btrfs.autoScrub = {
+    enable = true;
+    interval = "monthly"; # Because of this raid uses nvme's
+    fileSystems = [
+      "/"
+      "/mnt/storage"
+    ];
+  };
+
+  ${namespace}.services.monit = {
+    enable = true;
+    usage = {
+      fileSystem = {
+        enable = true;
+        fileSystems = {
+          rootfs = {
+            path = "/";
+          };
+          storage = {
+            path = "/mnt/storage";
+          };
+        };
+      };
+    };
+    health = {
+      disk = {
+        enable = true;
+        disks = [
+          "mmcblk0"
+          "nvme0n1"
+          "nvme1n1"
+          "nvme2n1"
+          "nvme3n1"
+        ];
+      };
+      mdadm = {
+        enable = true;
+        disks = [ "md127" ];
+      };
+      btrfs = {
+        enable = true;
+        inherit (config.services.btrfs.autoScrub) fileSystems;
+      };
+    };
+  };
 }
