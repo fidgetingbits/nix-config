@@ -109,12 +109,23 @@
     powerDownTimeOut = (60 * 30); # 30m. UPS reports ~45min
   };
 
+  # FIXME: Have a btrfs.nix file auto-load of the disks config contains btrfs filesystems, and if so
+  # automatically populate the paths for monit as well
+  services.btrfs.autoScrub = {
+    enable = true;
+    interval = "monthly"; # Because of this raid uses nvme's
+    fileSystems = [
+      "/"
+      "/mnt/storage"
+    ];
+  };
+
   ${namespace}.services.monit = {
     enable = true;
     usage = {
-      filesystem = {
+      fileSystem = {
         enable = true;
-        filesystems = {
+        fileSystems = {
           rootfs = {
             path = "/";
           };
@@ -133,6 +144,14 @@
           "nvme1n1"
           "nvme2n1"
         ];
+      };
+      mdadm = {
+        enable = true;
+        disks = [ "md127" ];
+      };
+      btrfs = {
+        enable = true;
+        inherit (config.services.btrfs.autoScrub) fileSystems;
       };
     };
   };

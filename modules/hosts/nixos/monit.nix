@@ -8,9 +8,9 @@
 #
 # TODO:
 # - [ ] Should maybe enable daemon behind nginx proxy?
-# - [ ] Add btrfs failure checks probably
 # - [ ] Add cpu temperature checks probably
-# - [ ] Add other services to have opt-in entries to monitor if the service fails
+# - [ ] Add other services to have opt-in entries to alert/monitor if the service fails
+# - [ ] Would mdmonitor make more sense here if using raid?
 {
   pkgs,
   config,
@@ -64,6 +64,20 @@ let
           echo "FAULTY"
           exit 1
       fi
+    '';
+  };
+
+  btrfsScrubStatus = pkgs.writeShellApplication {
+    name = "btrfs-scrub-status";
+    runtimeInputs = lib.attrValues {
+      inherit (pkgs) btrfs-progs gawk;
+    };
+    # FIXME: if we already know a drive has errors, what do we do? perhaps we set a new baseline value
+    # that defaults to 0 but that will equal whatever we expect the known number of errors on the fileSystem is?
+    # then we pass that value as a second argument to the script?
+    #
+    text = ''
+      btrfs scrub status "$1" | awk '/uncorrectable/ {if ($2 > 0) exit 1}'
     '';
   };
 in
@@ -120,15 +134,38 @@ in
             description = "Disk name to monitor";
           };
         };
+        mdadm = {
+          enable = lib.mkOption {
+            type = lib.types.bool;
+            description = "Enables mdadm raid array status monitoring";
+            default = false;
+          };
+          # FIXME:This could default to the list of mdadm arrays we already define in disks?
+          disks = lib.mkOption {
+            type = lib.types.listOf lib.types.str;
+            description = "List of mdadm arrays to check";
+          };
+        };
+        btrfs = {
+          enable = lib.mkOption {
+            type = lib.types.bool;
+            description = "Enables btrfs scrub status monitoring. Relies on services.btrfs.autoScrub";
+            default = false;
+          };
+          fileSystems = lib.mkOption {
+            type = lib.types.listOf lib.types.str;
+            description = "List of btrfs paths to monitor";
+          };
+        };
       };
       usage = {
-        filesystem = {
+        fileSystem = {
           enable = lib.mkOption {
             default = true;
             type = lib.types.bool;
-            description = "Enables filesystem usage monitoring";
+            description = "Enables fileSystem usage monitoring";
           };
-          filesystems = lib.mkOption {
+          fileSystems = lib.mkOption {
             type = lib.types.attrsOf (
               lib.types.submodule {
                 options = {
@@ -160,14 +197,14 @@ in
       enable = true;
       config =
         let
-          monitDisks = lib.optionalString cfg.usage.filesystem.enable (
+          monitDisks = lib.optionalString cfg.usage.fileSystem.enable (
             let
-              inherit (cfg.usage.filesystem) filesystems;
+              inherit (cfg.usage.fileSystem) fileSystems;
             in
             lib.concatMapStringsSep "\n" (name: ''
-              check filesystem ${name} with path ${filesystems.${name}.path}
-                if space usage > ${filesystems.${name}.limit} then alert
-            '') (lib.attrNames filesystems)
+              check fileSystem ${name} with path ${fileSystems.${name}.path}
+                if space usage > ${fileSystems.${name}.limit} then alert
+            '') (lib.attrNames fileSystems)
           );
 
           monitorDriveTemperature = drive: ''
@@ -187,6 +224,24 @@ in
                group health'';
           monitorDriveStatuses = lib.optionalString cfg.health.disk.enable (
             lib.strings.concatMapStringsSep "\n" monitorDriveStatus cfg.health.disk.disks
+          );
+          monitorRaidArrayStatus = drive: ''
+            check program "raid status: ${drive}" with path "${pkgs.mdadm}/bin/mdadm --misc --detail --test /dev/${drive}"
+              if status != 0 then alert
+          '';
+          monitorRaidArrayStatuses = lib.optionalString cfg.health.mdadm.enable (
+            lib.strings.concatMapStringsSep "\n" monitorRaidArrayStatus cfg.health.mdadm.disks
+          );
+          # This doesn't actually scrub, just checks the status of the scrub
+          # the autoScrub service did, so no harm running it more often (daily
+          # below). FIXME: could sync it somehow with autoScrub service timer
+          monitorBtrfsScrubStatus = path: ''
+            check program "btrfs scrub: ${path}" with path "${lib.getExe btrfsScrubStatus} ${path}"
+              every "0 3 * * *"
+              if status != 0 then alert
+          '';
+          monitorBtrfsScrubStatuses = lib.optionalString cfg.health.btrfs.enable (
+            lib.strings.concatMapStringsSep "\n" monitorBtrfsScrubStatus cfg.health.btrfs.fileSystems
           );
 
           monitConfig = ''
@@ -208,6 +263,8 @@ in
           monitDisks
           monitorDriveTemperatures
           monitorDriveStatuses
+          monitorRaidArrayStatuses
+          monitorBtrfsScrubStatuses
         ];
     };
     sops.templates.${secretConfig} =
