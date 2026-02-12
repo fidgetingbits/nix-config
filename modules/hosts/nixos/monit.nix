@@ -1,10 +1,6 @@
 # Some inspiration from:
 #  - https://github.com/tiredofit/nix-modules/blob/5cb4be/nixos/service/monit.nix
-#
-# To read:
-# Uses smart tools:
 #  - https://github.com/filipelsilva/nixos-config/blob/be22e8c1/modules/monit.nix
-# - https://github.com/charludo/nix/blob/65d6c9d/modules/nixos/monit.nix#L202
 #
 # TODO:
 # - [ ] Should maybe enable daemon behind nginx proxy?
