@@ -114,7 +114,7 @@
     usage = {
       filesystem = {
         enable = true;
-        disks = lib.mkAfter {
+        filesystems = {
           rootfs = {
             path = "/";
           };
@@ -122,6 +122,17 @@
             path = "/mnt/storage";
           };
         };
+      };
+    };
+    health = {
+      disk = {
+        enable = true;
+        disks = [
+          "mmcblk0"
+          "nvme0n1"
+          "nvme1n1"
+          "nvme2n1"
+        ];
       };
     };
   };
