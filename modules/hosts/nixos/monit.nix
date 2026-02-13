@@ -235,44 +235,44 @@ in
             '') (lib.attrNames fileSystems)
           );
 
-          monitorDriveTemperature = drive: ''
+          monitDriveTemperature = drive: ''
             check program "drive temperature: ${drive}" with path "${lib.getExe hdTemp} ${drive}"
                # Every 30 minutes
                every "0,30 * * * *"
                if status > ${cfg.health.disk.tempLimit} then alert
                group health'';
-          monitorDriveTemperatures = lib.optionalString cfg.health.disk.enable (
-            lib.strings.concatMapStringsSep "\n" monitorDriveTemperature cfg.health.disk.disks
+          monitDriveTemperatures = lib.optionalString cfg.health.disk.enable (
+            lib.strings.concatMapStringsSep "\n" monitDriveTemperature cfg.health.disk.disks
           );
-          monitorDriveStatus = drive: ''
+          monitDriveStatus = drive: ''
             check program "drive status: ${drive}" with path "${lib.getExe hdStatus} ${drive}"
                # Every 12 hours
                every "0 0,12 * * *"
                if status > 0 then alert
                group health'';
-          monitorDriveStatuses = lib.optionalString cfg.health.disk.enable (
-            lib.strings.concatMapStringsSep "\n" monitorDriveStatus cfg.health.disk.disks
+          monitDriveStatuses = lib.optionalString cfg.health.disk.enable (
+            lib.strings.concatMapStringsSep "\n" monitDriveStatus cfg.health.disk.disks
           );
-          monitorRaidArrayStatus = drive: ''
+          monitRaidArrayStatus = drive: ''
             check program "raid status: ${drive}" with path "${pkgs.mdadm}/bin/mdadm --misc --detail --test /dev/${drive}"
               if status != 0 then alert
           '';
-          monitorRaidArrayStatuses = lib.optionalString cfg.health.mdadm.enable (
-            lib.strings.concatMapStringsSep "\n" monitorRaidArrayStatus cfg.health.mdadm.disks
+          monitRaidArrayStatuses = lib.optionalString cfg.health.mdadm.enable (
+            lib.strings.concatMapStringsSep "\n" monitRaidArrayStatus cfg.health.mdadm.disks
           );
           # This doesn't actually scrub, just checks the status of the scrub
           # the autoScrub service did, so no harm running it more often (daily
           # below). FIXME: could sync it somehow with autoScrub service timer
-          monitorBtrfsScrubStatus = path: ''
+          monitBtrfsScrubStatus = path: ''
             check program "btrfs scrub: ${path}" with path "${lib.getExe btrfsScrubStatus} ${path}"
               every "0 3 * * *"
               if status != 0 then alert
           '';
-          monitorBtrfsScrubStatuses = lib.optionalString cfg.health.btrfs.enable (
-            lib.strings.concatMapStringsSep "\n" monitorBtrfsScrubStatus cfg.health.btrfs.fileSystems
+          monitBtrfsScrubStatuses = lib.optionalString cfg.health.btrfs.enable (
+            lib.strings.concatMapStringsSep "\n" monitBtrfsScrubStatus cfg.health.btrfs.fileSystems
           );
 
-          monitorFailedServices = lib.optionalString cfg.health.services.enable ''
+          monitFailedServices = lib.optionalString cfg.health.services.enable ''
             check program "systemd services" with path "${lib.getExe failedServices}"
               group system
               if status > 0 then alert
@@ -295,11 +295,11 @@ in
         lib.concatStringsSep "\n" [
           monitConfig
           monitDisks
-          monitorDriveTemperatures
-          monitorDriveStatuses
-          monitorRaidArrayStatuses
-          monitorBtrfsScrubStatuses
-          monitorFailedServices
+          monitDriveTemperatures
+          monitDriveStatuses
+          monitRaidArrayStatuses
+          monitBtrfsScrubStatuses
+          monitFailedServices
         ];
     };
     sops.templates.${secretConfig} =
