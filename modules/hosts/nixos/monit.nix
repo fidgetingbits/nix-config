@@ -63,6 +63,31 @@ let
     '';
   };
 
+  failedServices = pkgs.writeShellApplication {
+    name = "failed-systemd-services";
+    runtimeInputs = lib.attrValues {
+      inherit (pkgs) systemd jq;
+    };
+    text = ''
+      FAILED_SERVICES=$(systemctl \
+        --failed \
+        --type=service \
+        --output=json \
+        --no-pager \
+        | jq -er '
+          .[] | select((.active // "") == "failed" or (.sub // "") == "failed") | .unit
+        '
+      )
+
+      if [[ -n "$FAILED_SERVICES" ]]
+      then
+        echo "Failed systemd services detected:"
+        echo "$FAILED_SERVICES"
+        exit 1
+      fi
+    '';
+  };
+
   btrfsScrubStatus = pkgs.writeShellApplication {
     name = "btrfs-scrub-status";
     runtimeInputs = lib.attrValues {
@@ -128,6 +153,13 @@ in
           disks = lib.mkOption {
             type = lib.types.listOf lib.types.str;
             description = "Disk name to monitor";
+          };
+        };
+        services = {
+          enable = lib.mkOption {
+            default = true;
+            type = lib.types.bool;
+            description = "Enables failed systemd services check";
           };
         };
         mdadm = {
@@ -240,6 +272,12 @@ in
             lib.strings.concatMapStringsSep "\n" monitorBtrfsScrubStatus cfg.health.btrfs.fileSystems
           );
 
+          monitorFailedServices = lib.optionalString cfg.health.services.enable ''
+            check program "systemd services" with path "${lib.getExe failedServices}"
+              group system
+              if status > 0 then alert
+          '';
+
           monitConfig = ''
             set daemon 30
             ${lib.concatMapStringsSep "\n" (a: "set alert ${a} but not on { instance }") cfg.settings.email.to}
@@ -261,6 +299,7 @@ in
           monitorDriveStatuses
           monitorRaidArrayStatuses
           monitorBtrfsScrubStatuses
+          monitorFailedServices
         ];
     };
     sops.templates.${secretConfig} =
