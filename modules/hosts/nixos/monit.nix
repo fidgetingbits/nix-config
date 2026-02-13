@@ -52,7 +52,7 @@ let
           echo "STANDBY"
           exit 0
       fi
-      PASSED=$(jq '.smart_status.passed' <<< "$SMARTCTL_OUTPUT")
+      PASSED=$(jq ".smart_status.passed" <<< "$SMARTCTL_OUTPUT")
       if [ "$PASSED" = "true" ]
       then
           echo "PASSED"
@@ -69,23 +69,22 @@ let
     runtimeInputs = lib.attrValues {
       inherit (pkgs) systemd jq;
     };
+    # FIXME:why was jq '<expression>' quotes being messed up with $\n prefix?
     text = ''
       FAILED_SERVICES=$(systemctl \
         --failed \
         --type=service \
         --output=json \
         --no-pager \
-        | jq -er '
-          .[] | select((.active // "") == "failed" or (.sub // "") == "failed") | .unit
-        '
+        | jq -r '.[] | select((.active // "") == "failed" or (.sub // "") == "failed") | .unit'
       )
 
-      if [[ -n "$FAILED_SERVICES" ]]
-      then
+      if [[ -n "$FAILED_SERVICES" ]]; then
         echo "Failed systemd services detected:"
         echo "$FAILED_SERVICES"
         exit 1
       fi
+      exit 0
     '';
   };
 
