@@ -7,6 +7,7 @@
 # - [ ] Add cpu temperature checks probably
 # - [ ] Add other services to have opt-in entries to alert/monitor if the service fails
 # - [ ] Would mdmonitor make more sense here if using raid?
+# - [ ] Make the intervals all configurable?
 {
   pkgs,
   config,
@@ -265,6 +266,7 @@ in
           # below). FIXME: could sync it somehow with autoScrub service timer
           monitBtrfsScrubStatus = path: ''
             check program "btrfs scrub: ${path}" with path "${lib.getExe btrfsScrubStatus} ${path}"
+              # Daily at 3am
               every "0 3 * * *"
               if status != 0 then alert
           '';
@@ -274,6 +276,8 @@ in
 
           monitFailedServices = lib.optionalString cfg.health.services.enable ''
             check program "systemd services" with path "${lib.getExe failedServices}"
+              # Every hour
+              every "0 * * * *"
               group system
               if status > 0 then alert
           '';
