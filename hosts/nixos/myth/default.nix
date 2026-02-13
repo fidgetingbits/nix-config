@@ -75,6 +75,7 @@
       ]
       ++ (lib.map (u: "d /mnt/storage/backup/${u} 0700 ${name "${u}"} ${group "${u}"} -") [
         "pa"
+        "aa"
       ]);
   };
 
