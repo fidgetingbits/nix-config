@@ -88,5 +88,8 @@
 
     [Makefile]
     indent_style = tab
+
+    [*.puml.md,*.puml,*.iuml,*.uml,*.pu,*.plantuml]
+    indent_size = 2
   '';
 }
