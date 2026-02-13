@@ -604,7 +604,8 @@ in
                   #                        echo $! > /run/borg-backup.pid
                   #                      '';
                   #                  PIDFile = "/run/borg-backup.pid";
-                  RemainAfterExit = false;
+                  # This lets us query Result from monit without relying on ExecMainStatus
+                  RemainAfterExit = true;
                 };
 
               };
