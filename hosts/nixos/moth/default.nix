@@ -39,7 +39,7 @@
 
   services.remoteLuksUnlock = {
     enable = true;
-    notify.to = config.hostSpec.email.moth.alerts;
+    notify.to = config.hostSpec.email.${config.hostSpec.hostName}.alerts;
     ssh.users = [
       "aa"
       "ta"
@@ -90,7 +90,7 @@
 
   services.mirror-backups = {
     enable = true;
-    notify.to = config.hostSpec.email.moth.backups;
+    notify.to = config.hostSpec.email.${config.hostSpec.hostName}.backups;
     time = "*-*-* 5:00:00"; # Keep sync with myth times
     server = "myth.${config.hostSpec.domain}";
   };
@@ -104,11 +104,10 @@
   services.backup = {
     enable = true;
     borgBackupStartTime = "09:00:00";
-
     borgServer = "myth.${config.hostSpec.domain}";
     borgRemotePath = "/run/current-system/sw/bin/borg";
     borgBackupPath = "/mnt/storage/backup/aa";
-    borgNotifyTo = config.hostSpec.email.moth.backups;
+    borgNotifyTo = config.hostSpec.email.${config.hostSpec.hostName}.backups;
   };
 
   # Try to avoid bluez package

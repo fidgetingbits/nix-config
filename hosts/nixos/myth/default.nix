@@ -53,7 +53,7 @@
 
   services.remoteLuksUnlock = {
     enable = true;
-    notify.to = config.hostSpec.email.myth.alerts;
+    notify.to = config.hostSpec.email.${config.hostSpec.hostName}.alerts;
     ssh.users = [
       "aa"
       "ta"
@@ -62,6 +62,7 @@
   services.logind.settings.Login.HandlePowerKey = lib.mkForce "reboot";
   services.dyndns.enable = true;
 
+  # FIXME:This should be duplcated between myth/moth probably
   systemd = {
     tmpfiles.rules =
       let
@@ -73,7 +74,7 @@
         "d /mnt/storage/mirror/ 2770 ${name "borg"} ${group "borg"} -"
         "d /mnt/storage/share/ 2770 ${name "aa"} ${group "aa"} -"
       ]
-      ++ (lib.map (u: "d /mnt/storage/backup/${u} 0700 ${name "${u}"} ${group "${u}"} -") [
+      ++ (lib.map (u: "d /mnt/storage/backup/${u} 0770 ${name "${u}"} ${group "${u}"} -") [
         "pa"
         "aa"
       ]);
@@ -83,7 +84,7 @@
     enable = true;
     time = "*-*-* 4:00:00"; # Keep sync with moth times
     server = "moth.${config.hostSpec.domain}";
-    notify.to = config.hostSpec.email.myth.backups;
+    notify.to = config.hostSpec.email.${config.hostSpec.hostName}.backups;
   };
 
   # Allow moth to mirror into myth
@@ -98,7 +99,7 @@
     borgServer = "moth.${config.hostSpec.domain}";
     borgRemotePath = "/run/current-system/sw/bin/borg";
     borgBackupPath = "/mnt/storage/backup/aa";
-    borgNotifyTo = config.hostSpec.email.myth.backups;
+    borgNotifyTo = config.hostSpec.email.${config.hostSpec.hostName}.backups;
   };
 
   # Connect our NUT client to the UPS on the network
@@ -106,7 +107,7 @@
     client.enable = true;
     name = "ups";
     username = "monuser";
-    ip = config.hostSpec.networking.subnets.myth.hosts.synology.ip;
+    ip = config.hostSpec.networking.subnets.${config.hostSpec.hostName}.hosts.synology.ip;
     powerDownTimeOut = (60 * 30); # 30m. UPS reports ~45min
   };
 
