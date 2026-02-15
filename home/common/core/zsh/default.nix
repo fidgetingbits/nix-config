@@ -91,17 +91,15 @@ in
     };
 
     sessionVariables = {
-      #EDITOR = osConfig.hostSpec.defaultEditor; FIXME: Why does this set nano when we have it set to nvim? :/
       EDITOR = "nvim";
-      # FIXME: File a PR for this
-      #BAT_THEME = "Dracula"; # Stylix bug, they use "dracula" instead of "Dracula"
-
       #
       # FZF key-binding.zsh tweaks
       #
       FZF_CTRL_R_COMMAND = ""; # Disable, as we favor atuin
       #FZF_CTRL_T_COMMAND = "fd --type f --hidden --follow --exclude .git";
       FZF_CTRL_T_COMMAND = "fd --type f --exclude .git";
+      # FIXME:This should maybe sync with _fzf_git_fzf
+      # FIXME: ^G^T from fzf-git.zsh conflicts with this too
       FZF_CTRL_T_OPTS = "--preview '(highlight -O ansi -l {} 2> /dev/null || cat {} || tree -C {}) 2> /dev/null | head -200'";
     }
     // lib.optionalAttrs osConfig.hostSpec.isDevelopment {

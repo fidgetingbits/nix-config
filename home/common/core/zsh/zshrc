@@ -297,17 +297,20 @@ function nix_log_extract() {
 alias nix='nix_wrapper'
 alias nix-log-last='NIX_PAGER=cat nix log $NIX_LAST_DERIVATION'
 
-function git_changed_files() {
+# FIXME:This should move into where we setup fzf-git.sh probably
+function git_modified_files() {
     unstaged=$(git diff --name-only)
     staged=$(git diff --staged --name-only)
-    echo "$unstaged" "$staged" | fzf
+    local selected=$(echo "$unstaged" "$staged" | _fzf_git_fzf -m | __fzf_git_join)
+    [[ -z "$selected" ]] && return
+    zle reset-prompt
+    LBUFFER+=$selected
 }
 
+zle -N git_modified_files
 # Use fzf-git.sh style ctrl+g binding
-zle -N git_changed_files
 for m in emacs vicmd viins; do
-    #bindkey -M $m '^g^d' git_changed_files
-    bindkey -M $m '^gc' git_changed_files
+    bindkey -M $m '^g^m' git_modified_files
 done
 
 # Add and commit an updated flake lock file for the current or given host
