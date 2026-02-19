@@ -138,14 +138,16 @@
       };
     };
     health = {
-      disk = {
+      disks = {
         enable = true;
-        disks = [
-          "mmcblk0"
+        smart.disks = [
           "nvme0n1"
           "nvme1n1"
           "nvme2n1"
         ];
+        emmc.disks = {
+          mmcblk0 = { };
+        };
       };
       mdadm = {
         enable = true;
