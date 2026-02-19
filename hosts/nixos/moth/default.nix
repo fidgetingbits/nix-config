@@ -142,14 +142,9 @@
     health = {
       disks = {
         enable = true;
-        smart.disks = [
-          "nvme0n1"
-          "nvme1n1"
-          "nvme2n1"
-          "nvme3n1"
-        ];
+        smart.disks = config.system.disks.raidDisks;
         emmc.disks = {
-          mmcblk0 = { };
+          "mmc-SCA64G_0x56567305" = { };
         };
       };
       mdadm = {
