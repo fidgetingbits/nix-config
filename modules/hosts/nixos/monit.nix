@@ -70,7 +70,7 @@ let
   emmcHealthStatus =
     disk:
     pkgs.writeShellApplication {
-      name = "emmc-${disk}-backup-blocks-status";
+      name = "emmc-${disk}-health-status";
       runtimeInputs = lib.attrValues {
         inherit (pkgs) mmc-utils gawk coreutils;
       };
@@ -80,7 +80,7 @@ let
         in
         # bash
         ''
-          CSD=$(mmc extcsd read /dev/${disk})
+          CSD=$(mmc extcsd read /dev/disk/by-id/${disk})
           EOL=$(echo "$CSD" | grep "Pre EOL information" | awk '{print $NF}')
           LIFE_A=$(($(echo "$CSD" | grep "Life Time Estimation A" | awk '{print $NF}')*10))
           LIFE_B=$(($(echo "$CSD" | grep "Life Time Estimation B" | awk '{print $NF}')*10))
@@ -248,6 +248,11 @@ in
               };
             };
             emmc = {
+              enable = lib.mkOption {
+                default = true;
+                type = lib.types.bool;
+                description = "Enables emmc health check";
+              };
               disks = lib.mkOption {
                 type = lib.types.attrsOf (
                   lib.types.submodule {
@@ -270,9 +275,9 @@ in
                     };
                   }
                 );
-                description = "Set of disks to monitor with mmc-utils. Set names should match disk names";
+                description = "Set of disks to monitor with mmc-utils. Set names MUST match /dev/disk/by-id/<disk> name";
                 example = {
-                  "mmcblk0" = {
+                  "mmc-SCA64G_0x56567305" = {
                     reservedBlockLimit = 3; # Already > 80% of reserve block use, so now warn on 90% only
                     lifeTimeTypeBLimit = 80; # Type B lifetime already passed default 60%, so warn on 80%
                   };
@@ -301,7 +306,6 @@ in
               description = "Enables mdadm raid array status monitoring";
               default = false;
             };
-            # FIXME:This could default to the list of mdadm arrays we already define in disks?
             disks = lib.mkOption {
               type = lib.types.listOf lib.types.str;
               description = "List of mdadm arrays to check";
@@ -388,10 +392,10 @@ in
                group health'';
           monitDriveTemperatures = lib.optionalString cfg.health.disks.enable (
             lib.strings.concatMapStringsSep "\n" monitDriveTemperature (
-              cfg.health.disks.smart.disks ++ (lib.attrNames cfg.health.disks.emmc)
+              cfg.health.disks.smart.disks
+              ++ (map (name: "/dev/disk/by-id/${name}") (lib.attrNames cfg.health.disks.emmc.disks))
             )
           );
-
           monitDriveStatus = drive: ''
             check program "drive status: ${drive}" with path "${lib.getExe hdStatus} ${drive}"
                every ${cfg.health.disks.smart.interval}
@@ -402,7 +406,7 @@ in
           );
 
           monitRaidArrayStatus = drive: ''
-            check program "raid status: ${drive}" with path "${pkgs.mdadm}/bin/mdadm --misc --detail --test /dev/${drive}"
+            check program "raid status: ${builtins.baseNameOf drive}" with path "${pkgs.mdadm}/bin/mdadm --misc --detail --test /dev/${drive}"
               if status != 0 then alert
           '';
           monitRaidArrayStatuses = lib.optionalString cfg.health.mdadm.enable (
@@ -414,8 +418,9 @@ in
               every ${cfg.health.disks.emmc.interval}
               if status != 0 then alert
           '';
-          monitEmmcStatuses = lib.optionalString cfg.health.mdadm.enable (
+          monitEmmcStatuses = lib.optionalString cfg.health.disks.emmc.enable (
             lib.strings.concatMapStringsSep "\n" monitEmmcStatus (lib.attrNames cfg.health.disks.emmc.disks)
+
           );
 
           # This doesn't actually scrub, just checks the status of the scrub
