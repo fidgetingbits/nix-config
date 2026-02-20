@@ -4,6 +4,7 @@
   lib,
   config,
   pkgs,
+  namespace,
   ...
 }:
 {
@@ -131,4 +132,35 @@
   services.llama.enable = true;
 
   modules.hardware.radeon.enable = true;
+
+  services.btrfs.autoScrub = {
+    enable = true;
+    interval = "monthly";
+    fileSystems = [
+      "/"
+    ];
+  };
+  ${namespace}.services.monit = {
+    enable = true;
+    usage = {
+      fileSystem = {
+        enable = true;
+        fileSystems = {
+          rootfs = {
+            path = "/";
+          };
+        };
+      };
+    };
+    health = {
+      disks = {
+        enable = true;
+        smart.disks = map (d: builtins.baseNameOf d) [ config.system.disks.primary ];
+      };
+      btrfs = {
+        enable = true;
+        inherit (config.services.btrfs.autoScrub) fileSystems;
+      };
+    };
+  };
 }
