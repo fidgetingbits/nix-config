@@ -5,7 +5,7 @@
 ## This script makes some critical assumptions about how the filesystem has
 ## been created.
 ##
-## Note that unlike similar scripts, we don't use a blank snap shot to reset the root,
+## Note that unlike similar scripts, we don't use a blank snapshot to reset the root,
 ## instead we delete the root and create a new one.
 
 mkdir /btrfs_tmp
