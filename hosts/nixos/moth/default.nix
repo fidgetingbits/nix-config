@@ -143,8 +143,11 @@
       disks = {
         enable = true;
         smart.disks = map (d: builtins.baseNameOf d) config.system.disks.raidDisks;
-        emmc.disks = {
-          "mmc-SCA64G_0x56567305" = { };
+        emmc = {
+          enable = true;
+          disks = {
+            "mmc-SCA64G_0x56567305" = { };
+          };
         };
       };
       mdadm = {
