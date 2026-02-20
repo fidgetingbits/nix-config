@@ -31,7 +31,7 @@ let
     text =
       # bash
       ''
-        SMARTCTL_OUTPUT=$(smartctl --json=c --nocheck=standby -A "/dev/$1")
+        SMARTCTL_OUTPUT=$(smartctl --json=c --nocheck=standby -A "/dev/disk/by-id/$1")
         if [[ "$?" = "2" ]]; then
             echo "STANDBY"
             exit 0
@@ -49,7 +49,7 @@ let
     };
     text = # bash
       ''
-        SMARTCTL_OUTPUT=$(smartctl --json=c --nocheck=standby -H "/dev/$1")
+        SMARTCTL_OUTPUT=$(smartctl --json=c --nocheck=standby -H "/dev/disk/by-id/$1")
         if [[ "$?" = "2" ]]; then
             echo "STANDBY"
             exit 0
@@ -392,8 +392,7 @@ in
                group health'';
           monitDriveTemperatures = lib.optionalString cfg.health.disks.enable (
             lib.strings.concatMapStringsSep "\n" monitDriveTemperature (
-              cfg.health.disks.smart.disks
-              ++ (map (name: "/dev/disk/by-id/${name}") (lib.attrNames cfg.health.disks.emmc.disks))
+              (lib.attrNames cfg.health.disks.emmc.disks) ++ cfg.health.disks.smart.disks
             )
           );
           monitDriveStatus = drive: ''
