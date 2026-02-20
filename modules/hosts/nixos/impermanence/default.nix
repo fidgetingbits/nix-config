@@ -5,6 +5,9 @@
   lib,
   ...
 }:
+let
+
+in
 {
   imports = [ inputs.impermanence.nixosModules.impermanence ];
 
@@ -43,14 +46,18 @@
   # FIXME(impermanence): Indicate the subvolume to backup
   config = lib.mkIf config.system.impermanence.enable (
     let
+      disks = config.system.disks;
+      drivePath = if disks.luks.enable then "/dev/mapper/${disks.luks.label}" else disks.primary;
       btrfs-diff = pkgs.writeShellApplication {
         name = "btrfs-diff";
         runtimeInputs = lib.attrValues { inherit (pkgs) eza fd btrfs-progs; };
+        runtimeEnv = {
+          BTRFS_VOL = drivePath;
+        };
         text = lib.readFile ./btrfs-diff.sh;
       };
     in
     {
-
       # NOTE: With boot.initrd.systemd.enable = true, we can't use boot.initrd.postDeviceCommands as per
       # https://discourse.nixos.org/t/impermanence-vs-systemd-initrd-w-tpm-unlocking/25167
       # So we build an early stage systemd service, which is modeled after
@@ -60,7 +67,55 @@
       boot.initrd =
         let
           hostname = config.networking.hostName;
-          btrfs-subvolume-wipe-src = lib.readFile ./btrfs-wipe-root.sh;
+          wipeScript = pkgs.writeShellApplication {
+            name = "btrfs-wipe-root";
+
+            runtimeInputs = lib.attrValues {
+              inherit (pkgs)
+                coreutils
+                btrfs-progs
+                mount
+                umount
+                ;
+            };
+            text = # bash
+              ''
+                ## Reset current root to clear any files that are not persisted.
+                ## Runs during stage-0
+                ##
+                ## This script makes some critical assumptions about how the filesystem has
+                ## been created.
+                ##
+                ## Note that unlike similar scripts, we don't use a blank snapshot to reset the root,
+                ## instead we delete the root and create a new one.
+
+                mkdir /btrfs_tmp
+
+                # FIXME: encrypted-nixos needs to change for non-LUKs hosts with impermanence
+                mount -t btrfs -o subvol=/ ${drivePath} /btrfs_tmp
+
+                if [[ -e /btrfs_tmp/@root ]]; then
+                    mkdir -p /btrfs_tmp/@old_roots || true
+                    timestamp=$(date --date="@$(stat -c %Y /btrfs_tmp/@root)" "+%Y-%m-%d_%H:%M:%S")
+                    mv /btrfs_tmp/@root "/btrfs_tmp/@old_roots/$timestamp"
+                fi
+
+                delete_subvolume_recursively() {
+                    IFS=$'\n'
+                    for i in $(btrfs subvolume list -o "$1" | cut -f 9- -d ' '); do
+                        delete_subvolume_recursively "/btrfs_tmp/$i"
+                    done
+                    btrfs subvolume delete "$1"
+                }
+
+                find /btrfs_tmp/@old_roots/ -maxdepth 1 -mtime +30 | while read -r old; do
+                    delete_subvolume_recursively "$old"
+                done
+
+                btrfs subvolume create /btrfs_tmp/@root
+                umount /btrfs_tmp
+              '';
+          };
         in
         {
           supportedFilesystems = [ "btrfs" ];
@@ -68,7 +123,7 @@
             description = "Rollback BTRFS root subvolume to a pristine state";
             wantedBy = [ "initrd.target" ];
             after = [
-              # NOTE: he \\x2d is a hyphen in the systemd unit name
+              # NOTE: The \\x2d is a hyphen in the systemd unit name
               "dev-mapper-encrypted\\x2dnixos.device"
               # LUKS/TPM process
               "systemd-cryptsetup@${hostname}.service"
@@ -76,7 +131,7 @@
             before = [ "sysroot.mount" ];
             unitConfig.DefaultDependencies = "no";
             serviceConfig.Type = "oneshot";
-            script = btrfs-subvolume-wipe-src;
+            script = lib.getExe wipeScript;
           };
         };
 
@@ -126,7 +181,7 @@
         files = [
           # Essential. If you don't have these for basic setup, you will have a bad time
           # FIXME: There is some bug where sometimes on first rebuild after
-          # minimal install that it complains these files already exis
+          # minimal install that it complains these files already exist
           "/etc/machine-id"
           "/etc/ssh/ssh_host_ed25519_key"
           "/etc/ssh/ssh_host_ed25519_key.pub"

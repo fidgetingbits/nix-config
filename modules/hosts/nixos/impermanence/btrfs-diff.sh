@@ -35,7 +35,7 @@ function help_and_exit() {
     echo "USAGE: $0 [OPTIONS]"
     echo
     echo "OPTIONS:"
-    echo "  -b=<btrfs_vol>  Specify the btrfs volume to mount (default: /dev/mapper/encrypted-nixos)"
+    echo "  -b=<btrfs_vol>  Specify the btrfs volume to mount"
     echo "  -s=<snapshot>   Specify the snapshot to diff against"
     echo "  --list-old      List the old roots only"
     echo "  -h, --help      Show this help message and exit"
@@ -48,10 +48,9 @@ if [ "$UID" -ne "0" ]; then
     exit 0
 fi
 
+# BTRFS_VOL default comes from nix
 SNAPSHOT=""
 MOUNTDIR=$(mktemp -d)
-# FIXME: Should make the default whatever teh system uses, which won't always have luks
-BTRFS_VOL=/dev/mapper/encrypted-nixos
 ROOT_LABEL=@root
 OLD_ROOTS_LABEL=@old_roots
 LIST_OLD=0
