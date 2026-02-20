@@ -255,7 +255,7 @@ in
             exec msmtp -t <<EOF
           To: ${recipients}
           From:${cfg.borgNotifyFrom}
-          Subject: [${config.networking.hostName}: backup] $(date +%Y-%m-%d_%H-%M) $SUBJECT"
+          Subject: [${config.networking.hostName}: backup] $(date +%Y-%m-%d_%H-%M) $SUBJECT
 
           $(cat "$LOGFILE")
           EOF
