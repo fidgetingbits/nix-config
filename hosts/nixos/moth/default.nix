@@ -142,7 +142,7 @@
     health = {
       disks = {
         enable = true;
-        smart.disks = config.system.disks.raidDisks;
+        smart.disks = map (d: builtins.baseNameOf d) config.system.disks.raidDisks;
         emmc.disks = {
           "mmc-SCA64G_0x56567305" = { };
         };

@@ -140,13 +140,9 @@
     health = {
       disks = {
         enable = true;
-        smart.disks = [
-          "nvme0n1"
-          "nvme1n1"
-          "nvme2n1"
-        ];
+        smart.disks = map (d: builtins.baseNameOf d) config.system.disks.raidDisks;
         emmc.disks = {
-          mmcblk0 = { };
+          "mmc-DV4064_0x6101b932" = { };
         };
       };
       mdadm = {
