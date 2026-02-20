@@ -42,7 +42,7 @@ let
       '';
   };
 
-  hdStatus = pkgs.writeShellApplication {
+  smartStatus = pkgs.writeShellApplication {
     name = "hd-status";
     runtimeInputs = lib.attrValues {
       inherit (pkgs) smartmontools jq;
@@ -249,7 +249,7 @@ in
             };
             emmc = {
               enable = lib.mkOption {
-                default = true;
+                default = false;
                 type = lib.types.bool;
                 description = "Enables emmc health check";
               };
@@ -282,6 +282,7 @@ in
                     lifeTimeTypeBLimit = 80; # Type B lifetime already passed default 60%, so warn on 80%
                   };
                 };
+                default = { };
               };
               interval = mkInterval {
                 # Every sunday
@@ -369,118 +370,123 @@ in
         };
       };
     };
-  config = lib.mkIf cfg.enable {
-    services.monit = {
-      enable = true;
-      config =
-        let
-          monitDisks = lib.optionalString cfg.usage.fileSystem.enable (
-            let
-              inherit (cfg.usage.fileSystem) fileSystems;
-            in
-            lib.concatMapStringsSep "\n" (name: ''
-              check fileSystem ${name} with path ${fileSystems.${name}.path}
-                every ${cfg.usage.fileSystem.interval}
-                if space usage > ${fileSystems.${name}.limit} then alert
-            '') (lib.attrNames fileSystems)
-          );
+  config =
+    let
+      emmcDiskNames = lib.optional cfg.health.disks.emmc.enable (
+        lib.attrNames cfg.health.disks.emmc.disks
+      );
+      allDiskNames = emmcDiskNames ++ cfg.health.disks.smart.disks;
+    in
+    lib.mkIf cfg.enable {
+      services.monit = {
+        enable = true;
+        config =
+          let
+            monitDisks = lib.optionalString cfg.usage.fileSystem.enable (
+              let
+                inherit (cfg.usage.fileSystem) fileSystems;
+              in
+              lib.concatMapStringsSep "\n" (name: ''
+                check fileSystem ${name} with path ${fileSystems.${name}.path}
+                  every ${cfg.usage.fileSystem.interval}
+                  if space usage > ${fileSystems.${name}.limit} then alert
+              '') (lib.attrNames fileSystems)
+            );
 
-          monitDriveTemperature = drive: ''
-            check program "drive temperature: ${drive}" with path "${lib.getExe hdTemp} ${drive}"
-               every ${cfg.health.disks.temperature.interval}
-               if status > ${cfg.health.disks.temperature.limit} then alert
-               group health'';
-          monitDriveTemperatures = lib.optionalString cfg.health.disks.enable (
-            lib.strings.concatMapStringsSep "\n" monitDriveTemperature (
-              (lib.attrNames cfg.health.disks.emmc.disks) ++ cfg.health.disks.smart.disks
-            )
-          );
-          monitDriveStatus = drive: ''
-            check program "drive status: ${drive}" with path "${lib.getExe hdStatus} ${drive}"
-               every ${cfg.health.disks.smart.interval}
-               if status > 0 then alert
-               group health'';
-          monitDriveStatuses = lib.optionalString cfg.health.disks.enable (
-            lib.strings.concatMapStringsSep "\n" monitDriveStatus cfg.health.disks.smart.disks
-          );
+            monitDriveTemperature = drive: ''
+              check program "drive temperature: ${drive}" with path "${lib.getExe hdTemp} ${drive}"
+                 every ${cfg.health.disks.temperature.interval}
+                 if status > ${cfg.health.disks.temperature.limit} then alert
+                 group health'';
+            monitDriveTemperatures = lib.optionalString cfg.health.disks.enable (
+              lib.strings.concatMapStringsSep "\n" monitDriveTemperature allDiskNames
+            );
 
-          monitRaidArrayStatus = drive: ''
-            check program "raid status: ${builtins.baseNameOf drive}" with path "${pkgs.mdadm}/bin/mdadm --misc --detail --test /dev/${drive}"
-              if status != 0 then alert
-          '';
-          monitRaidArrayStatuses = lib.optionalString cfg.health.mdadm.enable (
-            lib.strings.concatMapStringsSep "\n" monitRaidArrayStatus cfg.health.mdadm.disks
-          );
+            monitDriveSmartStatus = drive: ''
+              check program "drive smart status: ${drive}" with path "${lib.getExe smartStatus} ${drive}"
+                 every ${cfg.health.disks.smart.interval}
+                 if status > 0 then alert
+                 group health'';
+            monitDriveSmartStatuses = lib.optionalString cfg.health.disks.enable (
+              lib.strings.concatMapStringsSep "\n" monitDriveSmartStatus cfg.health.disks.smart.disks
+            );
 
-          monitEmmcStatus = drive: ''
-            check program "emmc health: ${drive}" with path "${lib.getExe (emmcHealthStatus drive)}"
-              every ${cfg.health.disks.emmc.interval}
-              if status != 0 then alert
-          '';
-          monitEmmcStatuses = lib.optionalString cfg.health.disks.emmc.enable (
-            lib.strings.concatMapStringsSep "\n" monitEmmcStatus (lib.attrNames cfg.health.disks.emmc.disks)
+            monitRaidArrayStatus = drive: ''
+              check program "raid status: ${builtins.baseNameOf drive}" with path "${pkgs.mdadm}/bin/mdadm --misc --detail --test /dev/${drive}"
+                if status != 0 then alert
+            '';
+            monitRaidArrayStatuses = lib.optionalString cfg.health.mdadm.enable (
+              lib.strings.concatMapStringsSep "\n" monitRaidArrayStatus cfg.health.mdadm.disks
+            );
 
-          );
+            monitEmmcStatus = drive: ''
+              check program "emmc health: ${drive}" with path "${lib.getExe (emmcHealthStatus drive)}"
+                every ${cfg.health.disks.emmc.interval}
+                if status != 0 then alert
+            '';
+            monitEmmcStatuses = lib.optionalString cfg.health.disks.emmc.enable (
+              lib.strings.concatMapStringsSep "\n" monitEmmcStatus emmcDiskNames
+            );
 
-          # This doesn't actually scrub, just checks the status of the scrub
-          # the autoScrub service did, so no harm running it more often (daily
-          # below). FIXME: could sync it somehow with autoScrub service timer
-          monitBtrfsScrubStatus = path: ''
-            check program "btrfs scrub: ${path}" with path "${lib.getExe btrfsScrubStatus} ${path}"
-              every ${cfg.health.btrfs.interval}
-              if status != 0 then alert
-          '';
-          monitBtrfsScrubStatuses = lib.optionalString cfg.health.btrfs.enable (
-            lib.strings.concatMapStringsSep "\n" monitBtrfsScrubStatus cfg.health.btrfs.fileSystems
-          );
+            # This doesn't actually scrub, just checks the status of the scrub
+            # the autoScrub service did, so no harm running it more often (daily
+            # below). FIXME: could sync it somehow with autoScrub service timer
+            monitBtrfsScrubStatus = path: ''
+              check program "btrfs scrub: ${path}" with path "${lib.getExe btrfsScrubStatus} ${path}"
+                every ${cfg.health.btrfs.interval}
+                if status != 0 then alert
+            '';
+            monitBtrfsScrubStatuses = lib.optionalString cfg.health.btrfs.enable (
+              lib.strings.concatMapStringsSep "\n" monitBtrfsScrubStatus cfg.health.btrfs.fileSystems
+            );
 
-          monitFailedServices = lib.optionalString cfg.health.services.enable ''
-            check program "systemd services" with path "${lib.getExe failedServices}"
-              # Every hour
-              every ${cfg.health.services.interval}
-              group system
-              if status > 0 then alert
-          '';
+            monitFailedServices = lib.optionalString cfg.health.services.enable ''
+              check program "systemd services" with path "${lib.getExe failedServices}"
+                # Every hour
+                every ${cfg.health.services.interval}
+                group system
+                if status > 0 then alert
+            '';
 
-          # FIXME: Allow email format customization
-          monitConfig = ''
-            set daemon ${toString cfg.cycleDuration}
-            ${lib.concatMapStringsSep "\n" (a: "set alert ${a} but not on { instance }") cfg.email.to}
-            set logfile /var/log/monit.log
+            # FIXME: Allow email format customization
+            monitConfig = ''
+              set daemon ${toString cfg.cycleDuration}
+              ${lib.concatMapStringsSep "\n" (a: "set alert ${a} but not on { instance }") cfg.email.to}
+              set logfile /var/log/monit.log
 
-            include ${config.sops.templates.${secretConfig}.path}
+              include ${config.sops.templates.${secretConfig}.path}
 
-            set mail-format {
-             from: ${cfg.email.from}
-             subject: [$HOST: monit]: $SERVICE - $EVENT on $DATE
-             message: $DESCRIPTION
-            }
-          '';
-        in
-        lib.concatStringsSep "\n" [
-          monitConfig
-          monitDisks
-          monitDriveTemperatures
-          monitDriveStatuses
-          monitRaidArrayStatuses
-          monitEmmcStatuses
-          monitBtrfsScrubStatuses
-          monitFailedServices
-          cfg.extraConfig
-        ];
-    };
-    sops.templates.${secretConfig} =
-      let
-        password = "passwords/${if mail.useRelay then "postfix-relay" else "msmtp"}";
-      in
-      {
-        content = ''
-          set mailserver ${mail.smtpHost} port ${toString mail.smtpPort}
-            username "${mail.smtpUser}" password "${config.sops.placeholder."${password}"}"
-            using tls
-        '';
-        owner = "root";
-        mode = "400";
+              set mail-format {
+               from: ${cfg.email.from}
+               subject: [$HOST: monit]: $SERVICE - $EVENT on $DATE
+               message: $DESCRIPTION
+              }
+            '';
+          in
+          lib.concatStringsSep "\n" [
+            monitConfig
+            monitDisks
+            monitDriveTemperatures
+            monitDriveSmartStatuses
+            monitRaidArrayStatuses
+            monitEmmcStatuses
+            monitBtrfsScrubStatuses
+            monitFailedServices
+            cfg.extraConfig
+          ];
       };
-  };
+      sops.templates.${secretConfig} =
+        let
+          password = "passwords/${if mail.useRelay then "postfix-relay" else "msmtp"}";
+        in
+        {
+          content = ''
+            set mailserver ${mail.smtpHost} port ${toString mail.smtpPort}
+              username "${mail.smtpUser}" password "${config.sops.placeholder."${password}"}"
+              using tls
+          '';
+          owner = "root";
+          mode = "400";
+        };
+    };
 }
