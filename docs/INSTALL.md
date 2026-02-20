@@ -71,7 +71,7 @@ Boot your target and be sure to change the boot order so DVD-ROM is second and t
 This is an example of running it from `nix-config` base folder installing on a VM (`okra`):
 
 ```bash
-scripts/bootstrap-nixos.sh -n=okra -d=192.168.122.29 -k=~/.ssh/id_yubikey -u=root --impermanence
+scripts/bootstrap-nixos.sh -n=okra -d=192.168.122.29 -k=~/.ssh/id_yubikey -u=aa --impermanence
 ```
 Answer the questions.
 
