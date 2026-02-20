@@ -44,7 +44,6 @@ in
         example = "/dev/disk/by-id/mmc-SCA64G_0x56567305";
         description = "Primary install disk";
       };
-      # FIXME: atm this is the label for disko itself, not the luks
       primaryDiskoLabel = lib.mkOption {
         type = lib.types.str;
         default = "primary";
@@ -66,57 +65,56 @@ in
           default = "encrypted-nixos";
         };
       };
-
-    };
-    swapSize = lib.mkOption {
-      type = lib.types.nullOr lib.types.str;
-      example = "2G";
-      description = "Size of swap drive or null for no swap";
-      default = null;
-    };
-    bootSize = lib.mkOption {
-      type = lib.types.nullOr lib.types.str;
-      example = "512M";
-      description = "Size of /boot partition. Bigger allows more boot entries";
-      default = "512M";
-    };
-    raidLevel = lib.mkOption {
-      type = lib.types.int;
-      example = 5;
-      default = 5;
-      description = "Type of raid to use with mdadm";
-    };
-    raidDisks = lib.mkOption {
-      type = lib.types.nullOr (lib.types.listOf lib.types.str);
-      default = null;
-      example = [
-        "/dev/disk/by-id/nvme-EDILOCA_EN705_4TB_AA251809669"
-        "/dev/disk/by-id/nvme-EDILOCA_EN705_4TB_AA251809987"
-      ];
-      description = "List of drives to add to mdadm raid array. Raid disabled if not set";
-    };
-    extraDisks = lib.mkOption {
-      type = lib.types.listOf (lib.types.attrsOf lib.types.str);
-      default = [
-        {
-          name = "encrypted-storage";
-          # FIXME: Should check how to control the name-any-raid5 parts in disko
-          path = "/dev/disks/by-id/md-name-any:raid5";
-        }
-      ];
-      description = "Names and labels of non-primary luks-encrypted disks, used for automatic boot-time LUKS unlocking.";
-      example = [
-        {
-          name = "encrypted-storage";
-          path = "/dev/disks/by-id/md-name-any:raid5";
-        }
-      ];
-    };
-    raidMountPath = lib.mkOption {
-      type = lib.types.str;
-      default = "/mnt/storage";
-      description = "Path to mount the RAID array";
-      example = "/mnt/storage";
+      swapSize = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        example = "2G";
+        description = "Size of swap drive or null for no swap";
+        default = null;
+      };
+      bootSize = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        example = "512M";
+        description = "Size of /boot partition. Bigger allows more boot entries";
+        default = "512M";
+      };
+      raidLevel = lib.mkOption {
+        type = lib.types.int;
+        example = 5;
+        default = 5;
+        description = "Type of raid to use with mdadm";
+      };
+      raidDisks = lib.mkOption {
+        type = lib.types.nullOr (lib.types.listOf lib.types.str);
+        default = null;
+        example = [
+          "/dev/disk/by-id/nvme-EDILOCA_EN705_4TB_AA251809669"
+          "/dev/disk/by-id/nvme-EDILOCA_EN705_4TB_AA251809987"
+        ];
+        description = "List of drives to add to mdadm raid array. Raid disabled if not set";
+      };
+      extraDisks = lib.mkOption {
+        type = lib.types.listOf (lib.types.attrsOf lib.types.str);
+        default = [
+          {
+            name = "encrypted-storage";
+            # FIXME: Should check how to control the name-any-raid5 parts in disko
+            path = "/dev/disks/by-id/md-name-any:raid5";
+          }
+        ];
+        description = "Names and labels of non-primary luks-encrypted disks, used for automatic boot-time LUKS unlocking.";
+        example = [
+          {
+            name = "encrypted-storage";
+            path = "/dev/disks/by-id/md-name-any:raid5";
+          }
+        ];
+      };
+      raidMountPath = lib.mkOption {
+        type = lib.types.str;
+        default = "/mnt/storage";
+        description = "Path to mount the RAID array";
+        example = "/mnt/storage";
+      };
     };
   };
 
