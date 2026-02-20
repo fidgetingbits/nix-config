@@ -1,10 +1,10 @@
 { ... }:
 {
   system.disks = {
-    primary = "/dev/nvme0n1";
-    primaryLabel = "disk0";
+    primary = "/dev/nvme-CT2000P310SSD8_2522509359B2";
+    primaryDiskoLabel = "disk0";
     swapSize = "16G";
     bootSize = "1G";
-    useLuks = true;
+    luks.enable = true;
   };
 }

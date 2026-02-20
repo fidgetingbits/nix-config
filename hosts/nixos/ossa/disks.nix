@@ -2,9 +2,9 @@
 {
   system.disks = {
     primary = "/dev/nvme0n1";
-    primaryLabel = "disk0";
+    primaryDiskoLabel = "disk0";
     swapSize = "16G";
     bootSize = "1G";
-    useLuks = true;
+    luks.enable = true;
   };
 }

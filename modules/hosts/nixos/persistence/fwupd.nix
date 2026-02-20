@@ -8,7 +8,7 @@ let
 in
 {
   config = lib.mkIf (config.services.fwupd.enable && isImpermanent) {
-    environment.persistence.${config.hotsSpec.persisFolder}.directories = [
+    environment.persistence.${config.hostSpec.persistFolder}.directories = [
       "/var/cache/fwupd"
       "/var/lib/fwupd"
     ];
