@@ -47,7 +47,8 @@ let
     runtimeInputs = lib.attrValues {
       inherit (pkgs) smartmontools jq;
     };
-    text = # bash
+    text =
+      # bash
       ''
         SMARTCTL_OUTPUT=$(smartctl --json=c --nocheck=standby -H "/dev/disk/by-id/$1")
         if [[ "$?" = "2" ]]; then
@@ -134,7 +135,8 @@ let
     runtimeInputs = lib.attrValues {
       inherit (pkgs) systemd jq;
     };
-    text = # bash
+    text =
+      # bash
       ''
         FAILED_SERVICES=$(systemctl \
           --failed \
@@ -162,7 +164,8 @@ let
     # that defaults to 0 but that will equal whatever we expect the known number of errors on the fileSystem is?
     # then we pass that value as a second argument to the script?
     #
-    text = # bash
+    text =
+      # bash
       ''
         btrfs scrub status "$1" | awk '/uncorrectable/ {if ($2 > 0) exit 1}'
       '';
