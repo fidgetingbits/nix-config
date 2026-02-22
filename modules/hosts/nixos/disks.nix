@@ -278,11 +278,6 @@ in
       # Unlock extra disks
       # https://wiki.nixos.org/wiki/Full_Disk_Encryption#Unlocking_secondary_drives
       #
-      # NOTE: Using /dev/disk/by-partlabel/ would be nicer than UUID, however
-      # because we are sometimes using raid5, there is no single part-label to
-      # use, we need the UUID assigned to the raid5 device created by mdadm (ex:
-      # /dev/md127)
-      #
       # FIXME: See if the secondary-unlock key can actually be part of sops,
       # which would be possible if systemd-cryptsetup@xxx.service runs after sops
       # service
@@ -293,14 +288,14 @@ in
       # now, as it's not pressing. The drives are already using the same
       # passphrase as the main drive, which we have recorded
       #
-      # Find UUID with: lsblk -o name,uuid,mountpoints
+      # Find path with: ls /dev/disk/by-id/
       #
       environment = {
         etc.crypttab.text = lib.optionalString (!config.hostSpec.isMinimal) (
           lib.concatMapStringsSep "\n" (
             d:
             # FIXME: noauto doesn't work, so path has to be correct or boot fails
-            # investigate a way to make this work and just mount from a script after the normal boot proceed, or ideally have x-systemd.automount mount on access for us (but need to test how it fails if UUID is wrong)
+            # investigate a way to use x-systemd.automount mount or similar
             "${d.name} ${d.path} /luks-secondary-unlock.key noauto,nofail"
           ) cfg.extraDisks
         );
@@ -322,15 +317,5 @@ in
       systemd.services."mdmonitor".environment = lib.optionalAttrs hasRaid {
         MDADM_MONITOR_ARGS = "--scan --syslog";
       };
-      #    FIXME: Check for any TBD entries in array
-      #    warnings =
-      #      if (hasRaid && cfg.raidUUID == "TBD") then
-      #        [
-      #          "You haven't set config.system.disks.raidUUID to a valid UUID yet.\
-      #          Your raid array will not auto-decrypt.\
-      #          Use: lsblk -oname,uuid,mountpoints"
-      #        ]
-      #      else
-      #        [ ];
     };
 }
