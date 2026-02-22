@@ -33,6 +33,7 @@ let
           exit 0
         fi
 
+        LOG=/root/mirror-log.txt
         # --chmod ensures the files are group-accessible on host B, even if
         # they aren't normally on host A. This is needed because we use a
         # different user to copy the files from host A to B.
@@ -47,16 +48,25 @@ let
           --delete \
           --chmod=Dg+srwx,Fg+rw,o-rwx \
           ${lib.concatStringsSep " " cfg.folders} \
-          ${cfg.server}:${cfg.destinationPath} 2>&1 | tee /root/mirror-log.txt
+          ${cfg.server}:${cfg.destinationPath} 2>&1 | tee $LOG
         EOF
         )
 
         systemd-inhibit --why="Mirror backups to ${cfg.server}" --who="Backup Mirror Task" --mode=block ${lib.getExe pkgs.bash} -c "$SYNC_CMD"
 
+        if head -1 $LOG | grep -q "Number of files"; then
+          RESULT="succeeded"
+        elif head -1 $LOG | grep -q "@@@@"; then
+          RESULT="failed due to being in luks unlock state"
+        else
+          RESULT="result unknown"
+        fi
+
+
         exec msmtp -t  <<EOF
         To: ${recipients}
         From: ${cfg.notify.from}
-        Subject: [${config.networking.hostName}: mirror] Mirroring to ${cfg.server} complete
+        Subject: [${config.networking.hostName}: mirror] Mirroring to ${cfg.server} $RESULT
 
         $(cat /root/mirror-log.txt)
         EOF
