@@ -160,10 +160,10 @@ let
     runtimeInputs = lib.attrValues {
       inherit (pkgs) btrfs-progs gawk;
     };
-    # FIXME: if we already know a drive has errors, what do we do? perhaps we set a new baseline value
-    # that defaults to 0 but that will equal whatever we expect the known number of errors on the fileSystem is?
-    # then we pass that value as a second argument to the script?
-    #
+    # FIXME: if we already know a drive has errors, what do we do? perhaps we
+    # set a new baseline value that defaults to 0 but that will equal whatever
+    # we expect the known number of errors on the fileSystem is? then we pass
+    # that value as a second argument to the script?
     text =
       # bash
       ''
@@ -432,8 +432,7 @@ in
             );
 
             # This doesn't actually scrub, just checks the status of the scrub
-            # the autoScrub service did, so no harm running it more often (daily
-            # below). FIXME: could sync it somehow with autoScrub service timer
+            # the autoScrub service did, so no harm running it more often
             monitBtrfsScrubStatus = path: ''
               check program "btrfs scrub: ${path}" with path "${lib.getExe btrfsScrubStatus} ${path}"
                 every ${cfg.health.btrfs.interval}
