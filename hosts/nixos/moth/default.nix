@@ -113,15 +113,14 @@
   # Try to avoid bluez package
   hardware.bluetooth.enable = lib.mkForce false;
 
-  # FIXME: Have a btrfs.nix file auto-load of the disks config contains btrfs filesystems, and if so
-  # automatically populate the paths for monit as well
   services.btrfs.autoScrub = {
     enable = true;
     interval = "monthly"; # Because of this raid uses nvme's
-    fileSystems = [
-      "/"
-      "/mnt/storage"
-    ];
+    # Defaults to all filesystems
+    # fileSystems = [
+    #   "/"
+    #   "/mnt/storage"
+    # ];
   };
 
   ${namespace}.services.monit = {
@@ -129,6 +128,7 @@
     usage = {
       fileSystem = {
         enable = true;
+        # FIXME:This should be automated from disko subvolume parsing or something
         fileSystems = {
           rootfs = {
             path = "/";

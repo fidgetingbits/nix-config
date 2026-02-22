@@ -136,15 +136,13 @@
   services.btrfs.autoScrub = {
     enable = true;
     interval = "monthly";
-    fileSystems = [
-      "/"
-    ];
   };
   ${namespace}.services.monit = {
     enable = true;
     usage = {
       fileSystem = {
         enable = true;
+        # FIXME:This should be automated from disko subvolume parsing or something
         fileSystems = {
           rootfs = {
             path = "/";
