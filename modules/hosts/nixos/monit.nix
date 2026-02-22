@@ -475,6 +475,15 @@ in
             cfg.extraConfig
           ];
       };
+      # Start late enough that any additional drives are decrypted/mounted
+      systemd.services.monit = {
+        after = [
+          "local-fs.target"
+          "remote-fs.target"
+          "network-online.target"
+        ];
+      };
+
       sops.templates.${secretConfig} =
         let
           password = "passwords/${if mail.useRelay then "postfix-relay" else "msmtp"}";
