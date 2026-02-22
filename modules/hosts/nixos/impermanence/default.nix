@@ -3,6 +3,7 @@
   inputs,
   config,
   lib,
+  utils,
   ...
 }:
 let
@@ -119,20 +120,23 @@ in
         in
         {
           supportedFilesystems = [ "btrfs" ];
-          systemd.services.btrfs-rollback = {
-            description = "Rollback BTRFS root subvolume to a pristine state";
-            wantedBy = [ "initrd.target" ];
-            after = [
-              # NOTE: The \\x2d is a hyphen in the systemd unit name
-              "dev-mapper-encrypted\\x2dnixos.device"
-              # LUKS/TPM process
-              "systemd-cryptsetup@${hostname}.service"
-            ];
-            before = [ "sysroot.mount" ];
-            unitConfig.DefaultDependencies = "no";
-            serviceConfig.Type = "oneshot";
-            script = lib.getExe wipeScript;
-          };
+          systemd.services.btrfs-rollback =
+            let
+              luks = config.system.disks.luks;
+            in
+            {
+              description = "Rollback BTRFS root subvolume to a pristine state";
+              wantedBy = [ "initrd.target" ];
+              after = lib.optionals luks.enable [
+                (utils.escapeSystemdPath "dev/mapper/${luks.label}.device")
+                # LUKS/TPM process
+                "systemd-cryptsetup@${hostname}.service"
+              ];
+              before = [ "sysroot.mount" ];
+              unitConfig.DefaultDependencies = "no";
+              serviceConfig.Type = "oneshot";
+              script = lib.getExe wipeScript;
+            };
         };
 
       fileSystems."${config.hostSpec.persistFolder}".neededForBoot = true;
