@@ -57,7 +57,12 @@ in
         '';
       };
       luks = {
-        enable = lib.mkEnableOption "Use LUKs on primary and raid drives";
+        # NOTE: Enabled by default
+        enable = lib.mkOption {
+          type = lib.types.bool;
+          default = true;
+          description = "Use LUKs on primary and raid drives";
+        };
         label = lib.mkOption {
           type = lib.types.str;
           example = "encrypted-nixos";
