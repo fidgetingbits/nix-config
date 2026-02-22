@@ -17,6 +17,6 @@
         path = "/dev/disk/by-id/md-name-any:raid5";
       }
     ];
+    luks.enable = true;
   };
-  luks.enable = true;
 }
