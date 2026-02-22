@@ -375,7 +375,7 @@ in
     };
   config =
     let
-      emmcDiskNames = lib.optional cfg.health.disks.emmc.enable (
+      emmcDiskNames = lib.optionals cfg.health.disks.emmc.enable (
         lib.attrNames cfg.health.disks.emmc.disks
       );
       allDiskNames = emmcDiskNames ++ cfg.health.disks.smart.disks;
