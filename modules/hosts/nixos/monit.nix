@@ -482,7 +482,6 @@ in
         after = [
           "local-fs.target"
           "remote-fs.target"
-          "network-online.target"
         ];
       };
 
