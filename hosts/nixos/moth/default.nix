@@ -72,8 +72,9 @@
         group = user: config.users.users.${user}.group;
       in
       [
-        "d /mnt/storage/backup/ 2770 ${name "borg"} ${group "borg"} -"
-        "d /mnt/storage/mirror/ 2770 ${name "borg"} ${group "borg"} -"
+        # d+ will fix up perms if they go bad
+        "d+ /mnt/storage/backup/ 2770 ${name "borg"} ${group "borg"} -"
+        "d+ /mnt/storage/mirror/ 2770 ${name "borg"} ${group "borg"} -"
         # Because we mirror from oath, which doesn't already use aa/ prefix for copying
         "d /mnt/storage/mirror/aa 2770 ${name "borg"} ${group "borg"} -"
       ]
@@ -93,6 +94,16 @@
     notify.to = config.hostSpec.email.${config.hostSpec.hostName}.backups;
     time = "*-*-* 5:00:00"; # Keep sync with myth times
     server = "myth.${config.hostSpec.domain}";
+    folders = {
+      destination = "/mnt/storage/mirror";
+      source = {
+        base = "/mnt/storage/backup";
+        collections = [
+          "aa"
+          "ta"
+        ];
+      };
+    };
   };
 
   # Allow other servers to mirror their backups into moth
@@ -159,5 +170,39 @@
         inherit (config.services.btrfs.autoScrub) fileSystems;
       };
     };
+  };
+
+  # Temporary add auditd to monitor folder disappearance
+  # FIXME:This is copied from elsewhere, so review after. Just want something
+  # so ausearch actually works
+  security.auditd.enable = true;
+  environment.etc = {
+    "audit/audit.conf".text = ''
+      local_events = yes
+      write_logs = yes
+      log_file = /var/log/audit/audit.log
+      log_group = wheel
+      log_format = ENRICHED
+      flush = INCREMENTAL_ASYNC
+      freq = 50
+      max_log_file = 8
+      num_logs = 5
+      priority_boost = 4
+      name_format = NONE
+      max_log_file_action = ROTATE
+      space_left = 75
+      space_left_action = SYSLOG
+      verify_email = yes
+      action_mail_acct = root
+      admin_space_left = 50
+      admin_space_left_action = SUSPEND
+      disk_full_action = SUSPEND
+      disk_error_action = SUSPEND
+      use_libwrap = yes
+      tcp_listen_queue = 5
+      tcp_max_per_addr = 1
+      tcp_client_max_idle = 0
+      distribute_network = no
+    '';
   };
 }
