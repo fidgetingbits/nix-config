@@ -79,7 +79,7 @@ hosts/common/core/sops.nix
 +    "passwords/borg" = {
 +      owner = "root";
 +      group = if pkgs.stdenv.isLinux then "root" else "wheel";
-+      mode = "0600";
++      mode = "*-*-* 0600";
 +      path = "/etc/borg/passphrase";
 +    };
 
@@ -134,7 +134,7 @@ nix-config/hosts/ghost/default.nix
 
   services.backup = {
     enable = true;
-    borgBackupStartTime = "02:00:00";
+    borgBackupStartTime = "*-*-* 02:00:00";
     borgServer = "${configVars.networking.subnets.oops.ip}";
     borgUser = "${configVars.username}";
     borgPort = "${builtins.toString configVars.networking.subnets.oops.port}";

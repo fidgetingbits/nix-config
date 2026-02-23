@@ -132,7 +132,7 @@
   services.fwupd.enable = true;
   services.backup = {
     enable = true;
-    borgBackupStartTime = "11:00:00";
+    borgBackupStartTime = "*-*-* 11:00:00";
     borgExcludes = [
       "${config.hostSpec.home}/movies"
       "${config.hostSpec.home}/.local/share/Steam"

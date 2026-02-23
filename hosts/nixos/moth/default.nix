@@ -114,7 +114,7 @@
 
   services.backup = {
     enable = true;
-    borgBackupStartTime = "09:00:00";
+    borgBackupStartTime = "*-*-* 09:00:00";
     borgServer = "myth.${config.hostSpec.domain}";
     borgRemotePath = "/run/current-system/sw/bin/borg";
     borgBackupPath = "/mnt/storage/backup/aa";

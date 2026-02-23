@@ -103,7 +103,7 @@
 
   services.backup = {
     enable = true;
-    borgBackupStartTime = "04:30:00";
+    borgBackupStartTime = "*-*-* 04:30:00";
 
     borgServer = "moth.${config.hostSpec.domain}";
     borgRemotePath = "/run/current-system/sw/bin/borg";

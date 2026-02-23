@@ -43,7 +43,7 @@
 
   #services.backup = {
   #  enable = true;
-  #  borgBackupStartTime = "05:00:00";
+  #  borgBackupStartTime = "*-*-* 05:00:00";
   # /.cache isn't writable on darwin
   #  borgCacheDir = "/var/root/.cache/borg";
   #};

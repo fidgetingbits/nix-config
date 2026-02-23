@@ -72,7 +72,7 @@
 
   services.backup = {
     enable = true;
-    borgBackupStartTime = "22:00:00";
+    borgBackupStartTime = "*-*-* 22:00:00";
   };
 
   # Bootloader.

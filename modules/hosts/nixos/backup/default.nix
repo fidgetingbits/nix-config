@@ -182,7 +182,7 @@ in
     };
     borgBackupStartTime = lib.mkOption {
       type = lib.types.str;
-      default = "00:00:00";
+      default = "*-*-* 00:00:00";
       description = "The time to start the backup";
     };
     borgBackupLogPath = lib.mkOption {
@@ -615,7 +615,7 @@ in
                 requires = [ "network-online.target" ];
                 after = [ "network-online.target" ];
                 timerConfig = {
-                  OnCalendar = "*-*-* ${cfg.borgBackupStartTime}";
+                  OnCalendar = "${cfg.borgBackupStartTime}";
                   Persistent = true;
                 };
               };

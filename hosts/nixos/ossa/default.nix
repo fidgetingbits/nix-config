@@ -105,7 +105,7 @@
   services.fwupd.enable = true;
   services.backup = {
     enable = true;
-    borgBackupStartTime = "03:00:00";
+    borgBackupStartTime = "*-*-* 03:00:00";
   };
 
   system.impermanence.enable = true;

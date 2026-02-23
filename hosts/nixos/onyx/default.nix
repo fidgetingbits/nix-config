@@ -108,7 +108,7 @@ rec {
   services.fwupd.enable = true;
   services.backup = {
     enable = true;
-    borgBackupStartTime = "09:00:00";
+    borgBackupStartTime = "*-*-* 09:00:00";
     # This is only relevant while I'm not using btrfs subvolume backup
     borgExcludes = [ "${config.hostSpec.home}/movies" ];
   };
