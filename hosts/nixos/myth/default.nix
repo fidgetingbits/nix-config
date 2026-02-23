@@ -70,9 +70,9 @@
         group = user: config.users.users.${user}.group;
       in
       [
-        "d /mnt/storage/backup/ 2770 ${name "borg"} ${group "borg"} -"
-        "d /mnt/storage/mirror/ 2770 ${name "borg"} ${group "borg"} -"
-        "d /mnt/storage/share/ 2770 ${name "aa"} ${group "aa"} -"
+        "d+ /mnt/storage/backup/ 2770 ${name "borg"} ${group "borg"} -"
+        "d+ /mnt/storage/mirror/ 2770 ${name "borg"} ${group "borg"} -"
+        "d+ /mnt/storage/share/ 2770 ${name "aa"} ${group "aa"} -"
       ]
       ++ (lib.map (u: "d /mnt/storage/backup/${u} 0770 ${name "${u}"} ${group "${u}"} -") [
         "pa"
