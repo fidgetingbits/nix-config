@@ -62,7 +62,7 @@
   services.logind.settings.Login.HandlePowerKey = lib.mkForce "reboot";
   services.dyndns.enable = true;
 
-  # FIXME:This should be duplcated between myth/moth probably
+  # FIXME:This should be shared between myth/moth probably
   systemd = {
     tmpfiles.rules =
       let
@@ -85,6 +85,15 @@
     time = "*-*-* 4:00:00"; # Keep sync with moth times
     server = "moth.${config.hostSpec.domain}";
     notify.to = config.hostSpec.email.${config.hostSpec.hostName}.backups;
+
+    folders = {
+      destination = "/mnt/storage/mirror";
+      source = {
+        base = "/mnt/storage/backup";
+        leafs = [ "pa" ];
+        collections = [ "aa" ];
+      };
+    };
   };
 
   # Allow moth to mirror into myth
@@ -100,6 +109,7 @@
     borgRemotePath = "/run/current-system/sw/bin/borg";
     borgBackupPath = "/mnt/storage/backup/aa";
     borgNotifyTo = config.hostSpec.email.${config.hostSpec.hostName}.backups;
+
   };
 
   # Connect our NUT client to the UPS on the network
@@ -113,12 +123,8 @@
 
   services.btrfs.autoScrub = {
     enable = true;
-    interval = "monthly"; # Because of this raid uses nvme's
+    interval = "monthly"; # This raid uses nvme's
     # Defaults to all filesystems
-    #fileSystems = [
-    #  "/"
-    #  "/mnt/storage"
-    #];
   };
 
   ${namespace}.services.monit = {

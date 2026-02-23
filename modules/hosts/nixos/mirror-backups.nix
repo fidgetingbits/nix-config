@@ -9,7 +9,7 @@ let
   sshKeyPath = "/root/.ssh/id_borg";
   port = toString config.hostSpec.networking.ports.tcp.ssh;
   # FIXME: This needs to be part of a loop that is per-mirror
-  mirror-backups = pkgs.writeShellApplication {
+  mirror-backups = pkgs.writeShellApplication rec {
     name = "mirror-backups";
     runtimeInputs = lib.attrValues {
       inherit (pkgs)
@@ -18,58 +18,114 @@ let
         rsync
         openssh
         util-linux
+        bashNonInteractive
         ;
     };
     text =
       let
         recipients = lib.concatStringsSep ", " cfg.notify.to;
+        leafFolders = lib.concatStringsSep " " cfg.folders.source.leafs;
+        collectionFolders = lib.concatStringsSep " " cfg.folders.source.collections;
       in
-      # FIXME: lockfd path should be changed to the per-script name when we have multiple mirror scripts
       # bash
       ''
-        exec {LOCKFD}> /var/lock/mirror-backups.lock
+
+        function gen_sync_cmd {
+          subfolder=$1
+          log=$2
+          destination=${cfg.folders.destination}/"$subfolder"
+            # --chmod ensures the files are group-accessible on host B, even if
+            # they aren't normally on host A. This is needed because we use a
+            # different user to copy the files from host A to B.
+          cat <<EOF
+            ssh -l ${cfg.user} -i ${sshKeyPath} -p ${port} -oIdentitiesOnly=yes ${cfg.server} \
+              "mkdir -p "$destination" 2>/dev/null|| true" && \
+            rsync -e "ssh -l ${cfg.user} -i ${sshKeyPath} -p ${port} -oIdentitiesOnly=yes" \
+              -aHS --stats \
+              --delete \
+              --dry-run \
+              --chmod=Dg+srwx,Fg+rw,o-rwx \
+              ${cfg.folders.source.base}/"$subfolder" \
+              ${cfg.server}:"$destination" >> "$log" 2>&1
+        EOF
+        }
+
+        function run_sync_cmd {
+          sync_cmd=$1
+          log=$2
+          systemd-inhibit --why="Mirror backups to ${cfg.server}" \
+            --who="Backup Mirror Task" \
+            --mode=block bash \
+            -c "$sync_cmd"
+
+          # NOTE: This will break if rsync is used with -v for testing
+          first=$(grep . "$log" | head -1)
+          if echo "$first" | grep -q "Number of files"; then
+            echo "succeeded!"
+          elif echo "$first" | grep -q "@@@@"; then
+            echo "failed due to being in luks unlock state"
+          else
+            echo "result unknown"
+          fi
+        }
+
+        function mail_results {
+          result=$1
+          log=$2
+          exec msmtp -t <<EOF
+        To: ${recipients}
+        From: ${cfg.notify.from}
+        Subject: [${config.networking.hostName}: mirror] Mirroring to ${cfg.server} $result
+
+        $(cat "$log" || echo "ERROR: no logs")
+        EOF
+        }
+
+        exec {LOCKFD}> /var/lock/${name}.lock
         if ! flock -n ''${LOCKFD}; then
           echo "Another backup running; exiting"
           exit 0
         fi
 
-        LOG=/root/mirror-log.txt
-        # --chmod ensures the files are group-accessible on host B, even if
-        # they aren't normally on host A. This is needed because we use a
-        # different user to copy the files from host A to B.
-        #
-        # I don't use --checksum since some of our backup servers use nvme. This
-        # technically risks missing disk corruption. But periodic disk validation
-        # on the hosts should notify of this.
-        # FIXME: run this in a loop until it definitely finishes, similar to long-rsync?
-        SYNC_CMD=$(cat <<EOF
-        rsync -e "ssh -l ${cfg.user} -i ${sshKeyPath} -p ${port} -oIdentitiesOnly=yes" \
-          -aHS --stats \
-          --delete \
-          --chmod=Dg+srwx,Fg+rw,o-rwx \
-          ${lib.concatStringsSep " " cfg.folders} \
-          ${cfg.server}:${cfg.destinationPath} 2>&1 | tee $LOG
-        EOF
-        )
+        # Temp logdir for accumulating per-sync log files
+        logdir=$(mktemp -d)
 
-        systemd-inhibit --why="Mirror backups to ${cfg.server}" --who="Backup Mirror Task" --mode=block ${lib.getExe pkgs.bash} -c "$SYNC_CMD"
+        # Final log sent via email and preserved for follow up analysis
+        mirror_log=/root/${name}-log.txt
+        rm $mirror_log 2>/dev/null|| true
 
-        if head -1 $LOG | grep -q "Number of files"; then
-          RESULT="succeeded"
-        elif head -1 $LOG | grep -q "@@@@"; then
-          RESULT="failed due to being in luks unlock state"
-        else
-          RESULT="result unknown"
-        fi
+        declare -a folders
+        folders=(${leafFolders})
+        # Loop over each collections folder and sync each sub folder
+        # shellcheck disable=SC2043
+        for collection in "${collectionFolders}"; do
+          while IFS= read -r -d "" folder
+          do
+            folders+=("$collection/$folder")
+          done < <(find "${cfg.folders.source.base}/$collection" -mindepth 1 -maxdepth 1 -type d -printf "%P\0")
+        done
 
+        # Loop over each folder and copy it
+        for folder in "''${folders[@]}"; do
+          log=$(mktemp -p "$logdir")
 
-        exec msmtp -t  <<EOF
-        To: ${recipients}
-        From: ${cfg.notify.from}
-        Subject: [${config.networking.hostName}: mirror] Mirroring to ${cfg.server} $RESULT
+          echo "Syncing ${cfg.folders.source.base}/$folder to ${cfg.server}:${cfg.folders.destination}/$folder"
+          sync_cmd=$(gen_sync_cmd "$folder" "$log")
+          result=$(run_sync_cmd "$sync_cmd" "$log")
 
-        $(cat /root/mirror-log.txt)
-        EOF
+          echo "${cfg.folders.source.base}/$folder to ${cfg.server}:${cfg.folders.destination}/$folder" >> "$mirror_log"
+          echo "-----" >> "$mirror_log"
+          cat "$log\n" >> "$mirror_log"
+          echo "-----" >> "$mirror_log"
+
+          if [[ ! "$result" = "succeeded"* ]]; then
+            # Exit on first failure encountered
+            mail_results "$result" "$mirror_log"
+            exit 1
+          fi
+        done
+
+        mail_results "succeeded!" "$mirror_log"
       '';
   };
 in
@@ -85,20 +141,64 @@ in
       description = "Script package to use for the mirroring";
       default = mirror-backups;
     };
-    destinationPath = lib.mkOption {
-      type = lib.types.str;
-      default = "/mnt/storage/mirror/";
-      description = "The path on the destination server to mirror to";
-    };
     user = lib.mkOption {
       type = lib.types.str;
       default = "borg";
       description = "The user to authenticate to the server with";
     };
-    folders = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = [ "/mnt/storage/backup/" ];
-      description = "List of folders to mirror to the destination server";
+    folders = {
+      destination = lib.mkOption {
+        type = lib.types.str;
+        default = "/mnt/storage/mirror/";
+        description = "The path on the destination server to mirror to";
+      };
+      source = {
+
+        base = lib.mkOption {
+          type = lib.types.str;
+          default = "/mnt/storage/backup/";
+          description = "The base path on the origin server to mirror files from";
+        };
+        leafs = lib.mkOption {
+          type = lib.types.listOf lib.types.str;
+          default = [ ];
+          description = ''
+            List of folders to mirror entirely to the destination server.
+
+            For example: /a/b/c will use rsync --delete /a/b/c to copy it to the
+            destination and any additional contents in /a/b/c that were already on
+            destination and are missing from source server will be deleted.
+
+            This is suitable when /a/b/c is a folder ONLY used by the system
+            mirroring this folder.
+
+            If multiple servers share a parent folder that needs to have some
+            contents backed up, use collectionFolders instead.
+          '';
+        };
+        collections = lib.mkOption {
+          type = lib.types.listOf lib.types.str;
+          default = [ ];
+          description = ''
+            List of folders whose containing folders should be copied to destination.
+
+            For example: given folders /a/b/{c,d,e}, passing /a/b to collectionFolders will
+            individually rsync --delete /a/b/c, /a/b/d, and /a/b/e folders. If the
+            destination already had the /a/b folder and some other sub folders
+            /a/b/foo, /a/b/bar, those folders will NOT be deleted.
+
+            This is to be used when multiple servers use the same directory heirarchy, and you want to
+            copy underlying folders without deleting missing folders from the parent.
+            to delete any missing contents from this same folder on the destination. DO NOT
+            use this to mirror a folder that other systems also mirror to the destination.
+
+            This allows multiple backup servers to mirror their subfolders to a central folder without
+            having to specify a unique parent folder, which simplifies backup access for users
+            recovering from the mirror.
+          '';
+
+        };
+      };
     };
     time = lib.mkOption {
       type = lib.types.str;
