@@ -19,7 +19,6 @@
           "audio-tools.nix"
           "development"
           "helper-scripts"
-          "xdg.nix"
           "gpg.nix"
           "ghostty.nix"
           "media.nix"

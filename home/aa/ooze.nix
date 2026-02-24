@@ -17,7 +17,6 @@
         (map (f: "home/common/optional/${f}") [
           "helper-scripts"
           "sops.nix"
-          "xdg.nix"
           "gpg.nix"
           "atuin.nix"
         ])

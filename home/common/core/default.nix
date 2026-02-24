@@ -96,4 +96,6 @@
     bash.enable = true;
     home-manager.enable = true;
   };
+
+  introdus.xdg.enable = true;
 }

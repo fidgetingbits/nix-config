@@ -92,4 +92,13 @@
     [*.puml.md,*.puml,*.iuml,*.uml,*.pu,*.plantuml]
     indent_size = 2
   '';
+
+  xdg = {
+    # Disable pwntools auto-update
+    configFile."pwn.conf".text = ''
+      [update]
+      interval=never
+    '';
+  };
+
 }

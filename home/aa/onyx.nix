@@ -22,7 +22,6 @@
           "aws.nix"
           "helper-scripts"
           "sops.nix"
-          "xdg.nix"
           "gpg.nix"
           #common/optional/kitty.nix
           "ghostty.nix"

@@ -14,7 +14,6 @@
       ++
         # Optional common modules
         (map (f: "home/common/optional/${f}") [
-          "xdg.nix"
           "gpg.nix"
           "ghostty.nix"
           "media.nix"
