@@ -20,7 +20,7 @@
       "aa"
     ];
     wallpaper = "${inputs.nix-assets}/images/wallpapers/astronaut.webp";
-    defaultDesktop = "hyprland-uwsm";
+    defaultDesktop = "niri-uwsm";
     persistFolder = lib.mkForce "";
   };
 }

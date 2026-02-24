@@ -35,7 +35,8 @@ rec {
           # "gdm.nix"
           "sddm.nix"
           "gnome.nix"
-          "i3wm.nix"
+          # "i3wm.nix"
+          "niri.nix"
 
           # Miscellaneous
           "podman.nix"
@@ -66,12 +67,13 @@ rec {
           "fonts.nix"
 
           "logind.nix"
+
         ])
     ))
   ];
 
   # FIXME: Further tweak this
-  desktops.hyprland.enable = true;
+  desktops.hyprland.enable = false;
 
   wifi = {
     enable = true;

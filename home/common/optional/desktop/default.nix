@@ -2,7 +2,7 @@
 {
   # FIXME: This should import based on wayland or not if it ever matters
   imports = [
-    ./hyprland
+    # ./hyprland
     ./gnome
     ./niri
     ./wayland
