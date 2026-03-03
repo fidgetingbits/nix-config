@@ -28,12 +28,11 @@ layout {
             plugin location="compact-bar"
         }
         pane split_direction="vertical" {
-            pane command="vi" cwd="$HOME/dev/nix/nixCats-example" size="50%" {
+            pane command="vi" cwd="$HOME/dev/nix/neovim" size="50%" {
                 start_suspended false
             }
             pane size="50%" {
-                pane cwd="$HOME/dev/nix/nixCats-example" size="50%"
-                pane cwd="$HOME/dev/nix/nixvim-flake/config" size="50%"
+                pane cwd="$HOME/dev/nix/neovim" size="50%"
             }
         }
     }
@@ -53,10 +52,10 @@ layout {
             plugin location="compact-bar"
         }
         pane split_direction="vertical" {
-            pane command="vi" cwd="$HOME/dev/nix/emergentmind" size="50%" {
+            pane command="vi" cwd="$HOME/dev/nix/emergentmind-nix-config" size="50%" {
                 start_suspended false
             }
-            pane cwd="$HOME/dev/nix/emergentmind" size="50%"
+            pane cwd="$HOME/dev/nix/emergentmind-nix-config" size="50%"
         }
     }
     tab name="Wiki" hide_floating_panes=true {
