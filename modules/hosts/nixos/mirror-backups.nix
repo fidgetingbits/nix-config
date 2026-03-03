@@ -29,7 +29,6 @@ let
       in
       # bash
       ''
-
         function gen_sync_cmd {
           subfolder=$1
           log=$2
@@ -40,11 +39,11 @@ let
           cat <<EOF
             ssh -l ${cfg.user} -i ${sshKeyPath} -p ${port} -oIdentitiesOnly=yes ${cfg.server} \
               "mkdir -p "$destination" 2>/dev/null|| true" && \
-            rsync -e "ssh -l ${cfg.user} -i ${sshKeyPath} -p ${port} -oIdentitiesOnly=yes" \
-              -aHS --stats \
+            rsync -aHS \
+              --stats \
               --delete \
-              --dry-run \
               --chmod=Dg+srwx,Fg+rw,o-rwx \
+              -e "ssh -l ${cfg.user} -i ${sshKeyPath} -p ${port} -oIdentitiesOnly=yes" \
               ${cfg.folders.source.base}/"$subfolder" \
               ${cfg.server}:"$destination" >> "$log" 2>&1
         EOF
