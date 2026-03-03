@@ -199,6 +199,12 @@
 
     #################### Utilities ####################
 
+    # Utility wrappers
+    wrappers = {
+      url = "github:BirdeeHub/nix-wrapper-modules";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Secret management
     sops-nix = {
       url = "github:Mic92/sops-nix";
@@ -281,10 +287,12 @@
       url = "git+ssh://git@gitlab.com/fidgetingbits/nix-secrets.git?shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixcats-flake = {
-      url = "github:fidgetingbits/neovim?ref=main&shallow=1";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    fidgetingvim = {
+      url = "path:///home/aa/persist/source/nix/neovim";
+      #inputs.nixpkgs.follows = "nixpkgs-unstable";
+      inputs.flake-parts.follows = "flake-parts";
     };
+
     nix-assets = {
       url = "github:fidgetingbits/nix-assets?shallow=1";
     };

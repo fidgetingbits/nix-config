@@ -9,7 +9,6 @@
 }:
 {
   imports = [
-    inputs.nixcats-flake.nixosModules.default
     inputs.introdus.nixosModules.default
   ];
 

@@ -5,5 +5,5 @@ pkgs.writeShellScriptBin "neovim-term.sh" ''
   set -eo pipefail
 
   # IMPORTANT: talon title handling relies on the explicit zsh
-  ${pkgs.nixcats}/bin/nvim -c ':term zsh'
+  ${pkgs.fidgetingvim}/bin/nvim -c ':term zsh'
 ''

@@ -24,7 +24,7 @@ copy-lock-out HOST=`hostname`:
 rebuild-pre HOST=`hostname`:
     just update-nix-secrets {{ HOST }} && \
     just update {{ HOST }} nix-assets && \
-    just update {{ HOST }} nixcats-flake && \
+    just update {{ HOST }} fidgetingvim && \
     just update {{ HOST }} nix-index-database && \
     just update {{ HOST }} introdus
     @git add --intent-to-add .

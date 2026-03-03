@@ -23,9 +23,6 @@ let
       )
       # Other external inputs
       // {
-        #neovim = inputs.nixvim-flake.packages.${system}.default;
-        neovim = inputs.nixcats-flake.packages.${system}.default;
-        nixcats = inputs.nixcats-flake.packages.${system}.default;
         nix-sweep = inputs.nix-sweep.packages.${system}.default;
         pwndbg = inputs.pwndbg.packages.${system}.default;
       };
