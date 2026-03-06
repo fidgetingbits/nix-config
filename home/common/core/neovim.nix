@@ -1,25 +1,36 @@
 {
   inputs,
   lib,
-  pkgs,
+  # pkgs,
   osConfig,
   ...
 }:
 {
   imports = [
-    # inputs.fidgetingvim.wrapperModules.fidgetingvim
+    (inputs.wrappers.lib.mkInstallModule {
+      loc = [
+        "home"
+        "packages"
+      ];
+      name = "neovim";
+      value = inputs.fidgetingvim.wrapperModules.default;
+    })
   ];
 
-  home.packages = [
-    #pkgs.fidgetingvim
-    # inputs.fidgetingvim.outputs.fidgetingvim
-    inputs.fidgetingvim.packages.${pkgs.stdenv.hostPlatform.system}.default
-  ];
-
-  # wrappers.fidgetingvim = {
-  #   enable = true;
-  #   dev_mode = true;
-  # };
+  wrappers.neovim =
+    let
+      isDev = osConfig.hostSpec.useWindowManager;
+    in
+    {
+      enable = true;
+      settings = {
+        neovide = isDev;
+        # NOTE: This means you need the neovim source at the specified unwrapped_config path
+        # ex ~/dev/nix/neovim
+        devMode = isDev;
+        terminal = osConfig.hostSpec.useNeovimTerminal;
+      };
+    };
 
   programs.zsh = {
     shellAliases = {
