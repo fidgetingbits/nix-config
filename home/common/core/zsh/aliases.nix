@@ -7,6 +7,7 @@ let
   devFolder = "~/dev";
   devTalon = "${devFolder}/talon";
   devNix = "${devFolder}/nix";
+  devPublic = "~/public/source/";
 in
 {
   whichreal = ''function _whichreal(){ (alias "$1" >/dev/null 2>&1 && (alias "$1" | sed "s/.*=.\(.*\).../\1/" | xargs which)) || which "$1"; }; _whichreal'';
@@ -94,6 +95,7 @@ in
   ctn = "cd ${devTalon}/talon.nvim";
   ccn = "cd ${devTalon}/cursorless.nvim";
   ccl = "cd ${devTalon}/cursorless";
+
   ## nix
   cnc = "cd ${devNix}/nix-config";
   cnn = "cd ${devNix}/neovim";
@@ -102,6 +104,7 @@ in
   cnp = "cd ${devNix}/nixpkgs";
   cni = "cd ${devNix}/introdus/aa";
   cne = "cd ${devNix}/emergentmind-nix-config";
+  cpn = "cd ${devPublic}/nix";
 
   ## rust cargo
   cr = "cargo run";
