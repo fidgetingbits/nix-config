@@ -334,6 +334,10 @@ binds {
     Super+Return hotkey-overlay-title="New shell" {
         spawn "ghostty"
     }
+    Super+V hotkey-overlay-title="New shell" {
+        // From fidgetingvim flake
+        spawn "nvim-neovide"
+    }
     // Open drun launcher.
     Super+Space hotkey-overlay-title="Launcher" {
         spawn "rofi" "-show" "drun"
