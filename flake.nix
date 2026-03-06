@@ -289,8 +289,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     fidgetingvim = {
-      url = "path:///home/aa/persist/source/nix/neovim";
-      #inputs.nixpkgs.follows = "nixpkgs-unstable";
+      url = "path:///home/aa/dev/nix/neovim";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
       inputs.flake-parts.follows = "flake-parts";
     };
 
