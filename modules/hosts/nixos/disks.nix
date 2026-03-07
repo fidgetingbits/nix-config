@@ -98,14 +98,8 @@ in
         description = "List of drives to add to mdadm raid array. Raid disabled if not set";
       };
       extraDisks = lib.mkOption {
-        type = lib.types.listOf (lib.types.attrsOf lib.types.str);
-        default = [
-          {
-            name = "encrypted-storage";
-            # FIXME: Should check how to control the name-any-raid5 parts in disko
-            path = "/dev/disks/by-id/md-name-any:raid5";
-          }
-        ];
+        type = lib.types.nullOr (lib.types.listOf (lib.types.attrsOf lib.types.str));
+        default = null;
         description = "Names and labels of non-primary luks-encrypted disks, used for automatic boot-time LUKS unlocking.";
         example = [
           {
@@ -296,14 +290,16 @@ in
       # Find path with: ls /dev/disk/by-id/
       #
       environment = {
-        etc.crypttab.text = lib.optionalString (!config.hostSpec.isMinimal) (
-          lib.concatMapStringsSep "\n" (
-            d:
-            # FIXME: noauto doesn't work, so path has to be correct or boot fails
-            # investigate a way to use x-systemd.automount mount or similar
-            "${d.name} ${d.path} /luks-secondary-unlock.key noauto,nofail"
-          ) cfg.extraDisks
-        );
+        etc.crypttab.text =
+          lib.optionalString (!config.hostSpec.isMinimal && !(builtins.isNull cfg.extraDisks))
+            (
+              lib.concatMapStringsSep "\n" (
+                d:
+                # FIXME: noauto doesn't work, so path has to be correct or boot fails
+                # investigate a way to use x-systemd.automount mount or similar
+                "${d.name} ${d.path} /luks-secondary-unlock.key noauto,nofail"
+              ) cfg.extraDisks
+            );
       }
       // lib.optionalAttrs config.system.impermanence.enable {
         persistence."${config.hostSpec.persistFolder}" = {
