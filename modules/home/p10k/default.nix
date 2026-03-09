@@ -14,7 +14,7 @@ in
 
       initContent = lib.mkBefore ''
         # Enable osc133 code for neovim [[ and ]] prompt jumping motions
-        # typeset -g POWERLEVEL9K_TERM_SHELL_INTEGRATION=true
+        typeset -g POWERLEVEL9K_TERM_SHELL_INTEGRATION=true
         # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
         # Initialization code that may require console input (password prompts, [y/n]
         # confirmations, etc.) must go above this block; everything else may go below.

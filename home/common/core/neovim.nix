@@ -1,34 +1,34 @@
 {
   inputs,
   lib,
-  pkgs,
+  # pkgs,
   osConfig,
-  config,
+  # config,
   ...
 }:
 let
   # From github, but useful for nested terminals. Tie to nvim terminal and add
   # https://github.com/sephid86/nixos/blob/5eefc2eb3c3f2afc362235682176f42916c8b948/homenix/home.nix#L362
-  nvim-add = pkgs.writeShellApplication {
-    name = "nvim-add";
-    runtimeInputs = [ config.wrappers.neovim.wrapper ];
-    text = ''
-      #!/usr/bin/env bash
-      NVIM_SOCKET="$HOME/.cache/nvim.sock"
-      # [ "$#" -gt 0 ] && set -- $(realpath -- "$@")
-      if [ "$#" -gt 0 ]; then
-          mapfile -t real_files < <(realpath -- "$@")
-          set -- "''${real_files[@]}"
-      fi
-      if n_=$(nvim --headless --server "$NVIM_SOCKET" --remote-expr "1" 2>/dev/null); then
-      if [ "$#" -eq 0 ]; then set -- "unnamed"; fi
-        exec nvim --server "$NVIM_SOCKET" --remote "$@"
-      else
-        rm -f $NVIM_SOCKET
-        exec nvim --listen "$NVIM_SOCKET" "$@"
-      fi
-    '';
-  };
+  # nvim-add = pkgs.writeShellApplication {
+  #   name = "nvim-add";
+  #   runtimeInputs = [ config.wrappers.neovim.wrapper ];
+  #   text = ''
+  #     #!/usr/bin/env bash
+  #     NVIM_SOCKET="$HOME/.cache/nvim.sock"
+  #     # [ "$#" -gt 0 ] && set -- $(realpath -- "$@")
+  #     if [ "$#" -gt 0 ]; then
+  #         mapfile -t real_files < <(realpath -- "$@")
+  #         set -- "''${real_files[@]}"
+  #     fi
+  #     if n_=$(nvim --headless --server "$NVIM_SOCKET" --remote-expr "1" 2>/dev/null); then
+  #     if [ "$#" -eq 0 ]; then set -- "unnamed"; fi
+  #       exec nvim --server "$NVIM_SOCKET" --remote "$@"
+  #     else
+  #       rm -f "$NVIM_SOCKET"
+  #       exec nvim --listen "$NVIM_SOCKET" "$@"
+  #     fi
+  #   '';
+  # };
 in
 {
   imports = [
@@ -76,5 +76,5 @@ in
       # neovim = "${pkgs.introdus.neovim-wrapped}/bin/neovim.sh";
     };
   };
-  home.packages = [ nvim-add ];
+  # home.packages = [ nvim-add ];
 }
