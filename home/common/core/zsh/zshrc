@@ -7,6 +7,20 @@ if [[ -n $SSH_CONNECTION ]]; then
     export VISUAL="vim"
 fi
 
+# FIXME: Move this probably
+# For neovim 0.11 [[ and ]] prompt motions
+_osc133_precmd() {
+    printf "\033]133;A\007"
+}
+_osc133_preexec() {
+    printf "\033]133;C\007"
+}
+
+# Add hooks to the Zsh lifecycle
+autoload -Uz add-zsh-hook
+add-zsh-hook precmd _osc133_precmd
+add-zsh-hook preexec _osc133_preexec
+
 unsetopt correct # autocorrect commands
 
 setopt hist_ignore_all_dups # remove older duplicate entries from history
@@ -113,9 +127,9 @@ FZF_CMD="fzf --preview 'ls | head -n 10' --height=10 --reverse +m"
 function fzf_auto_select() {
     local lines
     lines=$(fzf --filter="$1" --no-sort)
-    if [ -z "$lines" ]; then
+    if [ "$lines" = "" ]; then
         return 1
-    elif [ $(wc -l <<<"$lines") -eq 1 ]; then
+    elif [ "$(wc -l <<<"$lines")" -eq 1 ]; then
         echo "$lines"
     else
         echo "$lines" | fzf --query="$1"
@@ -131,14 +145,14 @@ function fzf_closest() {
 function cdf() {
     local files
     # NOTE: uses fd rather than fzf --filter to get built-in gitignore support
-    files=$(fd $1)
-    if [ -z "$files" ]; then
+    files=$(fd "$1")
+    if [ "$files" = "" ]; then
         return 1
-    elif [ $(wc -l <<<"$files") -eq 1 ]; then
+    elif [ "$(wc -l <<<"$files")" -eq 1 ]; then
         cd "$(dirname "$files")"
     else
         local selection=$(echo "$files" | fzf --height=40% --border --preview 'bat --color=always {}' --preview-window=right:60%)
-        if [ -n "$selection" ]; then
+        if [ "$selection" != "" ]; then
             cd "$(dirname "$selection")"
         fi
     fi
@@ -149,13 +163,13 @@ function cdd() {
     local dirs
     # NOTE: uses fd rather than fzf --filter to get built-in gitignore support
     dirs=$(fd -t d "$1")
-    if [ -z "$dirs" ]; then
+    if [ "$dirs" = "" ]; then
         return 1
-    elif [ $(wc -l <<<"$dirs") -eq 1 ]; then
+    elif [ "$(wc -l <<<"$dirs")" -eq 1 ]; then
         cd "$dirs"
     else
         local selection=$(echo "$dirs" | fzf --height=40% --border --preview 'tree -C {}' --preview-window=right:60%)
-        if [ -n "$selection" ]; then
+        if [ "$selection" != "" ]; then
             cd "$selection"
         fi
     fi
@@ -165,7 +179,7 @@ function cdd() {
 function cdup() {
     local parent_dir
     parent_dir=$( (
-        current_dir=$(pwd)
+        current_dir=$PWD
         while [ "$current_dir" != "/" ]; do
             echo "$current_dir"
             current_dir=$(dirname "$current_dir")
@@ -174,7 +188,7 @@ function cdup() {
     ) | fzf --tac) # --tac reverses the list to show closest parents first
 
     # If a directory was selected (and not cancelled), cd into it
-    if [ -n "$parent_dir" ]; then
+    if [ "$parent_dir" != "" ]; then
         cd "$parent_dir" || return
     fi
 }
@@ -183,7 +197,7 @@ function cdup() {
 # fuzzy directory with some depth
 function cdds() {
     local dir=$(fd -d 4 -t d "$1" | fzf --height=40% --border --preview 'tree -C {}' --preview-window=right:60%)
-    [ -n "$dir" ] && cd "$dir"
+    [ "$dir" != "" ] && cd "$dir"
 }
 
 # fdr - cd to selected parent directory
@@ -211,7 +225,7 @@ function nameshell() {
 }
 
 function reload() {
-    exec "${SHELL}" "$@"
+    exec "$SHELL" "$@"
 }
 
 function escape() {
@@ -246,7 +260,7 @@ function nix_log_extract() {
     script -q -f "$temp_file" -c "command nix $*"
     drv_line=$(grep "For full logs, run" "$temp_file")
 
-    if [ -n "$drv_line" ]; then
+    if [ "$drv_line" != "" ]; then
         # NOTE: The hard coding use of .drv is to prevent color sequences being tacked on the end
         # shellcheck disable=SC2001
         NIX_LAST_DERIVATION=$(echo "$drv_line" | sed "s/.*nix log \(.*\.drv\).*/\1/")
@@ -310,7 +324,7 @@ function git_modified_files() {
 zle -N git_modified_files
 # Use fzf-git.sh style ctrl+g binding
 for m in emacs vicmd viins; do
-    bindkey -M $m '^g^m' git_modified_files
+    bindkey -M "$m" '^g^m' git_modified_files
 done
 
 # Add and commit an updated flake lock file for the current or given host
@@ -354,7 +368,7 @@ function upgrade() {
 
 function reboot-host() {
     host="$(nix_hosts | fzf_auto_select)"
-    ssh $host "systemctl reboot"
+    ssh "$host" "systemctl reboot"
 }
 
 # List the dates for all flake.lock inputs to see how long ago they were updated
@@ -368,6 +382,6 @@ function flake_lock_dates() {
         | "\($name)\t\( $ts )"' \
         "$LOCK_FILE" |
         while IFS=$'\t' read -r name ts; do
-            printf "%-20s %s\n" "$name" "$(date -d @$ts '+%Y-%m-%d %H:%M:%S %Z')"
+            printf "%-20s %s\n" "$name" "$(date -d @"$ts" '+%Y-%m-%d %H:%M:%S %Z')"
         done
 }

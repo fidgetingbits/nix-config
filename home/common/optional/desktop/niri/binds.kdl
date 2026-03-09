@@ -334,9 +334,14 @@ binds {
     Super+Return hotkey-overlay-title="New shell" {
         spawn "ghostty"
     }
-    Super+V hotkey-overlay-title="New shell" {
+    // env is set to force mouse = 'a' from being disabled
+    Super+V hotkey-overlay-title="Neovide" {
         // From fidgetingvim flake
         spawn "nvim-neovide"
+    }
+    Super+T hotkey-overlay-title="New neovide shell" {
+        // From fidgetingvim flake
+        spawn "nvim-neovide" "--" "-c" "term"
     }
     // Open drun launcher.
     Super+Space hotkey-overlay-title="Launcher" {
