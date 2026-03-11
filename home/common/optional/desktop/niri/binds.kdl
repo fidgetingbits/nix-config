@@ -330,16 +330,16 @@ binds {
     //
     // ========== Quick Launch ==========
     //
-    // Open a terminal emulator.
-    Super+Return hotkey-overlay-title="New shell" {
+    // Open ghostty.
+    Super+Shift+G hotkey-overlay-title="New shell" {
         spawn "ghostty"
     }
-    // env is set to force mouse = 'a' from being disabled
+    // Open neovide
     Super+V hotkey-overlay-title="Neovide" {
         // From fidgetingvim flake
         spawn "nvim-neovide"
     }
-    Super+T hotkey-overlay-title="New neovide shell" {
+    Super+Return hotkey-overlay-title="New neovide shell" {
         // From fidgetingvim flake
         spawn "nvim-neovide" "--" "-c" "term"
     }
