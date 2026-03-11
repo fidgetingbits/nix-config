@@ -7,7 +7,6 @@ if [[ -n $SSH_CONNECTION ]]; then
     export VISUAL="vim"
 fi
 
-# FIXME: Double check if needed given p10k option and/or starship?
 # For neovim 0.11 [[ and ]] prompt motions
 _osc133_precmd() {
     printf "\033]133;A\007"
