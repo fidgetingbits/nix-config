@@ -341,6 +341,7 @@ binds {
     }
     Super+Return hotkey-overlay-title="New neovide shell" {
         // From fidgetingvim flake
+        // spawn "nvim-neovide" "--" "-c" "ToggleTerm"
         spawn "nvim-neovide" "--" "-c" "term"
     }
     // Open drun launcher.
