@@ -6,10 +6,7 @@
       ids = [ "*" ]; # Apply to all keyboards
       settings = {
         main = {
-          # NOTE: This conflicts with zsh sudo plugin in that sometimes too quick
-          # ctrl+<key> or similar presses will add a sudo to a command
           capslock = "overload(control, esc)";
-          enter = "overload(control, enter)";
           # Careful with this due to typing too fast
           # space = "overload(alt, space)";
           rightalt = "overload(meta, compose)";
