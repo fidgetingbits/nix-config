@@ -7,13 +7,10 @@
       settings = {
         main = {
           capslock = "overload(control, esc)";
-          # Careful with this due to typing too fast
-          # space = "overload(alt, space)";
           rightalt = "overload(meta, compose)";
           leftcontrol = "layer(layer1)";
           rightcontrol = "layer(layer1)";
-          # FIXME: this key only on onyx
-          menu = "super";
+          menu = "super"; # NOTE: this key only on onyx
           escape = "noop";
         };
         layer1 = {
