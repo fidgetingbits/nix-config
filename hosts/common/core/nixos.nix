@@ -38,7 +38,7 @@
     if config.hostSpec.isServer then
       pkgs.linuxPackages_6_12 # LTS
     else
-      pkgs.linuxPackages_6_18;
+      pkgs.linuxPackages_latest;
 
   boot.loader.efi.canTouchEfiVariables = true;
 

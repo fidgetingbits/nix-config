@@ -295,12 +295,12 @@
     };
 
     nix-assets = {
-      url = "github:fidgetingbits/nix-assets?shallow=1";
+      url = "github:fidgetingbits/nix-assets";
     };
     pwndbg.url = "github:pwndbg/pwndbg";
 
     introdus = {
-      # url = "git+ssh://git@codeberg.org/fidgetingbits/introdus?shallow=1&ref=aa";
+      # url = "git+ssh://git@codeberg.org/fidgetingbits/introdus?ref=aa";
       url = "path:///home/aa/dev/nix/introdus/aa";
     };
   };
