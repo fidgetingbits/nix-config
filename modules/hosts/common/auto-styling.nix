@@ -15,7 +15,7 @@ in
     inputs.stylix.${platformModules}.stylix
   ];
 
-  # Also seem modules/home/auto-styling.nix
+  # Also see ./../../home/auto-styling.nix
   config = lib.mkIf config.hostSpec.isAutoStyled {
     stylix = {
       enable = true;
