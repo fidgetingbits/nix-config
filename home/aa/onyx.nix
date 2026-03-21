@@ -67,6 +67,7 @@
       inherit (pkgs.introdus)
         easylkb
         cyberpower-pdu
+        unwanted-builtins # Testing
         ;
       inherit (pkgs.unstable)
         proton-authenticator
@@ -121,6 +122,35 @@
         path = "${config.home.homeDirectory}/.config/fly.io/token";
       };
     };
+  };
+
+  stylix = {
+    cursor = lib.mkForce {
+      name = lib.mkForce "catppuccin-mocha-light-cursors";
+      package = lib.mkForce pkgs.catppuccin-cursors.mochaLight;
+      size = lib.mkForce 40;
+    };
+    # override = {
+    #   scheme = "miasma";
+    #   author = "xero"; # https://github.com/xero/miasma.nvim/blob/main/extras/miasma.Xresources
+    #   base00 = "#222222";
+    #   base01 = "#685742";
+    #   base02 = "#5f875f";
+    #   base03 = "#b36d43";
+    #   base04 = "#78824b";
+    #   base05 = "#bb7744";
+    #   base06 = "#c9a554";
+    #   base07 = "#d7c483";
+    #   base08 = "#666666";
+    #   base09 = "#685742";
+    #   base0A = "#5f875f";
+    #   base0B = "#b36d43";
+    #   base0C = "#78824b";
+    #   base0D = "#bb7744";
+    #   base0E = "#c9a554";
+    #   base0F = "#d7c483";
+    # };
+    targets.neovide.enable = true;
   };
 
 }
