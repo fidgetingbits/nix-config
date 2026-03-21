@@ -33,11 +33,26 @@ in
       # FIXME: Would be nice to have per-lang icons for clearer alias results
       gitHubLangSearches = lib.mergeAttrsList (
         map (entry: mkGitHubLangSearch entry.lang entry.aliases) [
-          (mkLang "nix" [ "@nl" ])
-          (mkLang "lua" [ "@ll" ])
-          (mkLang "shell" [ "@sl" ])
-          (mkLang "rust" [ "@rl" ])
-          (mkLang "python" [ "@pl" ])
+          (mkLang "nix" [
+            "@nl"
+            "@nix"
+          ])
+          (mkLang "lua" [
+            "@ll"
+            "@lua"
+          ])
+          (mkLang "shell" [
+            "@sl"
+            "@bash"
+          ])
+          (mkLang "rust" [
+            "@rl"
+            "@rust"
+          ])
+          (mkLang "python" [
+            "@pl"
+            "@python"
+          ])
         ]
       );
     in
