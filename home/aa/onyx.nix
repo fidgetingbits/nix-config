@@ -67,7 +67,6 @@
       inherit (pkgs.introdus)
         easylkb
         cyberpower-pdu
-        unwanted-builtins # Testing
         ;
       inherit (pkgs.unstable)
         proton-authenticator
