@@ -10,6 +10,7 @@ let
   homeDir = config.home.homeDirectory;
 in
 {
+  # NOTE: See introdus for more automatic settings
   config = lib.mkMerge [
     (lib.mkIf osConfig.hostSpec.useWindowManager {
       programs.firefox = {
@@ -111,22 +112,22 @@ in
           };
       };
     })
-    (lib.mkIf (pkgs.stdenv.isLinux && osConfig.hostSpec.useWindowManager) {
-      # FIXME: This should become osConfig.hostSpec.defaultBrowser and not just if you import firefox
-      xdg.mimeApps.defaultApplications = {
-        "text/html" = [ "firefox.desktop" ];
-        "text/xml" = [ "firefox.desktop" ];
-        "x-scheme-handler/http" = [ "firefox.desktop" ];
-        "x-scheme-handler/https" = [ "firefox.desktop" ];
-      };
-    }
-      # WARNING: This uninstalled firefox for some reason
-      #    // (lib.mkIf osConfig.hostSpec.isAutoStyled {
-      #      # FIXME(firefox): Combine this with the profile name above automatically
-      #      stylix.targets.firefox.profileNames = [
-      #        "default"
-      #      ];
-      #    })
-    )
+    # (lib.mkIf (pkgs.stdenv.isLinux && osConfig.hostSpec.useWindowManager) {
+    #   # FIXME: This should become osConfig.hostSpec.defaultBrowser and not just if you import firefox
+    #   xdg.mimeApps.defaultApplications = {
+    #     "text/html" = [ "firefox.desktop" ];
+    #     "text/xml" = [ "firefox.desktop" ];
+    #     "x-scheme-handler/http" = [ "firefox.desktop" ];
+    #     "x-scheme-handler/https" = [ "firefox.desktop" ];
+    #   };
+    # }
+    #   # WARNING: This uninstalled firefox for some reason
+    #   #    // (lib.mkIf osConfig.hostSpec.isAutoStyled {
+    #   #      # FIXME(firefox): Combine this with the profile name above automatically
+    #   #      stylix.targets.firefox.profileNames = [
+    #   #        "default"
+    #   #      ];
+    #   #    })
+    # )
   ];
 }
