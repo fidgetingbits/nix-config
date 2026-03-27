@@ -74,24 +74,6 @@ bindkey '^[%' vi-match-bracket
 bindkey '^X^P' vi-find-prev-char
 bindkey '^[^K' kill-whole-line
 
-function zoxide_fzf() {
-    local orig_buffer=$LBUFFER
-    local selection
-    selection=$(zoxide query --list | fzf --height 40% --reverse --border) || {
-        LBUFFER=$orig_buffer
-        zle redisplay
-        return 0
-    }
-
-    if [[ -n "$selection" ]]; then
-        LBUFFER+="$selection"
-        zle redisplay
-    fi
-}
-
-zle -N zoxide_fzf
-bindkey "^F" zoxide_fzf
-
 # Default is ctrl-x ctrl-v
 bindkey '^]' vi-cmd-mode
 
@@ -161,6 +143,24 @@ function fzf_auto_select() {
 function fzf_closest() {
     fzf --filter="$1" | head -n 1
 }
+
+function zoxide_fzf() {
+    local orig_buffer=$LBUFFER
+    local selection
+    selection=$(zoxide query --list | fzf --height 40% --reverse --border) || {
+        LBUFFER=$orig_buffer
+        zle redisplay
+        return 0
+    }
+
+    if [[ -n "$selection" ]]; then
+        LBUFFER+="$selection"
+        zle redisplay
+    fi
+}
+
+zle -N zoxide_fzf
+bindkey '^F' zoxide_fzf
 
 # Fuzzy find file and jump to it's directory. Automatically select fzf result if only one match.
 function cdf() {
