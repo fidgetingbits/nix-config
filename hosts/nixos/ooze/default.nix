@@ -134,16 +134,16 @@ in
     wake-oppo
   ];
 
-  fileSystems."/mnt/oath-backups" = {
-    device = "borg@oath.${config.hostSpec.domain}:";
-    fsType = "sshfs";
-    options = [
-      "nodev"
-      "noatime"
-      "IdentityFile=/root/.ssh/id_borg"
-      "Port=${toString config.hostSpec.networking.ports.tcp.ssh}"
-    ];
-  };
+  # fileSystems."/mnt/oath-backups" = {
+  #   device = "borg@oath.${config.hostSpec.domain}:";
+  #   fsType = "sshfs";
+  #   options = [
+  #     "nodev"
+  #     "noatime"
+  #     "IdentityFile=/root/.ssh/id_borg"
+  #     "Port=${toString config.hostSpec.networking.ports.tcp.ssh}"
+  #   ];
+  # };
 
   # orchestrate mirror of backups from other hosts backed up onto oath, since oath isn't nix
   # mirror targets aren't big enough to hold all mirrors, so broken across hosts

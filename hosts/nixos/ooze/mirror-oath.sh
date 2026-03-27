@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
 #
 # Overview:
-# enter the synology as borg user, plant a key, and have oath direct rsync
-# mirror to moth. this duplicates a lot of code from long-rsync and
-# mirror-backups, but due to some specific differences it needs to be
-# stand-alone atm
+#   enter the synology as borg user
+#   plant an ssh key
+#   connect to oath and have it directly rsync to moth
+#
+# TODO:
+#   - [ ] This needs to to implement 'collectionsFolder' logic that mirror-backups is
+#         using, so we can re-add --delete
 #
 # FIXME: We may need to add some synology-specific functionality to prevent
 # auto-updates auto-reboot during sync?
 #
-# FIXME: Rework to deduplicate as much as possible with long-rsync
+# FIXME: Rework to deduplicate as much as possible with long-rsync/mirror-backups
 
 STARTED=$(date "+%Y-%m-%d %H:%M:%S")
 KEY_FILE=/root/.ssh/id_borg
@@ -47,6 +50,16 @@ function cleanup {
     rm -rf "$tmp_dir"
 }
 
+TOOL=$(basename "$0")
+LOCK=$(basename "${0%.*}")
+
+# Don't allow this script to be run at the same time
+exec {LOCKFD}>/var/lock/"$LOCK".lock
+if ! flock -n $LOCKFD; then
+    echo "Another copy of $TOOL is running; exiting"
+    exit 0
+fi
+
 runScp "$KEY_FILE" "$SOURCE:id_mirror"
 tmp_dir=$(mktemp -d)
 trap cleanup EXIT
@@ -55,11 +68,22 @@ runSshI "$SOURCE" "chmod 600 id_mirror"
 
 RSYNC_PATH="/run/current-system/sw/bin/rsync" # /bin/rsync is what's on the synology, but allow override
 FILENAME="rsync.sh"
+# FIXME: Remove --remote-option=--log-file=/tmp/rlog after debugging
 cat >>"$tmp_dir"/rsync.sh <<EOF
+exec {LOCKFD}>~/"$LOCK".lock
+if ! flock -n $LOCKFD; then
+    echo "Another copy of $TOOL is running; exiting"
+    exit 0
+fi
+
+# FIXME: Fix this messing up the permissions of the destination folder (becomes 711)
+# Switch to --info=progress2 probably
+# Add the chmod to match the other script?
 rsync -aHSP \
     --stats \
-    --delete \
     --rsync-path=$RSYNC_PATH \
+    --remote-option=--log-file=/tmp/rlog \
+    --chmod=Dg+srwx,Fg+rw,o-rwx \
     -e "ssh ${sshArgs[@]} -i id_mirror -o IdentitiesOnly=yes -o BatchMode=yes" \
     "$SOURCE_FOLDER" \
     "$DEST_USER@$DEST_HOST:$DEST_FOLDER"
@@ -79,7 +103,10 @@ EOF
 )
 
 echo "Running inhibited rsync loop"
-sudo systemd-inhibit --why="Mirroring oath backups to moth" --who="Backup Mirror" --mode=block bash -c "$SYNC_LOOP"
+sudo systemd-inhibit --why="Mirroring oath backups to moth" \
+    --who="Backup Mirror" \
+    --mode=block bash -c "$SYNC_LOOP"
+
 ENDED=$(date "+%Y-%m-%d %H:%M:%S")
 
 # RECIPIENTS and DELIVERER come from nix package
