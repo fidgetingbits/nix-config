@@ -6,7 +6,7 @@
     voiceCoding = lib.mkForce false;
     useYubikey = lib.mkForce true;
     wifi = lib.mkForce true;
-    useNeovimTerminal = lib.mkForce false;
+    useNeovimTerminal = lib.mkForce true;
     persistFolder = lib.mkForce "/persist";
     isImpermanent = lib.mkForce true;
     isProduction = lib.mkForce true;
