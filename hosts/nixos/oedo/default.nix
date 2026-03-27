@@ -122,6 +122,9 @@
     pkgs.introdus.nixos-extract-initrd
   ];
 
+  # 6.19.6 won't boot, so revert for now
+  boot.kernelPackages = lib.mkForce pkgs.linuxPackages_6_18;
+
   # FIXME: This could all be automated in a module with hostSpec isWifi and
   # isRoaming and isRemote
   wifi = {
