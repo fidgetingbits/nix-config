@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 #
+# NOTE: See ./default.nix:19 for packaging
+#
 # Overview:
 #   enter the synology as borg user
 #   plant an ssh key
@@ -27,8 +29,8 @@ DEST_HOST=moth
 DEST_FOLDER="/mnt/storage/mirror/aa/"
 
 # Reduce the noise of warnings, don't prompt for yubikey when key has been planted, etc
-# FIXME: We should be able to remove some of these as they were more relevant to long-rsync were we don't know if
-# we already have the keys
+# FIXME: We should be able to remove some of these as they were more relevant
+# to long-rsync where we don't know if we already have the keys
 declare -a sshArgs=(
     "-o" "PreferredAuthentications=publickey"
     "-o" "VisualHostKey=no"
@@ -55,7 +57,7 @@ LOCK=$(basename "${0%.*}")
 
 # Don't allow this script to be run at the same time
 exec {LOCKFD}>/var/lock/"$LOCK".lock
-if ! flock -n $LOCKFD; then
+if ! flock -n "$LOCKFD"; then
     echo "Another copy of $TOOL is running; exiting"
     exit 0
 fi
@@ -68,7 +70,6 @@ runSshI "$SOURCE" "chmod 600 id_mirror"
 
 RSYNC_PATH="/run/current-system/sw/bin/rsync" # /bin/rsync is what's on the synology, but allow override
 FILENAME="rsync.sh"
-# FIXME: Remove --remote-option=--log-file=/tmp/rlog after debugging
 cat >>"$tmp_dir"/rsync.sh <<EOF
 exec {LOCKFD}>~/"$LOCK".lock
 if ! flock -n $LOCKFD; then
@@ -76,11 +77,13 @@ if ! flock -n $LOCKFD; then
     exit 0
 fi
 
+# FIXME: Remove --remote-option=--log-file=/tmp/rlog after debugging
 # FIXME: Fix this messing up the permissions of the destination folder (becomes 711)
 # Switch to --info=progress2 probably
 # Add the chmod to match the other script?
 rsync -aHSP \
     --stats \
+    --dry-run \
     --rsync-path=$RSYNC_PATH \
     --remote-option=--log-file=/tmp/rlog \
     --chmod=Dg+srwx,Fg+rw,o-rwx \
