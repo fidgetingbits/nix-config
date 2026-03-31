@@ -68,17 +68,18 @@ in
 
   config =
     let
+      isCoreHost = (n: ((n != "iso") && !(lib.hasSuffix "Minimal" n)));
       nixosHostNames =
         inputs.self.nixosConfigurations
         |> lib.attrNames
-        |> lib.filter (name: (name != "iso") && (!(lib.hasSuffix "Minimal" name)));
+        # nixfmt hack
+        |> lib.filter isCoreHost;
 
       nixosHostsUnlockable =
         (
           inputs.self.nixosConfigurations
-          |> lib.filterAttrs (name: host: host.config.services.remoteLuksUnlock.enable or false)
+          |> lib.filterAttrs (name: host: (isCoreHost name) && host.config.services.remoteLuksUnlock.enable)
           |> lib.attrNames
-          |> lib.filter (name: (name != "iso") && (!(lib.hasSuffix "Minimal" name)))
         )
         ++ cfg.unlockableHosts;
       nixosHostsUnlockableNames = lib.lists.map (host: "${host}-unlock") nixosHostsUnlockable;
