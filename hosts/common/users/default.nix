@@ -38,9 +38,9 @@ in
     ];
   };
 
-  # Import all non-root users
   users = {
     users =
+      # Import all non-root users
       (lib.mergeAttrsList
         # FIXME: For isMinimal we can likely just filter out primaryUsername only?
         (
@@ -128,6 +128,13 @@ in
                   "home/${user}/common/${platform}.nix"
                 ]
               ))
+              # At least keep a nice shell on minimal
+              (lib.optional (hostSpec.isMinimal) (
+                map (fullPathIfExists) [
+                  "modules/home/p10k"
+                  "home/common/core/zsh"
+                ]
+              ))
               # Static module with common values avoids duplicate file per user
               (
                 { ... }:
@@ -149,11 +156,14 @@ in
         // {
           root = {
             home.stateVersion = "23.05"; # Avoid error
-            imports = (
-              map lib.custom.relativeToRoot [
-                "modules/home/starship.nix"
-                "modules/home/p10k"
-              ]
+            imports = lib.flatten (
+              (lib.optional (!hostSpec.isMinimal) (
+                map lib.custom.relativeToRoot [
+                  "modules/home/starship.nix"
+                  "modules/home/p10k"
+                  "home/common/core/zsh"
+                ]
+              ))
             );
 
             # programs.starship = {
@@ -162,10 +172,6 @@ in
             #   fill_str = "░";
             # };
 
-            programs.zsh = {
-              enable = true;
-            };
-            p10k.enable = true;
             # Borg backup tools run as root, so shut up PQ warning
             programs.ssh = {
               enable = true;

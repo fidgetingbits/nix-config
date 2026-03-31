@@ -151,20 +151,12 @@
         })
       ];
 
-  #  Framework 16 is super unreliable on 6.18.x it seems (unless it's hardware issues)
-  # boot.kernelPackages = lib.mkForce (
-  #   pkgs.linuxPackagesFor (
-  #     # Note: the override has to be for a package that exists, thus 6.18
-  #     pkgs.linux_6_18.override {
-  #       argsOverride = rec {
-  #         src = pkgs.fetchurl {
-  #           url = "mirror://kernel/linux/kernel/v6.x/linux-${version}.tar.xz";
-  #           sha256 = "sha256-EWgC3DrRZGFjzG/+m926JKgGm1aRNewFI815kGTy7bk=";
-  #         };
-  #         version = "6.17.13";
-  #         modDirVersion = "6.17.13";
-  #       };
-  #     }
-  #   )
-  # );
+  introdus.system.initrd-wifi = {
+    enable = true;
+    interface = "wlp191s0";
+    drivers = [
+      "mt7925e"
+    ];
+    configFile = lib.custom.relativeToRoot "secrets/wpa_supplicant-olan.conf";
+  };
 }

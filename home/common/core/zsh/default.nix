@@ -17,6 +17,7 @@ in
   #   fill_str = "░";
   # };
 
+  # FIXME: Some of this stuff should be limited to root vs non-root
   home.packages = [
     pkgs.phraze # for cmd line password generation
     pkgs.rmtrash # temporarily cache deleted files for recovery
@@ -114,11 +115,5 @@ in
         lib
         ;
     };
-  };
-
-  programs.zoxide = {
-    enable = true;
-    enableZshIntegration = true;
-    enableNushellIntegration = true;
   };
 }

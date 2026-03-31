@@ -16,6 +16,7 @@
     BOOTSTRAP_SSH_PORT = "10022";
     BOOTSTRAP_SSH_KEY = "/home/aa/.ssh/id_yubikey";
     NIX_SECRETS_DIR = "/home/aa/dev/nix/nix-secrets";
+    INTRODUS_DIR = "/home/aa/dev/nix/introdus/aa";
 
     # This is needed in case we manually run bats tests and similar
     # FIXME: move bats test to introdus to get rid of this

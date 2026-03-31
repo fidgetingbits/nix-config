@@ -85,6 +85,7 @@
                         config.allowUnfree = true;
                       };
                     })
+                    introdus.overlays.default
                   ];
                 }
                 inputs.home-manager.nixosModules.home-manager

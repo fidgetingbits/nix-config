@@ -63,12 +63,14 @@ in
             "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
           ];
 
+        }
+        // lib.optionalAttrs (config.hostSpec.isMinimal == false) {
           # FIXME: This might not only contain attic-related entries in the future
           netrc-file =
             if ((config ? "sops") && (hostSpec.useAtticCache)) then
               "${config.sops.secrets."passwords/netrc".path}"
             else
-              null;
+              null; # FIXME: This is busted if set to null (fixed by isMinimal check above for now).
         };
 
         # Access token prevents github rate limiting if you have to nix flake update a bunch
@@ -93,7 +95,6 @@ in
           config.nix.registry
           # nixfmt hack
           |> lib.mapAttrsToList (key: value: "${key}=${value.to.path}");
-
       };
     }
   ];

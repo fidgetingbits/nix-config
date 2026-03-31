@@ -1,6 +1,7 @@
 {
   pkgs,
   lib,
+  # config,
   ...
 }:
 {
@@ -9,16 +10,16 @@
     "hosts/common/core/ssh.nix"
     "hosts/common/users"
     "hosts/common/optional/minimal-user.nix"
+    # It'll always be me reinstalling, so always use my bindings
+    "hosts/common/optional/keyd.nix"
+    "modules/hosts/nixos/remote-luks-unlock/"
+    "modules/hosts/nixos/impermanence"
   ];
 
   # Note, users will already be set by flake.nix
   hostSpec = {
-    hostName = "installer";
-    primaryUsername = "aa";
-    persistFolder = "/persist";
     isMinimal = lib.mkForce true;
-    domain = "local"; # Temporary domain for the installer
-    email.admin = "example@example.com"; # Temporary for hosts using raid
+    isAutoStyled = lib.mkForce false;
   };
 
   fileSystems."/boot".options = [ "umask=0077" ]; # Removes permissions and security warnings.
@@ -36,6 +37,17 @@
     systemd.emergencyAccess = true; # Don't need to enter password in emergency mode
     luks.forceLuksSupportInInitrd = true;
   };
+
+  # Allow ssh unlock for minimal installs
+  services.remoteLuksUnlock = {
+    enable = true;
+    ssh = {
+      users = [ "root" ];
+      port = 10022;
+    };
+    notify.enable = false;
+  };
+
   boot.kernelParams = [
     "systemd.setenv=SYSTEMD_SULOGIN_FORCE=1"
     "systemd.show_status=true"
@@ -43,9 +55,6 @@
     "systemd.log_target=console"
     "systemd.journald.forward_to_console=1"
   ];
-
-  # ssh-agent is used to pull my private secrets repo from github when deploying my nixos config.
-  #programs.ssh.startAgent = true;
 
   # allow sudo over ssh with yubikey
   security.pam = {

@@ -103,6 +103,7 @@ in
   cnh = "cd ${devNix}/nixos-hardware";
   cnp = "cd ${devNix}/nixpkgs";
   cni = "cd ${devNix}/introdus/aa";
+  cnin = "cd ${devNix}/introdus/aa/wrapper/neovim";
   cne = "cd ${devNix}/emergentmind-nix-config";
   cpn = "cd ${devPublic}/nix";
 
@@ -139,18 +140,8 @@ in
   dis-x86 = "r2 -q -a x86 -b 32 -c 'pD'";
 
   # systemctl services
-  # NOTE: this kind of overlaps already with lots of sc-xxx aliases, so maybe revist
-  s = "systemctl";
-  sst = "systemctl status";
-  sus = "systemctl --user status";
-  sl = "systemctl list-units --type=service";
-  sla = "systemctl list-units --all";
-  sul = "systemctl --user list-units --type=service";
-  sula = "systemctl --user list-units --all";
-  sr = "systemctl restart";
-  sur = "systemctl --user restart";
-
-  scc = "systemctl cat";
+  # FIXME: This needs to be smarter, like showing the first script or the second if it's bash, so a function
+  sc-cat-script = "f() { cat $(sc-cat $@ | grep ExecStart | awk '{print \$2}') }; f";
 
   # journalctl
   jc = "journalctl";

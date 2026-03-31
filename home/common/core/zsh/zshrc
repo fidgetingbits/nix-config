@@ -144,24 +144,6 @@ function fzf_closest() {
     fzf --filter="$1" | head -n 1
 }
 
-function zoxide_fzf() {
-    local orig_buffer=$LBUFFER
-    local selection
-    selection=$(zoxide query --list | fzf --height 40% --reverse --border) || {
-        LBUFFER=$orig_buffer
-        zle redisplay
-        return 0
-    }
-
-    if [[ -n "$selection" ]]; then
-        LBUFFER+="$selection"
-        zle redisplay
-    fi
-}
-
-zle -N zoxide_fzf
-bindkey '^F' zoxide_fzf
-
 # Fuzzy find file and jump to it's directory. Automatically select fzf result if only one match.
 function cdf() {
     local files
@@ -262,9 +244,6 @@ function escape() {
 #source ~/.talon/user/fidget/apps/zsh/zsh-completion-server/setup.zsh
 
 # FIXME: Using $XDG_RUNTIME_DIR due to https://github.com/Mic92/sops-nix/issues/287
-
-# We shouldn't need this with programs.zoxide.enableZshIntegration but I seem to anyway :/
-eval "$(zoxide init zsh)"
 
 function nix_wrapper() {
     if [[ $1 == "build" ]]; then

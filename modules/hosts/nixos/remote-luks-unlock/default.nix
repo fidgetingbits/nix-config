@@ -36,6 +36,8 @@ in
               #checks = ({ value, ... }: lib.all (n: config.users.users ? n) value);
               description = "List of users whose authorized keys will be allowed to LUKs unlock this host";
             };
+            # FIXME: If this key doesn't exist, it actually bails on pathExists and not throwing the assert message
+            # but using lib.types.str didn't seem to fix it. Don't feel like digging atm... as long as it errors
             key = lib.mkOption rec {
               type = lib.types.path;
               default = lib.custom.relativeToRoot "hosts/nixos/${config.hostSpec.hostName}/initrd_ed25519_key";
@@ -231,5 +233,14 @@ in
           };
         };
       };
+    assertions = [
+      {
+        assertion = lib.pathExists "${config.services.remoteLuksUnlock.ssh.key}";
+        message = ''
+          You must generate an ssh key:
+            ssh-keygen -t ed25519 -f ${config.services.remoteLuksUnlock.ssh.key}
+        '';
+      }
+    ];
   };
 }

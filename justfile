@@ -15,9 +15,9 @@ copy-lock-in HOST=`hostname`:
 [private]
 copy-lock-out HOST=`hostname`:
     @mkdir -p locks
-    @cp flake.lock locks/{{ HOST }}.lock
-    @git rm --cached -f flake.lock > /dev/null || true
-    @rm flake.lock || true
+    @cp flake.lock locks/{{ HOST }}.lock 2>/dev/null && \
+    (git rm --cached -f flake.lock > /dev/null || true) && \
+    rm flake.lock || true
 
 # Update commonly changing flakes and prep for a build
 [private]
@@ -148,14 +148,15 @@ rebuild-host HOST=`hostname`:
 # Update sops keys in nix-secrets repo
 [group("secrets")]
 sops-rekey:
-    cd ../nix-secrets && for file in $(ls sops/*); do \
+    #!/usr/bin/env bash
+    cd ${NIX_SECRETS_DIR:-../nix-secrets} && for file in $(ls sops/*); do \
       sops updatekeys -y $file; \
     done
 
 # Update all keys in sops/*.yaml files in nix-secrets to match the creation rules keys
 [group("secrets")]
 rekey: sops-rekey
-    cd ../nix-secrets && \
+    cd ${NIX_SECRETS_DIR:-../nix-secrets} && \
       (pre-commit run --all-files || true) && \
       git add -u && (git commit -nm "chore: rekey" || true) && git push
 

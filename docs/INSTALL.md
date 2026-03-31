@@ -4,8 +4,8 @@ Bootstrapping a system uses a "minimal" configuration for most hosts, which is
 significantly stripped down in order to speed up testing to make sure the bare
 minimum works. This _normally_ is good, but sometimes leads to some bumps.
 
-Bootstrapping is done by the `nixos-bootstrap` tool that is part of the
-introdus config. It is run on the *source* host to install NixOS onto the
+Bootstrapping is done by the `nixos-bootstrap` tool that is part of
+introdus. It is run on the *source* host to install NixOS onto the
 *target* host.
 
 Although much of the process is automated, there are still some manual steps.
@@ -14,12 +14,29 @@ Although much of the process is automated, there are still some manual steps.
 
 ### Pre-installation steps:
 
-1. Add `nix-config/hosts/nixos/[hostname]/` and `nix-config/home/[user]/[hostname].nix` files. You must declare the configuration settings for the target host as usual in your nix-config.
-   Be sure to specify the device name (e.g. sda, nvme0n1, vda, etc) you want to install to along with the desired `nix-config/hosts/common/disks` disko spec.
+1. Add `nix-config/hosts/nixos/[hostname]/` and
+   `nix-config/home/[user]/[hostname].nix` files. You must declare the
+    configuration settings for the target host as usual in your nix-config.
 
-   If needed, you can find the device name on the target machine itself by booting it into the iso environment and running `lsblk` to see a list of the devices. Virtual Machines often using a device called `vda`.
-2. Add a `newConfig` entry for the target host in `nix-config/nixos-installer/flake.nix`, passing in the required arguments as noted in the file comments.
-3. If you are planning to use the `backup` module on the target host, you _must_ temporarily disable it in the target host's config options until bootstrapping is complete. Failure to disable these two modules, will cause nix-config to look for the associated secrets in the new `[hostname].yaml` secrets file where they have not yet been added, causing sops-nix to fail to start during the build process. After rebuilding, we'll add the required keys to secrets and re-enable these modules.
+   Be sure to specify the device name (e.g. sda, nvme0n1, vda, etc) you want to
+    install to along with the desired `nix-config/hosts/common/disks` disko spec.
+
+   If needed, you can find the device name on the target machine itself by
+    booting it into the iso environment and running `lsblk` to see a list of the
+    devices. Virtual Machines often using a device called `vda`.
+
+2. Add a `newConfig` entry for the target host in
+   `nix-config/nixos-installer/flake.nix`, passing in the required arguments as
+    noted in the file comments.
+
+3. If you are planning to use the `backup` module on the target host, you
+   _must_ temporarily disable it in the target host's config options until
+   bootstrapping is complete. Failure to disable these two modules, will cause
+   nix-config to look for the associated secrets in the new `[hostname].yaml`
+   secrets file where they have not yet been added, causing sops-nix to fail to
+   start during the build process. After rebuilding, we'll add the required keys
+   to secrets and re-enable these modules.
+
     For example:
     ```nix
     # nix-config/hosts/nixos/guppy/default.nix
@@ -71,8 +88,11 @@ Boot your target and be sure to change the boot order so DVD-ROM is second and t
 This is an example of running it from `nix-config` base folder installing on a VM (`okra`):
 
 ```bash
-scripts/bootstrap-nixos.sh -n=okra -d=192.168.122.29 -k=~/.ssh/id_yubikey -u=aa --impermanence
+bootstrap-script -n okra -d 192.168.122.29 -k ~/.ssh/id_yubikey -uaa --impermanence --lock-file locks/okra.lock
 ```
+
+Note that `--lock-file` is only necessary if your host is using per-host lock files.
+
 Answer the questions.
 
 ### 2. Post install steps for LUKS (optional)
