@@ -288,3 +288,10 @@ dev:
 [group("dev")]
 fmt:
     nix fmt --reference-lock-file locks/$(hostname).lock
+
+
+# Generate diff of current noctalia settings
+# FIXME: Should use json2nix.py to auto update it afterwards
+[group("admin")]
+noctalia-config:
+    nix shell nixpkgs#json-diff -c bash -c "json-diff <(jq -S . ~/.config/noctalia/settings.json) <(noctalia-shell ipc call state all | jq -S .settings)"
