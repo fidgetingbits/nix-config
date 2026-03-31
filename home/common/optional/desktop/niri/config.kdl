@@ -32,7 +32,7 @@ overview {
 //
 // ========== Startup ==========
 //
-spawn-at-startup "firefox "
+spawn-at-startup "noctalia-shell"
 // spawn-at-startup "spotify "
 spawn-sh-at-startup "uwsm finalize NIRI_SOCKET"
 // spawn-sh-at-startup "ghostty -e zellij attach nix"

@@ -7,6 +7,9 @@
     ./niri
     ./wayland
 
+    ########## Shell ##########
+    ./noctalia.nix
+
     ########## Utilities ##########
     ./rofi.nix
     ./wlogout.nix

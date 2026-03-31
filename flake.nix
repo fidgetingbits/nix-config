@@ -104,6 +104,9 @@
 
                   "hosts/common/optional/minimal-configuration.nix"
                 ])
+              ++ lib.optional (lib.pathExists ./hosts/nixos/${host}/minimal.nix) [
+                (customLib.custom.relativeToRoot "hosts/nixos/${host}/minimal.nix")
+              ]
               ++ lib.optional (lib.pathExists ./hosts/nixos/${host}/facter.json) [
                 inputs.nixos-facter-modules.nixosModules.facter
                 {
@@ -271,6 +274,11 @@
 
     talon-nix = {
       url = "github:fidgetingbits/talon-nix?ref=overrides";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    noctalia = {
+      url = "github:noctalia-dev/noctalia-shell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
