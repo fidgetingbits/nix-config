@@ -78,6 +78,7 @@ in
           inputs.self.nixosConfigurations
           |> lib.filterAttrs (name: host: host.config.services.remoteLuksUnlock.enable or false)
           |> lib.attrNames
+          |> lib.filter (name: (name != "iso") && (!(lib.hasSuffix "Minimal" name)))
         )
         ++ cfg.unlockableHosts;
       nixosHostsUnlockableNames = lib.lists.map (host: "${host}-unlock") nixosHostsUnlockable;
