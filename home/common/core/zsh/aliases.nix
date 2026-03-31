@@ -103,7 +103,7 @@ in
   cnh = "cd ${devNix}/nixos-hardware";
   cnp = "cd ${devNix}/nixpkgs";
   cni = "cd ${devNix}/introdus/aa";
-  cnin = "cd ${devNix}/introdus/aa/wrapper/neovim";
+  cnin = "cd ${devNix}/introdus/aa/wrappers/neovim";
   cne = "cd ${devNix}/emergentmind-nix-config";
   cpn = "cd ${devPublic}/nix";
 
