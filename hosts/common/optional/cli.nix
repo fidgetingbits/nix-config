@@ -15,6 +15,7 @@
       findutils # find, xargs, etc
       eza # better ls
       htop # better top
+      bottom # better top
       cyme # better lsusb
       pciutils # lspci
       usbutils # lsusb
