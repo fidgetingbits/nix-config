@@ -10,7 +10,7 @@ let
 in
 {
   imports = lib.map lib.custom.relativeToRoot [
-    "modules/common"
+    "modules/hosts/common"
     "hosts/common/core/ssh.nix"
     "hosts/common/users"
     "hosts/common/optional/minimal-user.nix"

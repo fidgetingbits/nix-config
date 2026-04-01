@@ -75,6 +75,7 @@ let
             fi
         }
 
+        # shellcheck disable=SC2034
         INTERFACE=$1
         ACTION=$2
 
