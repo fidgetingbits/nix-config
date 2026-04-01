@@ -9,8 +9,88 @@
   ...
 }:
 let
-  # FIXME: This allows us to access the settings from HM
-  hostSpec = if (config ? hostSpec) then config.hostSpec else osConfig.hostSpec;
+  isNixOS = (config ? hostSpec);
+  # NOTE: Differentiate NixOS and HM
+  hostSpec = if isNixOS then config.hostSpec else osConfig.hostSpec;
+  overridesFile = "/etc/nix/network-overrides.conf";
+  dispatcherScript = pkgs.writeShellApplication {
+    name = "check-nix-builders.sh";
+    runtimeInputs = lib.attrValues {
+      inherit (pkgs)
+        util-linux # logger
+        coreutils
+        curlMinimal
+        openssh
+        gawk
+        ;
+    };
+    text =
+      # bash
+      ''
+        LOG_TAG="nix-check-builders"
+        OVERRIDES_CONF=""
+        function check_substituters() {
+            # Disable any substituters that aren't accessible to prevent build spam/errors
+            extra_subs=$(grep "extra-substituters" /etc/nix/nix.conf | cut -d= -f2)
+            # shellcheck disable=SC2181
+            if [ "$?" -eq 0 ]; then
+              read -ra all_subs <<<"$extra_subs"
+              declare -a accessible_subs=()
+              for url in "''${all_subs[@]}"; do
+                  if [ "$url" == "" ]; then
+                      continue
+                  fi
+                  url=$(echo "$url" | cut -d/ -f1-3)
+                  if runuser -u nobody -- curl -IsL --connect-timeout 1 "$url" | grep -q "200"; then
+                      accessible_subs+=("$url")
+                  else
+                      logger -t "$LOG_TAG" "✘ extra-substituter $url is down"
+                  fi
+              done
+              if [ "''${#accessible_subs[@]}" -ne "''${#all_subs[@]}" ]; then
+                  OVERRIDES_CONF=$(echo -e "''${OVERRIDES_CONF:-}\nextra-substituters = ''${accessible_subs[*]}")
+              fi
+            fi
+        }
+
+        function check_builders() {
+            mapfile -t all_builders < <(grep -v '^#' /etc/nix/machines)
+            declare -a accessible_builders=()
+            for builder in "''${all_builders[@]}"; do
+                [[ -z "$builder" ]] && continue
+                host=$(echo "$builder" | awk '{print $1}' | sed 's|ssh://||')
+                # FIXME: Double check this is always the case?
+                keyFile=$(echo "$builder" | awk '{print $3}')
+
+                if ssh -q -o ConnectTimeout=2 -o BatchMode=yes -i "$keyFile" "$host" exit 0 >/dev/null 2>&1; then
+                    accessible_builders+=("$builder")
+                else
+                    logger -t "$LOG_TAG" "✘ builder $host is unreachable, skipping"
+                fi
+            done
+            if [ "''${#accessible_builders[@]}" -lt "''${#all_builders[@]}" ]; then
+                IFS=';'
+                OVERRIDES_CONF=$(echo -e "''${OVERRIDES_CONF:-}\nbuilders = ''${accessible_builders[*]}")
+                unset IFS
+            fi
+        }
+
+        INTERFACE=$1
+        ACTION=$2
+
+        case "$ACTION" in
+            up|down)
+                logger -t "$LOG_TAG" "Validating nix substituters and builders connectivity"
+                check_substituters
+                check_builders
+                if [ "$OVERRIDES_CONF" == "" ]; then
+                  logger -t "$LOG_TAG" "All substituters and builders are accessible"
+                fi
+                echo "$OVERRIDES_CONF" > ${overridesFile}
+                ;;
+        esac
+      '';
+  };
 in
 {
   options.${namespace}.nix = {
@@ -73,11 +153,19 @@ in
               null; # FIXME: This is busted if set to null (fixed by isMinimal check above for now).
         };
 
-        # Access token prevents github rate limiting if you have to nix flake update a bunch
-        # Only local systems are used to build anything, so only include there
-        extraOptions =
-          lib.optionalString ((config ? "sops") && (hostSpec.isLocal))
-            "!include ${config.sops.secrets."tokens/nix-access-tokens".path}";
+        extraOptions = ''
+          ${lib.optionalString ((config ? "sops") && (hostSpec.isLocal)) ''
+            # Access token prevents github rate limiting if you have to nix flake update a bunch
+            # Only local systems are used to build anything, so only include there
+            !include ${config.sops.secrets."tokens/nix-access-tokens".path}
+          ''}
+          ${lib.optionalString hostSpec.isRoaming ''
+            # Roaming systems may not have access to builders or caches, and nix doesn't gracefully
+            # handle when they are inaccessible. These overrides are dropped by a network
+            # dispatcher script and selectively disable some settings
+            !include /etc/nix/network-overrides
+          ''}
+        '';
 
         # Disabled because I am using nh
         # gc = {
@@ -96,6 +184,13 @@ in
           # nixfmt hack
           |> lib.mapAttrsToList (key: value: "${key}=${value.to.path}");
       };
+
+      # FIXME: This not complaining implies that home-manager doesn't actually parse this file?
+      networking.networkmanager.dispatcherScripts = lib.optionals (isNixOS && hostSpec.isRoaming) [
+        {
+          source = lib.getExe dispatcherScript;
+        }
+      ];
     }
   ];
 }

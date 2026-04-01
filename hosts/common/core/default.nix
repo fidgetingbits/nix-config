@@ -24,7 +24,7 @@ in
     { programs.nix-index-database.comma.enable = true; }
 
     (map lib.custom.relativeToRoot [
-      "modules/common/"
+      "modules/common/" # FIXME: We don't use home/host common anymore, so can drop this
       "modules/hosts/common"
       "modules/hosts/${platform}"
 
