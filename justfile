@@ -22,16 +22,21 @@ copy-lock-out HOST=`hostname`:
 # Update commonly changing flakes and prep for a build
 [private]
 rebuild-pre HOST=`hostname`:
+    just update-neovim-flake-inputs && \
     just update-nix-secrets {{ HOST }} && \
     just update {{ HOST }} nix-assets && \
     just update {{ HOST }} fidgetingvim && \
     just update {{ HOST }} nix-index-database && \
     just update {{ HOST }} introdus
-    @git add --intent-to-add .
+    git add --intent-to-add .
 
 # Run post-build checks, like if sops is running properly afterwards
 [private]
 rebuild-post: check-sops
+
+[group("dev")]
+update-neovim-flake-inputs:
+    cd ~/dev/nix/neovim && nix flake update introdus
 
 # Run a flake check on the config and installer
 [group("checks")]
