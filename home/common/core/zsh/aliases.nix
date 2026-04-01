@@ -147,6 +147,10 @@ in
   jc = "journalctl";
   jcu = "journalctl --user";
 
+  # top
+  top = "btm";
+  htop = "btm";
+
   # ssh
   sshnc = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o GlobalKnownHostsFile=/dev/null"; # sshnc = ssh no checks
   scpnc = "scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o GlobalKnownHostsFile=/dev/null"; # scpnc = scp no checks
