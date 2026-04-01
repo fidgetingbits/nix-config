@@ -16,7 +16,7 @@ rec {
       # FIXME: Switch this to just import hosts/common/core (though have to be careful to purposefully not add platform file..
       "hosts/common/optional/minimal-user.nix"
       "hosts/common/optional/keyd.nix"
-      "modules/common/host-spec.nix"
+      "modules/hosts/common/host-spec.nix"
     ])
     (
       let
