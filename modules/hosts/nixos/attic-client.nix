@@ -8,6 +8,7 @@
 }:
 let
   cfg = config.${namespace}.attic-client;
+  hasPerNetworkServices = config.${namespace}.services ? "per-network-services";
 in
 {
   options.${namespace}.attic-client = {
@@ -183,7 +184,9 @@ in
         };
       };
 
-    ${namespace}.services.per-network-services.trustedNetworkServices = [ "attic-watch-store" ];
+    ${namespace}.services = lib.optionalAttrs hasPerNetworkServices {
+      per-network-services.trustedNetworkServices = [ "attic-watch-store" ];
+    };
 
     # Client is added system-wide for manual debugging. Keeps the version the same as the
     # option (vs using a shell.nix version)

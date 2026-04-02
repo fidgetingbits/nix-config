@@ -151,12 +151,8 @@
         })
       ];
 
-  introdus.system.initrd-wifi = {
+  services.remoteLuksUnlock = {
     enable = true;
-    interface = "wlp191s0";
-    drivers = [
-      "mt7925e"
-    ];
-    configFile = lib.custom.relativeToRoot "secrets/wpa_supplicant-olan.conf";
+    notify.to = config.hostSpec.email.olanAdmins;
   };
 }

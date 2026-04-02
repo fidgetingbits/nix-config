@@ -9,18 +9,22 @@ let
   useWpaSupplicant = config.hostSpec.isRoaming && (!config.hostSpec.isRemote);
 in
 {
-  imports = lib.map lib.custom.relativeToRoot [
-    "modules/hosts/common"
-    "hosts/common/core/ssh.nix"
-    "hosts/common/users"
-    "hosts/common/optional/minimal-user.nix"
-    # It'll always be me reinstalling, so always use my bindings
-    "hosts/common/optional/keyd.nix"
-    "modules/hosts/nixos/remote-luks-unlock/"
-    "modules/hosts/nixos/impermanence"
+  imports = (
+    lib.map lib.custom.relativeToRoot [
+      "modules/hosts/common"
+      "hosts/common/core/ssh.nix"
+      "hosts/common/users"
+      "hosts/common/optional/minimal-user.nix"
+      # It'll always be me reinstalling, so always use my bindings
+      "hosts/common/optional/keyd.nix"
+      "modules/hosts/nixos/remote-luks-unlock/"
+      "modules/hosts/nixos/impermanence"
 
-    inputs.introdus.nixosModules.default
-  ];
+    ]
+    ++ [
+      inputs.introdus.nixosModules.default
+    ]
+  );
 
   config = lib.mkMerge [
     {

@@ -104,9 +104,9 @@
 
                   "hosts/common/optional/minimal-configuration.nix"
                 ])
-              ++ lib.optional (lib.pathExists ./hosts/nixos/${host}/minimal.nix) [
-                (customLib.custom.relativeToRoot "hosts/nixos/${host}/minimal.nix")
-              ]
+              ++ lib.optional (lib.pathExists ./hosts/nixos/${host}/core.nix) (
+                customLib.custom.relativeToRoot "hosts/nixos/${host}/core.nix"
+              )
               ++ lib.optional (lib.pathExists ./hosts/nixos/${host}/facter.json) [
                 inputs.nixos-facter-modules.nixosModules.facter
                 {

@@ -1,33 +1,36 @@
 { inputs, lib, ... }:
+let
+  inherit (lib.custom) highPrio;
+in
 {
   hostSpec = {
     hostName = "ossa";
-    users = lib.mkForce [
+    users = highPrio [
       "aa"
     ];
-    primaryUsername = lib.mkForce "aa";
+    primaryUsername = highPrio "aa";
 
     # System type flags
-    isWork = lib.mkForce true;
-    isDevelopment = lib.mkForce true;
-    isRoaming = lib.mkForce true;
-    isAdmin = lib.mkForce true;
-    isAutoStyled = lib.mkForce true;
-    isProduction = lib.mkForce true;
+    isWork = highPrio true;
+    isDevelopment = highPrio true;
+    isRoaming = highPrio true;
+    isAdmin = highPrio true;
+    isAutoStyled = highPrio true;
+    isProduction = highPrio true;
     isAmdGpu = true;
 
-    isImpermanent = lib.mkForce true;
-    persistFolder = lib.mkForce "/persist";
+    isImpermanent = highPrio true;
+    persistFolder = highPrio "/persist";
 
     # Functionality
-    useNeovimTerminal = lib.mkForce true;
-    useAtticCache = lib.mkForce true;
-    useYubikey = lib.mkForce true;
+    useNeovimTerminal = highPrio true;
+    useAtticCache = highPrio true;
+    useYubikey = highPrio true;
 
     # Desktop
-    useWayland = lib.mkForce true;
-    useWindowManager = lib.mkForce true;
-    scaling = lib.mkForce "2";
+    useWayland = highPrio true;
+    useWindowManager = highPrio true;
+    scaling = highPrio "2";
     wallpaper = "${inputs.nix-assets}/images/wallpapers/astronaut.webp";
     defaultDesktop = "niri-uwsm";
   };
