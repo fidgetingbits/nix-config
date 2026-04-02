@@ -26,7 +26,7 @@
           #common/optional/kitty.nix
           "ghostty.nix"
           #common/optional/wezterm.nix
-          "gnome-terminal.nix"
+          # "gnome-terminal.nix"
           "media.nix"
           "graphics.nix"
           "ebooks.nix"
@@ -49,27 +49,28 @@
     )
   );
 
-  talon = lib.optionalAttrs osConfig.hostSpec.voiceCoding {
-    enable = true;
-    autostart = false;
-    pynvim = true;
-    #  gaze-ocr = true;
-  };
-
   llm-tools.enable = true;
 
-  home.packages = lib.attrValues {
-    inherit (pkgs)
-      ntfs3g
-      ;
-    inherit (pkgs.introdus)
-      easylkb
-      cyberpower-pdu
-      ;
-    inherit (pkgs.unstable)
-      proton-authenticator
-      ;
-  };
+  home.packages =
+    lib.attrValues {
+      inherit (pkgs)
+        ntfs3g
+        ;
+      inherit (pkgs.introdus)
+        easylkb
+        cyberpower-pdu
+        ;
+      inherit (pkgs.unstable)
+        proton-authenticator
+        ;
+    }
+    ++ [
+      (pkgs.long-rsync.overrideAttrs (_: {
+        recipients = osConfig.hostSpec.email.olanAdmins;
+        deliverer = osConfig.hostSpec.email.notifier;
+        sshPort = osConfig.hostSpec.networking.ports.tcp.ssh;
+      }))
+    ];
 
   home.sessionVariables = {
     # This variable prevents the following from being spammed to the console constantly:
@@ -109,6 +110,15 @@
   sops = {
     secrets = {
     };
+  };
+
+  stylix = {
+    cursor = lib.mkForce {
+      name = lib.mkForce "catppuccin-mocha-light-cursors";
+      package = lib.mkForce pkgs.catppuccin-cursors.mochaLight;
+      size = lib.mkForce 40;
+    };
+    targets.neovide.enable = true;
   };
 
 }

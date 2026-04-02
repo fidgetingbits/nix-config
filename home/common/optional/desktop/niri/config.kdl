@@ -8,25 +8,18 @@
 // ========== Animations ==========
 //
 animations {
-    //FIXME(niri): go through available options
-    // Whether to disable animations.
-    //off
-    // Slow down or speed up animations by this factor. Values below 1 speed animations up.
     slowdown 0.7
 }
 //
 // ========== Overview screen ==========
 //
 overview {
-    //FIXME(niri): go through available options
-    // Color of the backdrop.
-    // backdrop-color "#17171a"
-    // Configuration of shadows around workspaces in the overview.
     workspace-shadow {
-        softness 40
-        spread 5
-        offset x=0 y=0
-        color "#74c7ec"
+        off
+ // softness 40
+        // spread 5
+        // offset x=0 y=0
+        // color "#74c7ec"
     }
 }
 //
@@ -58,4 +51,11 @@ switch-events {
     lid-open {
         spawn "notify-send 'The laptop lid is open.'"
     }
+}
+layer-rule {
+    match namespace="^noctalia-wallpaper*"
+    place-within-backdrop true
+}
+layout {
+    background-color "transparent"
 }

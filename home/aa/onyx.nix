@@ -49,14 +49,6 @@
     )
   );
 
-  # FIXME: this should be tied to hostSpec.voiceCoding
-  talon = {
-    enable = false;
-    autostart = false;
-    pynvim = true;
-    #  gaze-ocr = true;
-  };
-
   llm-tools.enable = true;
 
   home.packages =
