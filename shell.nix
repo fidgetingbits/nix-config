@@ -18,10 +18,6 @@
     NIX_SECRETS_DIR = "/home/aa/dev/nix/nix-secrets";
     INTRODUS_DIR = "/home/aa/dev/nix/introdus/aa";
 
-    # This is needed in case we manually run bats tests and similar
-    # FIXME: move bats test to introdus to get rid of this
-    HELPERS_PATH = "${pkgs.introdus.introdus-helpers}/share/introdus-helpers/helpers.sh";
-
     buildInputs = checks.pre-commit-check.enabledPackages;
     nativeBuildInputs =
       lib.attrValues {
@@ -36,14 +32,9 @@
           git-crypt # encrypt secrets in git not suited for sops
           attic-client # for attic backup
 
-          # FIXME: Deprecated now that we use rebuild-host
-          nh # fancier nix building
-
           # FIXME: This needs to switch to being supplied by the introdus-helpers itself
           yq-go # jq for yaml, used for build scripts
-
-          # FIXME: Move to introdus
-          bats # for testing
+          json-diff # noctalia settings diffing
 
           age # bootstrap script
           ssh-to-age # bootstrap script
@@ -54,6 +45,7 @@
           bootstrap-nixos # introdus script for bootstrapping new hosts
           check-sops
           pin-systemd-boot-entry
+          json2nix
           ;
       }
       ++ [
