@@ -44,9 +44,9 @@ in
               };
               folder = lib.mkOption {
                 type = lib.types.str;
-                default = "${homeDirectory}/mount/${config.name}";
+                default = "${homeDirectory}/mount";
                 example = "/home/foo/mount/server";
-                description = "Folder to mount to";
+                description = "Base folder to mount to. Final folder is folder/name";
               };
               user = lib.mkOption {
                 type = lib.types.str;
@@ -84,16 +84,18 @@ in
 
     systemd.tmpfiles.rules =
       cfg.mounts
-      |> lib.map (
-        mount:
-        # https://www.man7.org/linux/man-pages/man5/tmpfiles.d.5.html
+      |> lib.map (mount:
+      # https://www.man7.org/linux/man-pages/man5/tmpfiles.d.5.html
+      [
         "d ${mount.folder} 0750 ${mount.user} ${mount.group} -"
-      );
+        "d ${mount.folder}/${mount.name} 0750 ${mount.user} ${mount.group} -"
+      ])
+      |> lib.flatten;
 
     fileSystems =
       cfg.mounts
       |> lib.map (mount: {
-        ${mount.folder} = {
+        "${mount.folder}/${mount.name}" = {
           device = mount.url;
           fsType = "cifs";
           options = [
