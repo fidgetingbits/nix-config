@@ -97,6 +97,8 @@ Answer the questions.
 
 ### 2. Post install steps for LUKS (optional)
 
+FIXME: Demo host-gen-pass
+
 #### Change LUKS2's passphrase if you entered a temporary passphrase during bootstrap
 
 ```bash
@@ -170,10 +172,14 @@ The secondary drive will be unlocked and made available under /dev/mapper/crypts
 
 Enable yubikey support:
 
-NOTE: This requires LUKS2 (use cryptsetup luksDump /path/to/dev/ to check)
+NOTE: This requires LUKS2. Use `lsblk -fs | grep LUKS` go find your LUKS devices, and
+`cryptsetup luksDump /path/to/dev/` to check if it is supported.
+
+Eg:
 
 ```bash
-sudo systemd-cryptenroll --fido2-device=auto /path/to/dev/
+sudo cryptsetup luksDump /dev/nvme0n1p2
+sudo systemd-cryptenroll --fido2-device=auto /dev/nvme0n1p2
 ```
 
 You will need to do it for each yubikey you want to use.
@@ -199,6 +205,7 @@ just rebuild
 Here you should have a fully working system, but some stuff you still need to do:
 
 - login to proton
+FIXME: This is automatable with host-gen-pass now
 - Add new u2f_keys to nix-secrets if you plan to use yubikey locally on the device
   - Run `pamu2fcfg` for each yubikey token you want to add. Append additional yubikeys to the first line using `:` and
     removing the username. Also note if using zsh the final `%` is not to be included. Place these into your sops file under a heading like:
@@ -218,16 +225,10 @@ Here you should have a fully working system, but some stuff you still need to do
 - Re-link signal
 - Setup atuin
   - `atuin login`
-  - Use existing `aa` user login to get key
-  - Use `atuin key` output from any other box already logged in?
-    - FIXME: Not sure if this is right, because some hosts have different keys
-  - Add `.local/share/autin/key` to  `keys/atuin` in sops secrets
+    - Use atuin creds, and leave key blank (should be using the shared key in sops)
+    - `atuin sync`
 - Manually set syncthing username/password
 - login to spotify
-- podman login
-- Setup talon
-  - Run bootstrap scripts (if not handled by backup recovery)
-  - Rebuild cursorless/command-server extensions
 
 ## Troubleshooting
 
