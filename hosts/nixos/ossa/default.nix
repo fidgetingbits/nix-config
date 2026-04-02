@@ -31,12 +31,7 @@
           "mail-delivery.nix"
 
           # Desktop environment and login manager
-          # FIXME: This should all move to desktop/ similar to home
-          "x11.nix"
-          # "gdm.nix"
           "sddm.nix"
-          "gnome.nix"
-          "i3wm.nix"
           "niri.nix"
 
           # Miscellaneous
@@ -45,7 +40,6 @@
           "wireshark.nix"
           "cli.nix"
           "yubikey.nix"
-          "thunar.nix"
           #"iphone-backup.nix"
 
           # Binary analysis tools
@@ -73,8 +67,11 @@
     ))
   ];
 
-  # FIXME: Further tweak this
-  desktops.hyprland.enable = true;
+  # FIXME: Hack. This is because something creates /home/aa/mount as root after install
+  # and I dunno what
+  systemd.tmpfiles.rules = [
+    "d    /home/${config.hostSpec.username}/mount    0700    ${config.hostSpec.username}    users    -    -"
+  ];
 
   wifi = {
     enable = true;
@@ -108,25 +105,11 @@
     borgBackupStartTime = "*-*-* 03:00:00";
   };
 
-  system.impermanence.enable = true;
-
-  # For explanations of these options, see
-  # https://github.com/CryoByte33/steam-deck-utilities/blob/main/docs/tweak-explanation.md
-  boot.kernel.sysctl = {
-    # Was getting crazy cpu stuttering from kcompactd0 which this seems to largely fix
-    "vm.compaction_proactiveness" = 0;
-    "vm.extfrag_threshold" = 1000;
-    # This is to stop kswapd0 which noticably stuttered after kcompactd0 lag went away
-    "vm.swappiness" = 1;
-    "vm.page_lock_unfairness" = 1;
-    "mm.transparent_hugepage.enabled" = "always";
+  services.remoteLuksUnlock = {
+    enable = true;
+    notify.to = config.hostSpec.email.olanAdmins;
   };
-  # Others noted khugepaged causes issues after the above was disabled, so also disabling that.
-  system.activationScripts.sysfs.text = ''
-    echo advise > /sys/kernel/mm/transparent_hugepage/shmem_enabled
-    echo never > /sys/kernel/mm/transparent_hugepage/defrag
-    echo 0 > /sys/kernel/mm/transparent_hugepage/khugepaged/defrag
-  '';
+  system.impermanence.enable = true;
 
   #  virtualisation.appvm = {
   #    enable = true;
@@ -151,8 +134,4 @@
         })
       ];
 
-  services.remoteLuksUnlock = {
-    enable = true;
-    notify.to = config.hostSpec.email.olanAdmins;
-  };
 }

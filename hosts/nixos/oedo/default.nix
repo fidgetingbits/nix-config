@@ -68,8 +68,6 @@
 
   system.impermanence.enable = true;
 
-  desktops.hyprland.enable = true;
-
   services.backup = {
     enable = true;
     borgBackupStartTime = "*-*-* 22:00:00";
@@ -78,11 +76,6 @@
   # Bootloader.
   boot.supportedFilesystems = [ "ntfs" ];
   boot.initrd.systemd.enable = true;
-
-  # FIXME: This should move to somewhere generic
-  systemd.tmpfiles.rules = [
-    "d    /home/${config.hostSpec.username}/mount    0700    ${config.hostSpec.username}    users    -    -"
-  ];
 
   services.remoteLuksUnlock = {
     enable = true;

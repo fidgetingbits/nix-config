@@ -26,7 +26,6 @@ rec {
           "plymouth.nix"
           "printing.nix"
           "locale.nix"
-          "x11.nix"
           "sound.nix"
           # FIXME: Rename this
           "mail-delivery.nix"
@@ -71,9 +70,6 @@ rec {
         ])
     ))
   ];
-
-  # FIXME: Further tweak this
-  desktops.hyprland.enable = false;
 
   wifi = {
     enable = true;
