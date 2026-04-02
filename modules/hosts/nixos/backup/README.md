@@ -172,3 +172,12 @@ There are three Exclude Lists:
 
 See the comments in each .lst file for instructions on how to add to them.
 ee the comments in each .lst file for instructions on how to add to them.
+
+## Restore
+
+Depending on how you are backing things up, you can either just backup the entire folder, or more commonly mount the backup and only recover specific parts that are deemed useful. ATM the latter is more common for when backing up with btrfs, as there is a work with the directory hierarchy atm.
+
+For instance, if I mount the backup from ossa which is using btrfs to backup @persist, I see the path:
+`/home/aa/mount/backup/ossa/tmp/tmp.LbScblLntH/@persist`. Atm this tmp/tmp.<random>/ part is a bug, and won't be handled gracefully by restoring directly using `borg-backup-restore`. At the moment borg-backup-restore only handles stripping one parent component (the tmp/) part when doing a restore.
+
+So you want to go into `@persist`, and then likely rsync out whatever you want.
