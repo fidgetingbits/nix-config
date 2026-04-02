@@ -519,6 +519,7 @@ in
         '';
       };
 
+      # See https://borgbackup.readthedocs.io/en/stable/usage/extract.html
       borg-backup-restore = pkgs.writeShellApplication {
         name = "borg-backup-restore";
         runtimeInputs = [ pkgs.borgbackup ];
