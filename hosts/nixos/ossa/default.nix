@@ -134,4 +134,26 @@
         })
       ];
 
+  # From here:
+  # https://community.frame.work/t/no-sound-from-speaker-but-audio-expansion-module-and-bluetooth-headphones-works-how-to-troubleshoot/79259/4
+  # Not sure if it's because of facter.json or what but, speaker wasn't set to default. pavucontrol
+  # and wpctl status showed tons of Ryzen HD Audio entries, but no speaker sound would work. After
+  # enabling/unmuting HiFi (Mic1, Mic2, Speaker) via alsamixer, the problem went away, and the entries in
+  # pavucontrol/noctalia are now sane.
+  services.pipewire.wireplumber = {
+    enable = true;
+    extraConfig.speakerProfile = {
+      "monitor.alsa.rules" = [
+        {
+          matches = [ { "device.name" = "alsa_card.pci-0000_c1_00.6"; } ];
+          actions = {
+            "update-props" = {
+              "device.profile" = "HiFi (Mic1, Mic2, Speaker)";
+            };
+          };
+        }
+      ];
+    };
+  };
+
 }
