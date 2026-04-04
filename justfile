@@ -41,6 +41,11 @@ update-neovim-flake-inputs:
 # Run a flake check on the config and installer
 [group("checks")]
 check HOST=`hostname` ARGS="":
+    #!/usr/bin/env bash
+    echo "Prepping build folder: $BUILD_FOLDER"
+    cp -R . "$BUILD_FOLDER"
+    trap 'rm -rf $BUILD_FOLDER' EXIT
+    cd $BUILD_FOLDER
     @just copy-lock-in {{ HOST }}
     NIXPKGS_ALLOW_UNFREE=1 REPO_PATH=$(pwd) nix flake check \
         --impure \
