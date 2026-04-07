@@ -6,7 +6,7 @@
       Description = "Weekly empty trash timer";
     };
     Install = {
-      wantedBy = [ "timers.target" ];
+      WantedBy = [ "timers.target" ];
     };
     Timer = {
       OnCalendar = "weekly";
