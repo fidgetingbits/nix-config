@@ -29,6 +29,10 @@
     }
   );
 
+  # Used by noctalia, but just enabling globally for now
+  services.upower.enable = true;
+  services.power-profiles-daemon.enable = true;
+
   # Database for aiding terminal-based programs
   environment.enableAllTerminfo = true;
   # enable firmware with a license allowing redistribution
