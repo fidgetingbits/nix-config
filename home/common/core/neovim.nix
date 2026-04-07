@@ -17,4 +17,18 @@
       baseConfig = lib.mkForce "/home/aa/dev/nix/introdus/aa/wrappers/neovim";
     };
   };
+  xdg.desktopEntries.nvim-neovide = {
+    name = "Neovide (Nvim Wrapper)";
+    genericName = "Text Editor";
+    exec = "nvim-neovide %F";
+    icon = "nvim";
+    terminal = false;
+    categories = [
+      "Utility"
+      "TextEditor"
+    ];
+    settings = {
+      StartupWMClass = "neovide";
+    };
+  };
 }
