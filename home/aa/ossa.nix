@@ -131,7 +131,7 @@
         }
         |> lib.readFile
         # nixfmt hack
-        |> lib.fromJSON;
+        |> builtins.fromJSON;
     };
   };
 
