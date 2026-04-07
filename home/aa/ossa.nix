@@ -94,9 +94,6 @@
   };
   programs.firefox.nativeMessagingHosts = [ pkgs.tridactyl-native ];
 
-  # Allows to show talon icon in system tray on X11
-  services.snixembed.enable = osConfig.hostSpec.voiceCoding;
-
   services.yubikey-touch-detector = {
     enable = true;
     notificationSound = true;
@@ -119,6 +116,23 @@
       size = lib.mkForce 40;
     };
     targets.neovide.enable = true;
+  };
+
+  # https://github.com/FrameworkComputer/linux-docs/blob/87e682ee85eca8b74f5869458f8ffbebc714cb86/easy-effects/README.md?plain=1#L4
+  # Official: https://raw.githubusercontent.com/FrameworkComputer/linux-docs/main/easy-effects/fw16-easy-effects.json
+  services.easyeffects = {
+    enable = true;
+    preset = "easyeffects-fw16";
+    extraPresets = {
+      "easyeffects-fw16" =
+        pkgs.fetchurl {
+          url = "https://raw.githubusercontent.com/FrameworkComputer/linux-docs/main/easy-effects/fw16-easy-effects.json";
+          sha256 = "sha256-Te8S9DsG5P/NuNk5WE6mSB/DjHS+rKjOFRN7mDEVg8g=";
+        }
+        |> lib.readFile
+        # nixfmt hack
+        |> lib.fromJSON;
+    };
   };
 
 }
