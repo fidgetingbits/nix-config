@@ -136,4 +136,5 @@ rec {
 
   # Bluetooth
   services.blueman.enable = true;
+
 }

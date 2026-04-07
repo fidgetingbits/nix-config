@@ -74,6 +74,8 @@ lib.mkMerge [
         configDir = "${homeDirectory}/.config/syncthing"; # settings and keys
         guiAddress = "127.0.0.1:${toString ports.tcp.syncthing.gui}";
         relay.enable = false; # Don't start the local relay service
+        key = config.sops.secrets."keys/syncthing/key".path;
+        cert = config.sops.secrets."keys/syncthing/cert".path;
 
         settings = {
           options = {
@@ -123,6 +125,20 @@ lib.mkMerge [
         };
       };
     };
+    sops.secrets =
+      let
+        inherit (config.users.users.${config.hostSpec.primaryUsername}) name;
+      in
+      {
+        "keys/syncthing/cert" = {
+          inherit name;
+          mode = "0400";
+        };
+        "keys/syncthing/key" = {
+          inherit name;
+          mode = "0400";
+        };
+      };
     ${namespace}.services.per-network-services.trustedNetworkServices = [ "syncthing" ];
   }
   granularFirewallRules

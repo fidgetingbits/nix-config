@@ -67,12 +67,6 @@
     ))
   ];
 
-  # FIXME: Hack. This is because something creates /home/aa/mount as root after install
-  # and I dunno what
-  systemd.tmpfiles.rules = [
-    "d    /home/${config.hostSpec.username}/mount    0700    ${config.hostSpec.username}    users    -    -"
-  ];
-
   wifi = {
     enable = true;
     roaming = config.hostSpec.isRoaming;
@@ -97,6 +91,8 @@
       paperkey # printed gpg key backup utilitie
       pinentry-curses # for gpg-agent
       pinentry-gtk2 # for gpg-agent
+
+      fw-ectool # FW16 fan speed, charge limit
       ;
   };
   services.fwupd.enable = true;
