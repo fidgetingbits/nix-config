@@ -1,6 +1,11 @@
 //
 // ========== Layer Rules ==========
 //
+// Place the background within the backdrop.
+layer-rule {
+    match namespace="^noctalia-wallpaper*"
+    place-within-backdrop true
+}
 layer-rule {
     //FIXME: confirm namespace for dmenu
     match namespace="drun"
@@ -17,15 +22,13 @@ layer-rule {
 // ========== Screen capture & screen share blackout ==========
 // see also layer rule of same name
 layer-rule {
-    // FIXME: CONFIRM NAMESPACEs
     match namespace="^org\\.keepassxc\\.KeePassXC$"
-    match namespace="Proton Pass$"
+    match namespace="^Proton"
     block-out-from "screen-capture"
 }
 layer-rule {
-    // FIXME: CONFIRM NAMESPACEs
     match namespace="^org\\.keepassxc\\.KeePassXC$"
-    match namespace="Proton Pass$"
+    match namespace="Proton"
     block-out-from "screencast"
 }
 //
@@ -71,8 +74,8 @@ layout {
         position "left"
         // Width of the tab indicator
         width 8
-        active-color "#FF9400"
-        inactive-color "#2D2D30"
+ // active-color "#FF9400"
+        // inactive-color "#2D2D30"
     }
     struts {
         // Set a negative strut for the top and bottom to minimize wasted space.
@@ -87,6 +90,7 @@ layout {
 // ========== Window Rules ==========
 //
 // ========== ALL windows ==========
+// FIXME: Why use shadow for active window vs focus-ring?
 window-rule {
     geometry-corner-radius 15 15 15 15
     clip-to-geometry true
@@ -112,6 +116,7 @@ window-rule {
         spread 3
         offset x=0 y=0
         // required with non-squared corners
+        // FIXME: Doesn't this clash with no-csd we already set?
         draw-behind-window true
         color "#cba6f7"
     }
@@ -124,7 +129,7 @@ window-rule {
 // ========== Workspace Assignments ==========
 // zellij nix session
 window-rule {
-    match app-id="com.mitchellh.ghostty" title="^nix |"
+    match app-id="Neovide" title="^nix |"
     open-on-workspace "1_dev"
 }
 window-rule {
@@ -191,12 +196,12 @@ window-rule {
 // see also layer rule of same name
 window-rule {
     match app-id="^org\\.keepassxc\\.KeePassXC$"
-    match app-id="Proton Pass$"
+    match app-id="^Proton"
     block-out-from "screen-capture"
 }
 window-rule {
     match app-id="^org\\.keepassxc\\.KeePassXC$"
-    match app-id="Proton Pass$"
+    match app-id="^Proton"
     match app-id="com.yubico.yubioath"
     block-out-from "screencast"
 }

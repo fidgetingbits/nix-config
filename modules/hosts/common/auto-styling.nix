@@ -36,6 +36,8 @@ in
         };
       };
       image = config.hostSpec.wallpaper;
+
     };
+
   };
 }

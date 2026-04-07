@@ -1,9 +1,4 @@
 // NOTE: Includes are automatically added by default.nix to allow per-host
-// values
-// include "inputs.kdl"
-// include "outputs.kdl"
-// include "binds.kdl"
-// include "rules.kdl"
 //
 // ========== Animations ==========
 //
@@ -16,23 +11,15 @@ animations {
 overview {
     workspace-shadow {
         off
- // softness 40
-        // spread 5
-        // offset x=0 y=0
-        // color "#74c7ec"
     }
 }
 //
 // ========== Startup ==========
 //
 spawn-at-startup "noctalia-shell"
-// spawn-at-startup "spotify "
+spawn-at-startup "firefox"
 spawn-sh-at-startup "uwsm finalize NIRI_SOCKET"
-// spawn-sh-at-startup "ghostty -e zellij attach nix"
 spawn-sh-at-startup "nvim-neovide -- -c 'lua require([[resession]]).load([[nix]])'"
-// IMPORTANT: This needs to be after uwsm finalize. For whatever reason the
-// service always fails waiting for WAYLAND_DISPLAY
-// spawn-sh-at-startup "systemctl --user enable --now awww-cycle.service"
 hotkey-overlay {
     skip-at-startup
 }
@@ -41,7 +28,7 @@ hotkey-overlay {
 //
 screenshot-path "~/images/screenshots/%Y-%m-%d-%H-%M-%S.png"
 // Disable client-side decorations
-// FIXME(niri): test this on or off
+// Prevents focus/ring border to show up through transparent windows
 prefer-no-csd
 // FIXME: revisit this on laptops, remove on desktop
 switch-events {
@@ -51,11 +38,4 @@ switch-events {
     lid-open {
         spawn "notify-send 'The laptop lid is open.'"
     }
-}
-layer-rule {
-    match namespace="^noctalia-wallpaper*"
-    place-within-backdrop true
-}
-layout {
-    background-color "transparent"
 }

@@ -3,13 +3,18 @@ gestures {
         off
     }
 }
-// FIXME: add something for quick reloading niri config
 binds {
     // Show a list of important bindings.
     Super+Slash {
         show-hotkey-overlay
     }
     // Shutting up hotkey-overlay defaults. I don't have/use mod5
+    Mod5+Up hotkey-overlay-title=null {
+        move-column-to-workspace-up
+    }
+    Mod5+Down hotkey-overlay-title=null {
+        move-column-to-workspace-down
+    }
     Mod5+Left hotkey-overlay-title=null {
         focus-column-left
     }
@@ -18,10 +23,6 @@ binds {
     }
     Mod5+Q hotkey-overlay-title=null {
         quit
-    }
-    // Exiting
-    Super+E hotkey-overlay-title="Logout menu" {
-        spawn "wlogout"
     }
     //
     // ========== Overview mode ==========
@@ -32,16 +33,16 @@ binds {
     //
     // ========== Monitor actions ==========
     //
-    Super+Ctrl+h {
+    Super+Ctrl+h hotkey-overlay-title="Focus monitor left" {
         focus-monitor-left
     }
-    Super+Ctrl+j {
+    Super+Ctrl+j hotkey-overlay-title="Focus monitor down" {
         focus-monitor-down
     }
-    Super+Ctrl+k {
+    Super+Ctrl+k hotkey-overlay-title="Focus monitor up" {
         focus-monitor-up
     }
-    Super+Ctrl+l {
+    Super+Ctrl+l hotkey-overlay-title="Focus monitor right" {
         focus-monitor-right
     }
     //
@@ -81,21 +82,8 @@ binds {
     Super+Y {
         focus-workspace "Y_qrs"
     }
-    Super+Period {
+    Super+Period hotkey-overlay-title="Focus workspace previous" {
         focus-workspace-previous
-    }
-    Super+M {
-        focus-workspace-up
-    }
-    Super+N {
-        focus-workspace-down
-    }
-    // ==========  Move workspace ==========
-    Super+Shift+M {
-        move-workspace-up
-    }
-    Super+Shift+N {
-        move-workspace-down
     }
     //
     // ========== Window and column actions ==========
@@ -184,28 +172,27 @@ binds {
     Super+Apostrophe hotkey-overlay-title="Move window to column right" {
         consume-or-expel-window-right
     }
-    // FIXME: laptops no direct home/end key
-    Super+Shift+Home {
+    Super+Shift+BracketLeft hotkey-overlay-title="Move column to first" {
         move-column-to-first
     }
-    Super+Shift+End {
+    Super+Shift+BracketRight hotkey-overlay-title="Move column to last" {
         move-column-to-last
     }
-    Super+Ctrl+Shift+H {
+    Super+Ctrl+Shift+H hotkey-overlay-title="Move window to monitor left" {
         move-window-to-monitor-left
     }
-    Super+Ctrl+Shift+L {
+    Super+Ctrl+Shift+J hotkey-overlay-title="Move window to monitor down" {
+        move-window-to-monitor-down
+    }
+    Super+Ctrl+Shift+K hotkey-overlay-title="Move window to monitor up" {
+        move-window-to-monitor-up
+    }
+    Super+Ctrl+Shift+L hotkey-overlay-title="Move window to monitor right" {
         move-window-to-monitor-right
-    }
-    Super+Ctrl+Shift+J {
-        move-column-to-workspace-down
-    }
-    Super+Ctrl+Shift+K {
-        move-column-to-workspace-up
     }
     // ========== Window Tabs ==========
     // Use `consume-or-expel-...` binds above to add/remove windows to a tabbed column
-    Super+G {
+    Super+G hotkey-overlay-title="Toggle column tabs" {
         toggle-column-tabbed-display
     }
     // Toggle the focused column between normal and tabbed display    //
@@ -219,25 +206,22 @@ binds {
     Super+Shift+R hotkey-overlay-title="Switch preset column height" {
         switch-preset-window-height
     }
-    Super+F {
+    Super+F hotkey-overlay-title="Toggle fullscreen" {
         fullscreen-window
     }
-    //tricks the window content into thinking its fullscreen
-    Super+Alt+F {
+    Super+Alt+F hotkey-overlay-title="Toggle windowed fullscreen" {
         toggle-windowed-fullscreen
     }
-    Super+Shift+F {
+    Super+Shift+F hotkey-overlay-title="Toggle floating" {
         toggle-window-floating
     }
-    // Toggle maximized state of the focused column
-    Super+Ctrl+F {
+    Super+Ctrl+F hotkey-overlay-title="Maximize column width" {
         maximize-column
     }
-    // Expand the focused column to space not taken up by other fully visible columns
-    Super+Shift+Ctrl+F {
+    // Toggle maximized state of the focused column
+    Super+Shift+Ctrl+F hotkey-overlay-title="Expand column to available width" {
         expand-column-to-available-width
     }
-    // FIXME: Add higher value Shift options
     Super+BracketLeft {
         set-column-width "-1"
     }
@@ -254,128 +238,135 @@ binds {
     // ========== System controls ==========
     //
     // ========== Brightness ==========
-    XF86MonBrightnessUp allow-when-locked=true {
-        spawn "brightnessctl" "set" "10%+"
+    XF86MonBrightnessUp allow-when-locked=true hotkey-overlay-title=null {
+        // spawn "brightnessctl" "set" "0.01+"
+        spawn "noctalia-shell" "ipc" "call" "brightness" "increase"
     }
-    XF86MonBrightnessDown allow-when-locked=true {
-        spawn "brightnessctl" "set" "10%-"
+    XF86MonBrightnessDown allow-when-locked=true hotkey-overlay-title=null {
+        // spawn "brightnessctl" "set" "0.01-"
+        spawn "noctalia-shell" "ipc" "call" "brightness" "decrease"
     }
     // ========== Media Control==========
-    XF86AudioPlay allow-when-locked=true {
-        spawn "playerctl" "play-pause" "--ignore-player=firefox,chromium,brave"
+    XF86AudioPlay allow-when-locked=true hotkey-overlay-title=null {
+        // spawn "playerctl" "play-pause" "--ignore-player=firefox,chromium,brave"
+        spawn "noctalia-shell" "ipc" "call" "media" "playPause"
     }
-    XF86AudioStop allow-when-locked=true {
-        spawn "playerctl" "stop" "--ignore-player=firefox,chromium,brave"
+    XF86AudioStop allow-when-locked=true hotkey-overlay-title=null {
+        // spawn "playerctl" "stop" "--ignore-player=firefox,chromium,brave"
+        spawn "noctalia-shell" "ipc" "call" "media" "pause"
     }
-    XF86AudioPrev allow-when-locked=true {
-        spawn "playerctl" "previous" "--ignore-player=firefox,chromium,brave"
+    XF86AudioPrev allow-when-locked=true hotkey-overlay-title=null {
+        // spawn "playerctl" "previous" "--ignore-player=firefox,chromium,brave"
+        spawn "noctalia-shell" "ipc" "call" "media" "previous"
     }
-    XF86AudioNext allow-when-locked=true {
-        spawn "playerctl" "next" "--ignore-player=firefox,chromium,brave"
+    XF86AudioNext allow-when-locked=true hotkey-overlay-title=null {
+        // spawn "playerctl" "next" "--ignore-player=firefox,chromium,brave"
+        spawn "noctalia-shell" "ipc" "call" "media" "next"
     }
-    XF86AudioRewind allow-when-locked=true {
-        spawn "playerctl" "position" "2-" "--ignore-player=firefox,chromium,brave"
+    XF86AudioRewind allow-when-locked=true hotkey-overlay-title=null {
+        // spawn "playerctl" "position" "2-" "--ignore-player=firefox,chromium,brave"
+        spawn "noctalia-shell" "ipc" "call" "media" "seekRelative" "-2"
     }
-    XF86AudioForward allow-when-locked=true {
-        spawn "playerctl" "position" "2+" "--ignore-player=firefox,chromium,brave"
-    }
-    // ========== Media audio control==========
-    Shift+XF86AudioRaiseVolume allow-when-locked=true {
-        spawn "playerctl" "volume" "0.05%+"
-    }
-    Shift+XF86AudioLowerVolume allow-when-locked=true {
-        spawn "playerctl" "volume" "0.05%-"
+    XF86AudioForward allow-when-locked=true hotkey-overlay-title=null {
+        // spawn "playerctl" "position" "2+" "--ignore-player=firefox,chromium,brave"
+        spawn "noctalia-shell" "ipc" "call" "media" "seekRelative" "2"
     }
     // ========== Output audio control==========
-    XF86AudioRaiseVolume hotkey-overlay-title="Output volume up" allow-when-locked=true {
-        spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.05+"
+    XF86AudioRaiseVolume allow-when-locked=true hotkey-overlay-title=null {
+        // spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.05+"
+        spawn "noctalia-shell" "ipc" "call" "volume" "increase"
     }
-    XF86AudioLowerVolume hotkey-overlay-title="Output volume down" allow-when-locked=true {
-        spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.05-"
+    XF86AudioLowerVolume allow-when-locked=true hotkey-overlay-title=null {
+        // spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.05-"
+        spawn "noctalia-shell" "ipc" "call" "volume" "decrease"
     }
-    XF86AudioMute hotkey-overlay-title="Output volume mute" allow-when-locked=true {
-        spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"
+    XF86AudioMute allow-when-locked=true hotkey-overlay-title=null {
+        // spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"
+        spawn "noctalia-shell" "ipc" "call" "volume" "muteOutput"
     }
     // ========== Input audio control==========
-    Super+XF86AudioRaiseVolume hotkey-overlay-title="Input volume up" allow-when-locked=true {
-        spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SOURCE@" "0.05+"
+    Super+XF86AudioRaiseVolume allow-when-locked=true hotkey-overlay-title=null {
+        // spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SOURCE@" "0.05+"
+        spawn "noctalia-shell" "ipc" "call" "volume" "increaseInput"
     }
-    Super+XF86AudioLowerVolume hotkey-overlay-title="Input volume down" allow-when-locked=true {
-        spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SOURCE@" "0.05-"
+    Super+XF86AudioLowerVolume allow-when-locked=true hotkey-overlay-title=null {
+        // spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SOURCE@" "0.05-"
+        spawn "noctalia-shell" "ipc" "call" "volume" "decreaseInput"
     }
-    Super+XF86AudioMute hotkey-overlay-title="Input volume mute" allow-when-locked=true {
-        spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"
+    Super+XF86AudioMute allow-when-locked=true hotkey-overlay-title=null {
+        // spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"
+        spawn "noctalia-shell" "ipc" "call" "volume" "muteInput"
     }
-    XF86AudioMicMute hotkey-overlay-title="Mic mute" allow-when-locked=true {
-        spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"
+    XF86AudioMicMute allow-when-locked=true hotkey-overlay-title=null {
+        // spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"
+        spawn "noctalia-shell" "ipc" "call" "volume" "muteInput"
     }
-    // ========== Power menu ==========
-    // FIXME(niri): probably disable interrupting power?
-    // XF86PowerOff allow-when-locked=true { spawn "wlogout"; }
-    // XF86Sleep    allow-when-locked=true { spawn "wlogout"; }
-    // XF86Suspend  allow-when-locked=true { spawn "wlogout"; }
-    //
     // ========== Screenshots ==========
     //
     // NOTE: see config.kdl for screenshot-path
     Print {
         screenshot
     }
-    Super+Shift+P {
+    Super+Shift+P hotkey-overlay-title="Screenshot" {
         screenshot
     }
     // Super+Ctrl+Shift+P { screenshot write-to-disk=true; }
     // Super+Alt+P { screenshot show-pointer=false; }
     // Super+Ctrl+Alt+P { screenshot show-pointer=true; }
     //
+    //
+    // ========== Noctalia calls ==========
+    //
+    // NOTE: Session Menu is for hibernate, sleep, logout, power, etc
+    Super+Shift+E hotkey-overlay-title="Session Menu" {
+        spawn-sh "noctalia-shell ipc call sessionMenu toggle"
+    }
+    Super+Space hotkey-overlay-title="Launcher" {
+        spawn-sh "noctalia-shell ipc call launcher toggle"
+    }
+    Super+Shift+Space hotkey-overlay-title="Command Launcher" {
+        spawn-sh "noctalia-shell ipc call launcher command"
+    }
+    Super+Comma hotkey-overlay-title="Noctalia Settings" {
+        spawn-sh "noctalia-shell ipc call settings open"
+    }
+    Super+Ctrl+x hotkey-overlay-title="Lock screen" {
+        spawn-sh "noctalia-shell ipc call lockScreen lock"
+    }
+    Super+Ctrl+S hotkey-overlay-title="Suspend" {
+        spawn-sh "noctalia-shell ipc call sessionMenu lockAndSuspend"
+    }
+    Super+Ctrl+M hotkey-overlay-title="System Monitor" {
+        spawn-sh "noctalia-shell ipc call systemMonitor toggle"
+    }
+    Super+Tab hotkey-overlay-title="Window selector" {
+        // spawn "rofi" "-show" "window"
+        spawn-sh "noctalia-shell ipc call launcher windows"
+    }
     // ========== Quick Launch ==========
     //
-    // Open ghostty.
-    Super+Shift+G hotkey-overlay-title="New shell" {
+    Super+Shift+G hotkey-overlay-title="Open non-neovim terminal" {
         spawn "ghostty"
     }
-    // Open neovide
-    Super+V hotkey-overlay-title="Neovide" {
+    Super+V hotkey-overlay-title="Open neovide" {
         // From fidgetingvim flake
         spawn "nvim-neovide"
     }
-    Super+Return hotkey-overlay-title="New neovide shell" {
-        // From fidgetingvim flake
-        // spawn "nvim-neovide" "--" "-c" "ToggleTerm"
+    Super+Return hotkey-overlay-title="New neovide terminal" {
         spawn "nvim-neovide" "--" "-c" "term"
-    }
-    // Open drun launcher.
-    Super+Space hotkey-overlay-title="Launcher" {
-        spawn "rofi" "-show" "drun"
-    }
-    // Open run/program launcher.
-    Super+Shift+Space hotkey-overlay-title="Run shell command" {
-        spawn "rofi" "-show" "run"
-    }
-    // Show ssh launcher.
-    Super+Shift+S hotkey-overlay-title="New ssh shell" {
-        spawn "rofi" "-show" "ssh"
-    }
-    // Show window selector.
-    Super+Tab hotkey-overlay-title="Window selector" {
-        spawn "rofi" "-show" "window"
-    }
-    // Show window selector.
-    Super+P hotkey-overlay-title="Clipboard" {
-        spawn "rofi-copyq"
-    }
-    // Show window selector.
-    Super+w hotkey-overlay-title="Walker" {
-        spawn "walker"
     }
     // Thunar
     Super+Ctrl+O hotkey-overlay-title="Spawn file explorer" {
         spawn "thunar"
     }
- //
+    //
     // ========== Clipboard ==========
     //
-    // FIXME(niri): setup with copyq
+    Super+P hotkey-overlay-title="Clipboard" {
+        // spawn "rofi-copyq"
+        spawn-sh "noctalia-shell ipc call launcher clipboard"
+    }
+ // FIXME(niri): setup with copyq
 	// Select from the clipboard.
 	//Super+Shift+V { spawn "dash" "-c" "clipman pick -t CUSTOM -T 'fuzzel -d --no-icons --width 60'"; }
 	// Clear the clipboard.
