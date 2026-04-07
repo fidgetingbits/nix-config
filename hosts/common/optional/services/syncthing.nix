@@ -127,15 +127,15 @@ lib.mkMerge [
     };
     sops.secrets =
       let
-        inherit (config.users.users.${config.hostSpec.primaryUsername}) name;
+        inherit (config.users.users.${config.hostSpec.primaryUsername}) name group;
       in
       {
         "keys/syncthing/cert" = {
-          inherit name;
+          inherit name group;
           mode = "0400";
         };
         "keys/syncthing/key" = {
-          inherit name;
+          inherit name group;
           mode = "0400";
         };
       };
