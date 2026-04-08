@@ -21,7 +21,7 @@ in
     services.unifi = {
       enable = true;
       openFirewall = false; # Set to true if useProxy is false AND you won't managed remotely via ssh
-      unifiPackage = pkgs.unifi;
+      unifiPackage = pkgs.unstable.unifi;
       mongodbPackage = pkgs.mongodb-ce;
     };
 
