@@ -1,4 +1,3 @@
-{ lib, ... }:
 {
   appLauncher = {
     autoPasteClipboard = false;
@@ -27,7 +26,7 @@
     showIconBackground = false;
     sortByMostUsed = true;
     terminalCommand = "alacritty -e";
-    viewMode = "grid";
+    viewMode = "list";
   };
   audio = {
     mprisBlacklist = [
@@ -45,10 +44,10 @@
   bar = {
     autoHideDelay = 500;
     autoShowDelay = 150;
-    backgroundOpacity = lib.mkForce 1;
+    backgroundOpacity = 0.8;
     barType = "simple";
     capsuleColorKey = "none";
-    capsuleOpacity = lib.mkForce 1;
+    capsuleOpacity = 1;
     contentPadding = 2;
     density = "default";
     displayMode = "always_visible";
@@ -56,7 +55,7 @@
     fontScale = 1;
     frameRadius = 12;
     frameThickness = 8;
-    hideOnOverview = false;
+    hideOnOverview = true;
     marginHorizontal = 4;
     marginVertical = 4;
     middleClickAction = "none";
@@ -79,10 +78,21 @@
     showCapsule = false;
     showOnWorkspaceSwitch = true;
     showOutline = false;
-    useSeparateOpacity = false;
+    useSeparateOpacity = true;
     widgetSpacing = 6;
     widgets = {
       center = [
+        {
+          clockColor = "none";
+          customFont = "";
+          formatHorizontal = "HH:mm ddd, MMM dd";
+          formatVertical = "HH mm - dd MM";
+          id = "Clock";
+          tooltipFormat = "HH:mm ddd, MMM dd";
+          useCustomFont = false;
+        }
+      ];
+      left = [
         {
           characterCount = 2;
           colorizeIcons = false;
@@ -103,48 +113,6 @@
           showBadge = true;
           showLabelsOnlyWhenOccupied = true;
           unfocusedIconsOpacity = 1;
-        }
-      ];
-      left = [
-        {
-          colorizeSystemIcon = "none";
-          customIconPath = "";
-          enableColorization = false;
-          icon = "rocket";
-          iconColor = "none";
-          id = "Launcher";
-          useDistroLogo = false;
-        }
-        {
-          clockColor = "none";
-          customFont = "";
-          formatHorizontal = "HH:mm ddd, MMM dd";
-          formatVertical = "HH mm - dd MM";
-          id = "Clock";
-          tooltipFormat = "HH:mm ddd, MMM dd";
-          useCustomFont = false;
-        }
-        {
-          compactMode = true;
-          diskPath = "/";
-          iconColor = "none";
-          id = "SystemMonitor";
-          showCpuCores = false;
-          showCpuFreq = false;
-          showCpuTemp = true;
-          showCpuUsage = true;
-          showDiskAvailable = false;
-          showDiskUsage = false;
-          showDiskUsageAsPercent = false;
-          showGpuTemp = false;
-          showLoadAverage = false;
-          showMemoryAsPercent = false;
-          showMemoryUsage = true;
-          showNetworkStats = false;
-          showSwapUsage = false;
-          textColor = "none";
-          useMonospaceFont = true;
-          usePadding = false;
         }
         {
           colorizeIcons = false;
@@ -176,19 +144,6 @@
       ];
       right = [
         {
-          blacklist = [
-
-          ];
-          chevronColor = "none";
-          colorizeIcons = false;
-          drawerEnabled = true;
-          hidePassive = false;
-          id = "Tray";
-          pinned = [
-
-          ];
-        }
-        {
           hideWhenZero = false;
           hideWhenZeroUnread = false;
           iconColor = "none";
@@ -208,6 +163,18 @@
         {
           displayMode = "onhover";
           iconColor = "none";
+          id = "Network";
+          textColor = "none";
+        }
+        {
+          displayMode = "onhover";
+          iconColor = "none";
+          id = "Bluetooth";
+          textColor = "none";
+        }
+        {
+          displayMode = "onhover";
+          iconColor = "none";
           id = "Volume";
           middleClickCommand = "pwvucontrol || pavucontrol";
           textColor = "none";
@@ -220,13 +187,39 @@
           textColor = "none";
         }
         {
-          colorizeDistroLogo = false;
-          colorizeSystemIcon = "none";
-          customIconPath = "";
-          enableColorization = false;
-          icon = "noctalia";
-          id = "ControlCenter";
-          useDistroLogo = false;
+          blacklist = [
+
+          ];
+          chevronColor = "none";
+          colorizeIcons = false;
+          drawerEnabled = true;
+          hidePassive = false;
+          id = "Tray";
+          pinned = [
+
+          ];
+        }
+        {
+          compactMode = true;
+          diskPath = "/";
+          iconColor = "none";
+          id = "SystemMonitor";
+          showCpuCores = false;
+          showCpuFreq = false;
+          showCpuTemp = true;
+          showCpuUsage = true;
+          showDiskAvailable = false;
+          showDiskUsage = false;
+          showDiskUsageAsPercent = false;
+          showGpuTemp = false;
+          showLoadAverage = false;
+          showMemoryAsPercent = false;
+          showMemoryUsage = true;
+          showNetworkStats = false;
+          showSwapUsage = false;
+          textColor = "none";
+          useMonospaceFont = true;
+          usePadding = false;
         }
       ];
     };
@@ -281,7 +274,7 @@
         id = "audio-card";
       }
       {
-        enabled = false;
+        enabled = true;
         id = "brightness-card";
       }
       {
@@ -337,7 +330,7 @@
   };
   dock = {
     animationSpeed = 1;
-    backgroundOpacity = lib.mkForce 1;
+    backgroundOpacity = 1;
     colorizeIcons = false;
     deadOpacity = 0.6;
     displayMode = "auto_hide";
@@ -424,14 +417,14 @@
     passwordChars = true;
     radiusRatio = 1;
     reverseScroll = false;
-    scaleRatio = 1;
-    screenRadiusRatio = 1;
+    scaleRatio = 0.8500000000000001;
+    screenRadiusRatio = 1.75;
     shadowDirection = "bottom_right";
     shadowOffsetX = 2;
     shadowOffsetY = 3;
     showChangelogOnStartup = true;
     showHibernateOnLockScreen = false;
-    showScreenCorners = false;
+    showScreenCorners = true;
     showSessionButtonsOnLockScreen = true;
     smoothScrollEnabled = true;
     telemetryEnabled = false;
@@ -476,6 +469,7 @@
     useFahrenheit = false;
     weatherEnabled = true;
     weatherShowEffects = true;
+    weatherTaliaMascotAlways = false;
   };
   network = {
     bluetoothAutoConnect = true;
@@ -501,7 +495,7 @@
     disableWallpaper = true;
   };
   notifications = {
-    backgroundOpacity = lib.mkForce 1;
+    backgroundOpacity = 1;
     clearDismissed = true;
     criticalUrgencyDuration = 15;
     density = "default";
@@ -535,7 +529,7 @@
   };
   osd = {
     autoHideMs = 2000;
-    backgroundOpacity = lib.mkForce 1;
+    backgroundOpacity = 1;
     enabled = true;
     enabledTypes = [
       0
@@ -610,8 +604,7 @@
     diskCriticalThreshold = 90;
     diskWarningThreshold = 80;
     enableDgpuMonitoring = false;
-    externalMonitor = "resources || missioncenter || jdsystemmonitor || corestats || system-monitoring-center || gnome-system-monitor || plasma-systemmonitor || mate-system
--monitor || ukui-system-monitor || deepin-system-monitor || pantheon-system-monitor";
+    externalMonitor = "resources || missioncenter || jdsystemmonitor || corestats || system-monitoring-center || gnome-system-monitor || plasma-systemmonitor || mate-system\n-monitor || ukui-system-monitor || deepin-system-monitor || pantheon-system-monitor";
     gpuCriticalThreshold = 90;
     gpuWarningThreshold = 80;
     memCriticalThreshold = 90;
@@ -635,10 +628,10 @@
     fontDefaultScale = 1;
     fontFixed = "FiraMono Nerd Font";
     fontFixedScale = 1;
-    panelBackgroundOpacity = lib.mkForce 1;
+    panelBackgroundOpacity = 1;
     panelsAttachedToBar = true;
     scrollbarAlwaysVisible = true;
-    settingsPanelMode = "attached";
+    settingsPanelMode = "window";
     settingsPanelSideBarCardStyle = false;
     tooltipsEnabled = true;
     translucentWidgets = false;

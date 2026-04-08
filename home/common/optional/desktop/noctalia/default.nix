@@ -91,8 +91,10 @@ in
       timer = {
       };
     };
-    # FIXME: Merge in per-host entries
-    # Settings are kept separate to allow easy `just noctalia-save` updates
-    settings = import ./settings.nix { inherit lib; };
+    # FIXME: Merge in per-host entries with mkForce
+    settings =
+      import ./settings.nix
+      # nixfmt hack
+      |> lib.mapAttrs (name: value: lib.custom.highPrio value);
   };
 }
