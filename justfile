@@ -314,3 +314,16 @@ noctalia-json:
 [group("noctalia")]
 noctalia-nix:
     @just noctalia-json | json2nix
+
+# Save current noctalia settings to nix file
+[group("noctalia")]
+noctalia-save:
+    @just noctalia-json | json2nix > home/common/optional/noctalia/settings.nix
+
+# Save current noctalia settings to host-specific settings file
+[group("noctalia")]
+noctalia-save-host:
+    #!/usr/bin/env bash
+    PATH=hosts/nixos/$(hostname)/noctalia/settings.nix
+    mkdir -p "$PATH" ||  true
+    @just noctalia-json | json2nix > "$PATH"

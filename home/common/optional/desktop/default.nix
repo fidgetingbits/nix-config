@@ -7,7 +7,7 @@
     ./wayland
 
     ########## Shell ##########
-    ./noctalia.nix
+    ./noctalia
 
     ########## Utilities ##########
     ./rofi.nix
