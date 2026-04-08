@@ -145,13 +145,9 @@ in
           ];
 
         }
-        // lib.optionalAttrs (config.hostSpec.isMinimal == false) {
+        // lib.optionalAttrs (config.hostSpec.isMinimal == false && hostSpec.useAtticCache) {
           # FIXME: This might not only contain attic-related entries in the future
-          netrc-file =
-            if ((config ? "sops") && (hostSpec.useAtticCache)) then
-              "${config.sops.secrets."passwords/netrc".path}"
-            else
-              null; # FIXME: This is busted if set to null (fixed by isMinimal check above for now).
+          netrc-file = if config ? "sops" then "${config.sops.secrets."passwords/netrc".path}" else null; # FIXME: This is busted if set to null (fixed by isMinimal check above for now).
         };
 
         extraOptions = ''
