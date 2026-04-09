@@ -328,7 +328,7 @@ binds {
         spawn-sh "noctalia-shell ipc call launcher command"
     }
     Super+Comma hotkey-overlay-title="Noctalia Settings" {
-        spawn-sh "noctalia-shell ipc call settings open"
+        spawn "spawn-noctalia-settings"
     }
     Super+Ctrl+x hotkey-overlay-title="Lock screen" {
         spawn-sh "noctalia-shell ipc call lockScreen lock"

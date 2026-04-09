@@ -25,7 +25,7 @@
     showCategories = true;
     showIconBackground = false;
     sortByMostUsed = true;
-    terminalCommand = "alacritty -e";
+    terminalCommand = "ghostty -e";
     viewMode = "list";
   };
   audio = {
