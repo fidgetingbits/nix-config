@@ -21,13 +21,11 @@ let
     pink = "#f5c2e7"; # Tertiary
     red = "#f38ba8"; # Error
   };
-  hostConfig = lib.custom.relativeToRoot "hosts/nixos/${osConfig.hostSpec.hostName}/noctalia.nix";
 in
 {
   imports = [
     inputs.noctalia.homeModules.default
-  ]
-  ++ lib.optional (lib.pathExists hostConfig) hostConfig;
+  ];
 
   home.packages = [
     # From Mic92:
@@ -35,6 +33,7 @@ in
     # to hicolor and can't find generic icons like user-desktop. The gtk3
     # platform theme reads gtk-icon-theme-name; ship breeze so that resolves.
     pkgs.kdePackages.breeze-icons
+    pkgs.adwaita-icon-theme
   ];
 
   # Testing why styling doesn't work
@@ -65,36 +64,47 @@ in
       mOutline = lib.mkForce mocha.overlay0;
       mShadow = lib.mkForce mocha.crust;
     };
-    plugins = {
-      sources = [
-        {
-          enabled = true;
-          name = "Official Noctalia Plugins";
-          url = "https://github.com/noctalia-dev/noctalia-plugins";
-        }
-      ];
-      states = {
-        privacy-indicator = {
-          enabled = true;
-          sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
+
+    plugins =
+      let
+        url = "https://github.com/noctalia-dev/noctalia-plugins";
+      in
+      {
+        sources = [
+          {
+            enabled = true;
+            name = "Official Noctalia Plugins";
+            inherit url;
+          }
+        ];
+        states = {
+          privacy-indicator = {
+            enabled = true;
+            sourceUrl = url;
+          };
+          timer = {
+            enabled = true;
+            sourceUrl = url;
+          };
         };
-        timer = {
-          enabled = true;
-          sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
-        };
+        version = 2;
       };
-      version = 2;
-    };
+
     pluginSettings = {
       privacy-indicator = {
       };
       timer = {
       };
     };
-    # FIXME: Merge in per-host entries with mkForce
+
     settings =
-      import ./settings.nix
+      let
+        baseSettings = import ./settings.nix;
+        hostConfigPath = lib.custom.relativeToRoot "hosts/nixos/${osConfig.hostSpec.hostName}/noctalia.nix";
+        hostSettings = if lib.pathExists hostConfigPath then import hostConfigPath else { };
+      in
+      lib.recursiveUpdate baseSettings hostSettings
       # nixfmt hack
-      |> lib.mapAttrs (name: value: lib.custom.highPrio value);
+      |> lib.mapAttrs (n: v: lib.mkForce v);
   };
 }
