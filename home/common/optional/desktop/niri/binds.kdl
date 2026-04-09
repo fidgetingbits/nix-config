@@ -318,7 +318,7 @@ binds {
     // ========== Noctalia calls ==========
     //
     // NOTE: Session Menu is for hibernate, sleep, logout, power, etc
-    Super+Shift+E hotkey-overlay-title="Session Menu" {
+    Super+E hotkey-overlay-title="Session Menu" {
         spawn-sh "noctalia-shell ipc call sessionMenu toggle"
     }
     Super+Space hotkey-overlay-title="Launcher" {
