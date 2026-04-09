@@ -34,6 +34,7 @@ in
       hostSpec = {
         isMinimal = lib.mkForce true;
         isAutoStyled = lib.mkForce false;
+        useAtticCache = lib.mkForce false;
       };
 
       fileSystems."/boot".options = [ "umask=0077" ]; # Removes permissions and security warnings.
