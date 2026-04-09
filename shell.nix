@@ -21,10 +21,14 @@
     buildInputs = checks.pre-commit-check.enabledPackages;
     nativeBuildInputs =
       lib.attrValues {
+
+        inherit (pkgs.unstable)
+          # unstable new enough to have --list --group
+          just
+          ;
         inherit (pkgs)
           home-manager
           git
-          just
           pre-commit
           sops
           deadnix # FIXME: deprecated?
