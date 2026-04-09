@@ -299,11 +299,10 @@ dev:
 fmt:
     nix fmt --reference-lock-file locks/$(hostname).lock
 
-
 # Generate json diff of current noctalia settings
 [group("noctalia")]
 noctalia-diff:
-    nix shell nixpkgs#json-diff -c bash -c "json-diff <(jq -S . ~/.config/noctalia/settings.json) <(noctalia-shell ipc call state all | jq -S .settings)"
+    -json-diff <(jq -S . ~/.config/noctalia/settings.json) <(noctalia-shell ipc call state all | jq -S .settings)
 
 # Dump noctalia settings
 [group("noctalia")]
