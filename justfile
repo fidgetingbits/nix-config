@@ -302,7 +302,7 @@ fmt:
 # Generate json diff of current noctalia settings
 [group("noctalia")]
 noctalia-diff:
-    -json-diff <(jq -S . ~/.config/noctalia/settings.json) <(noctalia-shell ipc call state all | jq -S .settings)
+    @-json-diff <(jq -S . ~/.config/noctalia/settings.json) <(noctalia-shell ipc call state all | jq -S .settings)
 
 # Dump noctalia settings
 [group("noctalia")]
