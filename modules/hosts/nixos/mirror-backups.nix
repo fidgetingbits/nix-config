@@ -112,10 +112,12 @@ let
           sync_cmd=$(gen_sync_cmd "$folder" "$log")
           result=$(run_sync_cmd "$sync_cmd" "$log")
 
-          echo "${cfg.folders.source.base}/$folder to ${cfg.server}:${cfg.folders.destination}/$folder" >> "$mirror_log"
-          echo "-----" >> "$mirror_log"
-          cat "$log\n" >> "$mirror_log"
-          echo "-----" >> "$mirror_log"
+          {
+            echo "${cfg.folders.source.base}/$folder to ${cfg.server}:${cfg.folders.destination}/$folder"
+            echo "-----"
+            cat "$log\n"
+            echo "-----"
+          } >> "$mirror_log"
 
           if [[ ! "$result" = "succeeded"* ]]; then
             # Exit on first failure encountered
