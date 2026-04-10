@@ -57,14 +57,6 @@ in
         "keys/git-crypt" = {
           sopsFile = "${sopsFolder}/olan.yaml";
         };
-        # FIXME: De-duplicate this eventually. See note in other sops.nix file
-        "passwords/netrc" = {
-          sopsFile = "${sopsFolder}/olan.yaml";
-        };
-        # formatted as extra-access-tokens = github.com=<PAT token>
-        "tokens/nix-access-tokens" = {
-          sopsFile = "${sopsFolder}/olan.yaml";
-        };
       }
       # // lib.optionalAttrs osConfig.hostSpec.isDevelopment {
       #   "tokens/openai" = {

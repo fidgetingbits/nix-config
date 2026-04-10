@@ -57,11 +57,12 @@ in
 
       (lib.mkIf (config.hostSpec.isLocal || config.hostSpec.useAtticCache) {
         # NOTE: These two entries are duplicated in home sops as well, and here because nix.nix can't
-
-        # directly check for sops usage due to recursion in some situations
         # formatted as extra-access-tokens = github.com=<PAT token>
         "tokens/nix-access-tokens" = {
           sopsFile = "${sopsFolder}/olan.yaml";
+          owner = "root";
+          group = "wheel";
+          mode = "0440";
         };
         "passwords/netrc" = {
           sopsFile = "${sopsFolder}/olan.yaml";
