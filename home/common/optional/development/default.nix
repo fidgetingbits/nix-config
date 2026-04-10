@@ -6,7 +6,6 @@
 {
   imports = lib.custom.scanPaths ./.;
 
-  # FIXME: Some of the reversing stuff, etc can likely be moved
   home.packages = lib.flatten [
     (
       lib.attrValues {
@@ -69,6 +68,7 @@
     ))
   ];
 
+  # FIXME: This should merge the introdus defaults probably instead of repeating
   home.file.".editorconfig".text = ''
     root = true
 
@@ -77,19 +77,30 @@
     insert_final_newline = true
     indent_style = space
     indent_size = 4
+    insert_final_newline = true
 
-    [*.nix]
+    charset = utf-8
+    trim_trailing_whitespace = true
+
+    [*.{nix,lua}]
     indent_style = space
     indent_size = 2
 
-    [*.lua]
+    [justfile]
+    indent_style = space
+    indent_size = 4
+
+    [*.{yaml,yml}]
     indent_style = space
     indent_size = 2
+
+    [*.sh]
+    indent_size = 4
 
     [Makefile]
     indent_style = tab
 
-    [*.puml.md,*.puml,*.iuml,*.uml,*.pu,*.plantuml]
+    [*.{puml.md,puml,iuml,uml,pu,plantuml}]
     indent_size = 2
   '';
 
