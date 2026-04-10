@@ -77,8 +77,10 @@ lib.mkMerge [
         key = config.sops.secrets."keys/syncthing/key".path;
         cert = config.sops.secrets."keys/syncthing/cert".path;
 
+        # https://docs.syncthing.net/users/config.html#config-option-options
         settings = {
           options = {
+            globalAnnounceEnabled = false;
             # localAnnounceEnabled = false;
             urAccepted = -1; # Don't send anonymous stats
             # Don't use public relay. Change this if we setup our own
@@ -98,8 +100,9 @@ lib.mkMerge [
               };
               ignorePatterns = [
                 ".git"
+                ".keep"
               ];
-              # Avoid conflicts
+              # Avoid conflicts. FIXME: Need a better way to deal with this
               restrictedType = if config.networking.hostName == "oedo" then "sendonly" else "receiveonly";
             in
             {
