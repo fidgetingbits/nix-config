@@ -4,7 +4,7 @@
   lib,
   config,
   pkgs,
-  namespace,
+  # namespace,
   ...
 }:
 {
@@ -32,7 +32,6 @@
         "plymouth.nix"
         "printing.nix"
         "locale.nix"
-        "x11.nix"
         "sound.nix"
         "podman.nix"
         "cli.nix"
@@ -133,28 +132,28 @@
     enable = true;
     interval = "monthly";
   };
-  ${namespace}.services.monit = {
-    enable = true;
-    usage = {
-      fileSystem = {
-        enable = true;
-        # FIXME:This should be automated from disko subvolume parsing or something
-        fileSystems = {
-          rootfs = {
-            path = "/";
-          };
-        };
-      };
-    };
-    health = {
-      disks = {
-        enable = true;
-        smart.disks = map (d: builtins.baseNameOf d) [ config.system.disks.primary ];
-      };
-      btrfs = {
-        enable = true;
-        inherit (config.services.btrfs.autoScrub) fileSystems;
-      };
-    };
-  };
+  # ${namespace}.services.monit = {
+  #   enable = true;
+  #   usage = {
+  #     fileSystem = {
+  #       enable = true;
+  #       # FIXME:This should be automated from disko subvolume parsing or something
+  #       fileSystems = {
+  #         rootfs = {
+  #           path = "/";
+  #         };
+  #       };
+  #     };
+  #   };
+  #   health = {
+  #     disks = {
+  #       enable = true;
+  #       smart.disks = map (d: builtins.baseNameOf d) [ config.system.disks.primary ];
+  #     };
+  #     btrfs = {
+  #       enable = true;
+  #       inherit (config.services.btrfs.autoScrub) fileSystems;
+  #     };
+  #   };
+  # };
 }

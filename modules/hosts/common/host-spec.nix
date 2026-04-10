@@ -178,7 +178,7 @@
         };
         useAtticCache = lib.mkOption {
           type = lib.types.bool;
-          default = true;
+          default = false;
           description = "Indicate a host that uses LAN atticd for caching";
         };
         hdr = lib.mkOption {

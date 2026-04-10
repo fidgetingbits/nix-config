@@ -1,4 +1,7 @@
 { lib, ... }:
+let
+  inherit (lib.custom) highPrio;
+in
 {
   hostSpec = {
     hostName = "oedo";
@@ -13,6 +16,9 @@
     isAutoStyled = lib.mkForce true;
     isDevelopment = lib.mkForce true;
     isAdmin = lib.mkForce true;
+
+    useAtticCache = highPrio true;
+
     # FIXME: We should have like "desktop" = "hyprland" and have that auto enable the rest?
     defaultDesktop = "niri-uwsm";
     useWayland = true;

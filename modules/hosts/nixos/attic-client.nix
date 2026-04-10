@@ -182,6 +182,10 @@ in
           Restart = "on-failure";
           RestartSec = "5s";
         };
+        # This is a hack because for whatever reason restarting it often fails
+        # on first run, then succeeds on second run. But the nixos rebuild is
+        # marked as a failure
+        restartIfChanged = false;
       };
 
     ${namespace}.services = lib.optionalAttrs hasPerNetworkServices {
