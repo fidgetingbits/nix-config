@@ -134,14 +134,17 @@ lib.mkMerge [
       in
       {
         "keys/syncthing/cert" = {
-          inherit name group;
+          owner = name;
+          inherit group;
           mode = "0400";
         };
         "keys/syncthing/key" = {
-          inherit name group;
+          owner = name;
+          inherit group;
           mode = "0400";
         };
       };
+
     ${namespace}.services.per-network-services.trustedNetworkServices = [ "syncthing" ];
   }
   granularFirewallRules
