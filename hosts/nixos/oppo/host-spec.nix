@@ -14,6 +14,7 @@
     scaling = lib.mkForce "2";
     isProduction = lib.mkForce true;
     isDevelopment = lib.mkForce true;
+    isIntrodusDev = lib.mkForce false;
     isImpermanent = lib.mkForce true;
 
     persistFolder = lib.mkForce "/persist";

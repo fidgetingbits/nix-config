@@ -64,6 +64,7 @@ let
               inherit (beta) url sha256;
             };
           });
+        neovim = final.unstable.neovim;
       });
 
     # Override unstable entries exposed via pkgs.unstable

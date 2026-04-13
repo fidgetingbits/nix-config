@@ -12,9 +12,10 @@
 
   # My custom neovim wrapper, built on top of the introdus neovim base, is enabled by the above
   # and exposed in the config as wrappers.neovim.
+
   wrappers.neovim = {
     settings =
-      if osConfig.hostSpec.isDevelopment then
+      if osConfig.hostSpec.isIntrodusDev then
         {
           # Set impure paths to allow hot reloading of `plugin/`, `snippets/`, etc
           unwrappedConfig = "/home/aa/dev/nix/neovim";
@@ -22,8 +23,9 @@
         }
       else
         {
+          hotReload = false;
           # Non-development boxes just use whatever is already in git
-          baseConfig = lib.mkForce "${inputs.introdus}/wrappers/neovim";
+          baseConfig = lib.mkForce "${inputs.introdus-git}/wrappers/neovim";
         };
   };
 }

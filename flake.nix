@@ -282,11 +282,18 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nix-assets = {
+      url = "github:fidgetingbits/nix-assets";
+    };
+
+    pwndbg.url = "github:pwndbg/pwndbg";
+
     #################### Ricing ####################
     stylix = {
       url = "github:danth/stylix/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
     silentSDDM = {
       url = "github:uiriansan/SilentSDDM";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -297,20 +304,22 @@
       url = "git+ssh://git@gitlab.com/fidgetingbits/nix-secrets.git?shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
     fidgetingvim = {
       url = "path:///home/aa/dev/nix/neovim";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
+      inputs.introdus.follows = "introdus";
       inputs.flake-parts.follows = "flake-parts";
     };
 
-    nix-assets = {
-      url = "github:fidgetingbits/nix-assets";
+    introdus-git = {
+      url = "git+ssh://git@codeberg.org/fidgetingbits/introdus?ref=aa";
     };
-    pwndbg.url = "github:pwndbg/pwndbg";
 
     introdus = {
       # url = "git+ssh://git@codeberg.org/fidgetingbits/introdus?ref=aa";
-      url = "path:///home/aa/dev/nix/introdus/aa";
+      # url = "path:///home/aa/dev/nix/introdus/aa";
+      url = "path:///home/aa/dev/nix/introdus/neovim-shared-config/";
     };
   };
 }
