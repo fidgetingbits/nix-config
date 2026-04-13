@@ -145,9 +145,9 @@ in
         u2f = {
           enable = true;
           settings = {
+            # debug = true; # Useful with pamtester or similar to see why something is failing
             cue = false; # Tells user they need to press the button
             authFile = "${homeDirectory}/.config/Yubico/u2f_keys";
-
           };
         };
         services = {
