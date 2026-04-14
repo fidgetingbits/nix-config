@@ -2,7 +2,6 @@
 # Any time you enable a service, rather than specifying the port is allowed, instead you specify the port and a list of
 # IPs you want to accept connections from
 { config, lib, ... }:
-# FIXME: This shouldn't be iptables specific eventually
 
 let
   cfg = config.networking.granularFirewall;
@@ -35,26 +34,6 @@ let
       };
     };
   };
-
-  generateIptablesRules =
-    rule:
-    let
-      allowRules = lib.concatMapStringsSep "\n" (
-        port:
-        lib.concatMapStringsSep "\n" (host: ''
-          iptables -A nixos-fw \
-            -p ${rule.protocol} \
-            --dport ${toString port} \
-            -s ${host.ip} \
-            -j ACCEPT \
-            -m comment --comment "Allow ${host.name} to ${rule.serviceName}"
-        '') rule.hosts
-      ) rule.ports;
-      denyRules = lib.concatMapStringsSep "\n" (port: ''
-        iptables -A nixos-fw -p ${rule.protocol} --dport ${toString port} -j DROP
-      '') rule.ports;
-    in
-    allowRules + "\n" + denyRules;
 in
 {
   options.networking.granularFirewall = {
@@ -66,8 +45,16 @@ in
     };
   };
   config = lib.mkIf cfg.enable {
-    networking.firewall.extraCommands = ''
-      ${lib.concatStringsSep "\n" (map generateIptablesRules cfg.allowedRules)}
-    '';
+    networking.firewall.extraInputRules = lib.concatMapStringsSep "\n" (
+      rule:
+      let
+        ipList = "{ ${lib.concatStringsSep ", " (map (h: h.ip) rule.hosts)} }";
+        portList = "{ ${lib.concatStringsSep ", " (map toString rule.ports)} }";
+      in
+      ''
+        ip saddr ${ipList} ${rule.protocol} dport ${portList} accept comment "Allow ${rule.serviceName}"
+        ${rule.protocol} dport ${portList} drop comment "Deny others to ${rule.serviceName}"
+      ''
+    ) cfg.allowedRules;
   };
 }

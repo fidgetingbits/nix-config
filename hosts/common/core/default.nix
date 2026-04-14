@@ -48,6 +48,8 @@ in
   };
 
   networking.hostName = config.hostSpec.hostName;
+  # Disabled to simplify ip addr output / firewall rules, since not using anywhere anyway
+  networking.enableIPv6 = false;
 
   # System-wide packages, in case we log in as root
   environment.systemPackages = [ pkgs.openssh ];

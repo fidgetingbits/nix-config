@@ -83,6 +83,7 @@
   # Stop blocking on network interfaces not needed for boot
   systemd.network.wait-online.enable = false;
   systemd.services.NetworkManager-wait-online.enable = false;
+  networking.nftables.enable = true;
 
   environment = {
     localBinInPath = true;
