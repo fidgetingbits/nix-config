@@ -15,6 +15,9 @@ in
   ];
   boot.kernelModules = [ "vfio-pci" ];
 
+  # Allow the `virbr0` network bridge through the firewall.
+  networking.firewall.trustedInterfaces = [ "virbr0" ];
+
   # Enable yubikey, and other usb, redirection into a QEMU image
   # https://github.com/NixOS/nixpkgs/issues/39618
   virtualisation.spiceUSBRedirection.enable = true;
