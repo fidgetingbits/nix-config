@@ -58,6 +58,8 @@
 
           # Fuzzy find the specified commit of the current or specified branch.
           # Print it and copy it to the clipboard
+          # FIXME: Add a -f argument so you can fzf select the worktree, then fzf select multiple commits
+          # this way we can map it to something like c-g c-c and select multiple commits to cherry pick, etc
           git-fuzzy-find-commit() {
             if ! git rev-parse --is-inside-work-tree >/dev/null; then
               exit 1
