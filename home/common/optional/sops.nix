@@ -58,12 +58,14 @@ in
           sopsFile = "${sopsFolder}/olan.yaml";
         };
       }
-      # // lib.optionalAttrs osConfig.hostSpec.isDevelopment {
-      #   "tokens/openai" = {
-      #     sopsFile = "${sopsFolder}/shared.yaml";
-      #     path = "${homeDirectory}/.config/openai/token";
-      #   };
-      # }
+      // lib.optionalAttrs osConfig.hostSpec.isDevelopment {
+        "tokens/openai" = {
+          sopsFile = "${sopsFolder}/development.yaml";
+        };
+        "tokens/copilot" = {
+          sopsFile = "${sopsFolder}/development.yaml";
+        };
+      }
       // lib.optionalAttrs osConfig.hostSpec.isWork {
         # FIXME(secrets): Need an activation script to build a config.yml using multiple files (ie: work and personal)
         "config/glab" = {

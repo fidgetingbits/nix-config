@@ -318,8 +318,8 @@
 
     introdus = {
       # url = "git+ssh://git@codeberg.org/fidgetingbits/introdus?ref=aa";
-      # url = "path:///home/aa/dev/nix/introdus/aa";
-      url = "path:///home/aa/dev/nix/introdus/neovim-shared-config/";
+      url = "path:///home/aa/dev/nix/introdus/aa";
+      # url = "path:///home/aa/dev/nix/introdus/neovim-shared-config/";
     };
   };
 }
