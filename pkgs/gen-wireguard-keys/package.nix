@@ -1,21 +1,16 @@
 {
   pkgs,
   lib,
-  ...
 }:
 pkgs.writeShellApplication {
-  name = "host-gen-pass";
+  name = "gen-wireguard-keys";
   runtimeInputs = lib.attrValues {
     inherit (pkgs)
-      ripgrep
-      dovecot
-      phraze
       gum
-      yq
+      wireguard-tools
+      rosenpass
       sops
       ;
-
   };
-
-  text = lib.readFile ./host-gen-pass.sh;
+  text = lib.readFile ./gen-wireguard-keys.sh;
 }

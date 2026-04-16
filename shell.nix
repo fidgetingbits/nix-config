@@ -44,6 +44,7 @@
           ssh-to-age # bootstrap script
           gum # shell script ricing
           host-gen-pass # Generate passwords/sops entries for new host
+          gen-wireguard-keys # Generate wireguard/rosenpass keys
           ;
         inherit (pkgs.introdus)
           bootstrap-nixos # introdus script for bootstrapping new hosts
