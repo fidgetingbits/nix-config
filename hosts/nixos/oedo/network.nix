@@ -37,13 +37,13 @@
   #        if [ "$new_ip_address" = "${network.subnets.ogre.hosts.oedo.ip}" ]; then
   #          ${lib.getBin pkgs.iproute2}/bin/ip route add \
   #            ${network.subnets.lab.cidr} \
-  #            via ${network.subnets.ogre.hosts.ottr.ip} \
+  #            via ${network.subnets.olan.hosts.ottr.ip} \
   #            dev $interface \
   #            2>>/tmp/error
   #        fi
   #        # ${lib.getBin pkgs.iproute2}/bin/ip route add \
   #        #   ${network.subnets.lab.cidr} \
-  #        #   via ${network.subnets.ogre.hosts.ottr.ip} \
+  #        #   via ${network.subnets.olan.hosts.ottr.ip} \
   #        #   dev enp0s20f0u1u4 \
   #        #   2>>/tmp/error
   #    '';
@@ -59,7 +59,7 @@
   #      labRoute = {
   #        address = secrets.networking.subnets.lab.ip;
   #        prefixLength = secrets.networking.subnets.lab.prefixLength;
-  #        via = secrets.networking.subnets.ogre.hosts.ottr.ip;
+  #        via = secrets.networking.subnets.olan.hosts.ottr.ip;
   #      };
   #      interfaceRoutes = lib.attrsets.mergeAttrsList (
   #        lib.map (name: { ${name}.ipv4.routes = [ labRoute ]; }) interfaceNames
@@ -72,7 +72,7 @@
   #    {
   #      address = secrets.networking.subnets.lab.ip;
   #      prefixLength = secrets.networking.subnets.lab.prefixLength;
-  #      via = secrets.networking.subnets.ogre.hosts.ottr.ip;
+  #      via = secrets.networking.subnets.olan.hosts.ottr.ip;
   #    }
   #  ];
   #
@@ -80,7 +80,7 @@
   #    {
   #      address = secrets.networking.subnets.lab.ip;
   #      prefixLength = secrets.networking.subnets.lab.prefixLength;
-  #      via = secrets.networking.subnets.ogre.hosts.ottr.ip;
+  #      via = secrets.networking.subnets.olan.hosts.ottr.ip;
   #    }
   #  ];
 

@@ -26,7 +26,7 @@ let
     })
     |> lib.attrsets.mergeAttrsList;
 
-  hosts = lib.map (d: secrets.networking.subnets.ogre.hosts.${d}) devices;
+  hosts = lib.map (d: secrets.networking.subnets.olan.hosts.${d}) devices;
 
   # Syncthing ports: 8384 for remote access to GUI
   # 22000 TCP and/or UDP for sync traffic

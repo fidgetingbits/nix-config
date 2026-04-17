@@ -3,6 +3,7 @@
   lib,
   config,
   pkgs,
+  namespace,
   ...
 }:
 let
@@ -12,7 +13,7 @@ let
     runtimeInputs = [ pkgs.wakeonlan ];
     text =
       let
-        oppo = config.hostSpec.networking.subnets.ogre.hosts.oppo;
+        oppo = config.hostSpec.networking.subnets.olan.hosts.oppo;
       in
       "wakeonlan ${lib.elemAt oppo.mac 0} -i ${oppo.ip}";
   };
@@ -67,7 +68,6 @@ in
 
           "acme.nix"
           "remote-builder.nix"
-
         ])
     ));
 
@@ -98,8 +98,6 @@ in
   };
 
   services.docuseal.enable = true; # Settings in module
-
-  networking.useDHCP = lib.mkDefault true;
 
   services.heartbeat-check = {
     enable = true;
@@ -153,5 +151,15 @@ in
     notify.to = config.hostSpec.email.moth.backups;
     time = "*-*-* 2:00:00"; # FIXME: Keep sync with other moth/myth times (also tz diff...)
     server = "moth.${config.hostSpec.domain}";
+  };
+  networking.useDHCP = lib.mkDefault true;
+
+  ${namespace}.wireguard = {
+    enable = true;
+    role = "server";
+    externalInterface = "enp3s0";
+    peerNames = [ "ossa" ];
+    networkParams = config.hostSpec.networking.wireguard.olan;
+    hosts = config.hostSpec.networking.subnets.olan.hosts;
   };
 }

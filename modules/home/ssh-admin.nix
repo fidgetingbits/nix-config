@@ -24,7 +24,7 @@ lib.mkIf cfg.isAdmin {
     ];
     ykNoDomainHosts = [
       "oath_gitlab"
-      cfg.networking.subnets.ogre.wildcard
+      cfg.networking.subnets.olan.wildcard
     ]
     ++ lib.optional cfg.isWork secrets.work.git.servers;
   };
@@ -40,8 +40,8 @@ lib.mkIf cfg.isAdmin {
       # any other non-nix subnet entries. Caveat is it will create entries for
       # anything that isn't running ssh, but that's better than listing it all
       # manually imo
-      ogreSubnetHosts =
-        osConfig.hostSpec.networking.subnets.ogre.hosts
+      olanSubnetHosts =
+        osConfig.hostSpec.networking.subnets.olan.hosts
         |> lib.attrNames
         |> lib.filter (name: !(lib.elem name nixosHostNames));
       extraSubnetEntries =
@@ -120,12 +120,12 @@ lib.mkIf cfg.isAdmin {
 
       # Isolated lab network, where IPs overlap all the time
       "lab" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-        host = cfg.networking.subnets.lab.wildcard;
+        host = cfg.networking.subnets.fg-lab.wildcard;
         extraOptions = {
           UserKnownHostsFile = "/dev/null";
           StrictHostKeyChecking = "no";
         };
       };
     }
-    // (extraSubnetEntries ogreSubnetHosts "ogre");
+    // (extraSubnetEntries olanSubnetHosts "olan");
 }

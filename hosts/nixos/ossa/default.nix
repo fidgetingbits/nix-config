@@ -1,9 +1,9 @@
-# Asus Zenbook Flip S13 UX371E
 {
   inputs,
   lib,
   pkgs,
   config,
+  namespace,
   ...
 }:
 {
@@ -150,6 +150,15 @@
         }
       ];
     };
+  };
+
+  ${namespace}.wireguard = {
+    enable = true;
+    role = "client";
+    peerNames = [ "ooze" ];
+    allowedIPs = [ config.hostSpec.networking.wireguard.olan.subnet ];
+    networkParams = config.hostSpec.networking.wireguard.olan;
+    hosts = config.hostSpec.networking.subnets.olan.hosts;
   };
 
 }

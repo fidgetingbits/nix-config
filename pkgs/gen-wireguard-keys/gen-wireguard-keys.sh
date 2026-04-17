@@ -47,10 +47,11 @@ parse_args() {
 
 function sops_set {
     entry=$1
-    if [ $# -gt 1 ]; then
-        secrets="$2" # Override of what secret file to use
-    else
-        secrets="$secrets_file"
+    secrets="$2"
+    if [ ! -f "${secrets}" ]; then
+        gum style --bold "ERROR: "
+        gum log "${secrets} doesn't exist?"
+        exit 1
     fi
     # shellcheck disable=SC2116,SC2086
     sops --config "$sops_config" --set "$entry" "$secrets"
@@ -58,14 +59,16 @@ function sops_set {
 
 function gen_keys() {
     host="${1:-}"
+    gum log "Generating keys for $host"
     rosenpass gen-keys --secret-key "$host"_pqsk --public-key "$host"_pqpk
     wg genkey | tee "$host"_wgsk | wg pubkey >"$host"_wgpk
-    sops_set '["keys"]["wireguard"]["wgsk"] "'"$(cat "$host"_wgsk)"'"'
+    sops_set '["keys"]["wireguard"]["wgsk"] "'"$(cat "$host"_wgsk)"'"' "${NIX_SECRETS_DIR}/sops/${host}.yaml"
     pqsk="$PWD"/"$host"_pqsk
     pqpk="$PWD"/"$host"_pqpk
     cd "$NIX_SECRETS_DIR" || exit
     # Encrypt the pqsk as an individual file due to it being binary format
     sops -e "$pqsk" >sops/"$host"_pqsk
+    chown "$SUDO_UID:$SUDO_GID" sops/"$host"_pqsk
 
     mkdir -p keys || true
     # Copy the binary pubkey file non-encrypted
@@ -74,7 +77,6 @@ function gen_keys() {
 }
 
 parse_args "1" "$@"
-target_hostname="${POSITIONAL_ARGS[0]}"
 
 if [ -z "$NIX_SECRETS_DIR" ]; then
     echo "$(gum style --bold ERROR:) NIX_SECRETS_DIR must point to the nix-secrets folder"
@@ -96,28 +98,18 @@ fi
 DIR=$(mktemp -d -p /root/)
 cd "$DIR" || exit
 
-for name in "${POSITIONAL_ARGS[@]}"; do
-    secrets_file="${NIX_SECRETS_DIR}/sops/${target_hostname}.yaml"
-    if [ ! -f "${secrets_file}" ]; then
-        gum style --bold "ERROR: "
-        gum log "${secrets_file} doesn't exist? Did you forget to bootstrap that host?"
-        exit 1
-    fi
-    gen_keys "$name"
-done
-
-for name in "${POSITIONAL_ARGS[@]}"; do
-    echo "Put the following in nix-secrets network.wireguard.<lan>.peers array:"
-    echo "-----"
-    echo "{"
-    echo "  name = \"$host\";"
-    echo "  publicKey= \"$(cat "$host"_wgpk)\";"
-    echo "}"
-
-done
-
 if [ "${DEBUG:-}" == 1 ]; then
-    echo "Keys were retained in $DIR"
+    echo "Keys will be retained in $DIR"
 else
-    rm -rf "$DIR"
+    trap 'rm -rf "$DIR"' EXIT
 fi
+
+for host in "${POSITIONAL_ARGS[@]}"; do
+    gen_keys "$host"
+done
+
+echo "Put the following in mkHost entry for eeach host in nix-secrets"
+echo "-----"
+for host in "${POSITIONAL_ARGS[@]}"; do
+    echo "${host}: wgpk = \"$(cat "$host"_wgpk)\";"
+done
