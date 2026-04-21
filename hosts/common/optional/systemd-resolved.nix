@@ -2,7 +2,6 @@
 {
   networking.useDHCP = lib.mkForce true;
   services.resolved = {
-
     enable = true;
     llmnr = "false"; # Prevent listening on 0.0.0.0:5355 as we don't need multicast DNS on LAN
     # dnssec breaks on ogre

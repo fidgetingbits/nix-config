@@ -1,10 +1,3 @@
-# Module for configuring pq-safe wireguard server and client
-#
-# Currently tested and setup for ipv4 only. Also assumes you want to derive
-# your wg IPs from your LAN ips
-#
-# See gen-wireguard-keys utility for generating wg/pq keys for multiple hosts
-#
 {
   config,
   lib,
@@ -17,20 +10,7 @@ let
   secretsFolder = builtins.toString inputs.nix-secrets;
   sopsFolder = secretsFolder + "/sops/";
   hostName = config.networking.hostName;
-  iifname = "wg0";
-  mkWireguardPeer = role: host: {
-    publicKey = host.wgpk;
-    allowedIPs = if (role == "client") then cfg.allowedIPs else [ (genWireguardIP host.name) ];
-    endpoint =
-      if (role == "client") then
-        # FIXME: Maybe need a cfg.endpoint instead, in case client doesn't want to use domain?
-        "${host.name}.${config.hostSpec.domain}:${toString cfg.networkParams.wireguardPort}"
-      else
-        null;
-    # Needed on clients for keeping NAT open
-    persistentKeepalive = if role == "client" then 25 else null;
-  };
-  mkWireguardPeers = role: hosts: (map (host: mkWireguardPeer role host) hosts);
+
   mkRosenpassPeer = role: host: {
     public_key = secretsFolder + "/keys/${host.name}_pqpk";
     peer = host.wgpk;
@@ -41,6 +21,7 @@ let
         null;
   };
   mkRosenpassPeers = role: hosts: (map (host: mkRosenpassPeer role host) hosts);
+  # FIXME: These could move to lib.custom.network, since they duplicate with ./server.nix
   subnetPrefix =
     ip:
     ip
@@ -58,6 +39,10 @@ let
     host: "${subnetPrefix cfg.networkParams.subnet}.${lastOctet cfg.hosts.${host}.ip}/32";
 in
 {
+  imports = [
+    ./server.nix
+    ./client.nix
+  ];
   options.${namespace}.wireguard = {
     enable = lib.mkEnableOption "PQ Wireguard";
     role = lib.mkOption {
@@ -66,6 +51,13 @@ in
         "client"
       ];
     };
+    interface = lib.mkOption {
+      type = lib.types.str;
+      default = "wg0";
+      example = "wg0";
+      description = "Name of interface to use for wireguard connection";
+    };
+
     externalInterface = lib.mkOption {
       type = lib.types.str;
       example = "en0";
@@ -93,6 +85,8 @@ in
         subnet = "192.168.0.1/24";
         wiregardPort = 51820;
         rosenpassPort = 9999;
+        dns = "192.168.0.1";
+        domain = "example.com";
       };
       description = "Core information about the wireguard network";
     };
@@ -115,50 +109,40 @@ in
     };
   };
   config = lib.mkIf cfg.enable {
+
+    # See ./client.nix or ./server.nix for role-specific settings
     networking = {
-      nat = lib.mkIf (cfg.role == "server") {
-        enable = true;
-        enableIPv6 = false;
-        internalInterfaces = [ iifname ];
-        inherit (cfg) externalInterface;
-      };
-
-      firewall.allowedUDPPorts = lib.mkIf (cfg.role == "server") [
-        cfg.networkParams.wireguardPort
-        cfg.networkParams.rosenpassPort
-      ];
-
-      wg-quick = {
+      wireguard = {
         interfaces = {
-          ${iifname} = {
-            peers =
-              cfg.peerNames
-              |> map (name: cfg.hosts.${name})
-              # nixfmt hack
-              |> mkWireguardPeers cfg.role;
+          ${cfg.interface} = {
             listenPort = cfg.networkParams.wireguardPort;
-            address = [ (genWireguardIP hostName) ];
+            ips = [ (genWireguardIP hostName) ];
             privateKeyFile = config.sops.secrets."keys/wireguard/wgsk".path;
           };
         };
       };
     };
-
     services.rosenpass = {
       enable = true;
-      defaultDevice = iifname;
+      defaultDevice = cfg.interface;
       settings = {
         verbosity = "Verbose";
         public_key = secretsFolder + "/keys/${hostName}_pqpk";
         secret_key = config.sops.secrets."${hostName}_pqsk".path;
-        listen =
-          if cfg.role == "server" then [ "0.0.0.0:${toString cfg.networkParams.rosenpassPort}" ] else [ ];
         peers =
           cfg.peerNames
           |> map (name: cfg.hosts.${name})
           # nixfmt hack
           |> mkRosenpassPeers cfg.role;
       };
+    };
+
+    systemd.services.rosenpass = {
+      after = [
+        "network-online.target"
+        "wg-quick-${cfg.interface}.service"
+      ];
+      requires = [ "wg-quick-${cfg.interface}.service" ];
     };
 
     sops.secrets = {
@@ -170,12 +154,5 @@ in
         format = "binary";
       };
     };
-
-    assertions = [
-      {
-        assertion = (cfg.role == "server" && cfg.allowedIPs == null);
-        message = "The allowedIPs option shouldn't be set for the server, as it is automatically configured using cfg.hosts";
-      }
-    ];
   };
 }

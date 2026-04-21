@@ -94,7 +94,10 @@ in
 
   services.dyndns = {
     enable = true;
-    subDomain = "ogre";
+    subDomains = [
+      "ogre"
+      "ooze"
+    ];
   };
 
   services.docuseal.enable = true; # Settings in module

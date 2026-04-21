@@ -160,5 +160,4 @@
     networkParams = config.hostSpec.networking.wireguard.olan;
     hosts = config.hostSpec.networking.subnets.olan.hosts;
   };
-
 }

@@ -12,11 +12,11 @@ in
   options = {
     services.dyndns = {
       enable = lib.mkEnableOption "dyndns";
-      subDomain = lib.mkOption rec {
-        type = lib.types.str;
-        default = config.hostSpec.hostName;
+      subDomains = lib.mkOption rec {
+        type = lib.types.listOf lib.types.str;
+        default = [ config.hostSpec.hostName ];
         example = default;
-        description = "Subdomain to update record for. The `foo` in `foo.example.com`.";
+        description = "List of subdomains to update records for. The `foo` in `foo.example.com`.";
       };
     };
 
@@ -28,7 +28,7 @@ in
       zone = config.hostSpec.domain;
       # NOTE: This record must already exist on gandi in order to update it,
       # otherwise will 404
-      domains = [ "${cfg.subDomain}.${config.hostSpec.domain}" ];
+      domains = map (d: "${d}.${config.hostSpec.domain}") cfg.subDomains;
       passwordFile = config.sops.secrets."tokens/gandi".path;
       username = "token";
       extraConfig = ''

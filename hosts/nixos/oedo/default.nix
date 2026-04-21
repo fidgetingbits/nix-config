@@ -106,7 +106,7 @@
   # Redundancy in case ooze goes down
   services.dyndns = {
     enable = true;
-    subDomain = "ogre";
+    subDomains = [ "ogre" ];
   };
   services.fwupd.enable = true;
   environment.systemPackages = [
