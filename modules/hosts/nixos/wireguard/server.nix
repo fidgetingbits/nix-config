@@ -67,7 +67,12 @@ lib.mkIf (cfg.enable && cfg.role == "server") {
   assertions = [
     {
       assertion = cfg.allowedIPs == null;
-      message = "The allowedIPs option shouldn't be set for the server, as it is automatically configured using cfg.hosts";
+      message = "The allowedIPs option shouldn't be set for the server, as it is automatically configured using cfg.hosts.";
     }
+    {
+      assertion = cfg.endpoint == null;
+      message = "The endpoint option shouldn't be set for a server.";
+    }
+
   ];
 }

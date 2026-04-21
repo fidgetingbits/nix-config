@@ -13,9 +13,7 @@ let
   mkWireguardPeer = role: host: {
     publicKey = host.wgpk;
     allowedIPs = cfg.allowedIPs;
-    endpoint =
-      # FIXME: Maybe need a cfg.endpoint instead, in case client doesn't want to use domain?
-      "${host.name}.${config.hostSpec.domain}:${toString cfg.networkParams.wireguardPort}";
+    endpoint = "${cfg.endpoint}:${toString cfg.networkParams.wireguardPort}";
     # Needed on clients for keeping NAT open
     persistentKeepalive = 25;
   };
@@ -23,6 +21,12 @@ let
 in
 lib.mkIf (cfg.enable && cfg.role == "client") {
   # See ./default.nix for shared settings across client/server
+
+  # NOTE: Setting this to unmanaged breaks networking.wireguard as is, maybe only works if you use systemd.networkd
+  # networking.networkmanager.unmanaged = [ "interface-name:${cfg.interface}" ];
+  # Prevent networkmanager messing with resovlectl settings, etc.
+  networking.dhcpcd.denyInterfaces = [ cfg.interface ];
+
   networking = {
     wireguard = {
       interfaces =
@@ -30,9 +34,13 @@ lib.mkIf (cfg.enable && cfg.role == "client") {
           resolvectl = lib.getExe' pkgs.systemd "resolvectl";
         in
         {
+          # FIXME: This should loop over multiple interfaces, since eventually clients will have multiples
           ${cfg.interface} = {
-            # Force endpoint updates in case IP changes (required for wireguard server using dyndns, etc)
+            # FIXME: This could be set if we indicate endpoint is a dns?
+            # Force endpoint updates in case IP changes (required for wireguard server endpoint behind dyndns)
             dynamicEndpointRefreshSeconds = 5;
+
+            allowedIPsAsRoutes = false; # FIXME: Probably want this dependent on how the VPN is setup, this lets me adjust metrics for my LAN
             peers =
               cfg.peerNames
               |> map (name: cfg.hosts.${name})
@@ -42,38 +50,32 @@ lib.mkIf (cfg.enable && cfg.role == "client") {
             # Manually manage routes so we can adjust the metric. This allows staying
             # connected to wireguard while on the LAN, but favoring routing locally. Metric just
             # has to be higher than what we set for LAN (50)
-            # NOTE: This currently routes everything. May need to match AllowedIPs entries or something?
+            preSetup = "set -x";
             postSetup = # bash
               ''
                 ${lib.concatMapStringsSep "\n" (
-                  ip: "ip route add ${ip} dev ${cfg.interface} metric 200"
+                  ip: "ip route replace ${ip} dev ${cfg.interface} metric 200"
                 ) cfg.allowedIPs}
 
-                ${
-                  # FIXME: Maybe just use an enable, like the link above
-                  if (cfg.networkParams ? "domain") then
-                    ''
-                      ${resolvectl} default-route ${cfg.interface} false
-                      ${resolvectl} domain ${cfg.interface} ${
-                        # FIXME: Make this an option probably
-                        lib.concatMapStringsSep " " (domain: "\"~${domain}\"") ([ cfg.networkParams.domain ])
-                      }
-                    ''
-                  else
-                    ""
-                }
+                 ${lib.optionalString (cfg.networkParams ? "domain") ''
+                   # FIXME: This will lneed to change for full tunnel
+                   ${resolvectl} default-route ${cfg.interface} false
+                   ${resolvectl} domain ${cfg.interface} ${
+                     # FIXME: Make this an option probably
+                     lib.concatMapStringsSep " " (domain: "\"~${domain}\"") ([ cfg.networkParams.domain ])
+                   }
+                   ${resolvectl} dns ${cfg.interface} ${cfg.networkParams.dns}
+
+                 ''}
               '';
-            postShutdown = # bash
+            preShutdown = # bash
               ''
-                ${lib.concatMapStrings (ip: "ip route del ${ip} dev ${cfg.interface} metric 200") cfg.allowedIPs}
+                echo "preShutdown"
+                # ${lib.concatMapStrings (ip: "ip route del ${ip} dev ${cfg.interface} metric 200") cfg.allowedIPs}
                 ip route del ${cfg.networkParams.subnet} dev ${cfg.interface} metric 200
               '';
           };
         };
     };
-  };
-  programs.zsh.shellAliases = {
-    "${cfg.interface}-up" = "sudo systemctl start wg-quick-${cfg.interface}";
-    "${cfg.interface}-down" = "sudo systemctl stop wg-quick-${cfg.interface}";
   };
 }

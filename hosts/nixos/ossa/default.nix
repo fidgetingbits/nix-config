@@ -159,5 +159,6 @@
     allowedIPs = [ config.hostSpec.networking.wireguard.olan.subnet ];
     networkParams = config.hostSpec.networking.wireguard.olan;
     hosts = config.hostSpec.networking.subnets.olan.hosts;
+    endpoint = "vpn.${config.hostSpec.domain}";
   };
 }
