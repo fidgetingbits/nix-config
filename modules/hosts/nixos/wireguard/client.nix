@@ -51,6 +51,7 @@ lib.mkIf (cfg.enable && cfg.role == "client") {
             # connected to wireguard while on the LAN, but favoring routing locally. Metric just
             # has to be higher than what we set for LAN (50)
             preSetup = "set -x";
+            # FIXME: Make this writeShellApplication for cleaner tool use
             postSetup = # bash
               ''
                 ${lib.concatMapStringsSep "\n" (
@@ -58,14 +59,19 @@ lib.mkIf (cfg.enable && cfg.role == "client") {
                 ) cfg.allowedIPs}
 
                  ${lib.optionalString (cfg.networkParams ? "domain") ''
-                   # FIXME: This will lneed to change for full tunnel
-                   ${resolvectl} default-route ${cfg.interface} false
-                   ${resolvectl} domain ${cfg.interface} ${
-                     # FIXME: Make this an option probably
-                     lib.concatMapStringsSep " " (domain: "\"~${domain}\"") ([ cfg.networkParams.domain ])
-                   }
-                   ${resolvectl} dns ${cfg.interface} ${cfg.networkParams.dns}
+                    # FIXME: This will lneed to change for full tunnel
+                    ${resolvectl} default-route ${cfg.interface} false
+                    ${resolvectl} domain ${cfg.interface} ${
+                      # FIXME: Make this an option probably
+                      lib.concatMapStringsSep " " (domain: "\"~${domain}\"") ([ cfg.networkParams.domain ])
+                    }
+                    ${resolvectl} dns ${cfg.interface} ${cfg.networkParams.dns}
 
+                   # FIXME: This might be a bit error prone if the defualt route isn't what you want to resolve it with?
+                   # IMPORTANT: Don't resolve the endpoint using the internal DNS. If dynamicEndpointRefreshSeconds is set,
+                   # this will bust the connection
+                   EIFACE=$(ip route show default | ${lib.getExe pkgs.gawk} '/default/ {print $5}' | head -n1)
+                   ${resolvectl} domain "$EIFACE" "~${cfg.endpoint}"
                  ''}
               '';
             preShutdown = # bash

@@ -156,7 +156,10 @@
     enable = true;
     role = "client";
     peerNames = [ "ooze" ];
-    allowedIPs = [ config.hostSpec.networking.wireguard.olan.subnet ];
+    allowedIPs = [
+      config.hostSpec.networking.wireguard.olan.subnet
+      config.hostSpec.networking.subnets.olan.cidr
+    ];
     networkParams = config.hostSpec.networking.wireguard.olan;
     hosts = config.hostSpec.networking.subnets.olan.hosts;
     endpoint = "vpn.${config.hostSpec.domain}";
