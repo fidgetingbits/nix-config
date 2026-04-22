@@ -91,6 +91,10 @@ binds {
     Super+Shift+Q {
         close-window
     }
+    // Disabling hidden built-in
+    Super+Q {
+        spawn "true"
+    }
     // ========== Focus windows/columns ==========
     Super+Z {
         switch-focus-between-floating-and-tiling
