@@ -27,7 +27,7 @@
         p7zip # archive
         pstree # tree-style ps
         lsof # list open files
-        tealdeer # smaller man pages
+        tlrc # official tldr rust client
         eva # cli calculator
         hexyl # hexdump replacement
         grc # colorize output
@@ -95,6 +95,11 @@
   programs = {
     bash.enable = true;
     home-manager.enable = true;
+  };
+
+  services.tldr-update = {
+    enable = true;
+    package = pkgs.tlrc;
   };
 
   introdus.xdg.enable = true;
