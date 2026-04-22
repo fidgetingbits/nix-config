@@ -6,23 +6,8 @@
 }:
 let
   cfg = config.${namespace}.wireguard;
-
-  # FIXME: These could move to lib.custom.network, since they duplicate with ./default.nix
-  subnetPrefix =
-    ip:
-    ip
-    |> lib.splitString "."
-    |> lib.take 3
-    # nixfmt hack
-    |> lib.concatStringsSep ".";
-  lastOctet =
-    ip:
-    ip
-    |> lib.splitString "."
-    # nixfmt hack
-    |> lib.last;
-  genWireguardIP =
-    host: "${subnetPrefix cfg.networkParams.subnet}.${lastOctet cfg.hosts.${host}.ip}/32";
+  inherit (lib.custom.network) triplet lastOctet;
+  genWireguardIP = host: "${triplet cfg.subnet}.${lastOctet cfg.hosts.${host}.ip}/32";
 
   mkWireguardPeer = role: host: {
     publicKey = host.wgpk;
@@ -44,8 +29,8 @@ lib.mkIf (cfg.enable && cfg.role == "server") {
     };
 
     firewall.allowedUDPPorts = [
-      cfg.networkParams.wireguardPort
-      cfg.networkParams.rosenpassPort
+      cfg.wireguardPort
+      cfg.rosenpassPort
     ];
 
     wireguard = {
@@ -62,7 +47,7 @@ lib.mkIf (cfg.enable && cfg.role == "server") {
   };
 
   # See ./default.nix for base settings
-  services.rosenpass.settings.listen = [ "0.0.0.0:${toString cfg.networkParams.rosenpassPort}" ];
+  services.rosenpass.settings.listen = [ "0.0.0.0:${toString cfg.rosenpassPort}" ];
 
   assertions = [
     {
@@ -73,6 +58,5 @@ lib.mkIf (cfg.enable && cfg.role == "server") {
       assertion = cfg.endpoint == null;
       message = "The endpoint option shouldn't be set for a server.";
     }
-
   ];
 }

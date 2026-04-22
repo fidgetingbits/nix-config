@@ -13,7 +13,7 @@ let
   mkWireguardPeer = role: host: {
     publicKey = host.wgpk;
     allowedIPs = cfg.allowedIPs;
-    endpoint = "${cfg.endpoint}:${toString cfg.networkParams.wireguardPort}";
+    endpoint = "${cfg.endpoint}:${toString cfg.wireguardPort}";
     # Needed on clients for keeping NAT open
     persistentKeepalive = 25;
   };
@@ -58,14 +58,13 @@ lib.mkIf (cfg.enable && cfg.role == "client") {
                   ip: "ip route replace ${ip} dev ${cfg.interface} metric 200"
                 ) cfg.allowedIPs}
 
-                 ${lib.optionalString (cfg.networkParams ? "domain") ''
+                 ${lib.optionalString cfg.dns.enable ''
                     # FIXME: This will lneed to change for full tunnel
                     ${resolvectl} default-route ${cfg.interface} false
                     ${resolvectl} domain ${cfg.interface} ${
-                      # FIXME: Make this an option probably
-                      lib.concatMapStringsSep " " (domain: "\"~${domain}\"") ([ cfg.networkParams.domain ])
+                      lib.concatMapStringsSep " " (domain: "\"~${domain}\"") ([ cfg.dns.domain ])
                     }
-                    ${resolvectl} dns ${cfg.interface} ${cfg.networkParams.dns}
+                    ${resolvectl} dns ${cfg.interface} ${cfg.dns.server}
 
                    # FIXME: This might be a bit error prone if the defualt route isn't what you want to resolve it with?
                    # IMPORTANT: Don't resolve the endpoint using the internal DNS. If dynamicEndpointRefreshSeconds is set,
@@ -78,7 +77,7 @@ lib.mkIf (cfg.enable && cfg.role == "client") {
               ''
                 echo "preShutdown"
                 # ${lib.concatMapStrings (ip: "ip route del ${ip} dev ${cfg.interface} metric 200") cfg.allowedIPs}
-                ip route del ${cfg.networkParams.subnet} dev ${cfg.interface} metric 200
+                ip route del ${cfg.subnet} dev ${cfg.interface} metric 200
               '';
           };
         };
