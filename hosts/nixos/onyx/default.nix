@@ -32,7 +32,6 @@ rec {
 
           # Desktop environment and login manager
           # "gdm.nix"
-          "sddm.nix"
           "gnome.nix"
           # "i3wm.nix"
           "niri.nix"

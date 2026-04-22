@@ -29,7 +29,6 @@
 
         # Desktop environment and login manager
         "x11.nix"
-        "sddm.nix"
 
         #"hyprland.nix"
         "gnome.nix"

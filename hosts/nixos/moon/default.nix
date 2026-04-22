@@ -20,7 +20,6 @@
         # Optional common modules
         (map (f: "hosts/common/optional/${f}") [
           # Desktop environment and login manager
-          "sddm.nix"
           "gnome.nix"
 
           # Services

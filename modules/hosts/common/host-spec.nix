@@ -115,6 +115,11 @@
           default = false;
           description = "Indicate a server host";
         };
+        isDesktop = lib.mkOption {
+          type = lib.types.bool;
+          default = !(config.hostSpec.isServer);
+          description = "Indicate a systeming using a desktop environment";
+        };
         isWork = lib.mkOption {
           type = lib.types.bool;
           default = false;
