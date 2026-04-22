@@ -20,7 +20,7 @@ let
   mkRosenpassPeer = role: host: {
     public_key = secretsFolder + "/keys/${host.name}_pqpk";
     peer = host.wgpk;
-    endpoint = lib.optionalString (role == "client") "${cfg.endpoint}:${toString cfg.rosenpassPort}";
+    endpoint = if (role == "client") then "${cfg.endpoint}:${toString cfg.rosenpassPort}" else null;
   };
   mkRosenpassPeers = role: hosts: (map (host: mkRosenpassPeer role host) hosts);
   genWireguardIP = host: "${triplet cfg.subnet}.${lastOctet cfg.hosts.${host}.ip}/32";
@@ -62,7 +62,8 @@ in
       description = "List of allowed IPs for the client when accessing the server";
     };
     endpoint = lib.mkOption {
-      type = lib.types.str;
+      type = lib.types.nullOr lib.types.str;
+      default = null;
       example = "192.168.1.100";
       description = "Server IP or domain for clients to connect to.";
     };

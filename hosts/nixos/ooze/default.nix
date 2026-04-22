@@ -155,13 +155,18 @@ in
   };
   networking.useDHCP = lib.mkDefault true;
 
-  ${namespace}.wireguard = {
-    enable = true;
-    role = "server";
-    externalInterface = "enp3s0";
-    peerNames = [ "ossa" ];
-    hosts = config.hostSpec.networking.subnets.olan.hosts;
-    wireguardPort = config.hostSpec.networking.ports.udp.wireguard;
-    rosenpassPort = config.hostSpec.networking.ports.udp.rosenpass;
-  };
+  ${namespace}.wireguard =
+    let
+      net = config.hostSpec.networking;
+    in
+    {
+      enable = true;
+      role = "server";
+      externalInterface = "enp3s0";
+      peerNames = [ "ossa" ];
+      hosts = net.subnets.olan.hosts;
+      wireguardPort = net.ports.udp.wireguard;
+      rosenpassPort = net.ports.udp.rosenpass;
+      subnet = net.wireguard.olan.subnet;
+    };
 }
