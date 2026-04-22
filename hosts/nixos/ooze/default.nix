@@ -162,7 +162,8 @@ in
     role = "server";
     externalInterface = "enp3s0";
     peerNames = [ "ossa" ];
-    networkParams = config.hostSpec.networking.wireguard.olan;
     hosts = config.hostSpec.networking.subnets.olan.hosts;
+    wireguardPort = config.hostSpec.networking.ports.udp.wireguard;
+    rosenpassPort = config.hostSpec.networking.ports.udp.rosenpass;
   };
 }

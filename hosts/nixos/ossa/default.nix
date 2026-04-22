@@ -152,16 +152,28 @@
     };
   };
 
-  ${namespace}.wireguard = {
-    enable = true;
-    role = "client";
-    peerNames = [ "ooze" ];
-    allowedIPs = [
-      config.hostSpec.networking.wireguard.olan.subnet
-      config.hostSpec.networking.subnets.olan.cidr
-    ];
-    networkParams = config.hostSpec.networking.wireguard.olan;
-    hosts = config.hostSpec.networking.subnets.olan.hosts;
-    endpoint = "vpn.${config.hostSpec.domain}";
-  };
+  ${namespace}.wireguard =
+    let
+      net = config.hostSpec.networking;
+      inherit (config.hostSpec) domain;
+    in
+    {
+      enable = true;
+      role = "client";
+      peerNames = [ "ooze" ];
+      allowedIPs = [
+        net.wireguard.olan.subnet
+        net.subnets.olan.cidr
+      ];
+      hosts = net.subnets.olan.hosts;
+      endpoint = "vpn.${domain}";
+      wireguardPort = net.ports.udp.wireguard;
+      rosenpassPort = net.ports.udp.rosenpass;
+      subnet = net.wireguard.olan.subnet;
+      dns = {
+        enable = true;
+        server = net.subnets.olan.hosts.ogre.ip;
+        inherit domain;
+      };
+    };
 }
