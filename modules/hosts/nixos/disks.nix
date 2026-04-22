@@ -303,9 +303,11 @@ in
       }
       // lib.optionalAttrs config.system.impermanence.enable {
         persistence."${config.hostSpec.persistFolder}" = {
-          files = [
-            "/luks-secondary-unlock.key"
-          ];
+          files =
+            [ ]
+            ++ lib.optionals (cfg.extraDisks != null) [
+              "/luks-secondary-unlock.key"
+            ];
         };
       };
 
