@@ -82,4 +82,9 @@ in
   security.pki.certificates = lib.flatten (
     lib.optional config.hostSpec.isWork secrets.work.certificates
   );
+
+  # Some quirk of impermanence/btrfs wiping that causes /root base to be recreated with 755
+  systemd.tmpfiles.rules = [
+    "d /root 0700 root root - -"
+  ];
 }
