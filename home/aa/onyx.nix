@@ -97,11 +97,6 @@
   # Allows to show talon icon in system tray on X11
   services.snixembed.enable = osConfig.hostSpec.voiceCoding;
 
-  services.yubikey-touch-detector = {
-    enable = true;
-    notificationSound = true;
-  };
-
   # FIXME: Make this part of a module
   services.copyq.enable = true;
 

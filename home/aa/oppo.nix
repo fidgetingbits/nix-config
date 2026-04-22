@@ -44,9 +44,6 @@
       ;
   };
 
-  services.yubikey-touch-detector.enable = true;
-  services.yubikey-touch-detector.notificationSound = true;
-
   # FIXME: Make this gnome-specific
   dconf.settings = {
     "org/gnome/settings-daemon/plugins/power" = {

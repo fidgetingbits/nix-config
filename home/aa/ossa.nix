@@ -94,11 +94,6 @@
   };
   programs.firefox.nativeMessagingHosts = [ pkgs.tridactyl-native ];
 
-  services.yubikey-touch-detector = {
-    enable = true;
-    notificationSound = true;
-  };
-
   # FIXME: Make this part of a module
   services.copyq.enable = true;
 

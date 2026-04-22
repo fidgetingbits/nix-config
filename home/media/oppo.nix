@@ -23,7 +23,4 @@
   home.packages = lib.attrValues {
 
   };
-
-  #services.yubikey-touch-detector.enable = true;
-  #services.yubikey-touch-detector.notificationSound = true;
 }

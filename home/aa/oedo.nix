@@ -74,8 +74,6 @@
     wallpaperDir = "${config.home.homeDirectory}/images/wallpaper/catppuccin-mocha";
   };
 
-  services.yubikey-touch-detector.enable = true;
-  services.yubikey-touch-detector.notificationSound = true;
   services.snixembed.enable = osConfig.hostSpec.voiceCoding;
   system.ssh-motd.enable = true;
   settings.work.enable = osConfig.hostSpec.isWork;
