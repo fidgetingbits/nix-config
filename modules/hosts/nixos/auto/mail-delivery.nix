@@ -1,10 +1,11 @@
-{ config, ... }:
+{ config, lib, ... }:
 let
   hostSpec = config.hostSpec;
   email = hostSpec.email;
 in
-{
-  mail-delivery = rec {
+lib.mkIf hostSpec.isProduction {
+  # FIXME: When isRoaming but using wireguard, we could still use the internal server
+  introdus.mail-delivery = rec {
     enable = true;
     useRelay = hostSpec.isLocal && (!hostSpec.isRoaming);
     emailFrom = email.notifier;

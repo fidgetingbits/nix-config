@@ -28,7 +28,6 @@
         "keyd.nix"
 
         # Host-specific stuff
-        "mail-delivery.nix"
         "plymouth.nix"
         "printing.nix"
         "locale.nix"
@@ -45,7 +44,7 @@
 
         # Window Manager
         #"gnome.nix"
-        "niri.nix"
+        "icons.nix"
 
         # "binaryninja.nix"
         # "cynthion.nix"
@@ -80,13 +79,16 @@
     notify.to = config.hostSpec.email.olanAdmins;
   };
 
-  introdus.system.initrd-wifi = {
-    enable = true;
-    interface = "wlp193s0";
-    drivers = [
-      "mt7925e"
-    ];
-    configFile = lib.custom.relativeToRoot "secrets/wpa_supplicant-olan.conf";
+  introdus = {
+    niri.enable = true;
+    system.initrd-wifi = {
+      enable = true;
+      interface = "wlp193s0";
+      drivers = [
+        "mt7925e"
+      ];
+      configFile = lib.custom.relativeToRoot "secrets/wpa_supplicant-olan.conf";
+    };
   };
 
   services.gnome.gnome-keyring.enable = true;

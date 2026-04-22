@@ -7,6 +7,9 @@
 }:
 {
   config = lib.mkIf config.hostSpec.isDesktop {
-    introdus.services.silent-sddm.enable = true;
+    introdus = {
+      services.audio.enable = true;
+      services.silent-sddm.enable = true;
+    };
   };
 }

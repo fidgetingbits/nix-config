@@ -25,7 +25,6 @@
           "systemd-resolved.nix"
 
           # Misc
-          "mail-delivery.nix"
           "logind.nix"
           "cli.nix"
         ])

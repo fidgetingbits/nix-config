@@ -31,7 +31,6 @@
           "systemd-resolved.nix"
 
           # Misc
-          "mail-delivery.nix"
           "plymouth.nix" # Boot graphics
           "sound.nix"
           "cli.nix"

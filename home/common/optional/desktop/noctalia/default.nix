@@ -28,11 +28,6 @@ in
   ];
 
   home.packages = [
-    # From Mic92:
-    # Qt's wayland QPA leaves QIcon::themeName empty so noctalia falls through
-    # to hicolor and can't find generic icons like user-desktop. The gtk3
-    # platform theme reads gtk-icon-theme-name; ship breeze so that resolves.
-    pkgs.kdePackages.breeze-icons
     pkgs.adwaita-icon-theme
   ];
 

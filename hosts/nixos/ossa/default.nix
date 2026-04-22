@@ -26,11 +26,8 @@
           "printing.nix"
           "locale.nix"
           "sound.nix"
-          # FIXME: Rename this
-          "mail-delivery.nix"
 
-          # Desktop environment and login manager
-          "niri.nix"
+          "icons.nix"
 
           # Miscellaneous
           "podman.nix"
@@ -64,6 +61,8 @@
         ])
     ))
   ];
+
+  introdus.niri.enable = true;
 
   # FIXME: Does this need to be name spaced?
   wifi = {

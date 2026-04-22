@@ -184,9 +184,12 @@ in
     };
 
     # modules/hosts/nixos/mail-delivery module
-    mail-delivery.extraUsers = [
-      config.power.ups.upsmon.user
-    ];
+    introdus.mail-delivery = {
+      enable = true;
+      extraUsers = [
+        config.power.ups.upsmon.user
+      ];
+    };
 
     sops.secrets = {
       "passwords/nut" = {

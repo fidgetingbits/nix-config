@@ -1,12 +1,6 @@
 { ... }:
 {
-  # Enable sound with pipewire.
+  # FIXME: This can probably get dropped, but test
+  # The rest is in introdus
   services.pulseaudio.enable = false;
-  security.rtkit.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-  };
 }

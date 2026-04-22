@@ -63,8 +63,6 @@ in
           "services/atticd.nix"
           "services/postfix-proton-relay.nix"
           "services/unifi.nix" # Unifi Controller
-          # For sending mail via backup scripts. Not sure if should just use postfix locally in this case
-          "mail-delivery.nix"
 
           "acme.nix"
           "remote-builder.nix"

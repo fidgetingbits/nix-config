@@ -1,4 +1,4 @@
-# NOTE: ollama uses a separate storage heirarchy (sha256) than llama-swap, so it's not
+# NOTE: ollama uses a separate storage hierarchy (sha256) than llama-swap, so it's not
 # possible (without scripting) to have them share a model folder. This means there can be
 # huge duplication if running the same models in both (eg: deepseek-r1:70b is ~40gb)
 {
