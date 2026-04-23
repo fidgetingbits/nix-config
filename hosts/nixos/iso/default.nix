@@ -5,7 +5,7 @@
   config,
   ...
 }:
-rec {
+{
   imports = lib.flatten [
     #"${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
     "${inputs.nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-gnome.nix"
@@ -30,12 +30,10 @@ rec {
   environment.etc = {
     isoBuildTime = {
       #
-      text = lib.readFile (
-        "${pkgs.runCommand "timestamp" {
-          # builtins.currentTime requires --impure
-          env.when = builtins.currentTime;
-        } "echo -n `date -d @$when  +%Y-%m-%d_%H-%M-%S` > $out"}"
-      );
+      text = lib.readFile "${pkgs.runCommand "timestamp" {
+        # builtins.currentTime requires --impure
+        env.when = builtins.currentTime;
+      } "echo -n `date -d @$when  +%Y-%m-%d_%H-%M-%S` > $out"}";
     };
   };
 
