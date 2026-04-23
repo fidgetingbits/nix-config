@@ -31,13 +31,10 @@
           git
           pre-commit
           sops
-          deadnix # FIXME: deprecated?
           statix
           git-crypt # encrypt secrets in git not suited for sops
           attic-client # for attic backup
 
-          # FIXME: This needs to switch to being supplied by the introdus-helpers itself
-          yq-go # jq for yaml, used for build scripts
           json-diff # noctalia settings diffing
 
           age # bootstrap script
