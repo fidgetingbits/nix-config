@@ -2,36 +2,37 @@
 {
   hostSpec = {
     hostName = "moon";
-    users = lib.mkForce [
+    users = (lib.mkOverride 100) [
       "admin"
       "ca"
     ];
-    primaryUsername = lib.mkForce "admin";
-    primaryDesktopUsername = lib.mkForce "ca";
+    primaryUsername = (lib.mkOverride 100) "admin";
+    primaryDesktopUsername = (lib.mkOverride 100) "ca";
     # FIXME: deprecate this
-    username = lib.mkForce "admin";
+    username = (lib.mkOverride 100) "admin";
 
     # System type flags
-    isWork = lib.mkForce false;
-    isProduction = lib.mkForce true;
-    isRemote = lib.mkForce true;
-    isImpermanent = lib.mkForce true;
+    isWork = (lib.mkOverride 100) false;
+    isProduction = (lib.mkOverride 100) true;
+    isRemote = (lib.mkOverride 100) true;
+    isImpermanent = (lib.mkOverride 100) true;
+    isMinimal = (lib.mkOverride 100) false;
 
     # Functionality
     # FIXME: Separate this out to allow yubikey for incoming auth but not physical yubikey plugged in
-    useYubikey = lib.mkForce false;
-    useNeovimTerminal = lib.mkForce true;
-    useAtticCache = lib.mkForce false;
+    useYubikey = (lib.mkOverride 100) false;
+    useNeovimTerminal = (lib.mkOverride 100) true;
+    useAtticCache = (lib.mkOverride 100) false;
 
     # Graphical
     defaultDesktop = "gnome";
-    useWayland = lib.mkForce true;
-    hdr = lib.mkForce true;
-    scaling = lib.mkForce "2";
-    isAutoStyled = lib.mkForce true;
+    useWayland = (lib.mkOverride 100) true;
+    hdr = (lib.mkOverride 100) true;
+    scaling = (lib.mkOverride 100) "2";
+    isAutoStyled = (lib.mkOverride 100) true;
     wallpaper = "${inputs.nix-assets}/images/wallpapers/botanical_garden.webp";
-    persistFolder = lib.mkForce "/persist";
-    timeZone = lib.mkForce "America/Edmonton";
+    persistFolder = (lib.mkOverride 100) "/persist";
+    timeZone = (lib.mkOverride 100) "America/Edmonton";
   };
 
 }

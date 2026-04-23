@@ -60,8 +60,8 @@ in
   # rework it. Ideally want to check something like isRemotelyManaged, but
   # will have to be like isDarwin outside of host-spec
   hostSpec = {
-    primaryUsername = "aa";
-    username = "aa"; # FIXME: deprecate
+    primaryUsername = lib.mkDefault "aa";
+    username = lib.mkDefault "aa"; # FIXME: deprecate
     users = [ "aa" ];
     handle = "fidgetingbits";
     inherit (secrets)
