@@ -100,6 +100,7 @@ in
     in
     {
       useGlobalPkgs = true;
+
       # useUserPackages = true;
       extraSpecialArgs = {
         inherit

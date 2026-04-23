@@ -17,6 +17,7 @@
       "hosts/common/optional/minimal-user.nix"
       "hosts/common/optional/keyd.nix"
       "modules/hosts/common/host-spec.nix"
+      "modules/hosts/nixos/auto/warnings.nix"
     ])
     (
       let
