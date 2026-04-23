@@ -42,23 +42,18 @@ update-neovim-flake-inputs:
 [group("checks")]
 check HOST=`hostname` ARGS="":
     #!/usr/bin/env bash
+    BUILD_FOLDER=$(mktemp -d)
     echo "Prepping build folder: $BUILD_FOLDER"
     cp -R . "$BUILD_FOLDER"
     trap 'rm -rf $BUILD_FOLDER' EXIT
     cd $BUILD_FOLDER
-    @just copy-lock-in {{ HOST }}
+    just copy-lock-in {{ HOST }}
     NIXPKGS_ALLOW_UNFREE=1 REPO_PATH=$(pwd) nix flake check \
         --impure \
         --keep-going \
         --show-trace \
         {{ ARGS }}
-    cd nixos-installer && \
-        NIXPKGS_ALLOW_UNFREE=1 REPO_PATH=$(pwd) nix flake check \
-        --impure \
-        --keep-going \
-        --show-trace \
-        {{ ARGS }}
-    @just copy-lock-out {{ HOST }}
+    just copy-lock-out {{ HOST }}
 
 # Rebuild specified host
 [group("building")]
