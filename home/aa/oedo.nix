@@ -38,8 +38,6 @@
 
           "wine.nix"
 
-          #"wezterm.nix"
-          #"kitty.nix"
           "ghostty.nix"
 
           # Tied to an enable probably

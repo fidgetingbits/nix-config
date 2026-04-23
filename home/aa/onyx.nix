@@ -23,9 +23,7 @@
           "helper-scripts"
           "sops.nix"
           "gpg.nix"
-          #common/optional/kitty.nix
           "ghostty.nix"
-          #common/optional/wezterm.nix
           "gnome-terminal.nix"
           "media.nix"
           "graphics.nix"
