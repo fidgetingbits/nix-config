@@ -2,32 +2,29 @@
 {
   hostSpec = {
     hostName = "ossa";
-    users = lib.mkForce [
-      "aa"
-    ];
-    primaryUsername = lib.mkForce "aa";
+    primaryUsername = (lib.mkOverride 100) "aa";
 
     # System type flags
-    isWork = lib.mkForce true;
-    isDevelopment = lib.mkForce true;
-    isRoaming = lib.mkForce true;
-    isAdmin = lib.mkForce true;
-    isAutoStyled = lib.mkForce true;
-    isProduction = lib.mkForce true;
+    isWork = (lib.mkOverride 100) true;
+    isDevelopment = (lib.mkOverride 100) true;
+    isRoaming = (lib.mkOverride 100) true;
+    isAdmin = (lib.mkOverride 100) true;
+    isAutoStyled = (lib.mkOverride 100) true;
+    isProduction = (lib.mkOverride 100) true;
     isAmdGpu = true;
 
-    isImpermanent = lib.mkForce true;
-    persistFolder = lib.mkForce "/persist";
+    isImpermanent = (lib.mkOverride 100) true;
+    persistFolder = (lib.mkOverride 100) "/persist";
 
     # Functionality
-    useNeovimTerminal = lib.mkForce true;
-    useAtticCache = lib.mkForce true;
-    useYubikey = lib.mkForce true;
+    useNeovimTerminal = (lib.mkOverride 100) true;
+    useAtticCache = (lib.mkOverride 100) true;
+    useYubikey = (lib.mkOverride 100) true;
 
     # Desktop
-    useWayland = lib.mkForce true;
-    useWindowManager = lib.mkForce true;
-    scaling = lib.mkForce "2";
+    useWayland = (lib.mkOverride 100) true;
+    useWindowManager = (lib.mkOverride 100) true;
+    scaling = (lib.mkOverride 100) "2";
     wallpaper = "${inputs.nix-assets}/images/wallpapers/astronaut.webp";
     defaultDesktop = "niri-uwsm";
   };

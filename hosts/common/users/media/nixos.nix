@@ -18,6 +18,8 @@
       ])
     ];
 
+}
+// lib.optionalAttrs (!config.hostSpec.isMinimal) {
   # Avatar used by login managers like SDDM (must be PNG)
   icon = "${inputs.nix-assets}/images/avatars/corgi-boba.png";
 }

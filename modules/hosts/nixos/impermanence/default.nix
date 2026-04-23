@@ -168,6 +168,8 @@ in
               }
 
             ]
+            # FIXME: This breaks because of duplication of /home/aa apparently?
+            # Where is that normally getting set even?
             ++ lib.optional config.system.impermanence.autoPersistHomes (
               map (user: {
                 directory = "${if pkgs.stdenv.isDarwin then "/Users" else "/home"}/${user}";

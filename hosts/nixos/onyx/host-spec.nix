@@ -2,25 +2,26 @@
 {
   hostSpec = {
     hostName = "onyx";
-    isWork = lib.mkForce true;
-    voiceCoding = lib.mkForce false;
-    useYubikey = lib.mkForce true;
-    useWayland = lib.mkForce true;
-    useWindowManager = lib.mkForce true;
-    isAutoStyled = lib.mkForce true;
-    useNeovimTerminal = lib.mkForce true;
-    hdr = lib.mkForce true;
-    scaling = lib.mkForce "2";
-    isProduction = lib.mkForce true;
-    useAtticCache = lib.mkForce true;
-    isDevelopment = lib.mkForce true;
-    isRoaming = lib.mkForce true;
-    isAdmin = lib.mkForce true;
-    users = lib.mkForce [
+    primaryUsername = "aa";
+    isWork = (lib.mkOverride 100) true;
+    voiceCoding = (lib.mkOverride 100) false;
+    useYubikey = (lib.mkOverride 100) true;
+    useWayland = (lib.mkOverride 100) true;
+    useWindowManager = (lib.mkOverride 100) true;
+    isAutoStyled = (lib.mkOverride 100) true;
+    useNeovimTerminal = (lib.mkOverride 100) true;
+    hdr = (lib.mkOverride 100) true;
+    scaling = (lib.mkOverride 100) "2";
+    isProduction = (lib.mkOverride 100) true;
+    useAtticCache = (lib.mkOverride 100) true;
+    isDevelopment = (lib.mkOverride 100) true;
+    isRoaming = (lib.mkOverride 100) true;
+    isAdmin = (lib.mkOverride 100) true;
+    users = (lib.mkOverride 100) [
       "aa"
     ];
     wallpaper = "${inputs.nix-assets}/images/wallpapers/astronaut.webp";
     defaultDesktop = "niri-uwsm";
-    persistFolder = lib.mkForce "";
+    persistFolder = (lib.mkOverride 100) "";
   };
 }

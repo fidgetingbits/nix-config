@@ -48,6 +48,7 @@ check HOST=`hostname` ARGS="":
     trap 'rm -rf $BUILD_FOLDER' EXIT
     cd $BUILD_FOLDER
     just copy-lock-in {{ HOST }}
+
     NIXPKGS_ALLOW_UNFREE=1 REPO_PATH=$(pwd) nix flake check \
         --impure \
         --keep-going \

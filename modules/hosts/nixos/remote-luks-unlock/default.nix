@@ -39,8 +39,12 @@ in
             # FIXME: If this key doesn't exist, it actually bails on pathExists and not throwing the assert message
             # but using lib.types.str didn't seem to fix it. Don't feel like digging atm... as long as it errors
             key = lib.mkOption rec {
-              type = lib.types.path;
-              default = lib.custom.relativeToRoot "hosts/nixos/${config.hostSpec.hostName}/initrd_ed25519_key";
+              type = lib.types.nullOr lib.types.path;
+              default =
+                if config.services.remoteLuksUnlock.enable then
+                  lib.custom.relativeToRoot "hosts/nixos/${config.hostSpec.hostName}/initrd_ed25519_key"
+                else
+                  null;
               example = default;
               description = ''
                 sshd private key as generated with `ssh-keygen -t ed25519 -f initrd_ed25519_key` or similar.\n
@@ -235,7 +239,10 @@ in
       };
     assertions = [
       {
-        assertion = lib.pathExists "${config.services.remoteLuksUnlock.ssh.key}";
+        assertion = (
+          config.services.remoteLuksUnlock.enable
+          && lib.pathExists "${config.services.remoteLuksUnlock.ssh.key}"
+        );
         message = ''
           You must generate an ssh key:
             ssh-keygen -t ed25519 -f ${config.services.remoteLuksUnlock.ssh.key}

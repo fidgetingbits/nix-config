@@ -5,21 +5,22 @@
   hostSpec = {
     # Read current directory to get the host name
     hostName = "oppo";
-    isWork = lib.mkForce false;
-    useYubikey = lib.mkForce true;
-    isAutoStyled = lib.mkForce true;
-    wifi = lib.mkForce false;
-    useNeovimTerminal = lib.mkForce true;
-    hdr = lib.mkForce true;
-    scaling = lib.mkForce "2";
-    isProduction = lib.mkForce true;
-    isDevelopment = lib.mkForce true;
-    isIntrodusDev = lib.mkForce false;
-    isImpermanent = lib.mkForce true;
+    primaryUsername = (lib.mkOverride 100) "aa";
+    isWork = (lib.mkOverride 100) false;
+    useYubikey = (lib.mkOverride 100) true;
+    isAutoStyled = (lib.mkOverride 100) true;
+    wifi = (lib.mkOverride 100) false;
+    useNeovimTerminal = (lib.mkOverride 100) true;
+    hdr = (lib.mkOverride 100) true;
+    scaling = (lib.mkOverride 100) "2";
+    isProduction = (lib.mkOverride 100) true;
+    isDevelopment = (lib.mkOverride 100) true;
+    isIntrodusDev = (lib.mkOverride 100) false;
+    isImpermanent = (lib.mkOverride 100) true;
 
-    persistFolder = lib.mkForce "/persist";
-    useWayland = lib.mkForce true;
-    users = lib.mkForce [
+    persistFolder = (lib.mkOverride 100) "/persist";
+    useWayland = (lib.mkOverride 100) true;
+    users = (lib.mkOverride 100) [
       "aa"
       "media"
     ];

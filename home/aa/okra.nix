@@ -1,7 +1,7 @@
-{ lib, ... }:
+{ lib, inputs, ... }:
 {
-  imports = (
-    map lib.custom.relativeToRoot (
+  imports =
+    (map lib.custom.relativeToRoot (
       [
         "home/common/core"
         "home/common/core/nixos.nix"
@@ -11,7 +11,8 @@
         (map (f: "home/common/optional/${f}") [
           "gnome-terminal.nix"
         ])
-    )
-  );
+
+    ))
+    ++ [ inputs.stylix.homeModules.stylix ];
 
 }

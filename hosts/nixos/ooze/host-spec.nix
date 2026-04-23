@@ -2,6 +2,7 @@
 {
   hostSpec = {
     hostName = "ooze";
+    primaryUsername = lib.mkForce "aa";
     isProduction = lib.mkForce true;
     isServer = lib.mkForce true;
     persistFolder = lib.mkForce "/persist";

@@ -12,9 +12,11 @@ stdenvNoCC.mkDerivation (finalAttrs: rec {
   dontConfigure = true;
   dontBuild = true;
 
-  recipients = recipients;
-  deliverer = deliverer;
-  sshPort = sshPort;
+  # FIXME: I don't set to null because the null check triggers on
+  # nix flake check, even though all configurations set it...
+  recipients = [ "" ];
+  deliverer = "";
+  sshPort = "";
 
   installPhase =
     let

@@ -62,7 +62,7 @@ in
   hostSpec = {
     primaryUsername = lib.mkDefault "aa";
     username = lib.mkDefault "aa"; # FIXME: deprecate
-    users = [ "aa" ];
+    # users = [ "aa" ];
     handle = "fidgetingbits";
     inherit (secrets)
       domain

@@ -185,7 +185,6 @@ in
 
     # modules/hosts/nixos/mail-delivery module
     introdus.mail-delivery = {
-      enable = true;
       extraUsers = [
         config.power.ups.upsmon.user
       ];

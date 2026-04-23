@@ -11,6 +11,7 @@ in
 {
   imports = (
     lib.map lib.custom.relativeToRoot [
+
       "modules/hosts/common"
       "hosts/common/users"
       "hosts/common/optional/minimal-user.nix"
@@ -21,6 +22,10 @@ in
 
     ]
     ++ [
+      # This is needed to appease auto modules, but we don't actually use it
+      # FIXME: could probably move this so it's shared?
+      inputs.sops-nix.nixosModules.sops
+
       inputs.introdus.nixosModules.default
     ]
   );
@@ -34,6 +39,8 @@ in
         isMinimal = lib.mkForce true;
         isAutoStyled = lib.mkForce false;
         useAtticCache = lib.mkForce false;
+        # appease raid stuff
+        email.admin = "admin@${config.hostSpec.domain}";
       };
 
       fileSystems."/boot".options = [ "umask=0077" ]; # Removes permissions and security warnings.
@@ -54,7 +61,7 @@ in
 
       # Allow ssh unlock for minimal installs
       services.remoteLuksUnlock = {
-        enable = true;
+        enable = config.system.disks.luks.enable;
         ssh = {
           users = [ "root" ];
           port = 10022;

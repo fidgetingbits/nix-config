@@ -18,7 +18,7 @@ in
       # Ensure this runs first
       aaa-check-flake-lock = {
         # NOTE: This is a hack because of a pre-commit bug interaction with my per-host flake locking and the need
-        # to temporariliy stage flake.lock files. Then the pre-commit hooks run and tries to change something
+        # to temporarily stage flake.lock files. Then the pre-commit hooks run and tries to change something
         # it will try to stash, but stashing will break with the flake.lock stuff, and ultimately it wipes
         # out all unstaged changes for git-tracked files which is maddening
         # You end up with something like this:
@@ -39,7 +39,7 @@ in
         name = "check-flake-lock";
         entry = "${./check-flake-lock.sh}";
         fail_fast = true; # Bail immediately if this fails
-        files = ".*";
+        files = "^flake\\.lock$";
         language = "script";
         #pass_on_error = false;
       };

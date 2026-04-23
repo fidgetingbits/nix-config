@@ -16,7 +16,6 @@
     isProduction = (lib.mkOverride 100) true;
     isRemote = (lib.mkOverride 100) true;
     isImpermanent = (lib.mkOverride 100) true;
-    isMinimal = (lib.mkOverride 100) false;
 
     # Functionality
     # FIXME: Separate this out to allow yubikey for incoming auth but not physical yubikey plugged in

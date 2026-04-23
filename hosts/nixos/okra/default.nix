@@ -51,7 +51,7 @@
 
   # We need IPv6 in order to access hetzner cloud
   #networking.networkmanager.enable = true;
-  networking.enableIPv6 = true;
+  networking.enableIPv6 = lib.mkForce true;
 
   # Keyring, required for auth even without gnome
   # This is used by VSCode, so we want it to be enabled

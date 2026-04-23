@@ -3,7 +3,7 @@ let
   hostSpec = config.hostSpec;
   email = hostSpec.email;
 in
-lib.mkIf hostSpec.isProduction {
+lib.mkIf ((hostSpec.isMinimal == false) && hostSpec.isProduction) {
   # FIXME: When isRoaming but using wireguard, we could still use the internal server
   introdus.mail-delivery = rec {
     enable = true;

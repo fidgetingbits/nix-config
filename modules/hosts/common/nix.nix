@@ -152,7 +152,7 @@ in
         };
 
         extraOptions = ''
-          ${lib.optionalString ((config ? "sops") && (hostSpec.isLocal)) ''
+          ${lib.optionalString (hostSpec.isLocal && hostSpec.isMinimal == false) ''
             # Access token prevents github rate limiting if you have to nix flake update a bunch
             # Only local systems are used to build anything, so only include there
             !include ${config.sops.secrets."tokens/nix-access-tokens".path}

@@ -5,17 +5,18 @@ in
 {
   hostSpec = {
     hostName = "oedo";
-    isWork = lib.mkForce false;
-    voiceCoding = lib.mkForce false;
-    useYubikey = lib.mkForce true;
-    wifi = lib.mkForce true;
-    useNeovimTerminal = lib.mkForce true;
-    persistFolder = lib.mkForce "/persist";
-    isImpermanent = lib.mkForce true;
-    isProduction = lib.mkForce true;
-    isAutoStyled = lib.mkForce true;
-    isDevelopment = lib.mkForce true;
-    isAdmin = lib.mkForce true;
+    primaryUsername = "aa";
+    isWork = (lib.mkOverride 100) false;
+    voiceCoding = (lib.mkOverride 100) false;
+    useYubikey = (lib.mkOverride 100) true;
+    wifi = (lib.mkOverride 100) true;
+    useNeovimTerminal = (lib.mkOverride 100) true;
+    persistFolder = (lib.mkOverride 100) "/persist";
+    isImpermanent = (lib.mkOverride 100) true;
+    isProduction = (lib.mkOverride 100) true;
+    isAutoStyled = (lib.mkOverride 100) true;
+    isDevelopment = (lib.mkOverride 100) true;
+    isAdmin = (lib.mkOverride 100) true;
 
     useAtticCache = highPrio true;
 
