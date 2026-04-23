@@ -117,7 +117,6 @@ in
       ];
       system.stateVersion = "23.11";
     }
-    # FIXME: This doesn't work yet, because /etc/wpa_supplicant doesn't work...
     (lib.mkIf useWpaSupplicant {
 
       networking.wireless = {
