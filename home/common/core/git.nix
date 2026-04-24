@@ -52,7 +52,8 @@
             if ! git rev-parse --is-inside-work-tree >/dev/null; then
               exit 1
             fi
-            git log --oneline "$@" | head -1 | awk "{print \$1}" | wl-copy
+            commit=$(git log --oneline "$@" | head -1 | awk "{print \$1}")
+            git rev-parse "$commit" | wl-copy
             echo "$(wl-paste)"
           }
 
@@ -64,12 +65,13 @@
             if ! git rev-parse --is-inside-work-tree >/dev/null; then
               exit 1
             fi
-            glo "$@" | \
+            commit=$(glo "$@" | \
               fzf --ansi --preview "git show --color=always {1}" | \
               sed 's/\x1b\[[0-9;]*m//g' | \
-              awk "{print \$1}" | \
-              wl-copy
-              echo "$(wl-paste)"
+              awk "{print \$1}"
+            )
+            git rev-parse "$commit" | wl-copy
+            echo "$(wl-paste)"
           }
         '';
   };
