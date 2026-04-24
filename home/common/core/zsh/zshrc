@@ -8,10 +8,10 @@ if [[ -n $SSH_CONNECTION ]]; then
 fi
 
 # For neovim 0.11 [[ and ]] prompt motions
-_osc133_precmd() {
+function _osc133_precmd() {
     printf "\033]133;A\007"
 }
-_osc133_preexec() {
+function _osc133_preexec() {
     printf "\033]133;C\007"
 }
 autoload -Uz add-zsh-hook
@@ -143,6 +143,31 @@ function fzf_auto_select() {
 function fzf_closest() {
     fzf --filter="$1" | head -n 1
 }
+
+# Custom fzf function that reads the current word on the command line to
+# allow fuzzy directory selection from a fixed point
+function fzf-context-aware-widget() {
+    # Get the word left of the cursor
+    local current_word="${LBUFFER##* }"
+
+    # If the word is a valid directory, use it as the search root
+    local search_root="."
+    if [[ -d "$current_word" ]]; then
+        search_root="$current_word"
+    fi
+
+    local selected
+    selected=$(fd . "$search_root" | fzf)
+
+    if [[ -n "$selected" ]]; then
+        # Remove the partial word we typed and replace it with the selection
+        LBUFFER="${LBUFFER%${current_word}}${selected}"
+    fi
+    zle reset-prompt
+}
+
+zle -N fzf-context-aware-widget
+bindkey '^T' fzf-context-aware-widget
 
 # Fuzzy find file and jump to it's directory. Automatically select fzf result if only one match.
 function cdf() {
