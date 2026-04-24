@@ -71,14 +71,14 @@
       # window management
       snixembed # Old school system tray (talon icon, etc)
 
-      # ricing
-      plymouth # bootscreen
-      adi1090x-plymouth-themes # https://github.com/adi1090x/plymouth-themes
-
       # gnupg - see yubikey.nix
       paperkey # printed gpg key backup utilitie
       pinentry-curses # for gpg-agent
       pinentry-gtk2 # for gpg-agent
       ;
+  };
+
+  introdus = {
+    plymouth.enable = true;
   };
 }

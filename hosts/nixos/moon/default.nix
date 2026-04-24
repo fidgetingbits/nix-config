@@ -31,7 +31,6 @@
           "systemd-resolved.nix"
 
           # Misc
-          "plymouth.nix" # Boot graphics
           "sound.nix"
           "cli.nix"
           "fonts.nix"
@@ -47,6 +46,10 @@
   wifi = {
     enable = true;
     wlans = [ "moon" ];
+  };
+
+  introdus = {
+    plymouth.enable = true;
   };
 
   system.impermanence.enable = true;

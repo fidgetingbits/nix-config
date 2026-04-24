@@ -21,8 +21,6 @@
 
         # Host-specific stuff
         "keyd.nix"
-        # WARNING: Blocks on boot on both gpus atm (Granite Ridge and 9070XT)
-        #"plymouth.nix"
         "locale.nix"
         "sound.nix"
 
@@ -178,4 +176,10 @@
   };
 
   modules.hardware.radeon.enable = true;
+
+  introdus = {
+    # WARNING: Needs retest. Used to block on boot on both gpus
+    # Granite Ridge and 9070XT
+    plymouth.enable = false; # Was
+  };
 }

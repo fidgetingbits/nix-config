@@ -23,7 +23,6 @@ rec {
         (map (f: "hosts/common/optional/${f}") [
           # Host-specific stuff
           "keyd.nix"
-          "plymouth.nix"
           "printing.nix"
           "locale.nix"
           "sound.nix"
@@ -74,7 +73,10 @@ rec {
     roaming = config.hostSpec.isRoaming;
   };
 
-  introdus.niri.enable = true;
+  introdus = {
+    niri.enable = true;
+    plymouth.enable = true;
+  };
 
   # Just set the console font, don't mess with the font settings
   #console.font = lib.mkDefault "${pkgs.terminus_font}/share/consolefonts/ter-v32n.psf.gz";

@@ -28,7 +28,6 @@
         "keyd.nix"
 
         # Host-specific stuff
-        "plymouth.nix"
         "printing.nix"
         "locale.nix"
         "sound.nix"
@@ -81,6 +80,7 @@
 
   introdus = {
     niri.enable = true;
+    plymouth.enable = true;
     system.initrd-wifi = {
       enable = true;
       interface = "wlp193s0";

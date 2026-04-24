@@ -22,7 +22,6 @@
         (map (f: "hosts/common/optional/${f}") [
           # Host-specific stuff
           "keyd.nix"
-          "plymouth.nix"
           "printing.nix"
           "locale.nix"
           "sound.nix"
@@ -62,7 +61,10 @@
     ))
   ];
 
-  introdus.niri.enable = true;
+  introdus = {
+    niri.enable = true;
+    plymouth.enable = true;
+  };
 
   # FIXME: Does this need to be name spaced?
   wifi = {
