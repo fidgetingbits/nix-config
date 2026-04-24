@@ -2,7 +2,8 @@
 //
 // ========== Animations ==========
 //
-include "animations/glitch_01.kdl"
+// NOTE: Using .kdlx to avoid kdlfmt mangling the raw string
+include "animations/glitch_01.kdlx"
 // include "animations/glitch_00.kdl"
 // include "animations/pixelate.kdl"
 animations {

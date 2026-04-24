@@ -97,7 +97,8 @@
                   # Minimal modules for quick setup
                   "modules/hosts/common/host-spec.nix"
                   "modules/hosts/nixos/disks.nix"
-                  "modules/hosts/nixos/impermanence"
+                  # FIXME: verify this gets auto-loaded
+                  # "modules/hosts/nixos/impermanence"
 
                   "hosts/nixos/${host}/host-spec.nix"
                   "hosts/nixos/${host}/disks.nix"

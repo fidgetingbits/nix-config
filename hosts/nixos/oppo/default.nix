@@ -60,10 +60,6 @@
     };
   services.blueman.enable = true;
 
-  system.impermanence = {
-    enable = true;
-    autoPersistHomes = true;
-  };
   boot = {
     # Cooling / RGB
     kernelModules = [

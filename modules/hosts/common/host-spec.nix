@@ -266,9 +266,7 @@
     # FIXME: Add an assertion that the wifi category has a corresponding wifi.<cat>.yaml file in nix-secerts/sops/
     assertions =
       let
-        # We import these options to both HM and NixOS, so need to not fail on HM
-        isImpermanent =
-          config ? "system" && config.system ? "impermanence" && config.system.impermanence.enable;
+        isImpermanent = config.introdus.impermanence.enable;
       in
       [
         {
@@ -278,7 +276,7 @@
         }
         {
           assertion = !isImpermanent || (isImpermanent && !("${config.hostSpec.persistFolder}" == ""));
-          message = "config.system.impermanence.enable is true but no persistFolder path is provided";
+          message = "config.config.impermanence.enable is true but no persistFolder path is provided";
         }
         {
           assertion = !(config.hostSpec.voiceCoding && config.hostSpec.useWayland);

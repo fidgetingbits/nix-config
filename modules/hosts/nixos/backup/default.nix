@@ -13,7 +13,7 @@
 let
   cfg = config.services.backup;
   hasPerNetworkServices = lib.hasAttr "per-network-services" config.services;
-  hasImpermanence = (config.system ? impermanence && config.system.impermanence.enable);
+  hasImpermanence = config.introdus.impermanence.enable;
 
   hostName = config.networking.hostName;
   homeBase = if pkgs.stdenv.isLinux then "/home" else "/Users";

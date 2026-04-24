@@ -46,21 +46,19 @@ in
       startLimitBurst = 50;
     };
 
-    environment =
-      lib.optionalAttrs (config.system ? impermanence && config.system.impermanence.enable)
-        {
-          persistence = {
-            "${config.hostSpec.persistFolder}".directories = [
-              {
-                # NOTE: systemd Dynamic User requires /var/lib/private to be
-                # 0700. See impermanence module
-                directory = "/var/lib/private/ddclient";
-                user = "nobody";
-                group = "nogroup";
-              }
-            ];
-          };
-        };
+    environment = lib.optionalAttrs config.introdus.impermanence.enable {
+      persistence = {
+        "${config.hostSpec.persistFolder}".directories = [
+          {
+            # NOTE: systemd Dynamic User requires /var/lib/private to be
+            # 0700. See impermanence module
+            directory = "/var/lib/private/ddclient";
+            user = "nobody";
+            group = "nogroup";
+          }
+        ];
+      };
+    };
 
     sops.secrets."tokens/gandi" = {
       sopsFile = "${sopsFolder}/${config.hostSpec.hostName}.yaml";

@@ -106,7 +106,6 @@
     enable = true;
     notify.to = config.hostSpec.email.olanAdmins;
   };
-  system.impermanence.enable = true;
 
   #  virtualisation.appvm = {
   #    enable = true;
@@ -120,7 +119,7 @@
   programs.ccache.enable = true;
   nix.settings.extra-sandbox-paths = [ config.programs.ccache.cacheDir ];
   environment.persistence.${config.hostSpec.persistFolder}.directories =
-    lib.mkIf config.system.impermanence.enable
+    lib.mkIf config.introdus.impermanence.enable
       [
         # CCache
         (lib.mkIf config.programs.ccache.enable {

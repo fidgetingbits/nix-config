@@ -69,8 +69,6 @@ in
         ])
     ));
 
-  system.impermanence.enable = true;
-
   nixpkgs.config.nvidia.acceptLicense = true;
 
   services.backup = {

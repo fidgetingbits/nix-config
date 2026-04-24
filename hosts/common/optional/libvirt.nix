@@ -120,7 +120,7 @@ in
       pkgs.qemu
     ];
   }
-  // lib.optionalAttrs config.system.impermanence.enable {
+  // lib.optionalAttrs config.introdus.impermanence.enable {
     persistence = {
       "${config.hostSpec.persistFolder}".directories = [ "/var/lib/libvirt" ];
     };

@@ -19,14 +19,12 @@ in
       # It'll always be me reinstalling, so always use my bindings
       "hosts/common/optional/keyd.nix"
       "modules/hosts/nixos/remote-luks-unlock/"
-      "modules/hosts/nixos/impermanence"
-
+      # "modules/hosts/nixos/impermanence"
     ]
     ++ [
       # This is needed to appease auto modules, but we don't actually use it
       # FIXME: could probably move this so it's shared?
       inputs.sops-nix.nixosModules.sops
-
       inputs.introdus.nixosModules.default
     ]
   );

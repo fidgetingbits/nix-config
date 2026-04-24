@@ -61,7 +61,7 @@
         };
       };
 
-      environment = lib.optionalAttrs config.system.impermanence.enable {
+      environment = lib.optionalAttrs config.introdus.impermanence.enable {
         persistence = {
           "${config.hostSpec.persistFolder}".directories = [
             {

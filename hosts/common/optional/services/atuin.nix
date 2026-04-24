@@ -46,7 +46,7 @@
         };
 
         # FIXME: This should be switched to a function
-        environment = lib.optionalAttrs config.system.impermanence.enable {
+        environment = lib.optionalAttrs config.introdus.impermanence.enable {
           persistence = {
             "${config.hostSpec.persistFolder}".directories = [ "/var/lib/postgresql" ];
           };

@@ -31,8 +31,6 @@
     ))
   ];
 
-  system.impermanence.enable = true;
-
   environment.systemPackages = [ pkgs.borgbackup ];
 
   # wlo1 boot delay

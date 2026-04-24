@@ -52,8 +52,6 @@
     plymouth.enable = true;
   };
 
-  system.impermanence.enable = true;
-
   boot.initrd.systemd.enable = true;
 
   networking.networkmanager.enable = true;

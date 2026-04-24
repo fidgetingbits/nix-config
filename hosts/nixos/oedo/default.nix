@@ -62,8 +62,6 @@
 
   ];
 
-  system.impermanence.enable = true;
-
   services.backup = {
     enable = true;
     borgBackupStartTime = "*-*-* 22:00:00";

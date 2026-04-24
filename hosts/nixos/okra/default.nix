@@ -29,8 +29,6 @@
     ))
   ];
 
-  system.impermanence.enable = true;
-
   boot.initrd = {
     systemd.enable = true;
     # FIXME: Not sure we need to be explicit with all, but testing virtio due to luks disk errors on qemu

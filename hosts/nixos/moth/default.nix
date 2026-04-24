@@ -31,7 +31,6 @@
     ))
   ];
 
-  system.impermanence.enable = true;
   services.dyndns.enable = true;
 
   environment.systemPackages = [ pkgs.borgbackup ];

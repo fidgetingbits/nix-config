@@ -10,7 +10,6 @@
 let
   cfg = config.services.llama;
   time = lib.custom.time;
-  isImpermanent = config.system ? "impermanence" && config.system.impermanence.enable;
   modelsPath = "/var/lib/llm/models";
   cachePath = "/var/cache/private/llama-swap";
   user = config.users.users.${config.hostSpec.primaryUsername}.name;
@@ -124,7 +123,7 @@ in
     })
 
     (lib.mkIf cfg.enable {
-      environment = lib.optionalAttrs isImpermanent {
+      environment = lib.optionalAttrs config.introdus.impermanence.enable {
         persistence.${persistFolder}.directories = [
           "/var/lib/ollama"
           modelsPath
