@@ -21,10 +21,8 @@
       "If multiple of these password options are set at the same time then a"
 
       # These are stylix warnings that I can't fix myself, and don't care
-      # FIXME: These could be fixed upstream instead of ignoring :P
       "stylix: qt: `config.stylix.targets.qt.platform` other than 'qtct' are currently unsupported: gnome. Support may be added in the future."
       "The value `gnome` for option `qt.platformTheme.name` is deprecated. Use `adwaita` instead."
-      "stylix: firefox: `config.stylix.targets.firefox.profileNames` is not set."
 
       # This seems to come from some external module? I don't set nixpkgs in HM
       "You have set either `nixpkgs.config` or `nixpkgs.overlays` while using `home-manager.useGlobalPkgs`."
