@@ -2,8 +2,11 @@
 //
 // ========== Animations ==========
 //
+include "animations/glitch_01.kdl"
+// include "animations/glitch_00.kdl"
+// include "animations/pixelate.kdl"
 animations {
-    slowdown 0.7
+    slowdown 2.4
 }
 //
 // ========== Overview screen ==========

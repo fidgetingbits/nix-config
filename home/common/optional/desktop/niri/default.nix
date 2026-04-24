@@ -55,6 +55,10 @@ in
       in
       {
         ".config/niri/config.kdl".text = finalConfig;
+        ".config/niri/animations/" = {
+          source = ./animations;
+          recursive = true;
+        };
       };
   };
 }
