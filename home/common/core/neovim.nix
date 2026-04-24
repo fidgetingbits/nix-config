@@ -2,6 +2,7 @@
   lib,
   inputs,
   osConfig,
+  pkgs,
   ...
 }:
 {
@@ -14,6 +15,7 @@
   # and exposed in the config as wrappers.neovim.
 
   wrappers.neovim = {
+    package = pkgs.unstable.neovim-unwrapped;
     settings =
       if osConfig.hostSpec.isIntrodusDev then
         {
