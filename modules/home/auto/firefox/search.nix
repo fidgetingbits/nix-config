@@ -1,6 +1,5 @@
 { ... }:
 {
-  force = true; # Don't complain about clobbering backups
   default = "ddg";
   engines = {
     "Awesome Lists" = {
