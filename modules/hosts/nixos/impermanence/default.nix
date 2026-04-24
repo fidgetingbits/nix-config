@@ -7,7 +7,7 @@
   ...
 }:
 let
-
+  cfg = config.system.impermanence;
 in
 {
   imports = [ inputs.impermanence.nixosModules.impermanence ];
@@ -18,10 +18,10 @@ in
       default = config.hostSpec.isImpermanent;
       description = "Enable impermanence";
     };
-    # FIXME: Actually use this in the script, but need to use the substituteAll approach
     removeTmpFilesOlderThan = lib.mkOption {
       type = lib.types.int;
-      default = 14;
+      default = 30;
+      example = 14;
       description = "Number of days to keep old btrfs_tmp files";
     };
     autoPersistHomes = lib.mkOption {
@@ -34,6 +34,12 @@ in
         your user is in "users" group.
       '';
     };
+    subvolume = lib.mkOption {
+      type = lib.types.str;
+      default = "@root";
+      example = "@root";
+      description = "btrfs subvolume to backup and rollback.";
+    };
   };
 
   options.environment = {
@@ -44,8 +50,7 @@ in
     };
   };
 
-  # FIXME(impermanence): Indicate the subvolume to backup
-  config = lib.mkIf config.system.impermanence.enable (
+  config = lib.mkIf cfg.enable (
     let
       disks = config.system.disks;
       drivePath = if disks.luks.enable then "/dev/mapper/${disks.luks.label}" else disks.primary;
@@ -63,60 +68,10 @@ in
       # https://discourse.nixos.org/t/impermanence-vs-systemd-initrd-w-tpm-unlocking/25167
       # So we build an early stage systemd service, which is modeled after
       # https://github.com/kjhoerr/dotfiles/blob/trunk/.config/nixos/os/persist.nix
-      # boot.initrd.postDeviceCommands = lib.mkAfter (lib.readFile ./btrfs_wipe_root.sh);
       # Also see https://github.com/Misterio77/nix-config/blob/main/hosts/common/optional/ephemeral-btrfs.nix
       boot.initrd =
         let
           hostname = config.networking.hostName;
-          wipeScript = pkgs.writeShellApplication {
-            name = "btrfs-wipe-root";
-
-            runtimeInputs = lib.attrValues {
-              inherit (pkgs)
-                coreutils
-                btrfs-progs
-                mount
-                umount
-                ;
-            };
-            text = # bash
-              ''
-                ## Reset current root to clear any files that are not persisted.
-                ## Runs during stage-0
-                ##
-                ## This script makes some critical assumptions about how the filesystem has
-                ## been created.
-                ##
-                ## Note that unlike similar scripts, we don't use a blank snapshot to reset the root,
-                ## instead we delete the root and create a new one.
-
-                mkdir /btrfs_tmp
-
-                # FIXME: encrypted-nixos needs to change for non-LUKs hosts with impermanence
-                mount -t btrfs -o subvol=/ ${drivePath} /btrfs_tmp
-
-                if [[ -e /btrfs_tmp/@root ]]; then
-                    mkdir -p /btrfs_tmp/@old_roots || true
-                    timestamp=$(date --date="@$(stat -c %Y /btrfs_tmp/@root)" "+%Y-%m-%d_%H:%M:%S")
-                    mv /btrfs_tmp/@root "/btrfs_tmp/@old_roots/$timestamp"
-                fi
-
-                delete_subvolume_recursively() {
-                    IFS=$'\n'
-                    for i in $(btrfs subvolume list -o "$1" | cut -f 9- -d ' '); do
-                        delete_subvolume_recursively "/btrfs_tmp/$i"
-                    done
-                    btrfs subvolume delete "$1"
-                }
-
-                find /btrfs_tmp/@old_roots/ -maxdepth 1 -mtime +30 | while read -r old; do
-                    delete_subvolume_recursively "$old"
-                done
-
-                btrfs subvolume create /btrfs_tmp/@root
-                umount /btrfs_tmp
-              '';
-          };
         in
         {
           supportedFilesystems = [ "btrfs" ];
@@ -135,7 +90,44 @@ in
               before = [ "sysroot.mount" ];
               unitConfig.DefaultDependencies = "no";
               serviceConfig.Type = "oneshot";
-              script = lib.getExe wipeScript;
+              # IMPORTANT: Don't use lib.writeShellApplication, since the store paths won't work
+              script =
+                # bash
+                ''
+                  ## Reset current root to clear any files that are not persisted.
+                  ## Runs during stage-0
+                  ##
+                  ## This script makes some critical assumptions about how the filesystem has
+                  ## been created.
+                  ##
+                  ## Note that unlike similar scripts, we don't use a blank snapshot to reset the root,
+                  ## instead we delete the root and create a new one.
+
+                  mkdir /btrfs_tmp
+
+                  mount -t btrfs -o subvol=/ ${drivePath} /btrfs_tmp
+
+                  if [[ -e /btrfs_tmp/${cfg.subvolume} ]]; then
+                      mkdir -p /btrfs_tmp/@old_roots || true
+                      timestamp=$(date --date="@$(stat -c %Y /btrfs_tmp/${cfg.subvolume})" "+%Y-%m-%d_%H:%M:%S")
+                      mv /btrfs_tmp/${cfg.subvolume} "/btrfs_tmp/@old_roots/$timestamp"
+                  fi
+
+                  delete_subvolume_recursively() {
+                      IFS=$'\n'
+                      for i in $(btrfs subvolume list -o "$1" | cut -f 9- -d ' '); do
+                          delete_subvolume_recursively "/btrfs_tmp/$i"
+                      done
+                      btrfs subvolume delete "$1"
+                  }
+
+                  find /btrfs_tmp/@old_roots/ -maxdepth 1 -mtime +${toString cfg.removeTmpFilesOlderThan}  | while read -r old; do
+                      delete_subvolume_recursively "$old"
+                  done
+
+                  btrfs subvolume create /btrfs_tmp/${cfg.subvolume}
+                  umount /btrfs_tmp
+                '';
             };
         };
 
@@ -152,12 +144,9 @@ in
               "/var/lib/bluetooth" # move to bluetooth-specific
               "/var/lib/nixos"
               "/var/lib/systemd/coredump"
-              "/etc/NetworkManager/system-connections"
+              "/etc/NetworkManager/system-connections" # move to network manager specific
 
               # systemd DynamicUser requires /var/{lib,cache}/private to exist and be 0700
-              # FIXME: I don't entirely understand why this happens sometimes... a service works, then on rebuild
-              # it tries to migrate to use a */private/* version and fails because of 755 perms. Then often requires
-              # manual 700 modification to fix if I forget to add this first.
               {
                 directory = "/var/lib/private";
                 mode = "0700";
@@ -168,16 +157,11 @@ in
               }
 
             ]
-            # FIXME: This breaks because of duplication of /home/aa apparently?
-            # Where is that normally getting set even?
             ++ lib.optional config.system.impermanence.autoPersistHomes (
               map (user: {
                 directory = "${if pkgs.stdenv.isDarwin then "/Users" else "/home"}/${user}";
                 inherit user;
-                # FIXME: Can't use config.users.users here due to recursion, despite
-                # old code using it okay?
-                #group = config.users.users.${user}.group;
-                group = if pkgs.stdenv.isDarwin then "staff" else "users";
+                group = config.users.users.${user}.group;
                 mode = "u=rwx,g=,o=";
               }) config.hostSpec.users
             )
