@@ -2,6 +2,7 @@
 # https://wiki.nixos.org/wiki/NixOS_Hardening
 # Also poking at some stuff mentioned here:
 # https://github.com/NarrativeScience-old/nixpkgs/blob/cc6cf0a96a627e678ffc996a8f9d1416200d6c81/nixos/modules/profiles/hardened.nix#L25
+# Use https://github.com/a13xp0p0v/kernel-hardening-checker/ as guideline for more options
 {
   config,
   lib,
@@ -11,7 +12,8 @@
   config = lib.mkIf (config.hostSpec.isDesktop && config.hostSpec.hostName == "ossa") {
 
     # Makes userland exploitation of memory-corruption bugs more difficult
-    environment.memoryAllocator.provider = "graphene-hardened";
+    # FIXME: Disable until firefox/chromium/etc is wrapped
+    # environment.memoryAllocator.provider = "graphene-hardened";
 
     # Makes slab and buddy allocator exploitation more difficult.
     boot.kernelParams = [
@@ -29,6 +31,9 @@
 
       # Enable page allocator randomization
       "page_alloc.shuffle=1"
+
+      # Don't leak kernel addresses in logs
+      "hash_pointers=always"
     ];
 
     # Preventing the loading of modules helps prevents exposure to privilege
