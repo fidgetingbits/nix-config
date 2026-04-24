@@ -310,6 +310,7 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
       inputs.introdus.follows = "introdus";
       inputs.flake-parts.follows = "flake-parts";
+      inputs.wrappers.follows = "wrappers";
     };
 
     introdus-git = {
