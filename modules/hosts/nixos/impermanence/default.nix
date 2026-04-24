@@ -59,6 +59,7 @@ in
         runtimeInputs = lib.attrValues { inherit (pkgs) eza fd btrfs-progs; };
         runtimeEnv = {
           BTRFS_VOL = drivePath;
+          ROOT_LABEL = cfg.subvolume;
         };
         text = lib.readFile ./btrfs-diff.sh;
       };

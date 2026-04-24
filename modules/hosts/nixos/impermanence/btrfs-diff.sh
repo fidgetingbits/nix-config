@@ -48,10 +48,9 @@ if [ "$UID" -ne "0" ]; then
     exit 0
 fi
 
-# BTRFS_VOL default comes from nix
+# BTRFS_VOL and ROOT_LABEL defaults comes from nix
 SNAPSHOT=""
 MOUNTDIR=$(mktemp -d)
-ROOT_LABEL=@root
 OLD_ROOTS_LABEL=@old_roots
 LIST_OLD=0
 
