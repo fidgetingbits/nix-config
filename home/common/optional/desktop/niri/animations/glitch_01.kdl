@@ -14,7 +14,7 @@ animations {
         duration-ms 150
         curve "linear"
 
-        custom-shader r#"""
+        custom-shader r"
         float gh(float n) {
             return fract(sin(n) * 43758.5453);
         }
@@ -69,14 +69,14 @@ animations {
             float alpha = smoothstep(0.0, 0.15, p);
             return color * alpha;
         }
-        """#
+        "
     }
 
     window-close {
         duration-ms 150
         curve "linear"
 
-        custom-shader r#"""
+        custom-shader r"
         float gh(float n) {
             return fract(sin(n) * 43758.5453);
         }
@@ -131,14 +131,14 @@ animations {
             float alpha = smoothstep(1.0, 0.6, p);
             return color * alpha;
         }
-        """#
+        "
     }
 
     window-resize {
         duration-ms 150
         curve "linear"
 
-        custom-shader r#"""
+        custom-shader r"
         float gh(float n) {
             return fract(sin(n) * 43758.5453);
         }
@@ -207,7 +207,7 @@ animations {
 
             return color ;
         }
-        """#
+        "
     }
 
 
