@@ -65,6 +65,8 @@ let
             };
           });
         neovim = final.unstable.neovim;
+        neovide = final.unstable.neovide;
+        vimPlugins = final.unstable.vimPlugins;
       });
 
     # Override unstable entries exposed via pkgs.unstable

@@ -275,8 +275,24 @@
           message = "isWork is true but no work attribute set is provided";
         }
         {
-          assertion = !isImpermanent || (isImpermanent && !("${config.hostSpec.persistFolder}" == ""));
-          message = "config.config.impermanence.enable is true but no persistFolder path is provided";
+          assertion =
+            !isImpermanent
+            || (
+              isImpermanent
+              && (config.hostSpec.persistFolder != null)
+              && ("${config.hostSpec.persistFolder}" != "")
+            );
+          message = "config.introdus.impermanence.enable is true but no persistFolder path is provided";
+        }
+        {
+          assertion = (
+            isImpermanent
+            || (
+              !isImpermanent
+              && (config.hostSpec.persistFolder == null || "${config.hostSpec.persistFolder}" == "")
+            )
+          );
+          message = "config.introdus.impermanence.enable is ${toString config.introdus.impermanence.enable} but a persistFolder path is provided: ${config.hostSpec.persistFolder}";
         }
         {
           assertion = !(config.hostSpec.voiceCoding && config.hostSpec.useWayland);

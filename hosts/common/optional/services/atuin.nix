@@ -38,21 +38,6 @@
             ssl = false;
           }
         ];
-
-        # This is only for atuin atm, so need localhost only
-        # FIXME: This should be separate with an import maybe. atticd will use this too...
-        services.postgresql = {
-          enable = true;
-        };
-
-        # FIXME: This should be switched to a function
-        environment = lib.optionalAttrs config.introdus.impermanence.enable {
-          persistence = {
-            "${config.hostSpec.persistFolder}".directories = [ "/var/lib/postgresql" ];
-          };
-        };
-
-        # Enable something to backup atuin/postgresql. See mic92 postgresqlBackup
       }
       granularFirewallRules
       regularFirewallRules

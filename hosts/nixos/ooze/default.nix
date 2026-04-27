@@ -60,9 +60,10 @@ in
           "keyd.nix"
           "cli.nix"
           "services/atuin.nix"
-          "services/atticd.nix"
+          "services/atticd.nix" # Nix cache
           "services/postfix-proton-relay.nix"
           "services/unifi.nix" # Unifi Controller
+          "services/forgejo.nix" # git forge
 
           "acme.nix"
           "remote-builder.nix"

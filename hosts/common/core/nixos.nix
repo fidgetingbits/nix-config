@@ -61,18 +61,19 @@
       };
   };
 
-  # FIXME(networking): Some IPs will be different depending on if we are on
-  # there network or not. This needs per-network dispatcher scripts likely,
-  # which might preclude a read-only host file like this generates.
   networking.hosts =
     let
-      network = config.hostSpec.networking;
+      inherit (config) hostSpec;
+      network = hostSpec.networking;
+      domain = hostSpec.domain;
     in
     { }
     // lib.optionalAttrs config.hostSpec.isLocal {
       # Internal
-      "${network.subnets.oxid.gateway}" = [ "oxid.${config.hostSpec.domain}" ];
-
+      "${network.subnets.oxid.gateway}" = [ "oxid.${domain}" ];
+    }
+    // lib.optionalAttrs (hostSpec.isLocal && hostSpec.isDevelopment) {
+      "git.${domain}" = [ "git.ooze.${domain}" ];
       # VMs
       "${network.subnets.vm-lan.hosts.okra.ip}" = [ "okra.${config.hostSpec.domain}" ];
     }
