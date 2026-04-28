@@ -32,6 +32,8 @@
       XDG_SESSION_TYPE = "wayland";
       # Set by firefox wrapper in nixpkgs, but just in case it's used outside the wrapper?
       MOZ_ENABLE_WAYLAND = "1";
+
+      QT_QPA_PLATFORMTHEME = "gtk3";
     };
   };
 
