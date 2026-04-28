@@ -27,6 +27,10 @@ lib.mkIf cfg.isAdmin {
       cfg.networking.subnets.olan.wildcard
     ]
     ++ lib.optional cfg.isWork secrets.work.git.servers;
+    # Extra git servers that take yubikey auth and user git
+    extraGitServers = [
+      "git.${cfg.domain}"
+    ];
   };
   programs.ssh.matchBlocks =
     let
@@ -98,6 +102,7 @@ lib.mkIf cfg.isAdmin {
         );
       };
 
+      # FIXME: Remove this
       # FIXME(ssh): Use https://superuser.com/questions/838898/ssh-config-host-match-port
       # to match on port, so I don't need to rely on oath_gitlab by name
       "oath_gitlab" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {

@@ -8,6 +8,12 @@
 }:
 let
   cfg = config.sshAutoEntries;
+  gitServers = [
+    "github.com"
+    "gitlab.com"
+    "codeberg.org"
+    "git.sr.ht"
+  ];
 in
 {
   options = {
@@ -39,6 +45,14 @@ in
         default = osConfig.hostSpec.domain;
         description = "Common domain of hosts in this config and those administrated by the owner";
         example = "example.com";
+      };
+      extraGitServers = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [ ];
+        example = [ "git.example.com" ];
+        description = ''
+          A list of extra git servers to associate identities with.
+          These will be added to the standard set: ${gitServers}'';
       };
       useYubikey = lib.mkOption {
         type = lib.types.bool;
@@ -177,10 +191,11 @@ in
           };
 
           "git" = {
-            host = "github.com gitlab.com codeberg.org git.sr.ht";
+            host = lib.concatStringsSep " " (gitServers ++ cfg.extraGitServers);
             user = "git";
-            # NOTE: not included above because we may need to supply a token when using iso, etc. Also don't want to forward
-            # the agent to git servers.
+            # NOTE: not included above because we may need to supply a token
+            # when using iso, etc. Also don't want to forward the agent to git
+            # servers.
             identityFile = identityFiles;
           };
 
