@@ -23,7 +23,9 @@ in
       "id_drzt.pub"
     ];
     devRepos = secrets.git.repos;
-
+    extraForges = {
+      "git.${osConfig.hostSpec.domain}" = "noreply";
+    };
   }
   // lib.optionalAttrs osConfig.hostSpec.isWork {
     # work
