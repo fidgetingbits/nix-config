@@ -78,9 +78,10 @@
             };
             service.DISABLE_REGISTRATION = false;
             session.COOKIE_SECURE = true;
-            repository = {
-              DISABLE_HTTP_GIT = true; # Just use ssh
-            };
+
+            # repository = {
+            #   DISABLE_HTTP_GIT = false;
+            # };
             actions = {
               ENABLED = true;
               DEFAULT_ACTIONS_URL = "github";
@@ -88,6 +89,8 @@
             mailer = {
               ENABLED = true;
               SMTP_ADDR = config.hostSpec.email.internalServer;
+              PROTOCOL = "smtp+starttls";
+              SMPT_PORT = 25; # FIXME: Running on ooze so using the local relay, but likely should optional
               FROM = "noreply@${config.hostSpec.domain}";
               USER = config.hostSpec.hostName;
               SEND_AS_PLAIN_TEXT = true;
