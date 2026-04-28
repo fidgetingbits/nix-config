@@ -9,20 +9,6 @@
   imports = [ ./nginx.nix ];
   config =
     let
-      # FIXME: This is duplicated with hosts/common/users/default.nix so could probably make ti a lib
-      # Generate a list of public key contents to use by ssh
-      genPubKeyList =
-        user:
-        let
-          keyPath = (lib.custom.relativeToRoot "hosts/common/users/${user}/keys/");
-        in
-        if (lib.pathExists keyPath) then
-          lib.lists.forEach (lib.filesystem.listFilesRecursive keyPath) (key: lib.readFile key)
-        else
-          [ ];
-
-      # List of yubikey public keys that will allow auth to any user, across systems
-      superPubKeys = genPubKeyList "super";
       sopsFolder = (builtins.toString inputs.nix-secrets) + "/sops";
       forgejoPort = config.hostSpec.networking.ports.tcp.forgejo;
       sshPort = config.hostSpec.networking.ports.tcp.ssh;
@@ -48,10 +34,10 @@
         users.groups.git = { };
         users.users.git = {
           isSystemUser = true;
-          useDefaultShell = true;
           group = "git";
           home = config.services.forgejo.stateDir;
-          openssh.authorizedKeys.keys = superPubKeys;
+          useDefaultShell = true;
+          # NOTE: authorized keys are handled by forgejo user management
         };
 
         # https://codeberg.org/forgejo/docs/src/commit/7b8397/docs/admin/config-cheat-sheet.md
@@ -68,8 +54,9 @@
               HTTP_ADDR = "127.0.0.1"; # Accessed via nginx proxy
               DOMAIN = config.hostSpec.domain;
               # You need to specify this to remove the port from URLs in the web UI.
-              ROOT_URL = "https://git.${config.hostSpec.hostName}.${config.hostSpec.domain}/";
+              ROOT_URL = "https://git.${config.hostSpec.domain}/";
               HTTP_PORT = forgejoPort;
+              DISABLE_SSH = false;
               SSH_PORT = sshPort;
             };
             DEFAULT = {
@@ -90,7 +77,7 @@
               ENABLED = true;
               SMTP_ADDR = config.hostSpec.email.internalServer;
               PROTOCOL = "smtp+starttls";
-              SMPT_PORT = 25; # FIXME: Running on ooze so using the local relay, but likely should optional
+              SMTP_PORT = 25; # FIXME: Running on ooze so using the local relay, but likely should optional
               FROM = "noreply@${config.hostSpec.domain}";
               USER = config.hostSpec.hostName;
               SEND_AS_PLAIN_TEXT = true;
@@ -133,6 +120,14 @@
             ssl = false;
           }
         ];
+
+        # Need to allow authorize keys file use for this user to allow forgejo to manage it.
+        # Normally these files are locked down to prevent priv esc by dropping a new key
+        # See modules/hosts/nixos/openssh/default.nix for note
+        services.openssh.extraConfig = ''
+          Match User git
+              AuthorizedKeysFile /var/lib/forgejo/.ssh/authorized_keys
+        '';
 
         sops.secrets = {
           "passwords/forgejo/admin" = {

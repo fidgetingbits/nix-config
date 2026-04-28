@@ -25,6 +25,7 @@ in
     devRepos = secrets.git.repos;
     extraForges = {
       "git.${osConfig.hostSpec.domain}" = "noreply";
+      "git.ooze.${osConfig.hostSpec.domain}" = "noreply";
     };
   }
   // lib.optionalAttrs osConfig.hostSpec.isWork {

@@ -30,6 +30,7 @@ lib.mkIf cfg.isAdmin {
     # Extra git servers that take yubikey auth and user git
     extraGitServers = [
       "git.${cfg.domain}"
+      "git.ooze.${cfg.domain}"
     ];
   };
   programs.ssh.matchBlocks =
@@ -110,6 +111,13 @@ lib.mkIf cfg.isAdmin {
         hostname = "oath.${cfg.domain}";
         user = "git";
         port = cfg.networking.ports.tcp.gitlab;
+      };
+
+      # This is mostly covered by existing git from ssh-auto-entries, but the port differs
+      "internal-git" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
+        host = "git.${cfg.domain} git.ooze.${cfg.domain}";
+        hostname = "git.${cfg.domain}";
+        port = cfg.networking.ports.tcp.ssh;
       };
 
       "synology-tweaks" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
