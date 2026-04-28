@@ -94,6 +94,7 @@ in
     subDomains = [
       "ogre"
       "ooze"
+      "vpn"
     ];
   };
 
