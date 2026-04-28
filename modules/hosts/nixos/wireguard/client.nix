@@ -58,20 +58,20 @@ lib.mkIf (cfg.enable && cfg.role == "client") {
                   ip: "ip route replace ${ip} dev ${cfg.interface} metric 200"
                 ) cfg.allowedIPs}
 
-                 ${lib.optionalString cfg.dns.enable ''
-                    # FIXME: This will lneed to change for full tunnel
-                    ${resolvectl} default-route ${cfg.interface} false
-                    ${resolvectl} domain ${cfg.interface} ${
-                      lib.concatMapStringsSep " " (domain: "\"~${domain}\"") ([ cfg.dns.domain ])
-                    }
-                    ${resolvectl} dns ${cfg.interface} ${cfg.dns.server}
+                ${lib.optionalString cfg.dns.enable ''
+                   # FIXME: This will need to change for full tunnel
+                   ${resolvectl} default-route ${cfg.interface} false
+                   ${resolvectl} domain ${cfg.interface} ${
+                     lib.concatMapStringsSep " " (domain: "\"~${domain}\"") ([ cfg.dns.domain ])
+                   }
+                   ${resolvectl} dns ${cfg.interface} ${cfg.dns.server}
 
-                   # FIXME: This might be a bit error prone if the defualt route isn't what you want to resolve it with?
-                   # IMPORTANT: Don't resolve the endpoint using the internal DNS. If dynamicEndpointRefreshSeconds is set,
-                   # this will bust the connection
-                   EIFACE=$(ip route show default | ${lib.getExe pkgs.gawk} '/default/ {print $5}' | head -n1)
-                   ${resolvectl} domain "$EIFACE" "~${cfg.endpoint}"
-                 ''}
+                  # FIXME: This might be a bit error prone if the defualt route isn't what you want to resolve it with?
+                  # IMPORTANT: Don't resolve the endpoint using the internal DNS. If dynamicEndpointRefreshSeconds is set,
+                  # this will bust the connection
+                  EIFACE=$(ip route show default | ${lib.getExe pkgs.gawk} '/default/ {print $5}' | head -n1)
+                  ${resolvectl} domain "$EIFACE" "~${cfg.endpoint}"
+                ''}
               '';
             preShutdown = # bash
               ''
