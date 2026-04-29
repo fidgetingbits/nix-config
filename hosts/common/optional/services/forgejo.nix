@@ -48,7 +48,10 @@
           group = "git";
           # Enable support for Git Large File Storage
           lfs.enable = true;
-
+          # Enable little mini-backups (FIXME: not sure if worth)
+          dump = {
+            enable = true;
+          };
           settings = {
             server = {
               HTTP_ADDR = "127.0.0.1"; # Accessed via nginx proxy
