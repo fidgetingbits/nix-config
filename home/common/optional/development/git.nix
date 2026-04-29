@@ -118,6 +118,7 @@ in
       #    <(aarch64-unknown-linux-gnu-objdump -b binary -D -maarch64 "$temp_file2" | tr -s ' ' | cut -f3- -d ' ') | \
       #  delta --side-by-side; rm -f "$temp_file1" "$temp_file2"
       #'';
+
     };
   };
 }

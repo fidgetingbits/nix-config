@@ -7,6 +7,7 @@
     # dnssec breaks on ogre
     # dnssec = "true";
     domains = [ "~." ];
+
     # FIXME: Fix fallbacks so it definitely goes through LAN dns first...
     #    fallbackDns = [
     #      # LibreDNS

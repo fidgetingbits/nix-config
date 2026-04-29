@@ -73,7 +73,9 @@
       "${network.subnets.oxid.gateway}" = [ "oxid.${domain}" ];
     }
     // lib.optionalAttrs (hostSpec.isLocal && hostSpec.isDevelopment) {
-      "git.${domain}" = [ "git.ooze.${domain}" ];
+      "git.${domain}" = [
+        "git.ooze.${domain}"
+      ];
       # VMs
       "${network.subnets.vm-lan.hosts.okra.ip}" = [ "okra.${config.hostSpec.domain}" ];
     }

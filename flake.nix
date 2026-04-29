@@ -301,7 +301,8 @@
 
     #################### Personal ####################
     nix-secrets = {
-      url = "git+ssh://git@gitlab.com/fidgetingbits/nix-secrets.git?shallow=1";
+      url = "git+ssh://olan-forge/fidgetingbits/nix-secrets.git";
+      # url = "git+ssh://git@gitlab.com/fidgetingbits/nix-secrets.git?shallow=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

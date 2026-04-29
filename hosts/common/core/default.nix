@@ -86,4 +86,9 @@ in
   systemd.tmpfiles.rules = [
     "d /root 0700 root root - -"
   ];
+
+  environment.etc."gitconfig".text = ''
+    [url "ssh://git@git.${config.hostSpec.domain}/"]
+      insteadOf = ssh://olan-forge/
+  '';
 }
