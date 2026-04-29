@@ -112,14 +112,13 @@ iso HOST=`hostname`:
     # If we dont remove this folder, libvirtd VM doesnt run with the new iso
     rm -rf result
     nix build --impure .#nixosConfigurations.iso.config.system.build.isoImage --reference-lock-file locks/{{ HOST }}.lock && ln -sf result/iso/*.iso latest_{{ HOST }}.iso
+    echo "Built latest_{{ HOST }}.iso"
 
 # Install the latest iso to a flash drive
 [group("building")]
 iso-install DRIVE HOST=`hostname`:
     just iso {{ HOST }}
     sudo dd if=$(eza --sort changed result/iso/*.iso | tail -n1) of={{ DRIVE }} bs=4M status=progress oflag=sync
-
-# FIXME: This is deprecated now I think
 
 # Configure a drive password using disko
 [group("misc")]
@@ -136,6 +135,9 @@ disko DRIVE PASSWORD:
 [group("building")]
 rebuild-host HOST=`hostname`:
     #!/usr/bin/env bash
+    if [ "{{ HOST }}" == "$(hostname)" ]; then
+        just noctalia-backup || true
+    fi
     just rebuild-pre {{ HOST }}
     BUILD_FOLDER=$(mktemp -d)
     echo "Prepping build folder: $BUILD_FOLDER"
@@ -249,14 +251,6 @@ pin HOST=`hostname`:
 sync USER HOST PATH:
     rsync -av --filter=':- .gitignore' -e "ssh -l {{ USER }} -oport=10022" . {{ USER }}@{{ HOST }}:{{ PATH }}/nix-config
 
-# FIXME: Deprecated in favor of gen-pass
-
-# Create a new user with a password hash for dovecot, to be placed in ooze.yaml secrets
-[group("admin")]
-dovecot-hash:
-    touch /tmp/empty-dovecot.conf
-    DOVECONF=/dev/null nix shell nixpkgs#dovecot.out -c doveadm -c /tmp/empty-dovecot.conf pw -s SHA512-CRYPT
-
 # Updates the firefox extension list
 [group("admin")]
 firefox-addons:
@@ -295,6 +289,10 @@ dev:
 fmt:
     nix fmt --reference-lock-file locks/$(hostname).lock
 
+#
+# ========== Noctalia recipes ==========
+#
+
 # Generate json diff of current noctalia settings
 [group("noctalia")]
 noctalia-diff:
@@ -324,3 +322,17 @@ noctalia-save-host:
     SETTINGS=hosts/nixos/$(hostname)/noctalia/settings.nix
     mkdir -p "$PATH" ||  true
     echo "{ $(just noctalia-json | json2nix)}" > "$SETTINGS")
+
+# Backup the current noctalia json settings to backup folder
+[group("noctalia")]
+noctalia-backup:
+    #!/usr/bin/env bash
+    # A noctalia update can cause an IPC incompatibility that requires restart, but restart wipes
+    # recent settings changes that may have happened and have not yet been caught by noctalia-snapshot-settings
+    # service. A precautionary measure, since it's happened at least once before.
+    noctalia-shell ipc call state all | jq -S .settings > ~/.cache/noctalia/backup/settings_pre_rebuild.json
+
+# Diff current settings against the last rebuild backup
+[group("noctalia")]
+noctalia-diff-last-backup:
+    @-json-diff <(jq -S . ~/.cache/noctalia/backup/settings_pre_rebuild.json) <(noctalia-shell ipc call state all | jq -S .settings)
