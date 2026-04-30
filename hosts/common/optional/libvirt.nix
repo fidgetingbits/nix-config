@@ -29,13 +29,14 @@ in
       package = pkgs.qemu_kvm;
       runAsRoot = true;
       # HW TPM Emulation (need to check what systems I have already have hw TPM that could be used)
-      #swtpm.enable = true;
+      swtpm.enable = true;
       # Allow shared folder with window's hosts - https://discourse.nixos.org/t/virt-manager-cannot-find-virtiofsd/26752/9
       # requires manual setup on the guest of winfsp and virtio-win-guest-tools
       # https://github.com/virtio-win/kvm-guest-drivers-windows/wiki/Virtiofs:-Shared-file-system#guest
       vhostUserPackages = [ pkgs.virtiofsd ];
     };
   };
+
   virtualisation.libvirt = {
     enable = true;
     connections."qemu:///system" = {
