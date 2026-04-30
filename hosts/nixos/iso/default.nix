@@ -98,9 +98,17 @@
   };
 
   # root's ssh key are mainly used for remote deployment
+  users.users.root = {
+    # Needed for https://github.com/nix-community/nixos-anywhere/issues/280#issuecomment-4319910463
+    # To avoid zsh:1: no matches found: local?root=/mnt
+    # Overrides the default zsh set in users/default.nix
+    shell = lib.mkForce pkgs.bashInteractive;
+    # inherit (config.users.users.${config.hostSpec.username}) hashedPassword;
+  };
   users.extraUsers.root = {
-    inherit (config.users.users.${config.hostSpec.username}) hashedPassword;
+    hashedPassword = lib.mkForce config.users.users.${config.hostSpec.username}.hashedPassword;
     openssh.authorizedKeys.keys =
-      config.users.users.${config.hostSpec.username}.openssh.authorizedKeys.keys;
+      lib.mkForce
+        config.users.users.${config.hostSpec.username}.openssh.authorizedKeys.keys;
   };
 }
