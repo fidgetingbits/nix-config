@@ -27,6 +27,12 @@
       regularFirewallRules = lib.mkIf (cfg.enable == false) {
         networking.firewall.allowedTCPPorts = [ forgejoPort ];
       };
+
+      theme = pkgs.fetchzip {
+        url = "https://github.com/catppuccin/gitea/releases/download/v1.0.2/catppuccin-gitea.tar.gz";
+        sha256 = "sha256-rZHLORwLUfIFcB6K9yhrzr+UwdPNQVSadsw6rg8Q7gs=";
+        stripRoot = false;
+      };
     in
     lib.mkMerge [
       {
@@ -84,6 +90,16 @@
               FROM = "noreply@${config.hostSpec.domain}";
               USER = config.hostSpec.hostName;
               SEND_AS_PLAIN_TEXT = true;
+            };
+
+            ui = {
+              THEMES =
+                theme
+                |> builtins.readDir
+                |> lib.attrNames
+                |> map (name: lib.removePrefix "theme-" (lib.removeSuffix ".css" name))
+                |> lib.concatStringsSep ",";
+              DEFAULT_THEME = "catppuccin-mocha-sapphire";
             };
           };
           secrets = {
@@ -151,6 +167,24 @@
             ];
           };
         };
+
+        # Add custom themes/icons to forgejo instance
+        # FIXME: Should probably be an option
+        systemd.tmpfiles.rules =
+          let
+            cfg = config.services.forgejo;
+            img = "${inputs.nix-assets}/images/forgejo/";
+          in
+          [
+            "d '${cfg.customDir}/public' 0750 ${cfg.user} ${cfg.group} - -"
+            "d '${cfg.customDir}/public/assets' 0750 ${cfg.user} ${cfg.group} - -"
+            "d '${cfg.customDir}/public/assets/img' 0750 ${cfg.user} ${cfg.group} - -"
+            "L+ '${cfg.customDir}/public/assets/css' - - - - ${theme}"
+            "L+ '${cfg.customDir}/public/assets/img/logo.svg' - - - - ${img}/logo.svg"
+            "L+ '${cfg.customDir}/public/assets/img/logo.png' - - - - ${img}/logo.png"
+            "L+ '${cfg.customDir}/public/assets/img/favicon.svg' - - - - ${img}/favicon.svg"
+            "L+ '${cfg.customDir}/public/assets/img/favicon.png' - - - - ${img}/favicon.png"
+          ];
       }
       granularFirewallRules
       regularFirewallRules
