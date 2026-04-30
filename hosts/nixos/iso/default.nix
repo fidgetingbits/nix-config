@@ -10,11 +10,12 @@
     #"${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
     "${inputs.nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-gnome.nix"
     "${inputs.nixpkgs}/nixos/modules/installer/cd-dvd/channel.nix"
-    inputs.home-manager.nixosModules.home-manager
 
     # FIXME: These should just be added everywhere now?
+    inputs.home-manager.nixosModules.home-manager
     inputs.sops-nix.nixosModules.sops
     inputs.introdus.nixosModules.default
+
     (lib.custom.scanPaths ./.) # Load all extra host-specific *.nix files
     (map lib.custom.relativeToRoot [
       # FIXME: Switch this to just import hosts/common/core (though have to be careful to purposefully not add platform file..
@@ -22,14 +23,8 @@
       "hosts/common/optional/keyd.nix"
       "modules/hosts/common/host-spec.nix"
       "modules/hosts/nixos/auto/warnings.nix"
+      "hosts/common/users"
     ])
-    (
-      let
-        # FIXME: Infinite recursion if we use config.hostSpec.username
-        path = lib.custom.relativeToRoot "hosts/common/users/aa/default.nix";
-      in
-      lib.optional (lib.pathExists path) path
-    )
   ];
 
   environment.etc = {
@@ -53,6 +48,15 @@
   nixpkgs = {
     hostPlatform = lib.mkDefault "x86_64-linux";
     config.allowUnfree = true;
+    overlays = [
+      (final: prev: {
+        unstable = import inputs.nixpkgs-unstable {
+          system = final.stdenv.hostPlatform.system;
+          config.allowUnfree = true;
+        };
+      })
+      inputs.introdus.overlays.default
+    ];
   };
 
   nix = {
@@ -92,19 +96,6 @@
       hybrid-sleep.enable = false;
     };
   };
-
-  # FIXME: Seems like suspend disable in iso isn't always working
-  # home-manager.users.${hostSpec.username}.dconf.settings = {
-  #   "org/gnome/settings-daemon/plugins/power" = {
-  #     ambient-enabled = false;
-  #     idle-dim = true;
-  #     power-button-action = "interactive";
-  #     sleep-inactive-ac-type = "nothing";
-  #     sleep-inactive-ac-timeout = 0;
-  #     sleep-inactive-battery-type = "nothing";
-  #     sleep-inactive-battery-timeout = 0;
-  #   };
-  # };
 
   # root's ssh key are mainly used for remote deployment
   users.extraUsers.root = {

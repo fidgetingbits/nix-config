@@ -74,7 +74,7 @@ in
 
   services.backup = {
     enable = true;
-    borgBackupStartTime = "*-*-* 05:00:00";
+    borgBackupStartTime = "*-*-* 05:00:00"; # Daily at 5am
   };
   # If we setup postfix, this conflicts
   programs.msmtp.setSendmail = lib.mkForce false;
