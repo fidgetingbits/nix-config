@@ -83,17 +83,6 @@
     widgets = {
       center = [
         {
-          clockColor = "none";
-          customFont = "";
-          formatHorizontal = "HH:mm ddd, MMM dd";
-          formatVertical = "HH mm - dd MM";
-          id = "Clock";
-          tooltipFormat = "HH:mm ddd, MMM dd";
-          useCustomFont = false;
-        }
-      ];
-      left = [
-        {
           characterCount = 2;
           colorizeIcons = false;
           emptyColor = "secondary";
@@ -113,6 +102,17 @@
           showBadge = true;
           showLabelsOnlyWhenOccupied = true;
           unfocusedIconsOpacity = 1;
+        }
+      ];
+      left = [
+        {
+          clockColor = "secondary";
+          customFont = "";
+          formatHorizontal = "HH:mm ddd, MMM dd";
+          formatVertical = "HH mm - dd MM";
+          id = "Clock";
+          tooltipFormat = "HH:mm ddd, MMM dd";
+          useCustomFont = true;
         }
         {
           colorizeIcons = false;
@@ -152,24 +152,33 @@
           unreadBadgeColor = "primary";
         }
         {
+          defaultSettings = {
+            feeds = [
+
+            ];
+            markAsReadOnClick = true;
+            maxItemsPerFeed = 10;
+            readItems = [
+
+            ];
+            showOnlyUnread = false;
+            updateInterval = 600;
+          };
+          id = "plugin:rss-feed";
+        }
+        {
           deviceNativePath = "__default__";
-          displayMode = "graphic-clean";
-          hideIfIdle = false;
+          displayMode = "graphic";
+          hideIfIdle = true;
           hideIfNotDetected = true;
           id = "Battery";
           showNoctaliaPerformance = false;
-          showPowerProfiles = false;
+          showPowerProfiles = true;
         }
         {
           displayMode = "onhover";
           iconColor = "none";
           id = "Network";
-          textColor = "none";
-        }
-        {
-          displayMode = "onhover";
-          iconColor = "none";
-          id = "Bluetooth";
           textColor = "none";
         }
         {
@@ -198,28 +207,6 @@
           pinned = [
 
           ];
-        }
-        {
-          compactMode = true;
-          diskPath = "/";
-          iconColor = "none";
-          id = "SystemMonitor";
-          showCpuCores = false;
-          showCpuFreq = false;
-          showCpuTemp = true;
-          showCpuUsage = true;
-          showDiskAvailable = false;
-          showDiskUsage = false;
-          showDiskUsageAsPercent = false;
-          showGpuTemp = false;
-          showLoadAverage = false;
-          showMemoryAsPercent = false;
-          showMemoryUsage = true;
-          showNetworkStats = false;
-          showSwapUsage = false;
-          textColor = "none";
-          useMonospaceFont = true;
-          usePadding = false;
         }
       ];
     };
@@ -324,7 +311,22 @@
     gridSnap = false;
     gridSnapScale = false;
     monitorWidgets = [
-
+      {
+        name = "eDP-1";
+        widgets = [
+          {
+            diskPath = "/";
+            id = "SystemStat";
+            layout = "bottom";
+            roundedCorners = true;
+            scale = 1;
+            showBackground = true;
+            statType = "CPU";
+            x = 866;
+            y = 504;
+          }
+        ];
+      }
     ];
     overviewEnabled = true;
   };
