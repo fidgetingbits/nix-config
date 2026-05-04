@@ -171,6 +171,6 @@ in
       wireguardPort = net.ports.udp.wireguard;
       rosenpassPort = net.ports.udp.rosenpass;
       rosenpassExempt = [ "opia" ];
-      subnet = net.wireguard.olan.subnet;
+      subnet = net.subnets.olan.wireguard.subnet;
     };
 }

@@ -14,16 +14,6 @@
       sshPort = config.hostSpec.networking.ports.tcp.ssh;
 
       cfg = config.networking.granularFirewall;
-      granularFirewallRules = lib.mkIf cfg.enable {
-        networking.granularFirewall.allowedRules = [
-          {
-            serviceName = "forgejo";
-            protocol = "tcp";
-            ports = [ forgejoPort ];
-            hosts = config.hostSpec.networking.rules.${config.hostSpec.hostName}.forgejoAllowedHosts;
-          }
-        ];
-      };
       regularFirewallRules = lib.mkIf (cfg.enable == false) {
         networking.firewall.allowedTCPPorts = [ forgejoPort ];
       };
@@ -75,9 +65,6 @@
             service.DISABLE_REGISTRATION = true;
             session.COOKIE_SECURE = true;
 
-            # repository = {
-            #   DISABLE_HTTP_GIT = false;
-            # };
             actions = {
               ENABLED = true;
               DEFAULT_ACTIONS_URL = "github";
@@ -86,7 +73,7 @@
               ENABLED = true;
               SMTP_ADDR = config.hostSpec.email.internalServer;
               PROTOCOL = "smtp+starttls";
-              SMTP_PORT = 25; # FIXME: Running on ooze so using the local relay, but likely should optional
+              SMTP_PORT = 25; # NOTE: Running on ooze so using the local relay
               FROM = "noreply@${config.hostSpec.domain}";
               USER = config.hostSpec.hostName;
               SEND_AS_PLAIN_TEXT = true;
@@ -185,7 +172,6 @@
             "L+ '${cfg.customDir}/public/assets/img/favicon.png' - - - - ${img}/favicon.png"
           ];
       }
-      granularFirewallRules
       regularFirewallRules
     ];
 }
