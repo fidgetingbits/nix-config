@@ -22,6 +22,9 @@ in
       enable = true;
       openFirewall = false; # Set to true if useProxy is false AND you won't managed remotely via ssh
       unifiPackage = pkgs.unstable.unifi;
+      # https://github.com/NixOS/nixpkgs/pull/511607/changes/7685a643866bab316d6fdde455a0c44d3702bfa9
+      # FIXME: This should be default as of 26.05
+      jrePackage = pkgs.jdk25_headless;
       mongodbPackage = pkgs.mongodb-ce;
     };
 
