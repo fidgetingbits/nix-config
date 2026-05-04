@@ -115,7 +115,7 @@ let
           {
             echo "${cfg.folders.source.base}/$folder to ${cfg.server}:${cfg.folders.destination}/$folder"
             echo "-----"
-            cat "$log\n"
+            cat "$log"
             echo "-----"
           } >> "$mirror_log"
 
