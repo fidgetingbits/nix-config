@@ -163,10 +163,14 @@ in
       enable = true;
       role = "server";
       externalInterface = "enp3s0";
-      peerNames = [ "ossa" ];
+      peerNames = [
+        "ossa"
+        "opia"
+      ];
       hosts = net.subnets.olan.hosts;
       wireguardPort = net.ports.udp.wireguard;
       rosenpassPort = net.ports.udp.rosenpass;
+      rosenpassExempt = [ "opia" ];
       subnet = net.wireguard.olan.subnet;
     };
 }

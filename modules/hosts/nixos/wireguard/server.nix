@@ -10,7 +10,9 @@ let
   genWireguardIP = host: "${triplet cfg.subnet}.${lastOctet cfg.hosts.${host}.ip}/32";
 
   mkWireguardPeer = role: host: {
-    publicKey = host.wgpk;
+    publicKey =
+      assert lib.assertMsg (host.wgpk != "") "peer must have valid key";
+      host.wgpk;
     allowedIPs = [ (genWireguardIP host.name) ];
   };
   mkWireguardPeers = role: hosts: (map (host: mkWireguardPeer role host) hosts);

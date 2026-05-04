@@ -17,12 +17,30 @@ let
   hostName = config.networking.hostName;
   inherit (lib.custom.network) triplet lastOctet;
 
-  mkRosenpassPeer = role: host: {
-    public_key = secretsFolder + "/keys/${host.name}_pqpk";
-    peer = host.wgpk;
-    endpoint = if (role == "client") then "${cfg.endpoint}:${toString cfg.rosenpassPort}" else null;
-  };
-  mkRosenpassPeers = role: hosts: (map (host: mkRosenpassPeer role host) hosts);
+  # Not all wireguard peers will have rosenpeer support (eg: android), so check if the
+  # host has a key defined, and if not they get filtered out
+  mkRosenpassPeer =
+    role: host:
+    let
+      public_key = secretsFolder + "/keys/${host.name}_pqpk";
+      keyExists = lib.pathExists public_key;
+    in
+    if keyExists then
+      {
+        inherit public_key;
+        peer = host.wgpk;
+        endpoint = if (role == "client") then "${cfg.endpoint}:${toString cfg.rosenpassPort}" else null;
+      }
+    else
+      lib.warnIf (!keyExists && !(lib.elem host.name cfg.rosenpassExempt))
+        "${host.name} doesn't have a rosenpass public key and isn't white listed. This may impact VPN session security."
+        { };
+  mkRosenpassPeers =
+    role: hosts:
+    hosts
+    |> map (host: mkRosenpassPeer role host)
+    # nixfmt hack
+    |> lib.filter (peer: lib.length (lib.attrNames peer) > 0);
   genWireguardIP = host: "${triplet cfg.subnet}.${lastOctet cfg.hosts.${host}.ip}/32";
 in
 {
@@ -85,6 +103,12 @@ in
       type = lib.types.int;
       example = 9999;
       description = "Rosenpass UDP port";
+    };
+
+    rosenpassExempt = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      example = [ "hostA" ];
+      description = "List of systems that won't use Rosenpass. e.g. An Android device.";
     };
 
     hosts = lib.mkOption {
@@ -153,7 +177,8 @@ in
       };
     };
 
-    # FIXME: Need to figure out what to switch to after switched from wg-quick... sometimes still fails on rebuild
+    # FIXME: Need to figure out what to switch to after switched from
+    # wg-quick... sometimes still fails on rebuild
     systemd.services.rosenpass = {
       after = [
         "network-online.target"
