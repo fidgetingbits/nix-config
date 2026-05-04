@@ -76,6 +76,16 @@ update HOST=`hostname` *INPUT:
     nix flake update {{ INPUT }} --timeout 5
     @just copy-lock-out {{ HOST }}
 
+# Update current systems flake lock and then copy to every other host
+[group("update")]
+update-all:
+    #!/usr/bin/env bash
+    HOST=$(hostname)
+    just update
+    for lock in $(ls locks/); do
+        cp locks/$HOST.lock locks/$lock
+    done
+
 # Update and then rebuild
 [group("building")]
 upgrade: update rebuild
