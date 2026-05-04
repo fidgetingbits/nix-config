@@ -12,20 +12,21 @@
       let
         net = config.hostSpec.networking;
         inherit (config.hostSpec) domain;
+        olan = net.subnets.olan;
       in
       {
         enable = true;
         role = "client";
         peerNames = [ "ooze" ];
         allowedIPs = [
-          net.wireguard.olan.subnet
-          net.subnets.olan.cidr
+          olan.wireguard.subnet
+          olan.cidr
         ];
         hosts = net.subnets.olan.hosts;
         endpoint = "vpn.${domain}";
         wireguardPort = net.ports.udp.wireguard;
         rosenpassPort = net.ports.udp.rosenpass;
-        subnet = net.wireguard.olan.subnet;
+        subnet = olan.wireguard.subnet;
         dns = {
           enable = true;
           server = net.subnets.olan.hosts.ogre.ip;
