@@ -83,15 +83,6 @@
     wallpaperDir = "${config.home.homeDirectory}/images/wallpaper/catppuccin-mocha";
   };
 
-  # FIXME: Move this to tridactyl location
-  # See https://github.com/DivitMittal/firefox-nixCfg/blob/dc55e3750eac4d6381301901e269106efae621ff/config/tridactyl/config/tridactylrc for more examples (and tridactyl repo)
-  xdg.configFile."tridactyl/tridactylrc" = {
-    enable = true;
-    source = (lib.custom.relativeToRoot "modules/home/auto/firefox/tridactylrc");
-    recursive = true;
-  };
-  programs.firefox.nativeMessagingHosts = [ pkgs.tridactyl-native ];
-
   # Allows to show talon icon in system tray on X11
   services.snixembed.enable = osConfig.hostSpec.voiceCoding;
 
