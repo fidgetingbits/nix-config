@@ -72,7 +72,7 @@
               APP_NAME = "FidgetingGit";
               APP_SLOGAN = "Like lieutenant Dan we rollin'";
             };
-            service.DISABLE_REGISTRATION = false;
+            service.DISABLE_REGISTRATION = true;
             session.COOKIE_SECURE = true;
 
             # repository = {
@@ -169,7 +169,6 @@
         };
 
         # Add custom themes/icons to forgejo instance
-        # FIXME: Should probably be an option
         systemd.tmpfiles.rules =
           let
             cfg = config.services.forgejo;
