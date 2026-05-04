@@ -15,6 +15,11 @@ in
 
   imports = [ ./services/nginx.nix ];
 
+  # With no explicit rules this will make nginx listen on localhost only
+  # No SSL certs will make it listen on localhost:80, which is okay.
+  # WARNING: On a system hosting actual nginxProxy services, this may be
+  # problematic. Current untested.
+  networking.granularFirewall.enable = true;
   services.nginx = {
     virtualHosts.localhost = {
       locations."/" = {
