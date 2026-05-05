@@ -106,7 +106,6 @@
     borgRemotePath = "/run/current-system/sw/bin/borg";
     borgBackupPath = "/mnt/storage/backup/aa";
     borgNotifyTo = config.hostSpec.email.${config.hostSpec.hostName}.backups;
-
   };
 
   # Connect our NUT client to the UPS on the network
