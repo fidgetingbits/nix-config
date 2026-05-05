@@ -2,6 +2,7 @@
 {
   inputs,
   lib,
+  # config,
   ...
 }:
 {
@@ -75,10 +76,15 @@
     settings.Login.HandlePowerKey = lib.mkForce "reboot";
   };
 
-  # FIXME:
+  # FIXME: need to setup restricted authorizedKey on moth still
   # services.backup = {
   #   enable = true;
-  #   borgBackupStartTime = "*-*-* 09:00:00";
+  #   borgBackupStartTime = "*-*-* 04:30:00";
+  #   borgUser = "aa";
+  #   borgServer = "moth.${config.hostSpec.domain}";
+  #   borgRemotePath = "/run/current-system/sw/bin/borg";
+  #   borgBackupPath = "/mnt/storage/backup/aa";
+  #   borgNotifyTo = config.hostSpec.email.${config.hostSpec.hostName}.backups;
   # };
 
   sops = {
