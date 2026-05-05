@@ -18,6 +18,7 @@ let
   # NOTE: AMD AI 395+ with rocm 6 and rocm 7.0.1 (see overlay) both crash loading gguf files
   #llama-cpp = pkgs.llama-cpp.override { rocmSupport = true; };
   llama-cpp = pkgs.llama-cpp.override { vulkanSupport = true; };
+  ports = config.hostSpec.networking.ports;
 in
 {
   options = {
@@ -63,8 +64,8 @@ in
       # https://github.com/skissue/dotfiles/blob/main/hosts/windstorm/llama-swap.nix
       services.llama-swap = {
         enable = true;
-        openFirewall = true;
-        port = config.hostSpec.networking.ports.tcp.llama-swap;
+        openFirewall = !config.networking.granularFirewall.enable;
+        port = ports.tcp.llama-swap;
 
         settings =
           let
@@ -115,11 +116,32 @@ in
             };
           };
       };
+
       # When using -hf for models, it will auto-download from HuggingFace to this cache path
       systemd.services.llama-swap = {
         environment."LLAMA_CACHE" = cachePath;
         serviceConfig.CacheDirectory = "llama-swap";
       };
+
+      # FIXME: Expose the hosts as an option, expand who can talk to it
+      networking.granularFirewall =
+        let
+          devices = [
+            "ossa"
+          ];
+          hosts = lib.map (d: config.hostSpec.networking.subnets.olan.hosts.${d}) devices;
+        in
+        {
+          enable = true;
+          allowedRules = [
+            {
+              serviceName = "llama-swap";
+              protocol = "tcp";
+              ports = [ ports.tcp.llama-swap ];
+              inherit hosts;
+            }
+          ];
+        };
     })
 
     (lib.mkIf cfg.enable {
