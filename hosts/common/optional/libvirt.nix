@@ -103,6 +103,23 @@ in
   # Need to add [File (in the menu bar) -> Add connection] when start for the first time
   programs.virt-manager.enable = true;
 
+  # Try to prevent an issue where nftables don't seen enabled after service restart
+  systemd.services.nixvirt = {
+    after = [
+      "network-online.target"
+      "nftables.service"
+      "libvirtd.service"
+    ];
+    requires = [ "network-online.target" ];
+
+    # Often fails due to nftable table not being available, so try again
+    serviceConfig = {
+      Restart = "on-failure";
+      RestartSec = "5s";
+      StartLimitBurst = 3;
+    };
+  };
+
   environment = {
     systemPackages = [
       # QEMU/KVM(HostCpuOnly), provides:
