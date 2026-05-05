@@ -55,6 +55,11 @@ lib.mkIf config.programs.firefox.enable {
       " Handy multiwindow/multitasking binds
       bind gD composite tabduplicate; tabdetach
 
+      " FIXME: Need to somehow disable default c-n/c-p in cmdline mode
+      " More vim-like, instead of tab
+      " bind --mode=ex <C-n> completions_next
+      " bind --mode=ex <C-p> completions_prev
+
       " FIXME: Add some of my search aliases
       " bind c fillcmdline_notrail tabopen @nix
 
