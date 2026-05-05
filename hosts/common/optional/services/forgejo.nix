@@ -121,7 +121,8 @@
 
         services.nginxProxy.services = [
           {
-            subDomain = "git";
+            subDomain = "git"; # Creates git.host.domain
+            extraDomains = [ "git.${config.hostSpec.domain}" ];
             port = forgejoPort;
             ssl = false;
           }
