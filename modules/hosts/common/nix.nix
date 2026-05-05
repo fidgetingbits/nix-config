@@ -115,6 +115,7 @@ in
         # https://discourse.nixos.org/t/nix-2-30-0-released/66449/4
         package = lib.mkForce pkgs.unstable.nixVersions.git;
         settings = {
+
           # See https://jackson.dev/post/nix-reasonable-defaults/
           connect-timeout = 5;
           log-lines = 25;
@@ -144,6 +145,9 @@ in
             "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
           ];
 
+          # Limit which users can use nix.
+          # This reduces exposure to privilege escalation bugs like CVE-2026-39860
+          allowed-users = [ "@users" ];
         }
         // lib.optionalAttrs (hostSpec.useAtticCache) {
           # FIXME: This might not only contain attic-related entries in the future
