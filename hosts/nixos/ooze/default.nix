@@ -173,4 +173,10 @@ in
       rosenpassExempt = [ "opia" ];
       subnet = net.subnets.olan.wireguard.subnet;
     };
+
+  # This enables immich service with ML offload to oedo
+  services.immichML = {
+    enable = true;
+    remoteMachineLearningHost = "oedo";
+  };
 }

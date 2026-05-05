@@ -7,7 +7,19 @@
           options = {
             subDomain = lib.mkOption {
               type = lib.types.str;
-              description = "Sub-domain name for the proxy";
+              description = ''
+                Sub-domain name for the proxy. By default uses: ''${subDomain}.''${hostname}.''${domain}.
+                For additional domains, use cfg.extraDomains
+              '';
+            };
+            extraDomains = lib.mkOption {
+              type = lib.types.listOf lib.types.str;
+              default = [ ];
+              example = [ "foo.example.com" ];
+              description = ''
+                List of additional subdomains that are mapped in addition to the normal ''${subDomain}.''${hostname}.''${domain}.
+                This allows you to say have git.example.com, in addition to the default git.serverName.example.com
+              '';
             };
             port = lib.mkOption {
               type = lib.types.port;
@@ -18,10 +30,10 @@
               default = true;
               description = "Use SSL";
             };
-            extraConfig = lib.mkOption {
+            extraSettings = lib.mkOption {
               type = lib.types.attrsOf lib.types.anything;
               default = { };
-              description = "Extra nginx location configuration";
+              description = "Extra nginx location settings and configuration";
             };
           };
         }
@@ -40,13 +52,16 @@
     in
     {
       services.nginx.virtualHosts = lib.mkMerge (
-        map (
+        lib.concatMap (
           service:
           let
-            domain = "${service.subDomain}.${config.hostSpec.hostName}.${config.hostSpec.domain}";
+            domains = [
+              "${service.subDomain}.${config.hostSpec.hostName}.${config.hostSpec.domain}"
+            ]
+            ++ service.extraDomains;
             uri = if service.ssl then "https" else "http";
           in
-          {
+          map (domain: {
             "${domain}" = {
               listenAddresses = [ "0.0.0.0" ];
               onlySSL = true;
@@ -55,24 +70,27 @@
                 recommendedProxySettings = true;
                 proxyPass = "${uri}://127.0.0.1:${toString service.port}";
               }
-              // service.extraConfig;
+              // service.extraSettings;
             };
-          }
+          }) domains
         ) cfg.services
       );
 
       security.acme.certs = lib.mkMerge (
-        map (
+        lib.concatMap (
           service:
           let
-            domain = "${service.subDomain}.${config.hostSpec.hostName}.${config.hostSpec.domain}";
+            domains = [
+              "${service.subDomain}.${config.hostSpec.hostName}.${config.hostSpec.domain}"
+            ]
+            ++ service.extraDomains;
           in
-          {
+          map (domain: {
             "${domain}" = {
               inherit domain;
               group = config.services.nginx.group;
             };
-          }
+          }) domains
         ) cfg.services
       );
     };

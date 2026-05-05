@@ -67,7 +67,12 @@
       network = hostSpec.networking;
       domain = hostSpec.domain;
     in
-    { }
+    {
+      # FIXME: This should only be local or wireguard peered
+      "photos.${domain}" = [
+        "immich.ooze.${domain}"
+      ];
+    }
     // lib.optionalAttrs config.hostSpec.isLocal {
       # Internal
       "${network.subnets.oxid.gateway}" = [ "oxid.${domain}" ];

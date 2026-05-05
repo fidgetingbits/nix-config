@@ -131,6 +131,17 @@
     enable = true;
     interval = "monthly";
   };
+
+  services.immichML =
+    let
+      hosts = config.hostSpec.networking.subnets.olan.hosts;
+    in
+    {
+      enable = true;
+      isRemoteMachineLearningServer = true; # Host ML parsing server onlyallowed
+      immichServers = [ hosts.ooze ]; # List of systems allowed to access ML service
+    };
+
   # ${namespace}.services.monit = {
   #   enable = true;
   #   usage = {
