@@ -97,7 +97,7 @@ let
         folders=(${leafFolders})
         # Loop over each collections folder and sync each sub folder
         # shellcheck disable=SC2043
-        for collection in "${collectionFolders}"; do
+        for collection in ${collectionFolders}; do
           while IFS= read -r -d "" folder
           do
             folders+=("$collection/$folder")
