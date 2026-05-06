@@ -112,12 +112,6 @@ lib.mkMerge [
                 type = restrictedType;
                 inherit versioning ignorePatterns;
               };
-              scripts = {
-                path = "${homeDirectory}/scripts/";
-                devices = desktops;
-                type = restrictedType;
-                inherit versioning ignorePatterns;
-              };
               wiki = {
                 path = "${homeDirectory}/wiki/";
                 devices = desktops ++ mobiles;
