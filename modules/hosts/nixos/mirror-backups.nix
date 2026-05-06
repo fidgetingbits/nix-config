@@ -44,7 +44,7 @@ let
               --delete \
               --chmod=Dg+srwx,Fg+rw,o-rwx \
               -e "ssh -l ${cfg.user} -i ${sshKeyPath} -p ${port} -oIdentitiesOnly=yes" \
-              ${cfg.folders.source.base}/"$subfolder" \
+              ${cfg.folders.source.base}/"$subfolder/" \
               ${cfg.server}:"$destination" >> "$log" 2>&1
         EOF
         }
