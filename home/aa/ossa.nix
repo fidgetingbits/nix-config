@@ -55,6 +55,7 @@
     lib.attrValues {
       inherit (pkgs)
         ntfs3g
+        immich-cli
         ;
       inherit (pkgs.introdus)
         easylkb
@@ -72,11 +73,17 @@
       }))
     ];
 
+  # FIXME: Could setup some sort of auto-upload to immich for dumping into a specific folder
+  # like https://github.com/kiriwalawren/dotnix/blob/2f8d698c88fdb8ed260be077f4b2bbd00fdb063b/modules/system/immich-upload.nix#L39
+  sops.secrets."keys/immich" = { };
+
   home.sessionVariables = {
     # This variable prevents the following from being spammed to the console constantly:
     # "MESA: warning: Support for this platform is experimental with Xe KMD, bug reports may be ignored."
     # See https://docs.mesa3d.org/envvars.html for details
     MESA_LOG_FILE = "/dev/null";
+    IMMICH_INSTANCE_URL = "https://immich.ooze.${osConfig.hostSpec.domain}";
+    IMMICH_API_KEY = "cat ${config.sops.secrets."keys/immich".path}";
   };
 
   introdus.services.awww = {
