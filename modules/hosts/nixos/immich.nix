@@ -51,7 +51,6 @@ in
           };
         };
 
-      # FIXME: We probably need to adjust max file size for uploads, etc?
       services.nginxProxy.services = [
         {
           subDomain = "immich"; # Creates git.host.domain
@@ -97,7 +96,6 @@ in
     })
 
     (lib.mkIf cfg.isRemoteMachineLearningServer {
-
       services.immich = {
         enable = true;
         openFirewall = !config.networking.granularFirewall.enable;
@@ -107,6 +105,7 @@ in
           IMMICH_HOST = lib.mkForce "0.0.0.0";
           IMMICH_PORT = lib.mkForce (toString ports.tcp.immich-ml);
         };
+        accelerationDevices = null; # Grant access for hardware acceleration
       };
       # Only run the machine-learning portion
       systemd.services.immich-server = lib.mkForce { };
@@ -137,12 +136,16 @@ in
     })
 
     (lib.mkIf cfg.enable {
-
       environment = lib.optionalAttrs config.introdus.impermanence.enable {
         persistence = {
           "${config.hostSpec.persistFolder}".directories = [ "/var/lib/immich" ];
         };
       };
+      users.users.immich.extraGroups = lib.optionals (config.services.immich.accelerationDevices != [ ]) [
+        "video"
+        "render"
+        "media"
+      ];
     })
   ];
 }
