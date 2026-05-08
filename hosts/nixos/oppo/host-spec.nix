@@ -14,7 +14,7 @@
     hdr = (lib.mkOverride 100) true;
     scaling = (lib.mkOverride 100) "2";
     isProduction = (lib.mkOverride 100) true;
-    isDevelopment = (lib.mkOverride 100) true;
+    isDevelopment = (lib.mkOverride 100) false;
     isIntrodusDev = (lib.mkOverride 100) false;
     isImpermanent = (lib.mkOverride 100) true;
 
