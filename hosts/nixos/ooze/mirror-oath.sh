@@ -5,18 +5,9 @@
 # Overview:
 #   enter the synology as borg user
 #   plant an ssh key
-#   connect to oath and have it directly rsync to moth
-#
-# TODO:
-#   - [ ] This needs to to implement 'collectionsFolder' logic that mirror-backups is
-#         using, so we can re-add --delete
-#
-# FIXME: We may need to add some synology-specific functionality to prevent
-# auto-updates auto-reboot during sync?
+#   connect to oath and have it directly rsync each sub folder to moth
 #
 # FIXME: Rework to deduplicate as much as possible with long-rsync/mirror-backups
-
-set -x
 
 STARTED=$(date "+%Y-%m-%d %H:%M:%S")
 KEY_FILE=/root/.ssh/id_borg
@@ -70,33 +61,48 @@ trap cleanup EXIT
 
 runSshI "$SOURCE" "chmod 600 id_mirror"
 
-RSYNC_PATH="/run/current-system/sw/bin/rsync" # /bin/rsync is what's on the synology, but allow override
+# /bin/rsync is what's on the synology, but allow override
+RSYNC_PATH="/run/current-system/sw/bin/rsync"
 FILENAME="rsync.sh"
 cat >>"$tmp_dir"/rsync.sh <<EOF
+set -x
 exec {LOCKFD}>~/"$LOCK".lock
 if ! flock -n $LOCKFD; then
     echo "Another copy of $TOOL is running; exiting"
     exit 0
 fi
 
-# FIXME: Remove --remote-option=--log-file=/tmp/rlog after debugging
-# FIXME: Fix this messing up the permissions of the destination folder (becomes 711)
-# Switch to --info=progress2 probably
-# Add the chmod to match the other script?
-# We will want to add --delete eventually
-#
-# Debug:
-# --remote-option=--log-file=/tmp/rlog \
-# --dry-run \
-rsync -aHSP \
-    --stats \
-    --rsync-path=$RSYNC_PATH \
-    --dry-run
-    --remote-option=--log-file=/tmp/rlog \
-    --chmod=Dg+srwx,Fg+rw,o-rwx \
-    -e "ssh ${sshArgs[@]} -i id_mirror -o IdentitiesOnly=yes -o BatchMode=yes" \
-    "$SOURCE_FOLDER" \
-    "$DEST_USER@$DEST_HOST:$DEST_FOLDER"
+# This syncs to a destination folder that may already have contents mirrored/synced
+# from other servers. This means in order to use --delete, we must iterate over each
+# sub directory
+
+for sub in \$(find "$SOURCE_FOLDER" -mindepth 1 -maxdepth 1 -type d -printf "%P\n"); do
+    echo "Processing collection subfolder: \$sub"
+
+    # e.g., /mnt/storage/mirror/aa/ossa
+    DEST_SUBFOLDER="${DEST_FOLDER%/}/\$sub"
+
+    # Create the folder if it doesn't exist already
+    ssh ${sshArgs[*]} \
+        -i id_mirror -o IdentitiesOnly=yes -o BatchMode=yes \
+        "$DEST_USER@$DEST_HOST" \
+        "mkdir -p \$DEST_SUBFOLDER 2>/dev/null || true"
+
+    # FIXME: Fix this messing up the permissions of the destination folder (becomes 711)
+    # We will want to add --delete eventually
+    #
+    # Debug:
+    # --remote-option=--log-file=/tmp/rlog
+    # --dry-run
+    echo "Mirroring \$sub"
+    rsync -aHSP \
+        --stats \
+        --rsync-path=$RSYNC_PATH \
+        --chmod=Dg+srwx,Fg+rw,o-rwx \
+        -e "ssh ${sshArgs[*]} -i id_mirror -o IdentitiesOnly=yes -o BatchMode=yes" \
+        "$SOURCE_FOLDER/\$sub/" \
+        "$DEST_USER@$DEST_HOST:\$DEST_SUBFOLDER"
+done
 EOF
 
 runScp "$tmp_dir/$FILENAME" "$SOURCE:$FILENAME"
