@@ -17,6 +17,7 @@ let
       in
       "wakeonlan ${lib.elemAt oppo.mac 0} -i ${oppo.ip}";
   };
+
   mirror-oath = pkgs.writeShellApplication {
     name = "mirror-oath";
     runtimeInputs = lib.attrValues {
@@ -64,6 +65,8 @@ in
           "services/postfix-proton-relay.nix"
           "services/unifi.nix" # Unifi Controller
           "services/forgejo.nix" # git forge
+          "services/webdav.nix" # for grapheneos seedvault backups
+          "services/calibre-web.nix" # ebook management
 
           "acme.nix"
           "remote-builder.nix"
