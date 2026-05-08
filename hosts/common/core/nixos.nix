@@ -193,5 +193,31 @@
   # backup mirror assumes users is a shared gid across hosts, so hardcode it in case nixos ever changes the default
   users.groups.users.gid = 100;
 
+  # copy fail / dirty frag mitigations
+  boot.blacklistedKernelModules = [
+    "af_alg"
+    "algif_aead"
+    "algif_skcipher"
+    "algif_hash"
+    "algif_rng"
+
+    "esp4"
+    "esp6"
+    "rxrpc"
+  ];
+  boot.extraModprobeConfig = ''
+    install af_alg         ${pkgs.coreutils}/bin/false
+    install algif_aead     ${pkgs.coreutils}/bin/false
+    install algif_skcipher ${pkgs.coreutils}/bin/false
+    install algif_hash     ${pkgs.coreutils}/bin/false
+    install algif_rng      ${pkgs.coreutils}/bin/false
+    install authenc        ${pkgs.coreutils}/bin/false
+    install authencesn     ${pkgs.coreutils}/bin/false
+
+    install esp4           ${pkgs.coreutils}/bin/false
+    install esp6           ${pkgs.coreutils}/bin/false
+    install rxrpc          ${pkgs.coreutils}/bin/false
+  '';
+
   system.stateVersion = "23.05";
 }
