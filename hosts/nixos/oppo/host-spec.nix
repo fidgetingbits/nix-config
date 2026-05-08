@@ -1,6 +1,5 @@
 { inputs, lib, ... }:
 {
-
   # Host Specification
   hostSpec = {
     # Read current directory to get the host name
