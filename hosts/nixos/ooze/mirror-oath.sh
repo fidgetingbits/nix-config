@@ -16,6 +16,8 @@
 #
 # FIXME: Rework to deduplicate as much as possible with long-rsync/mirror-backups
 
+set -x
+
 STARTED=$(date "+%Y-%m-%d %H:%M:%S")
 KEY_FILE=/root/.ssh/id_borg
 SOURCE_HOST=oath
@@ -48,7 +50,7 @@ function runScp {
 }
 
 function cleanup {
-    runSshI "rm id_mirror rsync.sh"
+    runSshI "$SOURCE" "rm id_mirror rsync.sh"
     rm -rf "$tmp_dir"
 }
 
@@ -81,10 +83,15 @@ fi
 # FIXME: Fix this messing up the permissions of the destination folder (becomes 711)
 # Switch to --info=progress2 probably
 # Add the chmod to match the other script?
+# We will want to add --delete eventually
+#
+# Debug:
+# --remote-option=--log-file=/tmp/rlog \
+# --dry-run \
 rsync -aHSP \
     --stats \
-    --dry-run \
     --rsync-path=$RSYNC_PATH \
+    --dry-run
     --remote-option=--log-file=/tmp/rlog \
     --chmod=Dg+srwx,Fg+rw,o-rwx \
     -e "ssh ${sshArgs[@]} -i id_mirror -o IdentitiesOnly=yes -o BatchMode=yes" \
