@@ -63,6 +63,10 @@ in
     --expr 'rec { pkgs = import <nixpkgs>{}; lib = pkgs.lib; }'
   '';
 
+  # nftables
+  nftls = "sudo nft -at list ruleset"; # list all tables and chains
+  nftlsi = "sudo nft -at list chain inet nixos-fw input-allow"; # list the allow chain for the main table
+
   dmesg = "sudo dmesg -H";
   # finding
   t = "tree";
