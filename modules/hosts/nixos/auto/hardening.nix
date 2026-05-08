@@ -77,9 +77,5 @@
     # The value is taken from the KSPP recommendations (Debian uses 4096).
     boot.kernel.sysctl."vm.mmap_min_addr" = lib.mkDefault 65536;
     boot.kernel.sysctl."kernel.kptr_restrict" = lib.mkOverride 500 2;
-
-    # Limit which users can use nix.
-    # This reduces exposure to privilege escalation bugs like CVE-2026-39860
-    nix.settings.allowed-users = [ "@users" ];
   };
 }
