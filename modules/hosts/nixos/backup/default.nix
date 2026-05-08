@@ -255,7 +255,7 @@ in
             exec msmtp -t <<EOF
           To: ${recipients}
           From:${cfg.borgNotifyFrom}
-          Subject: [${config.networking.hostName}: backup] $(date +%Y-%m-%d_%H-%M) $SUBJECT
+          Subject: [$BORG_HOST: backup] $(date +%Y-%m-%d_%H-%M) $SUBJECT
 
           $(cat "$LOGFILE")
           EOF
@@ -283,14 +283,16 @@ in
       borg-backup-test-email = pkgs.writeShellApplication {
         name = "borg-backup-test-email";
         runtimeInputs = [ pkgs.msmtp ];
-        text = ''
-          TOOL_DESCRIPTION="Test borg script email sending function"
-          ${shellScriptHelpers}
-          ${shellScriptEmail}
-          LOGFILE=$(mktemp)
-          echo "Test backup from $(hostname)" >"$LOGFILE"
-          email_results
-        '';
+        text =
+          # bash
+          ''
+            TOOL_DESCRIPTION="Test borg script email sending function"
+            ${shellScriptHelpers}
+            ${shellScriptEmail}
+            LOGFILE=$(mktemp)
+            echo "Test backup from $(hostname)" >"$LOGFILE"
+            email_results
+          '';
       };
 
       borg-backup-btrfs-subvolume = pkgs.writeShellApplication {
@@ -302,42 +304,47 @@ in
           pkgs.umount
           pkgs.msmtp
           borg-backup-init
+          borg-backup-list
         ];
-        text = ''
-          TOOL_DESCRIPTION="Use borg to backup a btrfs subvolume"
-          ${shellScriptOptionHandling}
-          ${shellScriptHelpers}
-          ${shellScriptEmail}
-          parse_args "0" "$@"
+        text =
+          # bash
+          ''
+            TOOL_DESCRIPTION="Use borg to backup a btrfs subvolume"
+            ${shellScriptOptionHandling}
+            ${shellScriptHelpers}
+            ${shellScriptEmail}
+            parse_args "0" "$@"
 
-          LOGFILE="${cfg.borgBackupLogPath}"
+            LOGFILE="${cfg.borgBackupLogPath}"
 
-          # Configure a new backup if one doesn't already exist
-          borg-backup-init || true
+            # Configure a new backup if one doesn't already exist
+            # Redirect errors to avoid confusing with constant "A repo already exists at" spam
+            borg-backup-init 2>/dev/null || true
 
-          ${shellScriptCheckLock}
+            ${shellScriptCheckLock}
 
-          function borg_backup() {
-            MOUNTDIR=$(mktemp -d)
-            mount -t btrfs -o subvol=/ "$BORG_BTRFS_VOLUME" "$MOUNTDIR"
-            BACKUP_PATH="$MOUNTDIR/$BORG_BTRFS_SUBVOLUME"
-            # Borg doesn't let you specify the source parent folder that you want to recover, we enter the temp folder to
-            # prevent it from showing up while doing recoveries
-            cd "$BACKUP_PATH"
-            #shellcheck disable=SC2086
-            if borg create --remote-path $BORG_REMOTE_PATH -v --stats --exclude-caches "$BORG_REMOTE::$BORG_BACKUP_NAME" $PWD \
-              --exclude-if-present .nobackup \
-              ${if pkgs.stdenv.isDarwin then "--exclude-from ${darwinExcludesFile}" else " "} \
-              --exclude-from ${borgExcludesFile}; then
-              # NOTE: --glob-archives works like a tag, so we can rename pinned backups with a none matching prefix like pinned-...
-              borg prune --remote-path $BORG_REMOTE_PATH -v --list "$BORG_REMOTE" --glob-archives "$BORG_HOST-*" $BORG_EXPIRY
-            fi
-            cd -
-            umount "$MOUNTDIR"
-          }
-          borg_backup >$LOGFILE 2>&1
-          email_results
-        '';
+            function borg_backup() {
+              MOUNTDIR=$(mktemp -d)
+              mount -t btrfs -o subvol=/ "$BORG_BTRFS_VOLUME" "$MOUNTDIR"
+              BACKUP_PATH="$MOUNTDIR/$BORG_BTRFS_SUBVOLUME"
+              # Borg doesn't let you specify the source parent folder that you
+              # want to recover, we enter the temp folder to prevent it from
+              # showing up while doing recoveries
+              cd "$BACKUP_PATH"
+              #shellcheck disable=SC2086
+              if borg create --remote-path $BORG_REMOTE_PATH -v --stats --exclude-caches "$BORG_REMOTE::$BORG_BACKUP_NAME" $PWD \
+                --exclude-if-present .nobackup \
+                ${if pkgs.stdenv.isDarwin then "--exclude-from ${darwinExcludesFile}" else " "} \
+                --exclude-from ${borgExcludesFile}; then
+                # NOTE: --glob-archives works like a tag, so we can rename pinned backups with a none matching prefix like pinned-...
+                borg prune --remote-path $BORG_REMOTE_PATH -v --list "$BORG_REMOTE" --glob-archives "$BORG_HOST-*" $BORG_EXPIRY
+              fi
+              cd -
+              umount "$MOUNTDIR"
+            }
+            borg_backup >$LOGFILE 2>&1
+            email_results
+          '';
       };
 
       borg-backup-paths = pkgs.writeShellApplication {
@@ -346,202 +353,223 @@ in
           pkgs.borgbackup
           pkgs.mount
           pkgs.msmtp
+          borg-backup-init
+          borg-backup-list
         ];
-        text = ''
-          TOOL_DESCRIPTION="Use borg to backup a list of paths"
-          ${shellScriptOptionHandling}
-          ${shellScriptHelpers}
-          ${shellScriptEmail}
-          parse_args "0" "$@"
-          # FIXME: Would be nice if this part could just be generic
-          LOGFILE="${cfg.borgBackupLogPath}"
+        text =
+          # bash
+          ''
+            TOOL_DESCRIPTION="Use borg to backup a list of paths"
+            ${shellScriptOptionHandling}
+            ${shellScriptHelpers}
+            ${shellScriptEmail}
+            parse_args "0" "$@"
+            # FIXME: Would be nice if this part could just be generic
+            LOGFILE="${cfg.borgBackupLogPath}"
 
-          # Configure a new backup if one doesn't already exist
-          borg-backup-init || true
+            # Configure a new backup if one doesn't already exist
+            borg-backup-init || true
 
-          ${shellScriptCheckLock}
+            ${shellScriptCheckLock}
 
-          function borg_backup() {
-              # samba mounts that we want to exclude from the backup
-              MOUNT_EXCLUDES=()
-              for MOUNT in $(mount | grep -i cifs | cut -d" " -f3); do
-                  MOUNT_EXCLUDES+=("--exclude $MOUNT")
-              done
-              # FIXME(borg): Add a check to see if we need to run borg init
-              #shellcheck disable=SC2096,SC2068,SC2086
-              if borg create --remote-path $BORG_REMOTE_PATH -v --stats --exclude-caches "$BORG_REMOTE::$BORG_BACKUP_NAME" \
-                $BORG_BACKUP_PATHS \
-                --exclude-from ${borgExcludesFile} \
-                ''${MOUNT_EXCLUDES[@]}; then
-                borg prune --remote-path $BORG_REMOTE_PATH -v --list "$BORG_REMOTE" --glob-archives "$BORG_HOST-*" $BORG_EXPIRY
-              fi
-            }
-          borg_backup >$LOGFILE 2>&1
-          email_results
-        '';
+            function borg_backup() {
+                # samba mounts that we want to exclude from the backup
+                MOUNT_EXCLUDES=()
+                for MOUNT in $(mount | grep -i cifs | cut -d" " -f3); do
+                    MOUNT_EXCLUDES+=("--exclude $MOUNT")
+                done
+                # FIXME(borg): Add a check to see if we need to run borg init
+                #shellcheck disable=SC2096,SC2068,SC2086
+                if borg create --remote-path $BORG_REMOTE_PATH -v --stats --exclude-caches "$BORG_REMOTE::$BORG_BACKUP_NAME" \
+                  $BORG_BACKUP_PATHS \
+                  --exclude-from ${borgExcludesFile} \
+                  ''${MOUNT_EXCLUDES[@]}; then
+                  borg prune --remote-path $BORG_REMOTE_PATH -v --list "$BORG_REMOTE" --glob-archives "$BORG_HOST-*" $BORG_EXPIRY
+                fi
+              }
+            borg_backup >$LOGFILE 2>&1
+            email_results
+          '';
       };
 
       borg-backup-mount = pkgs.writeShellApplication {
         name = "borg-backup-mount";
         runtimeInputs = [ pkgs.borgbackup ];
-        text = ''
-          TOOL_DESCRIPTION="Mount a specified backup to a local directory"
-          USAGE="<backup_name>"
-          ${shellScriptOptionHandling}
-          ${shellScriptHelpers}
+        text =
+          # bash
+          ''
+            TOOL_DESCRIPTION="Mount a specified backup to a local directory"
+            USAGE="<backup_name>"
+            ${shellScriptOptionHandling}
+            ${shellScriptHelpers}
 
-          parse_args "1" "$@"
-          backup_name="''${POSITIONAL_ARGS[0]}"
+            parse_args "1" "$@"
+            backup_name="''${POSITIONAL_ARGS[0]}"
 
-          BORG_MOUNT_PATH="''${BORG_MOUNT_PATH:-${cfg.borgMountDir}/$BORG_HOST}/"
-          if [ ! -d "$BORG_MOUNT_PATH" ]; then
-            mkdir -p "$BORG_MOUNT_PATH"
-            echo "Created missing mount directory $BORG_MOUNT_PATH"
-          fi
+            BORG_MOUNT_PATH="''${BORG_MOUNT_PATH:-${cfg.borgMountDir}/$BORG_HOST}/"
+            if [ ! -d "$BORG_MOUNT_PATH" ]; then
+              mkdir -p "$BORG_MOUNT_PATH"
+              echo "Created missing mount directory $BORG_MOUNT_PATH"
+            fi
 
-          #shellcheck disable=SC2086
-          borg mount --remote-path $BORG_REMOTE_PATH -v "$BORG_REMOTE"::"$backup_name" "$BORG_MOUNT_PATH"
-          echo "Backup mounted at $BORG_MOUNT_PATH"
-        '';
+            #shellcheck disable=SC2086
+            borg mount --remote-path $BORG_REMOTE_PATH -v "$BORG_REMOTE"::"$backup_name" "$BORG_MOUNT_PATH"
+            echo "Backup mounted at $BORG_MOUNT_PATH"
+          '';
       };
 
       borg-backup-umount = pkgs.writeShellApplication {
         name = "borg-backup-umount";
         runtimeInputs = [ pkgs.borgbackup ];
-        text = ''
-          TOOL_DESCRIPTION="Unmount BORG_BACKUP_NAME backup path (Default: ${cfg.borgMountDir}/${hostName})"
-          ${shellScriptOptionHandling}
-          ${shellScriptHelpers}
+        text =
+          # bash
+          ''
+            TOOL_DESCRIPTION="Unmount BORG_BACKUP_NAME backup path (Default: ${cfg.borgMountDir}/${hostName})"
+            ${shellScriptOptionHandling}
+            ${shellScriptHelpers}
 
-          parse_args "0" "$@"
+            parse_args "0" "$@"
 
-          BORG_MOUNT_PATH="''${BORG_MOUNT_PATH:-${cfg.borgMountDir}/$BORG_HOST}/"
-          if [ ! -d "$BORG_MOUNT_PATH" ]; then
-            echo "Mount directory $BORG_MOUNT_PATH does not exist"
-            exit 1
-          fi
+            BORG_MOUNT_PATH="''${BORG_MOUNT_PATH:-${cfg.borgMountDir}/$BORG_HOST}/"
+            if [ ! -d "$BORG_MOUNT_PATH" ]; then
+              echo "Mount directory $BORG_MOUNT_PATH does not exist"
+              exit 1
+            fi
 
-          #shellcheck disable=SC2086
-          borg umount "$BORG_MOUNT_PATH"
-          echo "Backup unmounted from $BORG_MOUNT_PATH"
-        '';
+            #shellcheck disable=SC2086
+            borg umount "$BORG_MOUNT_PATH"
+            echo "Backup unmounted from $BORG_MOUNT_PATH"
+          '';
       };
 
       borg-backup-mount-list = pkgs.writeShellApplication {
         name = "borg-backup-mount-list";
         runtimeInputs = [ pkgs.borgbackup ];
-        text = ''
-          mount | grep borgfs
-        '';
+        text =
+          # bash
+          ''
+            mount | grep borgfs
+          '';
       };
 
       borg-backup-list = pkgs.writeShellApplication {
         name = "borg-backup-list";
         runtimeInputs = [ pkgs.borgbackup ];
-        text = ''
-          TOOL_DESCRIPTION="List borg backups"
-          ${shellScriptOptionHandling}
-          ${shellScriptHelpers}
+        text = # bash
+          ''
+            TOOL_DESCRIPTION="List borg backups"
+            ${shellScriptOptionHandling}
+            ${shellScriptHelpers}
 
-          parse_args "0" "$@"
+            parse_args "0" "$@"
 
-          #shellcheck disable=SC2086
-          borg list --remote-path $BORG_REMOTE_PATH $BORG_REMOTE
-        '';
+            #shellcheck disable=SC2086
+            borg list --remote-path $BORG_REMOTE_PATH $BORG_REMOTE
+          '';
       };
 
       borg-backup-break-lock = pkgs.writeShellApplication {
         name = "borg-backup-break-lock";
         runtimeInputs = [ pkgs.borgbackup ];
-        text = ''
-          TOOL_DESCRIPTION="Break a borg lock from a failed run"
-          ${shellScriptOptionHandling}
-          ${shellScriptHelpers}
+        text =
+          # bash
+          ''
+            TOOL_DESCRIPTION="Break a borg lock from a failed run"
+            ${shellScriptOptionHandling}
+            ${shellScriptHelpers}
 
-          parse_args "0" "$@"
+            parse_args "0" "$@"
 
-          #shellcheck disable=SC2086
-          borg break-lock --remote-path $BORG_REMOTE_PATH $BORG_REMOTE
-        '';
+            #shellcheck disable=SC2086
+            borg break-lock --remote-path $BORG_REMOTE_PATH $BORG_REMOTE
+          '';
       };
 
       borg-backup-init = pkgs.writeShellApplication {
         name = "borg-backup-init";
         runtimeInputs = [ pkgs.borgbackup ];
-        text = ''
-          TOOL_DESCRIPTION="Initialize a borg backup repository"
-          ${shellScriptOptionHandling}
-          ${shellScriptHelpers}
+        text =
+          # bash
+          ''
+            TOOL_DESCRIPTION="Initialize a borg backup repository"
+            ${shellScriptOptionHandling}
+            ${shellScriptHelpers}
 
-          parse_args "0" "$@"
+            parse_args "0" "$@"
 
-          #shellcheck disable=SC2086
-          borg init --remote-path $BORG_REMOTE_PATH --encryption=repokey "$BORG_REMOTE"
-        '';
+            #shellcheck disable=SC2086
+            borg init --remote-path $BORG_REMOTE_PATH --encryption=repokey "$BORG_REMOTE"
+          '';
       };
 
       borg-backup-rename = pkgs.writeShellApplication {
         name = "borg-backup-rename";
         runtimeInputs = [ pkgs.borgbackup ];
-        text = ''
-          TOOL_DESCRIPTION="Rename a borg backup"
-          USAGE="<backup_name> <new_name>"
-          ${shellScriptOptionHandling}
-          ${shellScriptHelpers}
+        text =
+          # bash
+          ''
+            TOOL_DESCRIPTION="Rename a borg backup"
+            USAGE="<backup_name> <new_name>"
+            ${shellScriptOptionHandling}
+            ${shellScriptHelpers}
 
-          parse_args "2" "$@"
-          backup_name="''${POSITIONAL_ARGS[0]}"
-          new_name="''${POSITIONAL_ARGS[1]}"
+            parse_args "2" "$@"
+            backup_name="''${POSITIONAL_ARGS[0]}"
+            new_name="''${POSITIONAL_ARGS[1]}"
 
-          #shellcheck disable=SC2086
-          borg rename --remote-path $BORG_REMOTE_PATH -v "$BORG_REMOTE"::"$backup_name" "$new_name"
-          echo "Renamed backup $backup_name with new_name $new_name"
-        '';
+            #shellcheck disable=SC2086
+            borg rename --remote-path $BORG_REMOTE_PATH -v "$BORG_REMOTE"::"$backup_name" "$new_name"
+            echo "Renamed backup $backup_name with new_name $new_name"
+          '';
       };
 
       borg-backup-delete = pkgs.writeShellApplication {
         name = "borg-backup-delete";
         runtimeInputs = [ pkgs.borgbackup ];
-        text = ''
-          TOOL_DESCRIPTION="Delete a borg backup"
-          USAGE="<backup_name>"
-          ${shellScriptOptionHandling}
-          ${shellScriptHelpers}
+        text =
+          # bash
+          ''
+            TOOL_DESCRIPTION="Delete a borg backup"
+            USAGE="<backup_name>"
+            ${shellScriptOptionHandling}
+            ${shellScriptHelpers}
 
-          parse_args "1" "$@"
-          backup_name="''${POSITIONAL_ARGS[0]}"
+            parse_args "1" "$@"
+            backup_name="''${POSITIONAL_ARGS[0]}"
 
-          #shellcheck disable=SC2086,SC2068
-          borg delete --dry-run --remote-path $BORG_REMOTE_PATH -v --list \
-            "$BORG_REMOTE"::"$backup_name" \
-            ''${POSITIONAL_ARGS[@]:1:''${#POSITIONAL_ARGS[@]}-1}
-          echo "Deleted backup $backup_name"
-        '';
+            #shellcheck disable=SC2086,SC2068
+            borg delete --dry-run --remote-path $BORG_REMOTE_PATH -v --list \
+              "$BORG_REMOTE"::"$backup_name" \
+              ''${POSITIONAL_ARGS[@]:1:''${#POSITIONAL_ARGS[@]}-1}
+            echo "Deleted backup $backup_name"
+          '';
       };
 
       # See https://borgbackup.readthedocs.io/en/stable/usage/extract.html
       borg-backup-restore = pkgs.writeShellApplication {
         name = "borg-backup-restore";
         runtimeInputs = [ pkgs.borgbackup ];
-        text = ''
-          TOOL_DESCRIPTION="Restore from a borg backup"
-          USAGE="<backup_name> <restore_path>"
-          ${shellScriptOptionHandling}
-          ${shellScriptHelpers}
+        text =
+          # bash
+          ''
+            TOOL_DESCRIPTION="Restore from a borg backup"
+            USAGE="<backup_name> <restore_path>"
+            ${shellScriptOptionHandling}
+            ${shellScriptHelpers}
 
-          parse_args "2" "$@"
-          backup_name="''${POSITIONAL_ARGS[0]}"
-          restore_path="''${POSITIONAL_ARGS[1]}"
+            parse_args "2" "$@"
+            backup_name="''${POSITIONAL_ARGS[0]}"
+            restore_path="''${POSITIONAL_ARGS[1]}"
 
-          #shellcheck disable=SC2086,SC2068
-          borg extract --remote-path $BORG_REMOTE_PATH -v \
-            "$BORG_REMOTE"::"$backup_name" \
-            --strip-components 1 -p "$restore_path" \
-            --list \
-            ''${POSITIONAL_ARGS[@]:2:''${#POSITIONAL_ARGS[@]}-1}
+            #shellcheck disable=SC2086,SC2068
+            borg extract --remote-path $BORG_REMOTE_PATH -v \
+              "$BORG_REMOTE"::"$backup_name" \
+              --strip-components 1 -p "$restore_path" \
+              --list \
+              ''${POSITIONAL_ARGS[@]:2:''${#POSITIONAL_ARGS[@]}-1}
 
-          echo "Restored backup $backup_name to $restore_path"
-        '';
+            echo "Restored backup $backup_name to $restore_path"
+          '';
       };
 
     in
@@ -570,6 +598,14 @@ in
             path = "${rootHome}/.ssh/id_borg";
           };
         };
+
+        # Other modules need access to files, so add overlay
+
+        nixpkgs.overlays = [
+          (final: prev: {
+            inherit borg-backup-init borg-backup-paths borg-backup-list;
+          })
+        ];
       }
       # lib.mkIf needed here to avoid infinite recursion
       (lib.mkIf pkgs.stdenv.isLinux {
@@ -588,7 +624,7 @@ in
                   Type = "oneshot";
                   ExecStart =
                     pkgs.writeShellScript "borg-backup-inhibited"
-                      #bash
+                      # bash
                       ''
                         ${pkgs.systemd}/bin/systemd-inhibit \
                                             --why="Backing up data" \
@@ -605,8 +641,7 @@ in
                   #                        echo $! > /run/borg-backup.pid
                   #                      '';
                   #                  PIDFile = "/run/borg-backup.pid";
-                  # This lets us query Result from monit without relying on ExecMainStatus
-                  RemainAfterExit = true;
+                  RemainAfterExit = false;
                 };
 
               };

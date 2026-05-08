@@ -39,6 +39,7 @@ let
         ${lib.readFile ./mirror-oath.sh}
       '';
   };
+
 in
 {
   imports =
@@ -79,6 +80,7 @@ in
     enable = true;
     borgBackupStartTime = "*-*-* 05:00:00"; # Daily at 5am
   };
+
   # If we setup postfix, this conflicts
   programs.msmtp.setSendmail = lib.mkForce false;
 
@@ -136,17 +138,6 @@ in
     wake-oppo
   ];
 
-  # fileSystems."/mnt/oath-backups" = {
-  #   device = "borg@oath.${config.hostSpec.domain}:";
-  #   fsType = "sshfs";
-  #   options = [
-  #     "nodev"
-  #     "noatime"
-  #     "IdentityFile=/root/.ssh/id_borg"
-  #     "Port=${toString config.hostSpec.networking.ports.tcp.ssh}"
-  #   ];
-  # };
-
   # orchestrate mirror of backups from other hosts backed up onto oath, since oath isn't nix
   # mirror targets aren't big enough to hold all mirrors, so broken across hosts
   services.mirror-backups = {
@@ -156,26 +147,29 @@ in
     time = "*-*-* 2:00:00"; # FIXME: Keep sync with other moth/myth times (also tz diff...)
     server = "moth.${config.hostSpec.domain}";
   };
+
   networking.useDHCP = lib.mkDefault true;
 
-  ${namespace}.wireguard =
-    let
-      net = config.hostSpec.networking;
-    in
-    {
-      enable = true;
-      role = "server";
-      externalInterface = "enp3s0";
-      peerNames = [
-        "ossa"
-        "opia"
-      ];
-      hosts = net.subnets.olan.hosts;
-      wireguardPort = net.ports.udp.wireguard;
-      rosenpassPort = net.ports.udp.rosenpass;
-      rosenpassExempt = [ "opia" ];
-      subnet = net.subnets.olan.wireguard.subnet;
-    };
+  ${namespace} = {
+    wireguard =
+      let
+        net = config.hostSpec.networking;
+      in
+      {
+        enable = true;
+        role = "server";
+        externalInterface = "enp3s0";
+        peerNames = [
+          "ossa"
+          "opia"
+        ];
+        hosts = net.subnets.olan.hosts;
+        wireguardPort = net.ports.udp.wireguard;
+        rosenpassPort = net.ports.udp.rosenpass;
+        rosenpassExempt = [ "opia" ];
+        subnet = net.subnets.olan.wireguard.subnet;
+      };
+  };
 
   # This enables immich service with ML offload to oedo
   services.immichML = {

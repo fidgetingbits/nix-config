@@ -107,7 +107,7 @@
   # Allow other servers to mirror their backups into moth
   users.users.borg.openssh.authorizedKeys.keys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICMso7GIZT7pDRxeE8xd+hkwUySI8v8LwvDn1gPJyGFK myth"
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOLLKlQQu/pl8e/Vs3c60crZqjwhB/GV3C58EmTD/L1y onyx"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOLLKlQQu/pl8e/Vs3c60crZqjwhB/GV3C58EmTD/L1y ooze"
   ];
 
   services.backup = {
