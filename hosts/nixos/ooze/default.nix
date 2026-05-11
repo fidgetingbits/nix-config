@@ -7,7 +7,6 @@
   ...
 }:
 let
-
   wake-oppo = pkgs.writeShellApplication {
     name = "wake-oppo";
     runtimeInputs = [ pkgs.wakeonlan ];
@@ -18,35 +17,13 @@ let
       "wakeonlan ${lib.elemAt oppo.mac 0} -i ${oppo.ip}";
   };
 
-  mirror-oath = pkgs.writeShellApplication {
-    name = "mirror-oath";
-    runtimeInputs = lib.attrValues {
-      inherit (pkgs)
-        rsync
-        openssh
-        gnused
-        coreutils
-        msmtp
-        ;
-    };
-
-    text =
-      # bash
-      ''
-        export RECIPIENTS=${lib.concatStringsSep ", " config.hostSpec.email.olanAdmins};
-        export DELIVERER=${config.hostSpec.email.notifier};
-        export SSH_PORT=${toString config.hostSpec.networking.ports.tcp.ssh};
-        ${lib.readFile ./mirror-oath.sh}
-      '';
-  };
-
 in
 {
   imports =
     lib.flatten [
       inputs.nixos-facter-modules.nixosModules.facter
       { config.facter.reportPath = ./facter.json; }
-      (lib.custom.scanPaths ./.) # Load all extra host-specific *.nix files
+      (lib.custom.scanPaths ./.) # Auto-load all extra host-specific *.nix files
     ]
     ++ (map lib.custom.relativeToRoot (
       [
@@ -105,6 +82,7 @@ in
 
   services.docuseal.enable = true; # Settings in module
 
+  # FIXME: This could be swapped with monit now I think
   services.heartbeat-check = {
     enable = true;
     interval = 10 * 60;
@@ -134,20 +112,10 @@ in
   '';
 
   environment.systemPackages = [
-    mirror-oath
     wake-oppo
   ];
 
-  # orchestrate mirror of backups from other hosts backed up onto oath, since oath isn't nix
-  # mirror targets aren't big enough to hold all mirrors, so broken across hosts
-  services.mirror-backups = {
-    enable = false;
-    package = mirror-oath;
-    notify.to = config.hostSpec.email.moth.backups;
-    time = "*-*-* 2:00:00"; # FIXME: Keep sync with other moth/myth times (also tz diff...)
-    server = "moth.${config.hostSpec.domain}";
-  };
-
+  # FIXME: I think this is generic elsewhere?
   networking.useDHCP = lib.mkDefault true;
 
   ${namespace} = {

@@ -13,12 +13,11 @@ let
   # maintain scripts on the NAS itself anymore.
   #
   # This relies on having the NAS share mounted via cifs/nfs. Otherwise we can
-  # mostly rely on local settings. We also are backing up oath, so we override
-  # to backup to moth instead
+  # mostly rely on default settings. Since we are backing up oath, we backup to
+  # moth instead
   backup-oath = pkgs.writeShellApplication {
     name = "backup-oath";
     runtimeInputs = lib.attrValues {
-      # This is globally installed via backups, but need to put it into pkgs I guess
       inherit (pkgs)
         borg-backup-paths
         ;
@@ -29,8 +28,18 @@ let
       let
         user = config.hostSpec.primaryUsername;
         server = "oath";
+        # NOTE: this corresponds to /volume1/shared/ on oath
         path = "/home/${user}/mount/oath/";
-        folders = [ "logs" ]; # Folders inside path that we want to backup
+        folders = [
+          "documents"
+          "ebooks"
+          # "images" - These are in immich now
+          "logs"
+          "public"
+          # "unsorted"
+          "video"
+          "work"
+        ]; # Subfolders inside path that we want to backup
       in
       # bash
       ''

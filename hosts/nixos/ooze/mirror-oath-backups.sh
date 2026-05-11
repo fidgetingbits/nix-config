@@ -1,13 +1,14 @@
-#!/usr/bin/env bash
-#
+# shellcheck disable=SC2148
 # NOTE: See ./default.nix:19 for packaging
 #
 # Overview:
 #   enter the synology as borg user
-#   plant an ssh key
-#   connect to oath and have it directly rsync each sub folder to moth
+#   temporarily plant an ssh key that can be used to copy to moth
+#   connect to synology and have it directly rsync each sub folder to moth
 #
 # FIXME: Rework to deduplicate as much as possible with long-rsync/mirror-backups
+
+# set -x
 
 STARTED=$(date "+%Y-%m-%d %H:%M:%S")
 KEY_FILE=/root/.ssh/id_borg
@@ -20,6 +21,8 @@ SOURCE="$SOURCE_USER@$SOURCE_HOST"
 DEST_USER=borg
 DEST_HOST=moth
 DEST_FOLDER="/mnt/storage/mirror/aa/"
+
+SSH_BIN=$(which ssh)
 
 # Reduce the noise of warnings, don't prompt for yubikey when key has been planted, etc
 # FIXME: We should be able to remove some of these as they were more relevant
@@ -47,6 +50,11 @@ function cleanup {
 
 TOOL=$(basename "$0")
 LOCK=$(basename "${0%.*}")
+
+if [ $UID != 0 ]; then
+    echo "ERROR: Script needs to access root-stored borg identity"
+    exit 1
+fi
 
 # Don't allow this script to be run at the same time
 exec {LOCKFD}>/var/lock/"$LOCK".lock
@@ -98,6 +106,7 @@ for sub in \$(find "$SOURCE_FOLDER" -mindepth 1 -maxdepth 1 -type d -printf "%P\
     rsync -aHSP \
         --stats \
         --rsync-path=$RSYNC_PATH \
+        --delete \
         --chmod=Dg+srwx,Fg+rw,o-rwx \
         -e "ssh ${sshArgs[*]} -i id_mirror -o IdentitiesOnly=yes -o BatchMode=yes" \
         "$SOURCE_FOLDER/\$sub/" \
@@ -107,21 +116,12 @@ EOF
 
 runScp "$tmp_dir/$FILENAME" "$SOURCE:$FILENAME"
 # Run the rsync command on the source host in a loop until it completes
-SYNC_LOOP=$(
-    cat <<EOF
-    until ssh ${sshArgs[@]} -i "$KEY_FILE" -o IdentitiesOnly=yes "$SOURCE" \
-    "sh < $FILENAME"; \
-    do
-        echo "Connection lost, retrying..."
-        sleep 10 # Maybe to cool down disks if connection loss was related? Because of moth heat issues...
-    done
-EOF
-)
-
-echo "Running inhibited rsync loop"
-sudo systemd-inhibit --why="Mirroring oath backups to moth" \
-    --who="Backup Mirror" \
-    --mode=block bash -c "$SYNC_LOOP"
+# FIXME: This might not always fail in a way we want it to repeat
+until "$SSH_BIN" "${sshArgs[@]}" -i "$KEY_FILE" -o IdentitiesOnly=yes "$SOURCE" \
+    "sh < $FILENAME"; do
+    echo "Connection lost, retrying..."
+    sleep 10 # Maybe to cool down disks if connection loss was related? Because of moth historical heat issues...
+done
 
 ENDED=$(date "+%Y-%m-%d %H:%M:%S")
 
