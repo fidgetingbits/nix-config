@@ -8,7 +8,6 @@ let
   cfg = config.services.mirror-backups;
   sshKeyPath = "/root/.ssh/id_borg";
   port = toString config.hostSpec.networking.ports.tcp.ssh;
-  # FIXME: This needs to be part of a loop that is per-mirror
   mirror-backups = pkgs.writeShellApplication rec {
     name = "mirror-backups";
     runtimeInputs = lib.attrValues {
@@ -18,7 +17,6 @@ let
         rsync
         openssh
         util-linux
-        bashNonInteractive
         ;
     };
     text =
@@ -29,49 +27,43 @@ let
       in
       # bash
       ''
-        function gen_sync_cmd {
+        function run_sync {
           subfolder=$1
           log=$2
           destination=${cfg.folders.destination}/"$subfolder"
-            # --chmod ensures the files are group-accessible on host B, even if
-            # they aren't normally on host A. This is needed because we use a
-            # different user to copy the files from host A to B.
-          cat <<EOF
-            ssh -l ${cfg.user} -i ${sshKeyPath} -p ${port} -oIdentitiesOnly=yes ${cfg.server} \
-              "mkdir -p "$destination" 2>/dev/null|| true" && \
+
+          # --chmod ensures the files are group-accessible on host B, even if
+          # they aren't normally on host A. This is needed because we use a
+          # different user to copy the files from host A to B.
+          if ssh -l ${cfg.user} -i ${sshKeyPath} -p ${port} -oIdentitiesOnly=yes ${cfg.server} \
+            "mkdir -p \"$destination\" 2>/dev/null|| true" && \
             rsync -aHS \
               --stats \
               --delete \
               --chmod=Dg+srwx,Fg+rw,o-rwx \
               -e "ssh -l ${cfg.user} -i ${sshKeyPath} -p ${port} -oIdentitiesOnly=yes" \
               ${cfg.folders.source.base}/"$subfolder/" \
-              ${cfg.server}:"$destination" >> "$log" 2>&1
-        EOF
-        }
+              ${cfg.server}:"$destination" >> "$log" 2>&1; then
 
-        function run_sync_cmd {
-          sync_cmd=$1
-          log=$2
-          systemd-inhibit --why="Mirror backups to ${cfg.server}" \
-            --who="Backup Mirror Task" \
-            --mode=block bash \
-            -c "$sync_cmd"
-
-          # NOTE: This will break if rsync is used with -v for testing
-          first=$(grep . "$log" | head -1)
-          if echo "$first" | grep -q "Number of files"; then
-            echo "succeeded!"
-          elif echo "$first" | grep -q "@@@@"; then
-            echo "failed due to being in luks unlock state"
+            # NOTE: This will break if rsync is used with -v for testing
+            first=$(grep . "$log" | head -1)
+            if echo "$first" | grep -q "Number of files"; then
+              echo "succeeded!"
+            elif echo "$first" | grep -q "@@@@"; then
+              echo "failed due to being in luks unlock state"
+            else
+              echo "result unknown"
+            fi
           else
-            echo "result unknown"
+              # If the ssh or rsync exit code was non-zero
+              echo "failed with exit code $?"
           fi
         }
 
         function mail_results {
           result=$1
           log=$2
-          exec msmtp -t <<EOF
+          msmtp -t <<EOF
         To: ${recipients}
         From: ${cfg.notify.from}
         Subject: [${config.networking.hostName}: mirror] Mirroring to ${cfg.server} $result
@@ -109,8 +101,7 @@ let
           log=$(mktemp -p "$logdir")
 
           echo "Syncing ${cfg.folders.source.base}/$folder to ${cfg.server}:${cfg.folders.destination}/$folder"
-          sync_cmd=$(gen_sync_cmd "$folder" "$log")
-          result=$(run_sync_cmd "$sync_cmd" "$log")
+          result=$(run_sync "$folder" "$log")
 
           {
             echo "${cfg.folders.source.base}/$folder to ${cfg.server}:${cfg.folders.destination}/$folder"
@@ -227,14 +218,20 @@ in
       default = { };
     };
   };
-  config = lib.mkIf cfg.enable ({
+  config = lib.mkIf cfg.enable {
     systemd = {
       services."mirror-backups" = {
         description = "Mirror local backups to the remote system";
         after = [ "network-online.target" ];
         wants = [ "network-online.target" ];
         serviceConfig = {
-          ExecStart = "${pkgs.bash}/bin/bash ${lib.getExe cfg.package}";
+          ExecStart = # bash
+            ''
+              ${pkgs.systemd}/bin/systemd-inhibit \
+                --why='Mirror local backups' \
+                --who='Mirror Script' \
+                --mode=block \
+                ${lib.getExe cfg.package}'';
           RemainAfterExit = false;
         };
       };
@@ -258,5 +255,5 @@ in
       mode = "0400";
       path = sshKeyPath;
     };
-  });
+  };
 }
