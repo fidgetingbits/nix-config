@@ -76,10 +76,10 @@ let
   borgExcludesFile = pkgs.writeText "borg-excludes.lst" (
     lib.concatMapStrings (s: s + "\n") (excludes ++ cfg.borgExcludes)
   );
-  # FIXME: This should be a list of various exclude files eventually
   darwinExcludesFile = pkgs.writeText "borg-exclude-macos-core.list" (
     lib.readFile ./borg-exclude-macos-core.list
   );
+
 in
 {
   options.services.backup = {
@@ -154,7 +154,6 @@ in
       default = "/dev/mapper/encrypted-nixos";
       description = "The btrfs volume containing the subvolume backup";
     };
-    # FIXME: This should be a list of subvolumes to backup
     borgBtrfsSubvolume = lib.mkOption {
       type = lib.types.str;
       default = "@persist";
@@ -200,7 +199,7 @@ in
   config = lib.mkIf cfg.enable (
     let
       shellScriptHelpers = lib.readFile ./backup-helpers.sh;
-      # FIXME(borg): - Should create a help script to actually dump and explain all of these from cli
+      # See borg-backup-help tool to dump a summary of these
       shellScriptOptionHandling =
         # bash
         ''
@@ -275,11 +274,6 @@ in
           echo > $LOGFILE
         '';
 
-      # FIXME: Check where the code associated with this comment disappeared to:
-      # On new systems doing their first backup, we may have to initialize a new repo.
-      # This automates checking and initializing, instead of having to manually run
-      # borg-backup-init
-
       borg-backup-test-email = pkgs.writeShellApplication {
         name = "borg-backup-test-email";
         runtimeInputs = [ pkgs.msmtp ];
@@ -314,12 +308,11 @@ in
             ${shellScriptHelpers}
             ${shellScriptEmail}
             parse_args "0" "$@"
-
             LOGFILE="${cfg.borgBackupLogPath}"
 
             # Configure a new backup if one doesn't already exist
             # Redirect errors to avoid confusing with constant "A repo already exists at" spam
-            borg-backup-init 2>/dev/null || true
+            borg-backup-init 2>/dev/null 1>&2 || true
 
             ${shellScriptCheckLock}
 
@@ -364,11 +357,10 @@ in
             ${shellScriptHelpers}
             ${shellScriptEmail}
             parse_args "0" "$@"
-            # FIXME: Would be nice if this part could just be generic
             LOGFILE="${cfg.borgBackupLogPath}"
 
             # Configure a new backup if one doesn't already exist
-            borg-backup-init || true
+            borg-backup-init 2>/dev/null 1>&2 || true
 
             ${shellScriptCheckLock}
 
@@ -571,6 +563,138 @@ in
             echo "Restored backup $backup_name to $restore_path"
           '';
       };
+      borg-backup-help = pkgs.writeShellApplication {
+        name = "borg-backup-help";
+        text = ''
+          cat <<EOF
+          ========================================================================
+          BORG BACKUP TOOLS
+          ========================================================================
+          These are a custom set of tools for handling host-specific backups, but
+          that are also catered to managing backups of other hosts in a way that
+          doesn't require remembering/tweaking cli arguments.
+
+          By default you will have a set of values declared by your Nix config, which
+          handle your hosts backups on some primary backup server. These defaults
+          will be used whenever running the scripts.
+
+          However, you sometimes may need to admin or inspect other host's backups
+          from a system that already has it's own defaults, in which case you can
+          tweak environment variables to adjust behavior. These variables, as well
+          as the backup tools, are described below.
+
+          ========================================================================
+          BORG BACKUP ENVIRONMENT SUMMARY
+          ========================================================================
+          These variables control how the borg-backup-* tools behave. You can
+          override them in your shell to target different repos and run a
+          group of commands specific to a "session". Most values shouldn't
+          need to be modified, and not all variables are shown below. For
+          source of truth, read the source.
+
+          VARIABLE             DEFAULT VALUES ON THIS SYSTEM
+          ------------------------------------------------------------------------
+          BORG_SERVER          ${cfg.borgServer}
+          BORG_HOST            ${config.networking.hostName}
+          BORG_PORT            ${toString cfg.borgPort}
+          BORG_USER            ${cfg.borgUser}
+
+          BORG_REMOTE_REPO     ${cfg.borgBackupPath}/${config.networking.hostName}
+          BORG_REMOTE_PATH     ${cfg.borgRemotePath}
+          BORG_SSH_KEY         ${cfg.borgSshKey}
+          BORG_CACHE_DIR       ${cfg.borgCacheDir}
+          BORG_LOG_PATH        ${cfg.borgBackupLogPath}
+          BORG_MOUNT_PATH      ${cfg.borgMountDir}
+          BORG_BACKUP_NAME     ${config.networking.hostName}-\$(date +%Y-%m-%d_%H-%M)
+          BORG_BACKUP_PATHS    ${lib.concatStringsSep " " cfg.borgBackupPaths}}
+
+          BORG_BTRFS_VOLUME    ${cfg.borgBtrfsVolume}
+          BORG_BTRFS_SUBVOLUME ${cfg.borgBtrfsSubvolume}
+          BORG_PASSPHRASE      Read automatically from /etc/borg/passphrase
+          ------------------------------------------------------------------------
+
+          WHEN TO OVERRIDE:
+          - Change BORG_HOST to list/restore backups from a different machine.
+          - Set BORG_TRACE=1 to see raw command execution (set -x).
+          - Override BORG_SERVER/BORG_PORT if you are analyzing backups that aren't
+            on the default server your system uses
+          - BORG_REMOTE_PATH will differ if the server is NixOS, Synology, etc
+
+          ========================================================================
+          BORG BACKUP TOOLSET SUMMARY
+          ========================================================================
+
+          Most commands can be run without arguments, as they will use the
+          default environment variables shown above.
+
+          CORE COMMANDS
+          - borg-backup-btrfs-subvolume: Backs up the @persist subvolume.
+          - borg-backup-paths:           Runs the standard backup of configured paths.
+                                         Not typically used if using persistence.
+          - borg-backup-init:            Initializes a new repo on the remote server.
+                                         Auto-run by borg-backup-btrfs-subvolume and borg-backup-paths
+          - borg-backup-list:            Lists all archives in the remote repository.
+          - borg-backup-help:            Shows borg-backup tool help output
+
+          RESTORATION & INSPECTION
+          - borg-backup-mount:           Mounts an archive to ${cfg.borgMountDir}.
+          - borg-backup-umount:          Unmounts the backup directory.
+          - borg-backup-restore:         Extracts an archive to a specific path.
+          - borg-backup-mount-list:      Shows active FUSE/borgfs mounts.
+
+          MAINTENANCE
+          - borg-backup-rename:          Renames an existing archive.
+          - borg-backup-delete:          Deletes a specific archive (uses --dry-run by default).
+          - borg-backup-break-lock:      Clears a stale lock on the remote repository.
+          - borg-backup-test-email:      Sends a test email via msmtp.
+
+          DO YOU WANT TO KNOW MORE?
+          - For tool usage examples run the command "tldr borg-backup"
+          ========================================================================
+          EOF
+        '';
+      };
+      # FIXME: Add more explicit examples from atuin history
+      borgTldrPage = pkgs.writeText "borg-backup.page.md" ''
+        # borg-backup
+
+        > Custom backup toolset using borg. See `borg-backup-help` for argument overrides
+
+        - List all existing archives in the repository:
+          `borg-backup-list`
+
+        - List all existing archives in the repository, for a different host:
+          `read -s -p "Passphrase:" BORG_PASSPHRASE && BORG_HOST=oedo borg-backup-list`
+
+        - Start a manual backup of the @persist btrfs subvolume:
+          `borg-backup-btrfs-subvolume`
+
+        - Start a manual backup of configured paths:
+          `borg-backup-paths`
+
+        - Mount a specific archive to examine files:
+          `borg-backup-mount <archive_name>`
+
+        - Restore a backup to a specific directory:
+          `borg-backup-restore <archive_name> <target_path>`
+
+        - Break a stale lock if a previous backup crashed:
+          `borg-backup-break-lock`
+
+        - View environment variables and defaults:
+          `borg-backup-help`
+
+        - Initialize the remote backup repository:
+          `borg-backup-init`
+      '';
+
+      borgTldrPackage =
+        pkgs.runCommand "borg-backup-tldr-page-install" { }
+          # bash
+          ''
+            mkdir -p $out/share/tldr/
+            cp ${borgTldrPage} $out/share/tldr/borg-backup.page.md
+          '';
 
     in
     lib.mkMerge [
@@ -588,8 +712,12 @@ in
           borg-backup-delete
           borg-backup-restore
           borg-backup-break-lock
+          borg-backup-help
+          borgTldrPackage
         ]
         ++ lib.optional hasImpermanence borg-backup-btrfs-subvolume;
+        # This is needed to link the custom borg-backup tldr page above
+        environment.pathsToLink = [ "/share/tldr" ];
         sops.secrets = {
           "keys/ssh/borg" = {
             # FIXME: ATM this is required by nix-darwin PR I'm using
@@ -604,8 +732,10 @@ in
         nixpkgs.overlays = [
           (final: prev: {
             inherit borg-backup-init borg-backup-paths borg-backup-list;
+            borg-tldr-page = borgTldrPackage;
           })
         ];
+
       }
       # lib.mkIf needed here to avoid infinite recursion
       (lib.mkIf pkgs.stdenv.isLinux {
