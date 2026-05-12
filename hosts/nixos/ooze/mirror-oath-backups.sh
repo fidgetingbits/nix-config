@@ -129,7 +129,7 @@ ENDED=$(date "+%Y-%m-%d %H:%M:%S")
 msmtp -t <<EOF
 To: ${RECIPIENTS:-}
 From: ${DELIVERER:-}
-Subject: [$(hostname): mirror-oath]: Copy from $SOURCE_HOST to $DEST_HOST completed
+Subject: [$(hostname): mirror-oath]: Mirroring backups from $SOURCE_HOST to $DEST_HOST completed
 
 Copy from $SOURCE_HOST to $DEST_HOST completed
 
