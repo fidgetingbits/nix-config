@@ -27,7 +27,6 @@
         p7zip # archive
         pstree # tree-style ps
         lsof # list open files
-        tlrc # official tldr rust client
         eva # cli calculator
         hexyl # hexdump replacement
         grc # colorize output
@@ -92,14 +91,15 @@
     }
   );
 
+  # NOTE: This is a hack to allow us to keep using the default tldr custom page folder
+  # but add in the backup notes NixOS.
+  home.file.".local/share/tealdeer/pages/borg-backup.page.md".source =
+    "${pkgs.borg-tldr-page}/share/tldr/borg-backup.page.md";
   programs = {
     bash.enable = true;
     home-manager.enable = true;
-  };
-
-  services.tldr-update = {
-    enable = true;
-    package = pkgs.tlrc;
+    # NOTE: Custom pages go in ~/.local/share/tealdeer/pages/ as *.page.md
+    tealdeer.enable = true;
   };
 
   introdus.xdg.enable = true;
