@@ -75,7 +75,8 @@ in
           }
         )
       );
-      description = "List of NAS to backup";
+      description = "List of external non-NixOS mounts (eg NAS) to backup";
+      default = [ ];
     };
   };
 

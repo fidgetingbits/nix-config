@@ -198,6 +198,24 @@ in
 
   config = lib.mkIf cfg.enable (
     let
+      writeSudoApplication =
+        {
+          name,
+          runtimeInputs ? [ ],
+          text,
+        }:
+        pkgs.writeShellApplication {
+          inherit name runtimeInputs;
+          text = ''
+            # Re-execute with sudo if not already root.
+            # -E preserves the user's environment variables (BORG_HOST, etc.)
+            if [ "$(id -u)" -ne 0 ]; then
+              exec sudo -E "$0" "$@"
+            fi
+
+            ${text}
+          '';
+        };
       shellScriptHelpers = lib.readFile ./backup-helpers.sh;
       # See borg-backup-help tool to dump a summary of these
       shellScriptOptionHandling =
@@ -222,9 +240,13 @@ in
           # Export variables not used directly in script, or only used in some scripts
           export BORG_BTRFS_VOLUME="''${BORG_BTRFS_VOLUME:-${cfg.borgBtrfsVolume}}"
           export BORG_BTRFS_SUBVOLUME="''${BORG_BTRFS_SUBVOLUME:-${cfg.borgBtrfsSubvolume}}"
-          export BORG_PASSPHRASE="''${BORG_PASSPHRASE:-$(cat /etc/borg/passphrase)}"
+          if [ -z "''${BORG_PASSPHRASE:-}" ] && [ -f /etc/borg/passphrase ]; then
+              BORG_PASSPHRASE=$(cat /etc/borg/passphrase)
+              export BORG_PASSPHRASE
+          fi
           if [ -z "$BORG_PASSPHRASE" ]; then
-            echo "No BORG_PASSPHRASE set, exiting"
+            echo "ERROR: No BORG_PASSPHRASE set, exiting."
+            echo "NOTE: If you didn't set it yourself, it means /etc/borg/passphrase wasn't setup by sops"
             exit 1
           fi
 
@@ -289,7 +311,7 @@ in
           '';
       };
 
-      borg-backup-btrfs-subvolume = pkgs.writeShellApplication {
+      borg-backup-btrfs-subvolume = writeSudoApplication {
         name = "borg-backup-btrfs-subvolume";
         runtimeInputs = [
           pkgs.borgbackup
@@ -340,7 +362,7 @@ in
           '';
       };
 
-      borg-backup-paths = pkgs.writeShellApplication {
+      borg-backup-paths = writeSudoApplication {
         name = "borg-backup-paths";
         runtimeInputs = [
           pkgs.borgbackup
@@ -384,7 +406,7 @@ in
           '';
       };
 
-      borg-backup-mount = pkgs.writeShellApplication {
+      borg-backup-mount = writeSudoApplication {
         name = "borg-backup-mount";
         runtimeInputs = [ pkgs.borgbackup ];
         text =
@@ -410,7 +432,7 @@ in
           '';
       };
 
-      borg-backup-umount = pkgs.writeShellApplication {
+      borg-backup-umount = writeSudoApplication {
         name = "borg-backup-umount";
         runtimeInputs = [ pkgs.borgbackup ];
         text =
@@ -444,7 +466,7 @@ in
           '';
       };
 
-      borg-backup-list = pkgs.writeShellApplication {
+      borg-backup-list = writeSudoApplication {
         name = "borg-backup-list";
         runtimeInputs = [ pkgs.borgbackup ];
         text = # bash
@@ -460,7 +482,7 @@ in
           '';
       };
 
-      borg-backup-break-lock = pkgs.writeShellApplication {
+      borg-backup-break-lock = writeSudoApplication {
         name = "borg-backup-break-lock";
         runtimeInputs = [ pkgs.borgbackup ];
         text =
@@ -477,7 +499,7 @@ in
           '';
       };
 
-      borg-backup-init = pkgs.writeShellApplication {
+      borg-backup-init = writeSudoApplication {
         name = "borg-backup-init";
         runtimeInputs = [ pkgs.borgbackup ];
         text =
@@ -494,7 +516,7 @@ in
           '';
       };
 
-      borg-backup-rename = pkgs.writeShellApplication {
+      borg-backup-rename = writeSudoApplication {
         name = "borg-backup-rename";
         runtimeInputs = [ pkgs.borgbackup ];
         text =
@@ -515,7 +537,7 @@ in
           '';
       };
 
-      borg-backup-delete = pkgs.writeShellApplication {
+      borg-backup-delete = writeSudoApplication {
         name = "borg-backup-delete";
         runtimeInputs = [ pkgs.borgbackup ];
         text =
@@ -538,7 +560,7 @@ in
       };
 
       # See https://borgbackup.readthedocs.io/en/stable/usage/extract.html
-      borg-backup-restore = pkgs.writeShellApplication {
+      borg-backup-restore = writeSudoApplication {
         name = "borg-backup-restore";
         runtimeInputs = [ pkgs.borgbackup ];
         text =
@@ -699,7 +721,6 @@ in
     in
     lib.mkMerge [
       {
-        # FIXME: Most of these rely on sudo to access BORG_PASSPHRASE so could wrap it
         environment.systemPackages = [
           pkgs.borgbackup
           borg-backup-init
