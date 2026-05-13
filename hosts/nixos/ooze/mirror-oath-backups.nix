@@ -33,7 +33,6 @@ let
   };
 in
 {
-
   environment.systemPackages = [
     mirror-oath-backups
   ];

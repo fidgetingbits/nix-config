@@ -699,6 +699,7 @@ in
     in
     lib.mkMerge [
       {
+        # FIXME: Most of these rely on sudo to access BORG_PASSPHRASE so could wrap it
         environment.systemPackages = [
           pkgs.borgbackup
           borg-backup-init
@@ -773,7 +774,6 @@ in
                   #                  PIDFile = "/run/borg-backup.pid";
                   RemainAfterExit = false;
                 };
-
               };
               timers."borg-backup" = {
                 description = "${backupToolName} backup service";
