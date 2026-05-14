@@ -773,7 +773,6 @@ in
                 wants = [ "network-online.target" ];
                 restartIfChanged = false;
                 serviceConfig = {
-                  Type = "oneshot";
                   ExecStart =
                     pkgs.writeShellScript "borg-backup-inhibited"
                       # bash
@@ -781,19 +780,20 @@ in
                         ${pkgs.systemd}/bin/systemd-inhibit \
                                             --why="Backing up data" \
                                             --who="${backupToolName}" \
-                                            ${lib.getBin backupTool}/bin/${backupToolName};
+                                            ${lib.getExe backupTool};
                       '';
+
                   # This is useful for debugging, but not ideal for systemd-inhibit
-                  #                  Type = "forking";
-                  #                  ExecStart =
-                  #                    pkgs.writeShellScript "borg-backup-forking"
-                  #                      # bash
-                  #                      ''
-                  #                        ${lib.getBin backupTool}/bin/${backupToolName} --debug &
-                  #                        echo $! > /run/borg-backup.pid
-                  #                      '';
-                  #                  PIDFile = "/run/borg-backup.pid";
-                  RemainAfterExit = false;
+                  # Type = "forking";
+                  # ExecStart =
+                  #   pkgs.writeShellScript "borg-backup-forking"
+                  #     # bash
+                  #     ''
+                  #       ${lib.getBin backupTool}/bin/${backupToolName} --debug &
+                  #       echo $! > /run/borg-backup.pid
+                  #     '';
+                  # PIDFile = "/run/borg-backup.pid";
+                  # RemainAfterExit = true;
                 };
               };
               timers."borg-backup" = {

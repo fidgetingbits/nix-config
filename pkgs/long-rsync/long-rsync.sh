@@ -155,7 +155,7 @@ ENDED=$(date "+%Y-%m-%d %H:%M:%S")
 msmtp -t <<EOF
 To: ${RECIPIENTS:-}
 From: ${DELIVERER:-}
-Subject: [$(hostname): rsync]: Copy from $SOURCE_HOST to $DEST_HOST completed
+Subject: [$(hostname): backup]: Long rsync from $SOURCE_HOST to $DEST_HOST completed
 
 Copy from $SOURCE_HOST to $DEST_HOST completed
 
