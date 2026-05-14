@@ -75,7 +75,14 @@
 
   # FIXME: Could setup some sort of auto-upload to immich for dumping into a specific folder
   # like https://github.com/kiriwalawren/dotnix/blob/2f8d698c88fdb8ed260be077f4b2bbd00fdb063b/modules/system/immich-upload.nix#L39
-  sops.secrets."keys/immich" = { };
+  sops.secrets = {
+    "keys/immich" = { };
+
+    # for systems that don't support yubikey, as well as microvms, etc
+    "keys/ssh/ed25519" = {
+      path = "${config.home.homeDirectory}/.ssh/id_ed25519";
+    };
+  };
 
   home.sessionVariables = {
     # This variable prevents the following from being spammed to the console constantly:
@@ -96,11 +103,6 @@
   services.copyq.enable = true;
 
   system.ssh-motd.enable = true;
-
-  sops = {
-    secrets = {
-    };
-  };
 
   stylix = {
     cursor = lib.mkForce {
