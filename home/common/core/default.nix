@@ -94,7 +94,7 @@
   # NOTE: This is a hack to allow us to keep using the default tldr custom page folder
   # but add in the backup notes NixOS.
   home.file.".local/share/tealdeer/pages/borg-backup.page.md".source =
-    "${pkgs.borg-tldr-page}/share/tldr/borg-backup.page.md";
+    "/run/current-system/sw/share/tldr/borg-backup.page.md";
   programs = {
     bash.enable = true;
     home-manager.enable = true;
