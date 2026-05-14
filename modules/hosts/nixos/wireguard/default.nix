@@ -49,7 +49,7 @@ in
     ./client.nix
   ];
   options.${namespace}.wireguard = {
-    enable = lib.mkEnableOption "PQ Wireguard";
+    enable = lib.mkEnableOption "Post-Quantum Wireguard";
     role = lib.mkOption {
       type = lib.types.enum [
         "server"
@@ -147,8 +147,8 @@ in
       };
     };
   };
-  config = lib.mkIf cfg.enable {
 
+  config = lib.mkIf cfg.enable {
     # See ./client.nix or ./server.nix for role-specific settings
     networking = {
       wireguard = {

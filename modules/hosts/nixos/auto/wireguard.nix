@@ -6,32 +6,38 @@
   namespace,
   ...
 }:
+let
+  net = config.hostSpec.networking;
+
+  # FIXME: Somehow check "home" LAN of a host rather than hardcode
+  subnet = net.subnets.olan;
+  inherit (config.hostSpec)
+    isLocal
+    isRoaming
+    hostName
+    domain
+    ;
+in
 {
-  config = lib.mkIf (config.hostSpec.isLocal && config.hostSpec.isRoaming) {
-    ${namespace}.wireguard =
-      let
-        net = config.hostSpec.networking;
-        inherit (config.hostSpec) domain;
-        olan = net.subnets.olan;
-      in
-      {
+  config = lib.mkIf (isLocal && isRoaming && (subnet.hosts.${hostName}.wgpk != "")) {
+    ${namespace}.wireguard = {
+      enable = true;
+      role = "client";
+      peerNames = [ "ooze" ];
+      allowedIPs = [
+        subnet.wireguard.subnet
+        subnet.cidr
+      ];
+      hosts = subnet.hosts;
+      endpoint = "vpn.${domain}";
+      wireguardPort = net.ports.udp.wireguard;
+      rosenpassPort = net.ports.udp.rosenpass;
+      subnet = subnet.wireguard.subnet;
+      dns = {
         enable = true;
-        role = "client";
-        peerNames = [ "ooze" ];
-        allowedIPs = [
-          olan.wireguard.subnet
-          olan.cidr
-        ];
-        hosts = net.subnets.olan.hosts;
-        endpoint = "vpn.${domain}";
-        wireguardPort = net.ports.udp.wireguard;
-        rosenpassPort = net.ports.udp.rosenpass;
-        subnet = olan.wireguard.subnet;
-        dns = {
-          enable = true;
-          server = net.subnets.olan.hosts.ogre.ip;
-          inherit domain;
-        };
+        server = subnet.hosts.ogre.ip;
+        inherit domain;
       };
+    };
   };
 }
