@@ -1,8 +1,8 @@
 # Beelink EQR5
+# NOTE: All .nix files in ./ are auto-loaded, so look there for extra logic
 {
   inputs,
   lib,
-  pkgs,
   config,
   namespace,
   ...
@@ -31,8 +31,6 @@
     ))
   ];
 
-  environment.systemPackages = [ pkgs.borgbackup ];
-
   # wlo1 boot delay
   #
   # FIXME: I removed wlo1 entirely from facter.json since the below didn't work,
@@ -59,53 +57,10 @@
   services.logind.settings.Login.HandlePowerKey = lib.mkForce "reboot";
   services.dyndns.enable = true;
 
-  # FIXME:This should be shared between myth/moth probably
-  systemd = {
-    tmpfiles.rules =
-      let
-        name = user: config.users.users.${user}.name;
-        group = user: config.users.users.${user}.group;
-      in
-      [
-        "d+ /mnt/storage/backup/ 2770 ${name "borg"} ${group "borg"} -"
-        "d+ /mnt/storage/mirror/ 2770 ${name "borg"} ${group "borg"} -"
-        "d+ /mnt/storage/share/ 2770 ${name "aa"} ${group "aa"} -"
-      ]
-      ++ (lib.map (u: "d /mnt/storage/backup/${u} 0770 ${name "${u}"} ${group "${u}"} -") [
-        "pa"
-        "aa"
-      ]);
-  };
-
-  services.mirror-backups = {
+  services.btrfs.autoScrub = {
     enable = true;
-    time = "*-*-* 4:00:00"; # Keep sync with moth times
-    server = "moth.${config.hostSpec.domain}";
-    notify.to = config.hostSpec.email.${config.hostSpec.hostName}.backups;
-
-    folders = {
-      destination = "/mnt/storage/mirror";
-      source = {
-        base = "/mnt/storage/backup";
-        leafs = [ "pa" ];
-        collections = [ "aa" ];
-      };
-    };
-  };
-
-  # Allow moth to mirror into myth
-  users.users.borg.openssh.authorizedKeys.keys = [
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKZp+oB8eZjz/S5Q8T8uFfq2yCt5NQWI3/Mm6q+ToAsA root@moth"
-  ];
-
-  services.backup = {
-    enable = true;
-    borgBackupStartTime = "*-*-* 04:30:00";
-
-    borgServer = "moth.${config.hostSpec.domain}";
-    borgRemotePath = "/run/current-system/sw/bin/borg";
-    borgBackupPath = "/mnt/storage/backup/aa";
-    borgNotifyTo = config.hostSpec.email.${config.hostSpec.hostName}.backups;
+    interval = "monthly"; # This raid uses nvme's
+    # Defaults to all filesystems
   };
 
   # Connect our NUT client to the UPS on the network
@@ -115,12 +70,6 @@
     username = "monuser";
     ip = config.hostSpec.networking.subnets.${config.hostSpec.hostName}.hosts.synology.ip;
     powerDownTimeOut = (60 * 30); # 30m. UPS reports ~45min
-  };
-
-  services.btrfs.autoScrub = {
-    enable = true;
-    interval = "monthly"; # This raid uses nvme's
-    # Defaults to all filesystems
   };
 
   ${namespace}.services.monit = {
