@@ -117,7 +117,8 @@ in
         settings = {
 
           # See https://jackson.dev/post/nix-reasonable-defaults/
-          connect-timeout = 5;
+          download-attempts = 2; # Default is 5, way too painful when github is down
+          # connect-timeout = 1;
           log-lines = 25;
           min-free = 128000000; # 128MB
           max-free = 1000000000; # 1GB
