@@ -30,7 +30,6 @@
 
           # Miscellaneous
           "podman.nix"
-          # FIXME: Busted while testing something
           "libvirt.nix"
           "wireshark.nix"
           "cli.nix"

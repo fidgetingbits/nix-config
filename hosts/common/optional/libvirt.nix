@@ -40,7 +40,6 @@ in
   virtualisation.libvirt = {
     enable = true;
     connections."qemu:///system" = {
-
       networks = [
         {
           active = true;
@@ -118,6 +117,12 @@ in
       RestartSec = "5s";
       StartLimitBurst = 3;
     };
+    # Not sure why but nixvirt.service regularly fails because this table doesn't exist
+    # preStart =
+    #   # bash
+    #   ''
+    #     ${pkgs.nftables}/bin/nft add table ip libvirt_network
+    #   '';
   };
 
   environment = {
@@ -147,5 +152,4 @@ in
   users.users.${config.hostSpec.username} = {
     extraGroups = [ "libvirtd" ];
   };
-
 }
