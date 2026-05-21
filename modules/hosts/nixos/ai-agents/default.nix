@@ -89,6 +89,10 @@ let
           mem = 4096;
           balloon = true;
 
+          # IMPORTANT: This is needed if you want microvm cli command to work
+          # when not defining microvms as stand-alone flake outputs
+          systemSymlink = true;
+
           # NOTE: The id is important as it correlates to the tap on the host-side.
           # If you change vm-agent- prefix, change the tap matching as well
           # FIXME: It should just be some option I guess
@@ -153,11 +157,13 @@ let
   };
 in
 {
-  options.${namespace}.ai-agents = {
-    vms = lib.mkOption {
-      type = lib.types.attrsOf (lib.types.attrsOf lib.types.anything); # FIXME: make a type
-      default = { };
-      description = "List of ai agent microvms to setup";
+  options.${namespace} = {
+    ai-agents = {
+      vms = lib.mkOption {
+        type = lib.types.attrsOf (lib.types.attrsOf lib.types.anything); # FIXME: make a type
+        default = { };
+        description = "List of ai agent microvms to setup";
+      };
     };
   };
 
@@ -226,7 +232,10 @@ in
         |> lib.concatStringsSep "\n";
     };
 
-    ${namespace}.agents-vpn.enable = true;
+    ${namespace} = {
+      agents-vpn.enable = true;
+    };
+
     boot.kernel.sysctl = {
       "net.ipv4.ip_forward" = 1;
       "net.ipv6.conf.all.forwarding" = 1;
@@ -246,7 +255,6 @@ in
         addresses = [ { Address = "${agent-lan.gateway}/${toString agent-lan.prefixLength}"; } ];
         networkConfig.ConfigureWithoutCarrier = true;
 
-        # FIXME: Double check this
         routingPolicyRules = [
           {
             # Allow access between the guest and the host
@@ -277,12 +285,13 @@ in
 
     };
 
-    # FIXME: Revisit this
-    # Strict Outbound NAT only for packets escaping out the Proton Interface
+    # Outbound NAT only for packets going out the proton vpn
+    # Allow established traffic for host -> microvm ssh session
     networking.nftables = {
       enable = true;
-      ruleset = ''
 
+      # FIXME: make the agents-vpn name configurable
+      ruleset = ''
         table inet agent_firewall {
               chain input {
                 type filter hook input priority filter; policy accept;
@@ -296,7 +305,6 @@ in
                oifname "${agentsBridge}" accept
               }
 
-              # 3. TRAFFIC ROUTING THROUGH THE HOST (VM -> Internet via VPN)
               chain forward {
                 type filter hook forward priority filter; policy drop;
 
@@ -316,17 +324,7 @@ in
       '';
     };
 
-    # FIXME: Switch this to route over VPN
-    # networking.nat = {
-    #   enable = true;
-    #   internalInterfaces = [ "vbr-agents" ];
-    # };
-
-    # Only enable this if you want your microvm's to be able to access host services
-    # networking.firewall.trustedInterfaces = [ agentsBridge ];
-
     microvm.vms = lib.mapAttrs mkAgentVm agents;
-    passthru.microvms = config.microvm.vms;
     microvm.autostart = lib.attrNames agents; # Ensures they boot with the host
 
     environment = {
