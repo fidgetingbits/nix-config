@@ -193,6 +193,7 @@
   # backup mirror assumes users is a shared gid across hosts, so hardcode it in case nixos ever changes the default
   users.groups.users.gid = 100;
 
+  # FIXME: Move to hardening
   # copy fail / dirty frag mitigations
   boot.blacklistedKernelModules = [
     "af_alg"
@@ -218,6 +219,66 @@
     install esp6           ${pkgs.coreutils}/bin/false
     install rxrpc          ${pkgs.coreutils}/bin/false
   '';
+
+  # FIXME: Move to styling
+  # Some ricing for all systems. This is in nixos vs hm because nft needs sudo, which
+  # so sudo grc nft won't pick up the ~/.grc/ conf file, and | grcat <style> is tedious
+  environment.etc = {
+    # FIXME: Not sure the sudo prefix regex makes sense, since we likely sudo grc nft?
+    "grc.conf".text = ''
+      # Match any sudo or raw invocation of nft list
+      (^nft\s+.*list.*|^sudo\s+nft\s+.*list.*)
+      /etc/grc/conf.nftables
+    '';
+
+    # FIXME: This is auto-generated atm. Needs work, but is better than nothing
+    "grc/conf.nftables".text = ''
+      # 1. Comments (Do this first so keywords inside comments don't get colored)
+      regexp=#.*$
+      colours=white
+      -
+      # 2. Double-quoted strings (e.g., log prefixes or interface names)
+      regexp="[^"]*"
+      colours=yellow
+      -
+      # 3. Table, Chain, and Set declarations
+      # Matches: 'table inet nixos-fw' or 'set temp-ports'
+      regexp=\b(table|chain|ruleset|set)\s+([\w-]+)\s+([\w-]+)?
+      colours=bold yellow, green, cyan
+      -
+      # 4. Hooks, Priorities, Policies, and Device types
+      regexp=\b(type|hook|priority|policy|device)\s+([\w+-]+)
+      colours=blue, bold blue
+      -
+      # 5. Core Actions / Verdicts / Flow Control
+      regexp=\b(accept|drop|reject|masquerade|counter|log|jump|goto|return|vmap)\b
+      colours=bold red
+      -
+      # 6. Protocol Layers & Meta expressions (expanded)
+      regexp=\b(ip|ip6|inet|arp|tcp|udp|icmp|icmpv6|ct|meta|fib|ether)\b
+      colours=cyan
+      -
+      # 7. Traffic Selectors (saddr, daddr, sport, dport)
+      regexp=\b([sd]addr|[sd]port)\b
+      colours=bold magenta
+      -
+      # 8. Set references (e.g., @temp-ports)
+      regexp=@[\w-]+
+      colours=bold cyan
+      -
+      # 9. Inline criteria & states (flags, state names, interface matching)
+      regexp=\b(iifname|oifname|state|flags|interval|established|related|new|invalid|untracked|exists|check)\b
+      colours=magenta
+      -
+      # 10. IPv4 / IPv6 addresses and CIDR blocks inside rules
+      regexp=\b([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}(/[0-9]{1,2})?|[a-fA-F0-9:]+::?(/[0-9]{1,3})?)\b
+      colours=bright_white
+      -
+      # 11. Highlight handles at the end of lines
+      regexp=handle\s+\d+
+      colours=green
+    '';
+  };
 
   system.stateVersion = "23.05";
 }
