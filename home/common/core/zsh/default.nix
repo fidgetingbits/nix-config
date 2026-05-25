@@ -102,9 +102,6 @@ in
       # FIXME:This should maybe sync with _fzf_git_fzf
       # FIXME: ^G^T from fzf-git.zsh conflicts with this too
       FZF_CTRL_T_OPTS = "--preview '(highlight -O ansi -l {} 2> /dev/null || cat {} || tree -C {}) 2> /dev/null | head -200'";
-    }
-    // lib.optionalAttrs osConfig.hostSpec.isDevelopment {
-      # OPENAI_API_KEY = "$(cat ${homeDirectory}/.config/openai/token)";
     };
 
     shellAliases = import ./aliases.nix {

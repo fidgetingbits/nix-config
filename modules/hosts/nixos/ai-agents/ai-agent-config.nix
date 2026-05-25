@@ -18,6 +18,18 @@ in
       type = lib.types.str;
       description = "Name of microvm guest.";
     };
+
+    user = lib.mkOption {
+      type = lib.types.str;
+      description = ''
+        Name of microvm user.
+
+        NOTE: If you plan to share coding projects between your host/guest,
+        you likely need the paths synced, so recommend using the same
+        username
+      '';
+      default = "user";
+    };
     packages = lib.mkOption {
       type = lib.types.listOf lib.types.package;
       default = [ ];
@@ -43,17 +55,19 @@ in
     users.mutableUsers = false;
     users.allowNoPasswordLogin = true;
 
-    # FIXME: Make this configurable?
-    users.users.agent = {
+    users.users.${cfg.user} = {
       isNormalUser = true;
-      uid = 1000;
-      home = "/home/agent";
+      uid = 1000; # FIXME: Needs to be configurable? Needs to be relayed to shared folders somehow
+      home = "/home/${cfg.user}";
       createHome = true;
-      shell = pkgs.bash;
+      # FIXME: Make this inherit some hm niceties
+      shell = pkgs.zsh;
       openssh.authorizedKeys.keys = cfg.hostAuthorizedKeys;
     };
 
-    users.groups.agent.gid = 1000;
+    programs.zsh.enable = true;
+
+    users.groups.${cfg.user}.gid = 1000;
 
     # FIXME: Revisit these defaults (overlay our neovim package, etc?)
     environment.systemPackages =
@@ -66,6 +80,7 @@ in
         python3
         openssh
         neovim
+        strace
       ]);
 
     services.openssh = {
@@ -112,19 +127,23 @@ in
       "esp6"
       "rxrpc"
     ];
-    boot.extraModprobeConfig = ''
-      install af_alg         ${pkgs.coreutils}/bin/false
-      install algif_aead     ${pkgs.coreutils}/bin/false
-      install algif_skcipher ${pkgs.coreutils}/bin/false
-      install algif_hash     ${pkgs.coreutils}/bin/false
-      install algif_rng      ${pkgs.coreutils}/bin/false
-      install authenc        ${pkgs.coreutils}/bin/false
-      install authencesn     ${pkgs.coreutils}/bin/false
+    boot.extraModprobeConfig =
+      let
+        false = "${pkgs.coreutils}/bin/false";
+      in
+      ''
+        install af_alg         ${false}
+        install algif_aead     ${false}
+        install algif_skcipher ${false}
+        install algif_hash     ${false}
+        install algif_rng      ${false}
+        install authenc        ${false}
+        install authencesn     ${false}
 
-      install esp4           ${pkgs.coreutils}/bin/false
-      install esp6           ${pkgs.coreutils}/bin/false
-      install rxrpc          ${pkgs.coreutils}/bin/false
-    '';
+        install esp4           ${false}
+        install esp6           ${false}
+        install rxrpc          ${false}
+      '';
     time.timeZone = "UTC";
   };
 }

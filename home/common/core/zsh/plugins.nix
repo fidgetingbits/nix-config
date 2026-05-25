@@ -1,3 +1,5 @@
+# Plugins to maybe add:
+# https://github.com/OKay2c/zsh-nft-completions/
 { pkgs }:
 [
   {

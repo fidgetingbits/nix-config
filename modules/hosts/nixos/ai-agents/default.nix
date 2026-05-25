@@ -75,6 +75,7 @@ let
         ${namespace}.microvm = {
           inherit name;
           inherit (agent)
+            user
             packages
             sshPort
             hostAuthorizedKeys

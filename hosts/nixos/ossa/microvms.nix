@@ -16,10 +16,14 @@ in
 {
   ${namespace}.ai-agents.vms = {
     claude = {
+      user = config.hostSpec.primaryUsername;
       inherit (lan.hosts.claude) ip;
       mac = (lib.head lan.hosts.claude.mac);
       sshPort = 22;
-      packages = [ pkgs.claude-code ];
+      packages = [
+        pkgs.claude-code
+        pkgs.claude-code-acp
+      ];
       inherit hostAuthorizedKeys;
       extraConfig = { };
     };
