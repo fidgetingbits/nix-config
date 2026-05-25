@@ -56,6 +56,7 @@
       inherit (pkgs)
         ntfs3g
         immich-cli
+        claude-code-acp
         ;
       inherit (pkgs.introdus)
         easylkb
@@ -90,8 +91,15 @@
     # See https://docs.mesa3d.org/envvars.html for details
     MESA_LOG_FILE = "/dev/null";
     IMMICH_INSTANCE_URL = "https://immich.ooze.${osConfig.hostSpec.domain}";
-    IMMICH_API_KEY = "cat ${config.sops.secrets."keys/immich".path}";
   };
+  programs.zsh.initContent =
+    lib.mkAfter
+      # bash
+      ''
+        export IMMICH_API_KEY=$(cat ${config.sops.secrets."keys/immich".path})
+        export OPENAI_API_KEY=$(cat ${config.sops.secrets."tokens/openai".path})
+        export ANTHROPIC_API_KEY=$(cat ${config.sops.secrets."tokens/claude".path})
+      '';
 
   introdus.services.awww = {
     enable = true;
