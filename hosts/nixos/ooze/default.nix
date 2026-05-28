@@ -45,6 +45,9 @@ in
           "services/forgejo.nix" # git forge
           "services/webdav.nix" # for grapheneos seedvault backups
           "services/calibre-web.nix" # ebook management
+          "services/commafeed.nix" # rss reader
+          # "services/nitter.nix" # ad-less twitter front-end
+          "services/paperless.nix" # document management
 
           "acme.nix"
           "remote-builder.nix"
