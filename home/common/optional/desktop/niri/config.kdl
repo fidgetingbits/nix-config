@@ -20,7 +20,6 @@ overview {
 //
 // ========== Startup ==========
 //
-spawn-at-startup "noctalia-shell"
 spawn-at-startup "firefox"
 spawn-sh-at-startup "uwsm finalize NIRI_SOCKET"
 spawn-sh-at-startup "nvim-neovide -- -c 'lua require([[resession]]).load([[nix]])'"

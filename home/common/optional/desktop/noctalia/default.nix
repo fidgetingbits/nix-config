@@ -4,6 +4,7 @@
   lib,
   pkgs,
   osConfig,
+  config,
   ...
 }:
 let
@@ -101,5 +102,25 @@ in
       lib.recursiveUpdate baseSettings hostSettings
       # nixfmt hack
       |> lib.mapAttrs (n: v: lib.mkForce v);
+  };
+
+  systemd.user.services.noctalia-shell = {
+    Unit = {
+      Description = "Noctalia Shell";
+      After = [ "graphical-session-pre.target" ];
+      PartOf = [ "graphical-session.target" ];
+      # Ensures sd-switch sees a unit-config change and restarts the
+      # service whenever the noctalia-shell package updates, so the
+      # running shell.qml path matches the CLI used by keybindings.
+      X-RestartIfChanged = "true";
+    };
+    Service = {
+      ExecStart = lib.getExe config.programs.noctalia-shell.package;
+      Restart = "on-failure";
+      RestartSec = 2;
+    };
+    Install = {
+      WantedBy = [ "graphical-session.target" ];
+    };
   };
 }
