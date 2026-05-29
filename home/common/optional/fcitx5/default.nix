@@ -5,6 +5,11 @@
     ".config/fcitx5/.keep".text = "# Managed by Home Manager";
   };
 
+  # Allegedly needed for xwayland, but untested
+  home.sessionVariables = {
+    XMODIFIERS = "@im=fcitx";
+  };
+
   xdg.configFile = {
     "fcitx5/profile" = {
       source = ./profile;
@@ -41,7 +46,8 @@
         qt6Packages.fcitx5-chinese-addons
         qt6Packages.fcitx5-configtool # Might need to enable rime using configtool after installed
         fcitx5-table-extra
-        fcitx5-chewing # Adds zhuyin https://fcitx-im.org/wiki/Chewing
+        fcitx5-mcbopomofo
+        fcitx5-chewing
         fcitx5-rime
         fcitx5-gtk
         libsForQt5.fcitx5-qt
@@ -49,4 +55,5 @@
       waylandFrontend = osConfig.hostSpec.useWayland;
     };
   };
+
 }
