@@ -253,22 +253,18 @@ in
         networkConfig.ConfigureWithoutCarrier = true;
 
         routingPolicyRules = [
+          # Allow access between the guest and the host
           {
-            # Allow access between the guest and the host
-            routingPolicyRuleConfig = {
-              From = agent-lan.cidr;
-              To = agent-lan.cidr;
-              Table = "main";
-              Priority = 999;
-            };
+            From = agent-lan.cidr;
+            To = agent-lan.cidr;
+            Table = "main";
+            Priority = 999;
           }
           # Route everything else over VPN
           {
-            routingPolicyRuleConfig = {
-              From = agent-lan.cidr;
-              Table = 42; # wg-proton-agents table
-              Priority = 1000;
-            };
+            From = agent-lan.cidr;
+            Table = 42; # wg-proton-agents table
+            Priority = 1000;
           }
         ];
       };

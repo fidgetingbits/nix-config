@@ -22,7 +22,7 @@ in
       sshPort = 22;
       packages = [
         pkgs.claude-code
-        pkgs.claude-code-acp
+        pkgs.claude-agent-acp
       ];
       inherit hostAuthorizedKeys;
       extraConfig = { };

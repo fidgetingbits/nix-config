@@ -6,7 +6,7 @@
   ...
 }:
 let
-  sopsFolder = (builtins.toString inputs.nix-secrets) + "/sops";
+  sopsFolder = (lib.toString inputs.nix-secrets) + "/sops";
   postfixPasswdFile = config.sops.secrets."postfix/sasl_passwd";
   passwdDir = "/var/lib/postfix/data/passwords";
 in
@@ -113,36 +113,36 @@ in
     {
       enable = true;
       enablePAM = false;
-      enableImap = false; # This is to stop imap listening, despite empty protocols= below.
-      mailLocation = "none";
       protocols = [ ]; # Don't run any servers, only auth
 
-      extraConfig = ''
+      settings = {
+        mail_path = "none"; # mail_path only works on >= 2.4
         # Disable all protocols
+        protocols.imap = false; # This is to stop imap listening, despite empty protocols= below.
 
         # Enable auth service
-        auth_debug = yes
-        service auth {
-          unix_listener  /var/lib/postfix/queue/private/auth {
-            mode = 0660
-            user = postfix
-            group = postfix
-          }
-        }
+        auth_debug = "yes";
+        "service auth" = {
+          "unix_listener  /var/lib/postfix/queue/private/auth" = {
+            mode = 0660;
+            user = "postfix";
+            group = "postfix";
+          };
+        };
 
         # Configure authentication
-        auth_mechanisms = plain login
+        auth_mechanisms = "plain login";
 
         # Use nix-secrets passwd file for atuh
-        passdb {
-          driver = passwd-file
-          args = ${passwdFile}
-        }
-        userdb {
-          driver = static
-          args = uid=postfix gid=postfix home=/var/spool/mail/%u
-        }
-      '';
+        passdb = {
+          driver = "passwd-file";
+          args = passwdFile;
+        };
+        userdb = {
+          driver = "static";
+          args = "uid=postfix gid=postfix home=/var/spool/mail/%u";
+        };
+      };
     };
 
   sops.secrets.dovecot = {
