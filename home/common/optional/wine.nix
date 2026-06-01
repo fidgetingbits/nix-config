@@ -5,7 +5,7 @@ let
     export WINEDEBUG=-all
     # Disable looking for Gecko support
     export WINEDLLOVERRIDES="mscoree,mshtml="
-    exec ${pkgs.wineWowPackages.stable}/bin/wine64 "$@"
+    exec ${pkgs.wineWow64Packages.stable}/bin/wine64 "$@"
   '';
 in
 {

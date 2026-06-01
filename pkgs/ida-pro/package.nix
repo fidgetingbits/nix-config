@@ -26,14 +26,26 @@
   libsForQt5,
   libunwind,
   libxkbcommon,
+  libice,
+  libsm,
+  libX11,
+  libxau,
+  libxcb,
+  libxext,
+  libxi,
+  libxrender,
+  libxcb-image,
+  libxcb-keysyms,
+  libxcb-render-util,
+  libxcb-wm,
   makeDesktopItem,
   makeWrapper,
   openssl,
   python3,
   stdenv,
-  xorg,
   zlib,
   pythonEnv ? python3,
+
 }:
 
 #   srcs = lib.strings.fromJSON (lib.readFile ./srcs.json);
@@ -108,18 +120,19 @@ stdenv.mkDerivation rec {
     openssl
     pythonEnv
     stdenv.cc.cc
-    xorg.libICE
-    xorg.libSM
-    xorg.libX11
-    xorg.libXau
-    xorg.libxcb
-    xorg.libXext
-    xorg.libXi
-    xorg.libXrender
-    xorg.xcbutilimage
-    xorg.xcbutilkeysyms
-    xorg.xcbutilrenderutil
-    xorg.xcbutilwm
+    libice
+    libsm
+    libX11
+    libxau
+    libxcb
+    libxext
+    libxi
+    libxrender
+    libxcb-image
+    libxcb-keysyms
+    libxcb-keysyms
+    libxcb-render-util
+    libxcb-wm
     zlib
   ];
   buildInputs = runtimeDependencies; # + copyPathTheStore src;

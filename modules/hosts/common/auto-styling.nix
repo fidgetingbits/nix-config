@@ -19,6 +19,9 @@ in
   config = lib.mkIf config.hostSpec.isAutoStyled {
     stylix = {
       enable = true;
+
+      # Don't complain about version mismatch, since stylix updates slower than nixpkgs
+      enableReleaseChecks = false;
       autoEnable = true;
       opacity.terminal = 1.0;
       base16Scheme = "${pkgs.base16-schemes}/share/themes/${config.hostSpec.theme}.yaml";
@@ -36,8 +39,6 @@ in
         };
       };
       image = config.hostSpec.wallpaper;
-
     };
-
   };
 }

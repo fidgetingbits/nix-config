@@ -3,10 +3,12 @@
   networking.useDHCP = lib.mkForce true;
   services.resolved = {
     enable = true;
-    llmnr = "false"; # Prevent listening on 0.0.0.0:5355 as we don't need multicast DNS on LAN
-    # dnssec breaks on ogre
-    # dnssec = "true";
-    domains = [ "~." ];
+    settings.Resolve = {
+      LLMNR = "false"; # Prevent listening on 0.0.0.0:5355 as we don't need multicast DNS on LAN
+      Domains = [ "~." ];
+      # dnssec breaks on ogre
+      # dnssec = "true";
+    };
 
     # FIXME: Fix fallbacks so it definitely goes through LAN dns first...
     #    fallbackDns = [

@@ -15,6 +15,6 @@
   };
 
   environment.systemPackages = [
-    pkgs.xorg.xf86inputevdev # for gilrs used by talon. need evdev
+    pkgs.xf86-input-evdev # for gilrs used by talon. need evdev
   ];
 }

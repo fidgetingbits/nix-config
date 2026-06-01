@@ -97,7 +97,10 @@ in
     group = "postfix";
     email = config.hostSpec.email.letsEncrypt;
     dnsProvider = "gandiv5";
-    credentialsFile = config.sops.secrets."tokens/gandi".path;
+    # credentialFiles = config.sops.secrets."tokens/gandi".path;
+    credentialFiles = {
+      "GANDIV5_PERSONAL_ACCESS_TOKEN_FILE" = config.sops.secrets."tokens/gandi".path;
+    };
     dnsPropagationCheck = true;
   };
 
