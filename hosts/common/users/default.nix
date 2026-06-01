@@ -157,6 +157,7 @@ in
         // {
           root = {
             home.stateVersion = "23.05"; # Avoid error
+
             imports = lib.flatten (
               (lib.optional (!hostSpec.isMinimal) (
                 map lib.custom.relativeToRoot [
@@ -177,12 +178,10 @@ in
             programs.ssh = {
               enable = true;
               enableDefaultConfig = false;
-              matchBlocks = {
+              settings = {
                 "missing-pq" = {
-                  host = "oath oath.${hostSpec.domain} onus onus.${hostSpec.domain}";
-                  extraOptions = {
-                    WarnWeakCrypto = "no-pq-kex";
-                  };
+                  Host = "oath oath.${hostSpec.domain} onus onus.${hostSpec.domain}";
+                  WarnWeakCrypto = "no-pq-kex";
                 };
               };
             };

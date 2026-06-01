@@ -69,12 +69,12 @@ in
         default = [ ];
         description = "Host names that accept yubikey auth, that have no common domain suffix, and that aren't part of this nixos config";
       };
-      secretMatchBlocks = lib.mkOption {
+      secretSettings = lib.mkOption {
         type = lib.types.anything;
         default =
           # FIXME: Maybe revisit this
-          (secrets.networking.ssh.matchBlocks lib)
-          // lib.optionalAttrs osConfig.hostSpec.isWork (secrets.work.ssh.matchBlocks lib);
+          (secrets.networking.ssh.settings lib)
+          // lib.optionalAttrs osConfig.hostSpec.isWork (secrets.work.ssh.settings lib);
         description = "Matchblocks from nix-secrets repo that won't be shown in plaintext in the reoo.";
       };
     };
@@ -138,7 +138,7 @@ in
           (
             "${yubikeyPath}/"
             |> lib.custom.relativeToRoot
-            |> builtins.readDir
+            |> lib.readDir
             # nixfmt hack
             |> lib.attrNames
           )
@@ -151,10 +151,10 @@ in
         vanillaHosts
         |> lib.lists.map (host: {
           "${host}" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            match = "host ${host},${host}.${osConfig.hostSpec.domain}";
-            hostname = "${host}.${osConfig.hostSpec.domain}";
-            port = osConfig.hostSpec.networking.ports.tcp.ssh;
-            user = inputs.self.nixosConfigurations.${host}.config.hostSpec.primaryUsername or cfg.defaultUser;
+            Match = "host ${host},${host}.${osConfig.hostSpec.domain}";
+            HostName = "${host}.${osConfig.hostSpec.domain}";
+            Port = osConfig.hostSpec.networking.ports.tcp.ssh;
+            User = inputs.self.nixosConfigurations.${host}.config.hostSpec.primaryUsername or cfg.defaultUser;
           };
         })
         |> lib.attrsets.mergeAttrsList;
@@ -164,14 +164,12 @@ in
         nixosHostsUnlockable
         |> lib.lists.map (host: {
           "${host}-unlock" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            host = "${host}-unlock";
-            hostname = "${host}.${osConfig.hostSpec.domain}";
-            user = "root";
-            port = osConfig.hostSpec.networking.ports.tcp.ssh;
-            extraOptions = {
-              UserKnownHostsFile = "/dev/null";
-              StrictHostKeyChecking = "no";
-            };
+            Host = "${host}-unlock";
+            HostName = "${host}.${osConfig.hostSpec.domain}";
+            User = "root";
+            Port = osConfig.hostSpec.networking.ports.tcp.ssh;
+            UserKnownHostsFile = "/dev/null";
+            StrictHostKeyChecking = "no";
           };
         })
         |> lib.attrsets.mergeAttrsList;
@@ -183,51 +181,49 @@ in
 
     lib.mkIf cfg.enable {
       programs.ssh = {
-        matchBlocks = {
-          # Only forward agent to hosts that need it
+        settings = {
+          #   # Only forward agent to hosts that need it
           "forward-agent-hosts" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            host = forwardAgentHostsString;
-            forwardAgent = true;
+            Host = forwardAgentHostsString;
+            ForwardAgent = true;
           };
-
           "git" = {
-            host = lib.concatStringsSep " " (gitServers ++ cfg.extraGitServers);
-            user = "git";
+            Host = lib.concatStringsSep " " (gitServers ++ cfg.extraGitServers);
+            User = "git";
             # NOTE: not included above because we may need to supply a token
             # when using iso, etc. Also don't want to forward the agent to git
             # servers.
-            identityFile = identityFiles;
+            IdentityFile = identityFiles;
           };
-
-          # FIXME: Revisit this
+          #
+          #   # FIXME: Revisit this
           "*" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
             # FIXME(ssh): Control path stuff should probably be for a limited set of systems only?
-            controlMaster = "auto";
-            controlPath = "${config.home.homeDirectory}/.ssh/sockets/S.%r@%h:%p";
-            controlPersist = "60m";
+            ControlMaster = "auto";
+            ControlPath = "${config.home.homeDirectory}/.ssh/sockets/S.%r@%h:%p";
+            ControlPersist = "60m";
             # Avoids infinite hang if control socket connection interrupted. ex:
             # vpn goes down/up
-            serverAliveCountMax = 3;
-            serverAliveInterval = 5; # 3 * 5s
-            hashKnownHosts = true;
-            addKeysToAgent = "yes";
-
-            extraOptions = {
-              SetEnv = "TERM=xterm-256color";
-              UpdateHostKeys = "ask";
+            ServerAliveCountMax = 3;
+            ServerAliveInterval = 5; # 3 * 5s
+            HashKnownHosts = true;
+            AddKeysToAgent = "yes";
+            SetEnv = {
+              TERM = "xterm-256color";
             };
           };
         }
         // lib.optionalAttrs cfg.useYubikey {
           "yubikey-hosts" = lib.hm.dag.entryAfter [ "*" ] {
-            host = ykHosts;
-            identitiesOnly = true;
-            identityFile = identityFiles;
+            Host = ykHosts;
+            IdentitiesOnly = true;
+            IdentityFile = identityFiles;
           };
         }
-        // cfg.secretMatchBlocks
+        // cfg.secretSettings
         // vanillaHostsConfig
         // unlockableHostsConfig;
+        # };
       };
 
       # NOTE: Yubikey .pub files aren't stored in .ssh/ root otherwise they're

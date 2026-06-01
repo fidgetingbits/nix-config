@@ -12,7 +12,7 @@
 }:
 let
   cfg = config.${namespace}.wireguard;
-  secretsFolder = builtins.toString inputs.nix-secrets;
+  secretsFolder = lib.toString inputs.nix-secrets;
   sopsFolder = secretsFolder + "/sops/";
   hostName = config.networking.hostName;
   inherit (lib.custom.network) triplet lastOctet;

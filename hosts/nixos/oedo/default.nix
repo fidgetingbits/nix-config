@@ -158,7 +158,7 @@
   #   health = {
   #     disks = {
   #       enable = true;
-  #       smart.disks = map (d: builtins.baseNameOf d) [ config.system.disks.primary ];
+  #       smart.disks = map (d: lib.baseNameOf d) [ config.system.disks.primary ];
   #     };
   #     btrfs = {
   #       enable = true;

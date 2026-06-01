@@ -58,12 +58,17 @@ check HOST=`hostname` ARGS="":
 
 # Rebuild specified host
 [group("building")]
-rebuild HOST=`hostname`: && rebuild-post
-    @just rebuild-host {{ HOST }}
+rebuild HOST=`hostname` NO_SWITCH="0": && rebuild-post
+    @just rebuild-host {{ HOST }} {{ NO_SWITCH }}
     # just rebuild-extensions-lite
 
-# Rebuild specified host and then run a flake check
+# Rebuild specified host, but don't auto-switch
 [group("building")]
+boot HOST=`hostname`:
+    @just rebuild-host {{ HOST }} no_switch
+
+# Rebuild specified host and then run a flake check
+[group("")]
 rebuild-full HOST=`hostname`: && rebuild-post
     @just rebuild-host {{ HOST }}
     just check {{ HOST }}
@@ -143,7 +148,7 @@ disko DRIVE PASSWORD:
 
 # Run nixos-rebuild on the remote host
 [group("building")]
-rebuild-host HOST=`hostname`:
+rebuild-host HOST=`hostname` NO_SWITCH="0":
     #!/usr/bin/env bash
     if [ "{{ HOST }}" == "$(hostname)" ]; then
         just noctalia-backup || true
@@ -155,7 +160,11 @@ rebuild-host HOST=`hostname`:
     trap 'rm -rf $BUILD_FOLDER' EXIT
     cd $BUILD_FOLDER
     just copy-lock-in {{ HOST }}
-    rebuild-host {{ HOST }}
+    if [ {{ NO_SWITCH }} != "1" ]; then
+        rebuild-host {{ HOST }}
+    else
+        rebuild-host --no-switch {{ HOST }}
+    fi
     just copy-lock-out {{ HOST }}
     cd -
 

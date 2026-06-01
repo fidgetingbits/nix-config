@@ -9,7 +9,7 @@ let
   inherit (lib) mkIf mkOption types;
   servicePort = config.hostSpec.networking.ports.tcp.docuseal;
   cfg = config.services.docuseal;
-  sopsFolder = (builtins.toString inputs.nix-secrets) + "/sops";
+  sopsFolder = (lib.toString inputs.nix-secrets) + "/sops";
 in
 {
   # imports = [ ./nginx.nix ];

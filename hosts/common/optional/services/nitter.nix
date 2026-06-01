@@ -6,7 +6,7 @@
 }:
 let
 
-  # secretsFolder = builtins.toString inputs.nix-secrets;
+  # secretsFolder = lib.toString inputs.nix-secrets;
   # sopsFolder = secretsFolder + "/sops/";
   servicePort = config.hostSpec.networking.ports.tcp.nitter;
 in

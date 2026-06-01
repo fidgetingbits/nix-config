@@ -20,7 +20,7 @@
   ...
 }:
 let
-  sopsFolder = (builtins.toString inputs.nix-secrets) + "/sops";
+  sopsFolder = (lib.toString inputs.nix-secrets) + "/sops";
   cfg = config.wifi;
 
   # Return a list of all Access Point (AP) names from the given WLAN secret file
@@ -38,7 +38,7 @@ let
   isWLANUsed = f: lib.elem (getWLAN f) cfg.wlans;
 
   allWLANFiles =
-    builtins.readDir sopsFolder
+    lib.readDir sopsFolder
     |> lib.attrNames
     |> lib.filter (name: lib.match "wifi\..*\.yaml" name != null);
 

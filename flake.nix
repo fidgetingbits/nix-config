@@ -125,7 +125,7 @@
           (lib.map (host: mkHost host isDarwin) hosts)
           ++ (lib.map (host: mkMinimalHost host) (lib.filter (h: h != "iso") hosts))
         );
-      readHosts = folder: lib.attrNames (builtins.readDir ./hosts/${folder});
+      readHosts = folder: lib.attrNames (lib.readDir ./hosts/${folder});
     in
     flake-parts.lib.mkFlake { inherit inputs; } {
       flake = {
@@ -184,7 +184,7 @@
   inputs = {
 
     #################### Core Nix Sources ####################
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     #nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.11";
 
@@ -194,7 +194,7 @@
     };
 
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.11";
+      url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

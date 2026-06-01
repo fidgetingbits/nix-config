@@ -7,7 +7,7 @@
   ...
 }:
 let
-  sopsFolder = (builtins.toString inputs.nix-secrets) + "/sops";
+  sopsFolder = (lib.toString inputs.nix-secrets) + "/sops";
   homeDirectory = config.home.homeDirectory;
   yubikeys = [
     "dade"

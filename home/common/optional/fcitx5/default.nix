@@ -2,7 +2,9 @@
 {
 
   home.file = {
-    ".config/fcitx5/.keep".text = "# Managed by Home Manager";
+    ".config/fcitx5/.keep" = {
+      text = "# Managed by Home Manager";
+    };
   };
 
   # Allegedly needed for xwayland, but untested
@@ -11,6 +13,10 @@
   };
 
   xdg.configFile = {
+    # Fix for https://github.com/nix-community/home-manager/issues/5982
+    # error installing file outside $HOME
+    # https://github.com/nix-community/home-manager/issues/9087
+    "fcitx5".recursive = true;
     "fcitx5/profile" = {
       source = ./profile;
       # every time fcitx5 switch input method, it will modify ~/.config/fcitx5/profile,

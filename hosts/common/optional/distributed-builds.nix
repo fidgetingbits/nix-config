@@ -76,7 +76,7 @@
       genHostEntry = hostName: ''
         Host ${hostName}
           HostName ${hostName}.${config.hostSpec.domain}
-          Port ${builtins.toString config.hostSpec.networking.ports.tcp.ssh}
+          Port ${lib.toString config.hostSpec.networking.ports.tcp.ssh}
       '';
       remoteMachines = lib.filter (m: m.hostName != "localhost") config.nix.buildMachines;
       hostNameList = map (machine: machine.hostName) remoteMachines;

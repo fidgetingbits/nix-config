@@ -415,7 +415,7 @@ in
             );
 
             monitRaidArrayStatus = drive: ''
-              check program "raid status: ${builtins.baseNameOf drive}" with path "${pkgs.mdadm}/bin/mdadm --misc --detail --test /dev/${drive}"
+              check program "raid status: ${lib.baseNameOf drive}" with path "${pkgs.mdadm}/bin/mdadm --misc --detail --test /dev/${drive}"
                 if status != 0 then alert
             '';
             monitRaidArrayStatuses = lib.optionalString cfg.health.mdadm.enable (

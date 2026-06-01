@@ -17,7 +17,7 @@ in
 lib.mkIf (lib.length (lib.attrNames cfg.vms) != 0) {
 
   # Automatic ssh entries
-  programs.ssh.matchBlocks =
+  programs.ssh.settings =
     cfg.vms
     |> lib.attrNames
     |> map (

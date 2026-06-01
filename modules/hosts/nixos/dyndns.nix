@@ -6,7 +6,7 @@
 }:
 let
   cfg = config.services.dyndns;
-  sopsFolder = (builtins.toString inputs.nix-secrets) + "/sops";
+  sopsFolder = (lib.toString inputs.nix-secrets) + "/sops";
 in
 {
   options = {

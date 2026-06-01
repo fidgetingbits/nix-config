@@ -6,7 +6,7 @@
   ...
 }:
 let
-  sopsFolder = (builtins.toString inputs.nix-secrets) + "/sops";
+  sopsFolder = (lib.toString inputs.nix-secrets) + "/sops";
 in
 {
   home.packages = lib.attrValues { inherit (pkgs) awscli eksctl kubectl; };

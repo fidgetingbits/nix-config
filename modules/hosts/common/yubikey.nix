@@ -50,7 +50,7 @@ in
         let
           yubikeyIds =
             config.yubikey.identifiers
-            |> lib.mapAttrsToList (name: id: "[${name}]=\"${builtins.toString id}\"")
+            |> lib.mapAttrsToList (name: id: "[${name}]=\"${lib.toString id}\"")
             |> lib.concatStringsSep " ";
         in
         pkgs.writeShellApplication {

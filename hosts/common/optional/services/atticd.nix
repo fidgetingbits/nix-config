@@ -8,7 +8,7 @@
   imports = [ ./nginx.nix ];
   config =
     let
-      sopsFolder = (builtins.toString inputs.nix-secrets) + "/sops";
+      sopsFolder = (lib.toString inputs.nix-secrets) + "/sops";
       atticPort = config.hostSpec.networking.ports.tcp.atticd;
     in
     {
@@ -27,7 +27,7 @@
         environmentFile = config.sops.secrets."tokens/attic".path;
 
         settings = {
-          listen = "127.0.0.1:${builtins.toString atticPort}";
+          listen = "127.0.0.1:${lib.toString atticPort}";
           # FIXME: revisit this
           garbage-collection = {
             interval = "5 days";

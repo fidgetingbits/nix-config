@@ -44,7 +44,7 @@ in
 
     sopsFile = lib.mkOption {
       type = lib.types.path;
-      default = (builtins.toString inputs.nix-secrets) + "/sops/olan.yaml";
+      default = (lib.toString inputs.nix-secrets) + "/sops/olan.yaml";
       description = "sops file containing attic cache access token";
     };
 

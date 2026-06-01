@@ -56,7 +56,7 @@
       inherit (pkgs)
         ntfs3g
         immich-cli
-        claude-code-acp
+        claude-agent-acp
         ;
       inherit (pkgs.introdus)
         easylkb
@@ -134,7 +134,7 @@
         }
         |> lib.readFile
         # nixfmt hack
-        |> builtins.fromJSON;
+        |> lib.fromJSON;
     };
   };
 

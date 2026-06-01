@@ -33,7 +33,8 @@ lib.mkIf cfg.isAdmin {
       "git.ooze.${cfg.domain}"
     ];
   };
-  programs.ssh.matchBlocks =
+
+  programs.ssh.settings =
     let
       nixosHostNames =
         inputs.self.nixosConfigurations
@@ -54,10 +55,10 @@ lib.mkIf cfg.isAdmin {
         hosts
         |> lib.lists.map (host: {
           "${host}" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            match = "host ${host},${host}.${osConfig.hostSpec.domain}";
-            hostname = "${host}.${osConfig.hostSpec.domain}";
-            user = osConfig.hostSpec.networking.subnets.${subnet}.hosts.${host}.user;
-            port = osConfig.hostSpec.networking.subnets.${subnet}.hosts.${host}.sshPort;
+            Match = "host ${host},${host}.${osConfig.hostSpec.domain}";
+            Hostname = "${host}.${osConfig.hostSpec.domain}";
+            User = osConfig.hostSpec.networking.subnets.${subnet}.hosts.${host}.user;
+            Port = osConfig.hostSpec.networking.subnets.${subnet}.hosts.${host}.sshPort;
           };
         })
         |> lib.attrsets.mergeAttrsList;
@@ -66,29 +67,25 @@ lib.mkIf cfg.isAdmin {
       # NOTE: These 2 are nixos config hosts, but still have dedicated entries
       # because of the local forward. Not sure how to deal with that yet.
       "moon" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-        localForwards =
+        LocalForward =
           let
             unifi = cfg.networking.ports.tcp.unifi-controller;
           in
-          [
-            {
-              # For unifi-controller web interface
-              bind.address = "localhost";
-              bind.port = unifi;
-              host.address = "localhost";
-              host.port = unifi;
-            }
-          ];
+          {
+            # For unifi-controller web interface
+            bind.port = unifi;
+            host.address = "localhost";
+            host.port = unifi;
+          };
       };
 
       "ooze" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-        # Serial consoles are attached to the server, so use socat to forward
-        # them as needed
-        localForwards = lib.flatten (
+        #   # Serial consoles are attached to the server, so use socat to forward
+        #   # them as needed
+        LocalForward = lib.flatten (
           lib.optionals cfg.isWork (
             lib.map
               (port: {
-                bind.address = "localhost";
                 bind.port = port;
                 host.address = "localhost";
                 host.port = port;
@@ -103,41 +100,27 @@ lib.mkIf cfg.isAdmin {
         );
       };
 
-      # FIXME: Remove this
-      # FIXME(ssh): Use https://superuser.com/questions/838898/ssh-config-host-match-port
-      # to match on port, so I don't need to rely on oath_gitlab by name
-      "oath_gitlab" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-        host = "oath_gitlab";
-        hostname = "oath.${cfg.domain}";
-        user = "git";
-        port = cfg.networking.ports.tcp.gitlab;
-      };
-
       # This is mostly covered by existing git from ssh-auto-entries, but the port differs
       "internal-git" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-        host = "git.${cfg.domain} git.ooze.${cfg.domain}";
-        hostname = "git.${cfg.domain}";
-        port = cfg.networking.ports.tcp.ssh;
+        Host = "git.${cfg.domain} git.ooze.${cfg.domain}";
+        HostName = "git.${cfg.domain}";
+        Port = cfg.networking.ports.tcp.ssh;
       };
 
       "synology-tweaks" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-        host = "oath oath.${cfg.domain} onus onus.${cfg.domain}";
-        extraOptions = {
-          # Stuck on older versions of ssh, so avoid PQ warning
-          WarnWeakCrypto = "no-pq-kex";
-          # Fix coloring nonsense
-          RemoteCommand = "export LS_COLORS+=':ow=01;34'; /bin/sh -l";
-          RequestTTY = "force";
-        };
+        Host = "oath oath.${cfg.domain} onus onus.${cfg.domain}";
+        # Stuck on older versions of ssh, so avoid PQ warning
+        WarnWeakCrypto = "no-pq-kex";
+        # Fix coloring nonsense
+        RemoteCommand = "export LS_COLORS+=':ow=01;34'; /bin/sh -l";
+        RequestTTY = "force";
       };
 
       # Isolated lab network, where IPs overlap all the time
       "lab" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-        host = cfg.networking.subnets.fg-lab.wildcard;
-        extraOptions = {
-          UserKnownHostsFile = "/dev/null";
-          StrictHostKeyChecking = "no";
-        };
+        Host = cfg.networking.subnets.fg-lab.wildcard;
+        UserKnownHostsFile = "/dev/null";
+        StrictHostKeyChecking = "no";
       };
     }
     // (extraSubnetEntries olanSubnetHosts "olan");

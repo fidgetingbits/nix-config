@@ -7,7 +7,7 @@
   ...
 }:
 let
-  sopsFolder = (builtins.toString inputs.nix-secrets) + "/sops";
+  sopsFolder = (lib.toString inputs.nix-secrets) + "/sops";
   workSecrets = "${sopsFolder}/work.yaml";
   vpnProfiles = secrets.work.vpn.profiles;
 in

@@ -104,7 +104,7 @@
           # Cycle to the next wallaper
           "${mainMod}, equals, exec, awww-next"
           # Set the primary wallpaper
-          "${mainMod} SHIFT, equals, exec, swww img ${osConfig.hostSpec.wallpaper}"
+          "${mainMod} SHIFT, equals, exec, awww img ${osConfig.hostSpec.wallpaper}"
 
           #
           # ========== Media Controls ==========

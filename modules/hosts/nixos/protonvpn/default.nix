@@ -8,7 +8,7 @@
   ...
 }:
 let
-  secretsFolder = builtins.toString inputs.nix-secrets;
+  secretsFolder = lib.toString inputs.nix-secrets;
   sopsFolder = secretsFolder + "/sops/";
   hostName = config.networking.hostName;
   cfg = config.${namespace}.agents-vpn;

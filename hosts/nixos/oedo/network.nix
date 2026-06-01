@@ -11,7 +11,7 @@
   #  ${namespace} = {
   #    cifs-mounts = {
   #      enable = true;
-  #      sopsFile = (builtins.toString inputs.nix-secrets) + "/sops/olan.yaml";
+  #      sopsFile = (lib.toString inputs.nix-secrets) + "/sops/olan.yaml";
   #      mounts = [
   #        {
   #          name = "onus";

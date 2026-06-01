@@ -86,7 +86,7 @@
 
       exec-once = [
       ]
-      ++ lib.optional config.introdus.services.awww.enable "swww img ${osConfig.hostSpec.wallpaper}";
+      ++ lib.optional config.introdus.services.awww.enable "awww img ${osConfig.hostSpec.wallpaper}";
 
     };
 

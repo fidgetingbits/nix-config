@@ -195,7 +195,7 @@ in
         settings =
           "${pkgs.starship}/share/starship/presets/nerd-font-symbols.toml"
           |> lib.readFile
-          |> builtins.fromTOML
+          |> lib.fromTOML
           |> lib.recursiveUpdate settings';
       };
 

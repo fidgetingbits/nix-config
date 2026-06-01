@@ -50,7 +50,7 @@
 
 #   srcs = lib.strings.fromJSON (lib.readFile ./srcs.json);
 let
-  dummyFile = builtins.toFile "dummy-ida.run" "dummy file for CI";
+  dummyFile = lib.toFile "dummy-ida.run" "dummy file for CI";
   idaFile = "${builtins.getEnv "REPO_PATH"}/pkgs/nixos/ida-pro/ida-pro_90_x64linux.run";
   isDummyBuild = builtins.getEnv "REPO_PATH" == "" || (!lib.pathExists idaFile);
 in

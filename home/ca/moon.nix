@@ -1,4 +1,5 @@
 {
+  # config,
   pkgs,
   lib,
   ...
@@ -25,6 +26,8 @@
     )
   );
 
+  stylix.enableReleaseChecks = false;
+
   home.packages = lib.attrValues {
     inherit (pkgs)
       google-chrome
@@ -36,6 +39,8 @@
     # policies = {
     #   DisableFirefoxAccounts = lib.mkForce true;
     # };
+
+    # configPath = "${config.xdg.configHome}/mozilla/firefox";
     profiles.default = {
       settings = {
         # "signon.rememberSignons" = lib.mkForce "false";

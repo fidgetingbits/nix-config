@@ -9,7 +9,7 @@
   imports = [ ./nginx.nix ];
   config =
     let
-      sopsFolder = (builtins.toString inputs.nix-secrets) + "/sops";
+      sopsFolder = (lib.toString inputs.nix-secrets) + "/sops";
       forgejoPort = config.hostSpec.networking.ports.tcp.forgejo;
       sshPort = config.hostSpec.networking.ports.tcp.ssh;
 
@@ -82,7 +82,7 @@
             ui = {
               THEMES =
                 theme
-                |> builtins.readDir
+                |> lib.readDir
                 |> lib.attrNames
                 |> map (name: lib.removePrefix "theme-" (lib.removeSuffix ".css" name))
                 |> lib.concatStringsSep ",";

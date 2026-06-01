@@ -24,10 +24,10 @@ let
       ${lib.getBin pkgs.msmtp}/bin/msmtp -t admin@${config.hostSpec.domain} <"$TMPDIR"/heartbeat.txt
       rm -rf "$TMPDIR"
     }
-    hosts=(${builtins.toString cfg.hosts})
+    hosts=(${lib.toString cfg.hosts})
     #echo "Checking hosts: ''${hosts[@]}"
       for host in ''${hosts[@]}; do
-        if ! ${lib.getBin pkgs.inetutils}/bin/ping -c ${builtins.toString cfg.pingCount} -w 1 $host > /dev/null; then
+        if ! ${lib.getBin pkgs.inetutils}/bin/ping -c ${lib.toString cfg.pingCount} -w 1 $host > /dev/null; then
           #echo "Host down: $host"
           if [ ! -f $STATE_DIR/$host ]; then
             echo "$(date)" > $STATE_DIR/$host
@@ -83,7 +83,7 @@ in
         timerConfig = {
           Persistent = true;
           OnBootSec = "1min";
-          OnUnitInactiveSec = "${builtins.toString cfg.interval}";
+          OnUnitInactiveSec = "${lib.toString cfg.interval}";
         };
       };
     };

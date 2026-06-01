@@ -92,7 +92,7 @@
     health = {
       disks = {
         enable = true;
-        smart.disks = map (d: builtins.baseNameOf d) config.system.disks.raidDisks;
+        smart.disks = map (d: lib.baseNameOf d) config.system.disks.raidDisks;
         emmc = {
           enable = true;
           disks = {

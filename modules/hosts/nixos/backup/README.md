@@ -137,7 +137,7 @@ nix-config/hosts/ghost/default.nix
     borgBackupStartTime = "*-*-* 02:00:00";
     borgServer = "${configVars.networking.subnets.oops.ip}";
     borgUser = "${configVars.username}";
-    borgPort = "${builtins.toString configVars.networking.subnets.oops.port}";
+    borgPort = "${lib.toString configVars.networking.subnets.oops.port}";
     borgBackupPath = "/var/services/homes/${configVars.username}/backups";
     borgNotifyFrom = "${configVars.email.notifier}";
     borgNotifyTo = "${configVars.email.backup}";

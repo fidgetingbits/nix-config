@@ -8,7 +8,7 @@
   ...
 }:
 let
-  sopsFolder = (builtins.toString inputs.nix-secrets) + "/sops";
+  sopsFolder = (lib.toString inputs.nix-secrets) + "/sops";
   homeDirectory = "/home/${config.hostSpec.username}";
   icon = pkgs.fetchurl {
     urls = [ "https://rust.binary.ninja/logo.png" ];
