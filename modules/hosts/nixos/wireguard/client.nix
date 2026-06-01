@@ -52,7 +52,8 @@ lib.mkIf (cfg.enable && cfg.role == "client") {
             # has to be higher than what we set for LAN (50)
             preSetup = "set -x";
             # FIXME: Make this writeShellApplication for cleaner tool use
-            postSetup = # bash
+            postSetup =
+              # bash
               ''
                 ${lib.concatMapStringsSep "\n" (
                   ip: "ip route replace ${ip} dev ${cfg.interface} metric 200"
@@ -69,6 +70,9 @@ lib.mkIf (cfg.enable && cfg.role == "client") {
                   # FIXME: This might be a bit error prone if the defualt route isn't what you want to resolve it with?
                   # IMPORTANT: Don't resolve the endpoint using the internal DNS. If dynamicEndpointRefreshSeconds is set,
                   # this will bust the connection
+                  until ip route show default | grep -q default; do
+                    sleep 1
+                  done
                   EIFACE=$(ip route show default | ${lib.getExe pkgs.gawk} '/default/ {print $5}' | head -n1)
                   ${resolvectl} domain "$EIFACE" "~${cfg.endpoint}"
                 ''}

@@ -162,6 +162,20 @@ in
       };
     };
 
+    # NOTE: On nixos-rebuild sometimes the wifi device isn't up yet depending on what services rebuilt,
+    # but I guess network-online.target is flagged as done, so wireguard fails to start. This tries to
+    # fix that by waiting for at least a default route to apply wireguard
+    # FIXME: This might be only necessary on the clients? Not sure it matters
+    systemd.services.wireguard-wg0 = {
+      preStart = ''
+        echo "Waiting for default network gateway..."
+        until ip route show default | grep -q default; do
+          sleep 1
+        done
+        echo "Gateway found, proceeding."
+      '';
+    };
+
     services.rosenpass = {
       enable = true;
       defaultDevice = cfg.interface;
@@ -177,12 +191,10 @@ in
       };
     };
 
-    # FIXME: Need to figure out what to switch to after switched from
-    # wg-quick... sometimes still fails on rebuild
     systemd.services.rosenpass = {
-      after = [
-        "network-online.target"
-      ];
+      # Wait for wireguard to be up first, which ensures we can pull out the default interface
+      # in our preStart script
+      after = [ "wireguard-wg0.service" ];
     };
 
     sops.secrets = {
