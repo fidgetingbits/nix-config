@@ -31,7 +31,7 @@ let
   # Base directory for:
   # 1) data shared with only this microvm
   # 2) data shared across microvms
-  sharedDir = "/home/${user}/microvm/shared";
+  sharedDir = "/home/${user}/dev/shared";
 
   agents = cfg.vms;
 
@@ -39,10 +39,6 @@ let
   agentsBridge = "vbr-agents";
 
   mkAgentVm = name: agent: {
-    # FIXME: Required for microvm -l to work, but requires
-    # the agents listed as outputs? Use our own mv aliases for now
-    # flake = inputs.self;
-
     # NOTE: Must add lib here to inject lib.custom
     specialArgs = {
       inherit inputs lib;
@@ -58,7 +54,9 @@ let
         ...
       }:
       let
-        agentUser = "agent";
+        # We do this to keep the paths synced between dev box and microvm
+        # FIXME: We could fix having a shared username by just doing root path like /shared/xxx
+        agentUser = config.hostSpec.primaryUsername;
       in
       {
         imports = lib.flatten [
@@ -116,7 +114,7 @@ let
             # Development folder for agent-specific projects
             {
               source = "${sharedDir}/${name}";
-              mountPoint = "/home/${agentUser}/dev";
+              mountPoint = "/home/${agentUser}/dev/shared";
               tag = "agent-dev";
               proto = "virtiofs";
             }
@@ -124,17 +122,15 @@ let
             # files, etc
             {
               source = "${sharedDir}/agents-share";
-              mountPoint = "/home/${agentUser}/shared";
+              mountPoint = "/home/${agentUser}/dev/agents-shared";
               tag = "agent-share";
               proto = "virtiofs";
             }
             # Secrets exposed from sops
-            # FIXME: Switch this and any other secrets to a /run-based folder, and also
-            # make it a generic secret store for multiple things on the guest (like api keys, etc)
             {
-              source = "${microvmState}/${name}-sshd";
-              mountPoint = "/var/lib/sshd-hostkeys";
-              tag = "agent-sshd";
+              source = "${microvmState}/${name}-secrets";
+              mountPoint = "/var/lib/secrets";
+              tag = "agent-secrets";
               proto = "virtiofs";
             }
           ];
@@ -185,9 +181,9 @@ in
       agents
       |> lib.attrNames
       |> map (name: [
-        "d ${sharedDir}/${name}          0750 ${config.hostSpec.primaryUsername} users -"
-        "d ${microvmState}/${name}       0750 1000  1000  -"
-        "d ${microvmState}/${name}-sshd  0700 root  root  -"
+        "d ${sharedDir}/${name}            0750 ${config.hostSpec.primaryUsername} users -"
+        "d ${microvmState}/${name}         0750 1000  1000  -"
+        "d /run/${name}-secrets            0700 root  root  -"
       ])
       |> lib.flatten
     );
@@ -228,7 +224,7 @@ in
         ''
           cp --remove-destination ${
             config.sops.secrets."microvms/keys/ssh/${name}".path
-          } ${microvmState}/${name}-sshd/ssh_host_ed25519_key
+          } /run/${name}-secrets/ssh_host_ed25519_key
         '')
         |> lib.concatStringsSep "\n";
     };
