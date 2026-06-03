@@ -92,10 +92,12 @@
     MESA_LOG_FILE = "/dev/null";
     IMMICH_INSTANCE_URL = "https://immich.ooze.${osConfig.hostSpec.domain}";
   };
+
   programs.zsh.initContent =
     lib.mkAfter
       # bash
       ''
+        export GITHUB_TOKEN=$(cat ${config.sops.secrets."tokens/github".path})
         export IMMICH_API_KEY=$(cat ${config.sops.secrets."keys/immich".path})
         export OPENAI_API_KEY=$(cat ${config.sops.secrets."tokens/openai".path})
         export ANTHROPIC_API_KEY=$(cat ${config.sops.secrets."tokens/claude".path})

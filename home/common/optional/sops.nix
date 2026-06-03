@@ -59,6 +59,10 @@ in
         };
       }
       // lib.optionalAttrs osConfig.hostSpec.isDevelopment {
+        # public read token for nixpkgs-review, etc
+        "tokens/github" = {
+          sopsFile = "${sopsFolder}/development.yaml";
+        };
         "tokens/openai" = {
           sopsFile = "${sopsFolder}/development.yaml";
         };
