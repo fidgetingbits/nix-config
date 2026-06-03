@@ -133,6 +133,7 @@ in
   # direnv
   da = "direnv allow";
   dr = "direnv reload";
+  dar = "direnv allow && direnv reload";
 
   # prevent accidental killing of single characters
   pkill = "pkill -x";
