@@ -5,6 +5,19 @@
   config,
   ...
 }:
+let
+  powerUpCommands =
+    # bash
+    ''
+      # Prevent USB devices from waking up the system
+      if grep XHC0 /proc/acpi/wakeup | grep enabled; then
+        echo "Disabling USB wakeup devices"
+        echo XHC0 > /proc/acpi/wakeup
+        echo XHC1 > /proc/acpi/wakeup
+        echo XHC2 > /proc/acpi/wakeup
+      fi
+    '';
+in
 {
   imports = lib.flatten [
     # Common
@@ -154,16 +167,37 @@
   powerManagement = {
     enable = true;
     cpuFreqGovernor = "ondemand";
-    # Power up and resume
-    powerUpCommands = ''
-      # Prevent USB devices from waking up the system
-      if grep XHC0 /proc/acpi/wakeup | grep enabled; then
-        echo "Disabling USB wakeup devices"
-        echo XHC0 > /proc/acpi/wakeup
-        echo XHC1 > /proc/acpi/wakeup
-        echo XHC2 > /proc/acpi/wakeup
-      fi
-    '';
+  };
+
+  # Power up and resume oneshot services. Copied existing oneshot services from
+  # power-management.nix with modified names, since they got deprecated, but worked
+  # fine for my use case
+  # https://github.com/NixOS/nixpkgs/blob/b51242/nixos/modules/config/power-management.nix#L80
+  systemd.services = {
+    # Service executed before suspending/hibernating.
+    sleep-actions-extra = {
+      description = "Extra Sleep Actions";
+      wantedBy = [ "sleep.target" ];
+      before = [ "sleep.target" ];
+      unitConfig.StopWhenUnneeded = true;
+      preStop = powerUpCommands;
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+      };
+    };
+
+    # Service executed after boot, and stopped during shutdown
+    post-boot-extra = {
+      description = "Extra Post-Boot Actions";
+      wantedBy = [ "multi-user.target" ];
+      restartIfChanged = false;
+      script = powerUpCommands;
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+      };
+    };
   };
 
   # Enable WoL port
