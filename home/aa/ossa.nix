@@ -3,6 +3,7 @@
   pkgs,
   lib,
   osConfig,
+  inputs,
   ...
 }:
 {
@@ -67,6 +68,8 @@
         ;
     }
     ++ [
+      inputs.nix-options-search.packages.${pkgs.stdenv.hostPlatform.system}.default
+      inputs.optnix.packages.${pkgs.stdenv.hostPlatform.system}.optnix
       (pkgs.long-rsync.overrideAttrs (_: {
         recipients = osConfig.hostSpec.email.olanAdmins;
         deliverer = osConfig.hostSpec.email.notifier;

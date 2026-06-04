@@ -246,6 +246,16 @@
       url = "github:nix-community/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # TUI for local option searching
+    nix-options-search = {
+      url = "github:madsbv/nix-options-search";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
+    # Another TUI for local option searching
+    optnix = {
+      url = "sourcehut:~watersucks/optnix";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
 
     nix-sweep = {
       url = "github:jzbor/nix-sweep/v0.7.0";
