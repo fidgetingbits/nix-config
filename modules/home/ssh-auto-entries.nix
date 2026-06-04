@@ -72,10 +72,9 @@ in
       secretSettings = lib.mkOption {
         type = lib.types.anything;
         default =
-          # FIXME: Maybe revisit this
           (secrets.networking.ssh.settings lib)
           // lib.optionalAttrs osConfig.hostSpec.isWork (secrets.work.ssh.settings lib);
-        description = "Matchblocks from nix-secrets repo that won't be shown in plaintext in the reoo.";
+        description = "Settings from nix-secrets repo that won't be shown in plaintext in the repo.";
       };
     };
   };
@@ -182,20 +181,16 @@ in
       programs.ssh = {
         settings = {
           #   # Only forward agent to hosts that need it
-          "forward-agent-hosts" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            Host = forwardAgentHostsString;
+          "${forwardAgentHostsString}" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
             ForwardAgent = true;
           };
-          "git" = {
-            Host = lib.concatStringsSep " " (gitServers ++ cfg.extraGitServers);
+          "${lib.concatStringsSep " " (gitServers ++ cfg.extraGitServers)}" = {
             User = "git";
             # NOTE: not included above because we may need to supply a token
             # when using iso, etc. Also don't want to forward the agent to git
             # servers.
             IdentityFile = identityFiles;
           };
-          #
-          #   # FIXME: Revisit this
           "*" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
             # FIXME(ssh): Control path stuff should probably be for a limited set of systems only?
             ControlMaster = "auto";
@@ -213,8 +208,7 @@ in
           };
         }
         // lib.optionalAttrs cfg.useYubikey {
-          "yubikey-hosts" = lib.hm.dag.entryAfter [ "*" ] {
-            Host = ykHosts;
+          "${ykHosts}" = lib.hm.dag.entryAfter [ "*" ] {
             IdentitiesOnly = true;
             IdentityFile = identityFiles;
           };

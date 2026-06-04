@@ -18,6 +18,7 @@ lib.mkIf cfg.isAdmin {
       "oxid"
       "oedo-wifi" # FIXME: Generate these wifi-based on some setting in nixosConfigurations
       "oath"
+      "okra"
       "onus"
       "omen"
       "owls"
