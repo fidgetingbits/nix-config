@@ -164,7 +164,6 @@ in
         nixosHostsUnlockable
         |> lib.lists.map (host: {
           "${host}-unlock" = lib.hm.dag.entryAfter [ "yubikey-hosts" ] {
-            Host = "${host}-unlock";
             HostName = "${host}.${osConfig.hostSpec.domain}";
             User = "root";
             Port = osConfig.hostSpec.networking.ports.tcp.ssh;
