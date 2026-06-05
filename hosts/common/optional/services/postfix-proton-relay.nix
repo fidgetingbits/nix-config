@@ -23,7 +23,12 @@ in
       enable = true;
 
       settings.main = {
-        relayHost = "smtp.protonmail.ch:587";
+        # IMPORTANT: This needs to match the syntax in ${passwdDir/sasl_passwd
+        relayhost = [ "[smtp.protonmail.ch]:587" ];
+        mydomain = config.hostSpec.domain;
+        myorigin = "$mydomain";
+        myhostname = "${config.hostSpec.hostName}.$mydomain";
+
         ##
         # smtp_xxx is to auth to the relay
         ##
@@ -39,7 +44,7 @@ in
         smtp_tls_loglevel = "2";
         # proton uses PLAIN, so must allow plaintext for TLS
         smtp_sasl_security_options = "noanonymous";
-        smtp_sasl_tls_security_options = "noanonymous";
+        smtp_sasl_tls_security_options = "$smtp_sasl_security_options";
         smtp_tls_note_starttls_offer = "yes";
         debug_peer_level = "5";
         debug_peer_list = "smtp.protonmail.ch";
@@ -53,9 +58,6 @@ in
         smtpd_sasl_local_domain = config.hostSpec.domain;
         smtpd_sasl_security_options = "noanonymous";
         smtpd_sasl_tls_security_options = "$smtpd_sasl_security_options";
-        # FIXME: This shows a warning in postfix check
-        #  warning: /etc/postfix/main.cf: support for parameter "smtpd_use_tls" will be removed; instead, specify "smtpd_tls_security_level"
-        smtpd_use_tls = "yes";
         smtpd_sasl_type = "dovecot";
         smtpd_sasl_path = "private/auth";
         smtpd_tls_security_level = "encrypt";
@@ -108,44 +110,69 @@ in
   # Test auth with swaks
   services.dovecot2 =
     let
-      passwdFile = config.sops.secrets.dovecot.path;
+      user = "postfix";
+      group = "postfix";
     in
     {
       enable = true;
       enablePAM = false;
-      protocols = [ ]; # Don't run any servers, only auth
+      package = pkgs.dovecot_2_4;
 
       settings = {
         mail_path = "none"; # mail_path only works on >= 2.4
         # Disable all protocols
-        protocols.imap = false; # This is to stop imap listening, despite empty protocols= below.
+        protocols.imap = false;
+
+        dovecot_config_version = config.services.dovecot2.package.version;
+        dovecot_storage_version = config.services.dovecot2.package.version;
 
         # Enable auth service
         auth_debug = "yes";
         "service auth" = {
-          "unix_listener  /var/lib/postfix/queue/private/auth" = {
-            mode = 0660;
-            user = "postfix";
-            group = "postfix";
+          "unix_listener /var/lib/postfix/queue/private/auth" = {
+            mode = "0660";
+            inherit user group;
           };
         };
 
         # Configure authentication
-        auth_mechanisms = "plain login";
+        auth_mechanisms = [
+          "plain"
+          "login"
+        ];
 
         # Use nix-secrets passwd file for atuh
-        passdb = {
+        "passdb passwd-file" = {
           driver = "passwd-file";
-          args = passwdFile;
+          passwd_file_path = config.sops.secrets.dovecot.path;
         };
-        userdb = {
+        "userdb passwd-file" = {
           driver = "static";
-          args = "uid=postfix gid=postfix home=/var/spool/mail/%u";
+          passwd_file_path = config.sops.secrets.dovecot.path;
+          fields = {
+            uid = "postfix";
+            gid = "postfix";
+            home = "/var/spool/mail/%{user}";
+          };
         };
       };
     };
+  systemd.services.dovecot.serviceConfig.ReadWritePaths = [
+    "/var/lib/postfix/queue/private"
+  ];
+
+  environment = lib.optionalAttrs config.introdus.impermanence.enable {
+    persistence = {
+      "${config.hostSpec.persistFolder}".directories = [
+        "/var/spool/mail"
+        "/var/lib/postfix"
+      ];
+    };
+  };
 
   sops.secrets.dovecot = {
     sopsFile = "${sopsFolder}/${config.hostSpec.hostName}.yaml";
+    owner = "dovecot2";
+    group = "dovecot2";
   };
 }
