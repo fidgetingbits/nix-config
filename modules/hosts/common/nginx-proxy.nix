@@ -30,6 +30,11 @@
               default = true;
               description = "Use SSL";
             };
+            extraSslSettings = lib.mkOption {
+              type = lib.types.attrsOf lib.types.anything;
+              default = { };
+              description = "Extra nginx SSL settings and configuration";
+            };
             extraSettings = lib.mkOption {
               type = lib.types.attrsOf lib.types.anything;
               default = { };
@@ -49,6 +54,7 @@
   config =
     let
       cfg = config.services.nginxProxy;
+      isAcmeDomain = domain: lib.match ".*\.${config.hostSpec.domain}" domain != null;
     in
     {
       services.nginx.virtualHosts = lib.mkMerge (
@@ -65,13 +71,14 @@
             "${domain}" = {
               listenAddresses = [ "0.0.0.0" ];
               onlySSL = true;
-              useACMEHost = domain;
+              useACMEHost = if isAcmeDomain domain then domain else null;
               locations."/" = {
                 recommendedProxySettings = true;
                 proxyPass = "${uri}://127.0.0.1:${toString service.port}";
               }
               // service.extraSettings;
-            };
+            }
+            // service.extraSslSettings;
           }) domains
         ) cfg.services
       );
@@ -83,7 +90,11 @@
             domains = [
               "${service.subDomain}.${config.hostSpec.hostName}.${config.hostSpec.domain}"
             ]
-            ++ service.extraDomains;
+            # Filter out anything that doesn't end with the primary domain, since host may use
+            # some redirect tricks for other public domains we don't want to generate certs for.
+            # FIXME: Make the set of domains to generate certs for configurable, in case a host
+            # has multiples
+            ++ (lib.filter (domain: isAcmeDomain domain) service.extraDomains);
           in
           map (domain: {
             "${domain}" = {
