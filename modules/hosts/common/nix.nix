@@ -133,10 +133,10 @@ in
           builders-use-substitutes = true;
           fallback = true; # Don't hard fail if a binary cache isn't available, since some systems roam
           substituters = lib.flatten [
-            (lib.optional (lib.substring 0 4 hostSpec.timeZone == "Asia") [
-              "https://mirror.sjtu.edu.cn/nix-channels/store" # Shanghai Jiao Tong University
-              "https://mirrors.ustc.edu.cn/nix-channels/store" # USTC backup mirror
-            ])
+            # (lib.optional (lib.substring 0 4 hostSpec.timeZone == "Asia") [
+            #   "https://mirror.sjtu.edu.cn/nix-channels/store" # Shanghai Jiao Tong University
+            #   "https://mirrors.ustc.edu.cn/nix-channels/store" # USTC backup mirror
+            # ])
             [
               "https://cache.nixos.org" # Official global cache
               "https://nix-community.cachix.org" # Community packages
