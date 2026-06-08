@@ -23,7 +23,7 @@ in
       extraDomains = [ "nit.${config.hostSpec.domain}" ];
       port = servicePort;
       ssl = false;
-      extraSettings = {
+      extraLocationSettings = {
         proxyWebsockets = true;
       };
     }

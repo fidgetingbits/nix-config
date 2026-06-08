@@ -80,7 +80,7 @@
           port = atticPort;
           ssl = false;
           # Avoids 413 Request Entity Too Large
-          extraSettings = {
+          extraLocationSettings = {
             extraConfig = "client_max_body_size 0;";
           };
         }

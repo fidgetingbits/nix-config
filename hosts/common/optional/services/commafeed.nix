@@ -17,7 +17,7 @@ in
       extraDomains = [ "rss.${config.hostSpec.domain}" ];
       port = servicePort;
       ssl = false;
-      extraSettings = {
+      extraLocationSettings = {
         proxyWebsockets = true;
       };
     }

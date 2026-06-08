@@ -58,7 +58,7 @@ in
           port = ports.tcp.immich;
           ssl = false;
           # Extra stuff from the wiki
-          extraSettings = {
+          extraLocationSettings = {
             proxyWebsockets = true;
             extraConfig = ''
               client_max_body_size 50000M;

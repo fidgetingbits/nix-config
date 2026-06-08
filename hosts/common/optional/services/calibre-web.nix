@@ -22,7 +22,7 @@ in
       extraDomains = [ "books.${config.hostSpec.domain}" ];
       port = servicePort;
       ssl = false;
-      extraSettings = {
+      extraLocationSettings = {
         proxyWebsockets = true;
         extraConfig = ''
           client_max_body_size 50000M;

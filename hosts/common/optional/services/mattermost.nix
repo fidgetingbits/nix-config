@@ -152,7 +152,7 @@ in
       ];
       port = servicePort;
       ssl = false;
-      extraSettings = {
+      extraLocationSettings = {
         proxyWebsockets = true;
       };
     }
@@ -165,12 +165,12 @@ in
       port = translatorPort;
       ssl = false;
 
-      extraSslSettings = {
+      extraHostSettings = {
         sslCertificate = "/var/lib/nginx/local-snakeoil.crt";
         sslCertificateKey = "/var/lib/nginx/local-snakeoil.key";
 
       };
-      extraSettings = {
+      extraLocationSettings = {
         proxyWebsockets = true;
         extraConfig = ''
           proxy_set_header Host $host;

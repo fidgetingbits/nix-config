@@ -33,7 +33,7 @@ in
       subDomain = "paperless";
       port = servicePort;
       ssl = false;
-      extraSettings = {
+      extraLocationSettings = {
         proxyWebsockets = true;
       };
     }

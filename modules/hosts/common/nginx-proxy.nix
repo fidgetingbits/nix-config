@@ -30,12 +30,12 @@
               default = true;
               description = "Use SSL";
             };
-            extraSslSettings = lib.mkOption {
+            extraHostSettings = lib.mkOption {
               type = lib.types.attrsOf lib.types.anything;
               default = { };
-              description = "Extra nginx SSL settings and configuration";
+              description = "Extra nginx virtualhost settings and configuration";
             };
-            extraSettings = lib.mkOption {
+            extraLocationSettings = lib.mkOption {
               type = lib.types.attrsOf lib.types.anything;
               default = { };
               description = "Extra nginx location settings and configuration";
@@ -76,9 +76,9 @@
                 recommendedProxySettings = true;
                 proxyPass = "${uri}://127.0.0.1:${toString service.port}";
               }
-              // service.extraSettings;
+              // service.extraLocationSettings;
             }
-            // service.extraSslSettings;
+            // service.extraHostSettings;
           }) domains
         ) cfg.services
       );
