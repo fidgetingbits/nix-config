@@ -46,7 +46,7 @@ in
           "services/webdav.nix" # for grapheneos seedvault backups
           "services/calibre-web.nix" # ebook management
           "services/commafeed.nix" # rss reader
-          "services/mattermost.nix" # chat notifications
+          "services/mattermost" # chat notifications
           # "services/nitter.nix" # ad-less twitter front-end
           "services/paperless.nix" # document management
 
