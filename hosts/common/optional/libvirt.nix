@@ -24,7 +24,8 @@ in
 
   virtualisation.libvirtd = {
     enable = true;
-    firewallBackend = "nftables";
+    # firewallBackend = "nftables";
+    firewallBackend = "iptables"; # WARNING: I get restart failures due to libvirt_network table missing when using nftables
     qemu = {
       package = pkgs.qemu_kvm;
       runAsRoot = true;
@@ -106,7 +107,7 @@ in
   systemd.services.nixvirt = {
     after = [
       "network-online.target"
-      "nftables.service"
+      # "nftables.service"
       "libvirtd.service"
     ];
     requires = [ "network-online.target" ];
@@ -117,12 +118,6 @@ in
       RestartSec = "5s";
       StartLimitBurst = 3;
     };
-    # Not sure why but nixvirt.service regularly fails because this table doesn't exist
-    # preStart =
-    #   # bash
-    #   ''
-    #     ${pkgs.nftables}/bin/nft add table ip libvirt_network
-    #   '';
   };
 
   environment = {
