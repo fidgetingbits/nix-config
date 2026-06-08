@@ -27,6 +27,8 @@ in
         # NOTE: this path corresponds to /volume1/shared/ on oath
         mountPath = "/home/${config.hostSpec.primaryUsername}/mount/${host}";
         folders = [
+          "art"
+          "audio"
           "documents"
           "ebooks"
           # "images" - These are in immich now
