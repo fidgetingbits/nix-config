@@ -11,6 +11,7 @@
       lib.attrValues {
         inherit (pkgs)
           # Development
+          devenv
           direnv
           act # github workflow runner
           gh # github cli
