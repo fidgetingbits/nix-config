@@ -52,7 +52,7 @@ rec {
           "systemd-resolved.nix"
 
           # Remote network mounts and syncing
-          "services/syncthing.nix"
+          # "services/syncthing.nix"
 
           "startpage.nix"
 
