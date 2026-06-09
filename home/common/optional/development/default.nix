@@ -105,6 +105,12 @@
     indent_size = 2
   '';
 
+  programs.zsh.initContent =
+    # bash
+    ''
+      eval "$(devenv hook zsh)"
+    '';
+
   xdg = {
     # Disable pwntools auto-update
     configFile."pwn.conf".text = ''
