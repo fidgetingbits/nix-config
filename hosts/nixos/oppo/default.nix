@@ -43,7 +43,7 @@ in
         #"hyprland.nix"
         "gnome.nix"
 
-        "libvirt.nix"
+        # "libvirt.nix"
         "cli.nix"
         "yubikey.nix"
 
@@ -150,9 +150,30 @@ in
   };
 
   services.udev.extraRules = ''
+    # ethernet device connected to TV for remote power on/off
     SUBSYSTEM=="net", ACTION=="add", ATTRS{idVendor}=="0b95", ATTRS{idProduct}=="7720", NAME="usb-eth"
+    # usb mouse shouldn't turn on the tv
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c539",  ATTR{power/wakeup}="disabled"
     ${lib.readFile "${pkgs.liquidctl}/lib/udev/rules.d/71-liquidctl.rules"}
   '';
+
+  # Disable audio devices not connected so it doesn't auto revert when TV shuts off
+  services.pipewire.wireplumber.extraConfig = {
+    "51-disable-audio" = {
+      "monitor.alsa.rules" = [
+        {
+          matches = [
+            {
+              "device.name" = "alsa_card.pci-0000_0d_00.6";
+            }
+          ];
+          actions.update-props = {
+            "device.profile" = "off";
+          };
+        }
+      ];
+    };
+  };
 
   tunnels.cakes.enable = true;
   services.logind = {
