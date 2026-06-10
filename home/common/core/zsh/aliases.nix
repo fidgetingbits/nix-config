@@ -100,6 +100,11 @@ in
   ccn = "cd ${devTalon}/cursorless.nvim";
   ccl = "cd ${devTalon}/cursorless";
 
+  ## docs
+  cwa = "cd wiki/abbot";
+  cwp = "cd wiki/personal";
+  cdb = "cd dev/blog";
+
   ## nix
   cnc = "cd ${devNix}/nix-config";
   cnn = "cd ${devNix}/neovim";
