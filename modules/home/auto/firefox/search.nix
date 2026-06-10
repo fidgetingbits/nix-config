@@ -48,10 +48,5 @@
       urls = [ { template = "https://hanzicraft.com/character/{searchTerms}"; } ];
       definedAliases = [ "@hc" ];
     };
-    "wikipedia".metaData.hidden = true;
-    "google".metaData.hidden = true;
-    "amazondotcom-us".metaData.hidden = true;
-    "bing".metaData.hidden = true;
-    "ebay".metaData.hidden = true;
   };
 }
