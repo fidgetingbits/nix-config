@@ -58,11 +58,13 @@ in
           sopsFile = "${sopsFolder}/olan.yaml";
         };
       }
+      # FIXME: these tokens are duplicated into agents.yaml now, so can probably move
       // lib.optionalAttrs osConfig.hostSpec.isDevelopment {
         # public read token for nixpkgs-review, etc
         "tokens/github" = {
           sopsFile = "${sopsFolder}/development.yaml";
         };
+
         "tokens/openai" = {
           sopsFile = "${sopsFolder}/development.yaml";
         };
