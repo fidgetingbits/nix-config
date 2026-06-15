@@ -9,7 +9,7 @@
   ...
 }:
 let
-  cfg = osConfig.${namespace}.ai-agents;
+  cfg = osConfig.${namespace}.microvms;
   home = config.home.homeDirectory;
   microvmPath = "/var/lib/microvms";
 in
@@ -37,10 +37,6 @@ lib.mkIf (lib.length (lib.attrNames cfg.vms) != 0) {
     )
     |> lib.mergeAttrsList;
 
-  home.sessionVariables = {
-    AGENTS_STATE_DIR = "${home}/.local/state/ai-agents";
-  };
-
   programs.zsh = {
     shellAliases = {
       # microvm-specific helpers
@@ -51,7 +47,6 @@ lib.mkIf (lib.length (lib.attrNames cfg.vms) != 0) {
       codex = "ssh codex codex";
 
       # Microvm management
-      cas = "${home}/.local/state/ai-microvms"; # cd agent state
       mv-start = "function _mv-start() { systemctl start microvm@$1 }; _mv-start";
       mv-stop = "function _mv-stop() { systemctl stop microvm@$1 }; _mv-stop";
       mv-restart = "function _mv-restart() { systemctl stop microvm@$1 }; _mv-restart";
@@ -106,5 +101,4 @@ lib.mkIf (lib.length (lib.attrNames cfg.vms) != 0) {
           };
         '';
   };
-
 }

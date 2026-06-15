@@ -15,34 +15,31 @@
 # isolation. The host reaches the guest sshd via a Linux bridge
 # (virbr-ai); bash aliases on the host ssh into the VM
 # and invoke the tool binary.
-#
-# State (OAuth tokens, config) lives in
-# ~/.local/state/ai-agents/<name> and is virtiofs-shared into
-# the guest as /home/agent. ~/code is shared read-write.
 
 let
-  cfg = config.${namespace}.ai-agents;
+  cfg = config.${namespace}.microvms;
 
+  sopsFolder = (lib.toString inputs.nix-secrets) + "/sops";
   user = config.hostSpec.primaryUsername;
-  # FIXME: revisit this path as I don't think I want it here
-  # If you change it see home/auto/ai-agents.nix too
-  microvmState = "/home/${user}/.local/state/ai-agents";
 
   # Base directory for:
   # 1) data shared with only this microvm
   # 2) data shared across microvms
-  sharedDir = "/home/${user}/dev/shared";
+  aiDir = "/home/${user}/dev/ai/";
 
+  # FIXME: Rename this
   agents = cfg.vms;
 
+  # FIXME: Rename this
   agent-lan = config.hostSpec.networking.subnets.agent-lan;
+  # FIXME: Rename this
   agentsBridge = "vbr-agents";
 
   mkAgentVm = name: agent: {
     # NOTE: Must add lib here to inject lib.custom
     specialArgs = {
       inherit inputs lib;
-      namespace = "agent-microvm";
+      namespace = "vm-${name}";
     };
     config =
       {
@@ -54,21 +51,19 @@ let
         ...
       }:
       let
-        # We do this to keep the paths synced between dev box and microvm
+        # We do this to keep the paths synced between dev box and microvm, this allows something
+        # like nvim codecompanion to relay local paths to remote host
         # FIXME: We could fix having a shared username by just doing root path like /shared/xxx
-        agentUser = config.hostSpec.primaryUsername;
+        vmUser = config.hostSpec.primaryUsername;
       in
       {
         imports = lib.flatten [
           inputs.microvm.nixosModules.microvm
+          # FIXME: This should be supplied as an extra config of whoever is setting up the system
           ./ai-agent-config.nix
         ];
 
-        # FIXME: Setup the numtide llm-agent.nix stuff
-        # nixpkgs.overlays = [ (import ../overlays/default.nix { inherit inputs; }) ];
-
-        system.stateVersion = "25.11";
-        networking.hostName = "ai-${name}";
+        networking.hostName = "${name}";
 
         ${namespace}.microvm = {
           inherit name;
@@ -77,7 +72,7 @@ let
             packages
             sshPort
             hostAuthorizedKeys
-            extraConfig
+            extraConfig # FIXME: Use this
             ;
         };
 
@@ -92,6 +87,28 @@ let
           # when not defining microvms as stand-alone flake outputs
           systemSymlink = true;
 
+          # Writable nix store overlay (tmpfs — ephemeral).
+          writableStoreOverlay = "/nix/.rw-store";
+
+          # Persistent volumes (stored in /var/lib/microvms/<name>/)
+          volumes = [
+            {
+              mountPoint = "/var";
+              image = "var.img";
+              size = 102400; # 100 GB
+            }
+            {
+              mountPoint = "/nix/.rw-store";
+              image = "nix-store.img";
+              size = 61440; # 60 GB for nix store
+            }
+            {
+              mountPoint = "/home/${user}";
+              image = "home.img";
+              size = 102400; # 100 GB for home directory
+            }
+          ];
+
           # NOTE: The id is important as it correlates to the tap on the host-side.
           # If you change vm-agent- prefix, change the tap matching as well
           # FIXME: It should just be some option I guess
@@ -104,38 +121,41 @@ let
           ];
 
           shares = [
-            # Basic home directory where
+            # Host's /nix/store (avoids building a squashfs image)
+            # FIXME: Blacklist some files if possible?
+            # There is a wifi password in /nix/store on some systems due to initrd ssh unlock
             {
-              source = "${microvmState}/${name}";
-              mountPoint = "/home/${agentUser}";
-              tag = "agent-home";
               proto = "virtiofs";
+              tag = "ro-store";
+              source = "/nix/store";
+              mountPoint = "/nix/.ro-store";
             }
+
             # Development folder for agent-specific projects
             {
-              source = "${sharedDir}/${name}";
-              mountPoint = "/home/${agentUser}/dev/shared";
+              source = "${aiDir}/shared/${name}";
+              mountPoint = "/home/${vmUser}/dev/ai/shared/${name}";
               tag = "agent-dev";
               proto = "virtiofs";
             }
-            # Shared folder used across agent microvms, allowing them to pass
-            # files, etc
+            # Shared folder used across microvms
             {
-              source = "${sharedDir}/agents-share";
-              mountPoint = "/home/${agentUser}/dev/agents-shared";
+              source = "${aiDir}/agents-shared";
+              mountPoint = "/home/${vmUser}/dev/ai/agents-shared";
               tag = "agent-share";
               proto = "virtiofs";
             }
-            # Secrets exposed from sops
+            # Secrets exposed from host sops
             {
-              source = "${microvmState}/${name}-secrets";
-              mountPoint = "/var/lib/secrets";
-              tag = "agent-secrets";
+              tag = "microvm-secrets";
+              source = "/run/microvm-secrets/${name}";
+              mountPoint = "/run/secrets";
               proto = "virtiofs";
             }
           ];
         };
 
+        # FIXME: Move this to network.nix
         networking.useNetworkd = true;
         networking.useDHCP = false;
 
@@ -155,7 +175,7 @@ let
 in
 {
   options.${namespace} = {
-    ai-agents = {
+    microvms = {
       vms = lib.mkOption {
         type = lib.types.attrsOf (lib.types.attrsOf lib.types.anything); # FIXME: make a type
         default = { };
@@ -172,35 +192,48 @@ in
 
     # FIXME: Should track the uid:gid for the microvm somewhere instead of hardcoding 1000?
     # I guess ideally we want it to match the UID on the host as well?
+    # FIXME: vm-secrets part should loop over all vms
     systemd.tmpfiles.rules = [
-      "d ${microvmState}           0750 ${config.hostSpec.primaryUsername} users -"
-      "d ${sharedDir}              0750 ${config.hostSpec.primaryUsername} users -"
-      "d ${sharedDir}/agents-share 0750 1000 1000 -"
+      "d ${aiDir}               0750 ${config.hostSpec.primaryUsername} users -"
+      "d ${aiDir}/shared        0750 ${config.hostSpec.primaryUsername} users -"
+      "d ${aiDir}/agents-shared 0750 1000 1000 -"
     ]
     ++ (
       agents
       |> lib.attrNames
       |> map (name: [
-        "d ${sharedDir}/${name}            0750 ${config.hostSpec.primaryUsername} users -"
-        "d ${microvmState}/${name}         0750 1000  1000  -"
-        "d /run/${name}-secrets            0700 root  root  -"
+        "d ${aiDir}/shared/${name}      0750 ${config.hostSpec.primaryUsername} users -"
+        "d /run/microvm-secrets/        0750 root  kvm   -"
+        "d /run/microvm-secrets/${name} 0750 root  kvm   -"
       ])
       |> lib.flatten
     );
 
-    sops.secrets =
-      agents
-      |> lib.attrNames
-      |> lib.map (name: {
-        "microvms/keys/ssh/${name}" = {
-          owner = "root";
-          group = "root";
-          mode = "0400";
-          # See systemd prep script below
-          # path = "${microvmState}/${name}-sshd/ssh_host_ed25519_key";
+    # IMPORTANT: It seems templates don't work. You can set path to point
+    # into a folder mounted into the VM, but it will still symlink into
+    # /run/secrets/rendered/ and that folder won't actually exist on the VM
+    sops = {
+      # FIXME: Move this to specific agent definitions somewhere else
+      secrets = {
+        "tokens/claude" = {
+          sopsFile = "${sopsFolder}/ai-agents.yaml";
+          group = "kvm";
+          mode = "0440";
         };
-      })
-      |> lib.mergeAttrsList;
+      }
+      // (
+        agents
+        |> lib.attrNames
+        |> lib.map (name: {
+          "microvms/keys/ssh/${name}" = {
+            owner = "root";
+            group = "root";
+            mode = "0400";
+          };
+        })
+        |> lib.mergeAttrsList
+      );
+    };
 
     # The secrets defined above won't be directly accessible in the virtiofs share
     # if placed with .path, because they are a symlink. So this service copies
@@ -224,7 +257,12 @@ in
         ''
           cp --remove-destination ${
             config.sops.secrets."microvms/keys/ssh/${name}".path
-          } /run/${name}-secrets/ssh_host_ed25519_key
+          } /run/microvm-secrets/${name}/ssh_host_ed25519_key
+          # FIXME: Move this elsewhere
+          cp --remove-destination ${
+            config.sops.secrets."tokens/claude".path
+          } /run/microvm-secrets/${name}/anthropic_api_key
+          chgrp kvm /run/microvm-secrets/${name}/anthropic_api_key
         '')
         |> lib.concatStringsSep "\n";
     };

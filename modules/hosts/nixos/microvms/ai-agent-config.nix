@@ -1,16 +1,22 @@
 # This is a module defining data to be placed inside of a microvm
+#
 # NOTE: Do not assume other modules/config are accessible unless
-# explicitly added in the main microvm declaration
+# explicitly added in the main microvm declaration in ./default.nix
+#
+# IMPORTANT: Seems sops doesn't work, so we inject them at runtime
+# from the host
 {
+  inputs,
   config,
   lib,
   pkgs,
   namespace,
   ...
 }:
-
 let
   cfg = config.${namespace}.microvm;
+  user = cfg.user;
+  sshKeyPath = "/run/secrets/ssh_host_ed25519_key";
 in
 {
   options.${namespace}.microvm = {
@@ -51,37 +57,85 @@ in
     };
   };
 
-  config = {
-    users.mutableUsers = false;
-    users.allowNoPasswordLogin = true;
+  imports = [
+    inputs.home-manager.nixosModules.home-manager
+  ];
 
-    users.users.${cfg.user} = {
-      isNormalUser = true;
-      uid = 1000; # FIXME: Needs to be configurable? Needs to be relayed to shared folders somehow
-      home = "/home/${cfg.user}";
-      createHome = true;
-      # FIXME: Make this inherit some hm niceties
-      shell = pkgs.zsh;
-      openssh.authorizedKeys.keys = cfg.hostAuthorizedKeys;
+  config = {
+
+    home-manager = {
+      useGlobalPkgs = true;
+      useUserPackages = true;
+      extraSpecialArgs = { inherit user inputs; };
+      users.${user} = {
+        imports = [
+          ./home.nix
+        ];
+      };
     };
 
+    users = {
+      mutableUsers = false;
+      allowNoPasswordLogin = true;
+
+      users.${user} = {
+        isNormalUser = true;
+        uid = 1000; # FIXME: Needs to be configurable? Needs to be relayed to shared folders somehow
+        home = "/home/${user}";
+        createHome = true;
+        shell = pkgs.zsh;
+        openssh.authorizedKeys.keys = cfg.hostAuthorizedKeys;
+        # Secrets exposed in /run/micromv-secrets/{name} are scoped to this group
+        extraGroups = [ "kvm" ];
+      };
+
+      groups.${user}.gid = 1000;
+    };
+
+    # agent has root in microvm
+    security.sudo.extraRules = [
+      {
+        users = [ user ];
+        commands = [
+          {
+            command = "ALL";
+            options = [ "NOPASSWD" ];
+          }
+        ];
+      }
+    ];
+
+    systemd.tmpfiles.rules = [
+      # Required when a volume is mounted as home (see ./default.nix)
+      "d /home/${user} 0755 ${user} ${user} -"
+      # Secrets mirror from host sops
+      "d /run/secrets  2750 root kvm -"
+    ];
+
+    # ── Fix for microvm shutdown hang (issue #170) ────────────────
+    # Without this, systemd tries to unmount /nix/store during
+    # shutdown but umount lives in /nix/store → deadlock.
+    # From https://github.com/FintanH/fintos/blob/67dd2cf6ae7db2bab2a7dd9825f604188565f2ef/microvm/base.nix
+    systemd.mounts = [
+      {
+        what = "store";
+        where = "/nix/store";
+        overrideStrategy = "asDropin";
+        unitConfig.DefaultDependencies = false;
+      }
+    ];
+
+    # FIXME: Setup the numtide llm-agent.nix stuff
+    # nixpkgs.overlays = [ (import ../overlays/default.nix { inherit inputs; }) ];
+
+    environment.systemPackages = cfg.packages;
+    system.stateVersion = "26.05";
+    nix.settings.experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
+
     programs.zsh.enable = true;
-
-    users.groups.${cfg.user}.gid = 1000;
-
-    # FIXME: Revisit these defaults (overlay our neovim package, etc?)
-    environment.systemPackages =
-      cfg.packages
-      ++ (with pkgs; [
-        git
-        curl
-        jq
-        ripgrep
-        python3
-        openssh
-        neovim
-        strace
-      ]);
 
     services.openssh = {
       enable = true;
@@ -107,7 +161,7 @@ in
       # See this thread: https://github.com/microvm-nix/microvm.nix/issues/52
       hostKeys = [
         {
-          path = "/var/lib/secrets/ssh_host_ed25519_key";
+          path = sshKeyPath;
           type = "ed25519";
         }
       ];
