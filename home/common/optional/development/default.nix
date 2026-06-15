@@ -17,6 +17,7 @@
           gh # github cli
           glab # gitlab cli
           yq-go # Parser for Yaml and Toml Files, that mirrors jq
+          git-crypt
           # reversing
           radare2
           binwalk
