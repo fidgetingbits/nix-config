@@ -25,7 +25,9 @@ in
   virtualisation.libvirtd = {
     enable = true;
     # firewallBackend = "nftables";
-    firewallBackend = "iptables"; # WARNING: I get restart failures due to libvirt_network table missing when using nftables
+    # WARNING: I get restart failures due to libvirt_network table missing when
+    # using nftables
+    firewallBackend = "iptables";
     qemu = {
       package = pkgs.qemu_kvm;
       runAsRoot = true;
@@ -103,16 +105,13 @@ in
   # Need to add [File (in the menu bar) -> Add connection] when start for the first time
   programs.virt-manager.enable = true;
 
-  # Try to prevent an issue where nftables don't seen enabled after service restart
   systemd.services.nixvirt = {
     after = [
       "network-online.target"
-      # "nftables.service"
       "libvirtd.service"
     ];
     requires = [ "network-online.target" ];
 
-    # Often fails due to nftable table not being available, so try again
     serviceConfig = {
       Restart = "on-failure";
       RestartSec = "5s";
@@ -129,7 +128,7 @@ in
       pkgs.qemu_kvm
 
       # Install QEMU(other architectures), provides:
-      #   ......
+      #   ......https://github.com/NixOS/nixpkgs/issues/501336
       #   qemu-loongarch64 qemu-system-loongarch64
       #   qemu-riscv64 qemu-system-riscv64 qemu-riscv32  qemu-system-riscv32
       #   qemu-system-arm qemu-arm qemu-armeb qemu-system-aarch64 qemu-aarch64 qemu-aarch64_be
@@ -140,7 +139,10 @@ in
   }
   // lib.optionalAttrs config.introdus.impermanence.enable {
     persistence = {
-      "${config.hostSpec.persistFolder}".directories = [ "/var/lib/libvirt" ];
+      "${config.hostSpec.persistFolder}".directories = [
+        "/var/lib/libvirt"
+        "/var/lib/systemd" # Fixes https://github.com/NixOS/nixpkgs/issues/501336
+      ];
     };
   };
 
