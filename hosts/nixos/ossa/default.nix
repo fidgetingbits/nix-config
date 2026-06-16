@@ -44,6 +44,7 @@
 
           # Network management
           "systemd-resolved.nix"
+          "opensnitch.nix"
 
           # Remote network mounts and syncing
           "services/syncthing.nix"
