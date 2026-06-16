@@ -3,6 +3,7 @@
 
 {
   lib,
+  pkgs,
   config,
   osConfig,
   namespace,
@@ -12,8 +13,9 @@ let
   cfg = osConfig.${namespace}.microvms;
   home = config.home.homeDirectory;
   microvmPath = "/var/lib/microvms";
+  # FIXME: Make this default configurable
+  sharedPath = "${home}/dev/ai/shared";
 in
-
 lib.mkIf (lib.length (lib.attrNames cfg.vms) != 0) {
 
   # Automatic ssh entries
@@ -37,15 +39,14 @@ lib.mkIf (lib.length (lib.attrNames cfg.vms) != 0) {
     )
     |> lib.mergeAttrsList;
 
+  home.packages = lib.attrValues {
+    inherit (pkgs)
+      bindfs
+      ;
+  };
+
   programs.zsh = {
     shellAliases = {
-      # microvm-specific helpers
-      # FIXME: cmds to run should come from vm definition in nixos
-      # and names should auto-derive
-      claude = "ssh claude claude";
-      pi = "ssh pi pi";
-      codex = "ssh codex codex";
-
       # Microvm management
       mv-start = "function _mv-start() { systemctl start microvm@$1 }; _mv-start";
       mv-stop = "function _mv-stop() { systemctl stop microvm@$1 }; _mv-stop";
@@ -57,19 +58,36 @@ lib.mkIf (lib.length (lib.attrNames cfg.vms) != 0) {
       # FIXME: add helpers for only ones booted/running? like logs for failed only
       # add stuff to dump the network?
       # add zsh completions?
-      # FIXME
-      mv-list = "ls ${microvmPath}";
+      mv-list = "get_microvms";
       mv-list-running = "systemctl list-units \"microvm@*.service\" --state=running";
       mv-list-stopped = "systemctl list-units \"microvm@*.service\" --state=inactive";
       mvl = "mv-list";
       mvlr = "mv-list-running";
       mvls = "mv-list-stopped";
+
+      # I bind mount some dev folders into agent folders, so this allows easy lookup
+      # FIXME: need to filter out the VM-specific-binds
+      mv-binds = "_mv-binds";
+      mvlb = "mv-binds";
+      # FIXME: need to filter out the results
+      # mv-binds-all = "function _mv-binds() { findmnt --submounts --target ''${MICROVM_SHARED_PATH:-${sharedPath}} }; _mv-binds";
+      mv-unbind = "mv-unbind";
+      mv-unbind-all = "";
+      mv-bind = "_mv-bind";
+      mvb = "mv-bind";
+      # FIXME: finish
+      mv-umount-all = "";
+
+      # VM-specific helpers that need to be moved
+      agent = "ssh nano zla agents"; # Attach to agent session
     };
     # Helper functions for aliases that are annoying to inline
     initContent =
       lib.mkAfter
         # bash
         ''
+          zmodload zsh/mapfile
+
           function get_microvms() {
             if [ $# -gt 0 ]; then
               echo "$1"
@@ -98,6 +116,95 @@ lib.mkIf (lib.length (lib.attrNames cfg.vms) != 0) {
               args+=("-u" "$vm")
             done
             journalctl ''${args[@]} -e;
+          };
+
+          function _mv-binds() {
+            MICROVM_SHARED_PATH=''${MICROVM_SHARED_PATH:-${sharedPath}}
+            if [ "$#" -ne 1 ]; then
+              vm_list=( ''${(f@)"$(get_microvms)"} )
+            else
+              vm_list=( ''${(f)1} )
+            fi
+
+            local json_output
+            json_output=$(findmnt --submounts --target "$MICROVM_SHARED_PATH" -J 2>/dev/null)
+            if [ -z "$json_output" ]; then
+              echo "No active mounts found @ '$MICROVM_SHARED_PATH'."
+              return 0
+            fi
+
+            for target_vm in ''${vm_list[@]}; do
+              if [ $#vm_list -gt 1 ]; then
+                echo "$target_vm mounts:"
+                echo ----
+              fi
+              echo "$json_output" |
+                jq -r --arg prefix "$MICROVM_SHARED_PATH/$target_vm" '
+                  .. | objects | select(.target? | strings | startswith($prefix)) |
+                  "\(.target | split("/") | last) -> \(.target) (\(.source))"
+                '
+              if [ $#vm_list -gt 1 ]; then
+                echo ----
+              fi
+            done
+          }
+
+          function _mv-bind() {
+              MICROVM_SHARED_PATH=''${MICROVM_SHARED_PATH:-${sharedPath}}
+              if [ "$#" -ne 2 ]; then
+                echo "Usage: mv-bind <microvm-name> <source_path>" >&2
+                echo "Example: mv-bind <microvm-name> ~/dev/new-project" >&2
+                echo
+                echo "This will create a $MICROVM_SHARED_PATH/<microvm-name>/new-project"
+                echo " folder and bind mount ~/dev/new-project/ to the folder"
+                return 1
+              fi
+
+              local target_vm="$1"
+              local source_raw="$2"
+
+              if [ ! -d "$source_raw" ]; then
+                echo "Error: Source directory '$source_raw' does not exist." >&2
+                return 1
+              fi
+              local source_abs
+              source_abs=$(realpath "$source_raw")
+
+              local leaf_node
+              leaf_node=$(basename "$source_abs")
+
+              local dest_dir="$MICROVM_SHARED_PATH/$target_vm/$leaf_node"
+
+              if [ ! -d "$dest_dir" ]; then
+                echo "Creating mount point: $dest_dir"
+                mkdir -p "$dest_dir"
+              fi
+
+              # Check if something is already mounted there to prevent stacking
+              # FIXME: Double check this as I don't think it works
+              if findmnt "$dest_dir" >/dev/null 2>&1; then
+                echo "Warning: Something is already mounted at '$dest_dir'." >&2
+                return 1
+              fi
+
+              # Execute the bindfs mount
+              echo "Mounting $source_abs -> $dest_dir"
+              if ${lib.getExe pkgs.bindfs} "$source_abs" "$dest_dir"; then
+                echo "Success!"
+              else
+                echo "Error: bindfs failed to mount." >&2
+                return 1
+              fi
+          };
+
+          function mv-unbind() {
+            if [ "$#" -ne 2 ]; then
+              echo "Usage: mv-unbind <microvm-name> <leaf_node>" >&2
+              echo "Example: mv-unbind nano project" >&2
+              echo
+              echo "This would unmount ${sharedPath}/nano/project"
+            fi
+            umount -l ''${MICROVM_SHARED_PATH:-${sharedPath}/$1/$2}
           };
         '';
   };

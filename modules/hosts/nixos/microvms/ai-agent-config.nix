@@ -129,6 +129,7 @@ in
     # nixpkgs.overlays = [ (import ../overlays/default.nix { inherit inputs; }) ];
 
     environment.systemPackages = cfg.packages;
+    environment.etc."vm-version".text = "generation-test-4";
     system.stateVersion = "26.05";
     nix.settings.experimental-features = [
       "nix-command"

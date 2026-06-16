@@ -1,6 +1,7 @@
-# WIP module for setting up ai-agent microvms
+# WIP module for setting up microvms, currently geared towards agents
 # Inspiration from:
 # https://github.com/jasonodoom/nixos-configs/blob/17b43a1/framework-desktop/modules/ai-microvms.nix
+# https://github.com/FintanH/fintos/blob/67dd2c/microvm/base.nix
 
 {
   config,
@@ -27,15 +28,11 @@ let
   # 2) data shared across microvms
   aiDir = "/home/${user}/dev/ai/";
 
+  vm-lan = config.hostSpec.networking.subnets.nlan;
   # FIXME: Rename this
-  agents = cfg.vms;
+  vmBridge = "vbr-agents";
 
-  # FIXME: Rename this
-  agent-lan = config.hostSpec.networking.subnets.agent-lan;
-  # FIXME: Rename this
-  agentsBridge = "vbr-agents";
-
-  mkAgentVm = name: agent: {
+  mkMicrovm = name: mvm: {
     # NOTE: Must add lib here to inject lib.custom
     specialArgs = {
       inherit inputs lib;
@@ -67,7 +64,7 @@ let
 
         ${namespace}.microvm = {
           inherit name;
-          inherit (agent)
+          inherit (mvm)
             user
             packages
             sshPort
@@ -116,7 +113,7 @@ let
             {
               type = "tap";
               id = "vm-agent-${name}"; # IMPORTANT: Before changing, read the comment above
-              mac = agent.mac;
+              mac = mvm.mac;
             }
           ];
 
@@ -162,9 +159,9 @@ let
         # FIXME: use dhcp? if the host is bridged through vpn, it will use
         # whatever is provided like the default VPN dns?
         systemd.network.networks."10-eth" = {
-          matchConfig.MACAddress = agent.mac;
-          address = [ "${agent.ip}/${toString agent-lan.prefixLength}" ];
-          routes = [ { Gateway = agent-lan.gateway; } ];
+          matchConfig.MACAddress = mvm.mac;
+          address = [ "${mvm.ip}/${toString vm-lan.prefixLength}" ];
+          routes = [ { Gateway = vm-lan.gateway; } ];
           dns = [
             "1.1.1.1"
             "8.8.8.8"
@@ -179,7 +176,7 @@ in
       vms = lib.mkOption {
         type = lib.types.attrsOf (lib.types.attrsOf lib.types.anything); # FIXME: make a type
         default = { };
-        description = "List of ai agent microvms to setup";
+        description = "List of microvms to setup";
       };
     };
   };
@@ -199,7 +196,7 @@ in
       "d ${aiDir}/agents-shared 0750 1000 1000 -"
     ]
     ++ (
-      agents
+      cfg.vms
       |> lib.attrNames
       |> map (name: [
         "d ${aiDir}/shared/${name}      0750 ${config.hostSpec.primaryUsername} users -"
@@ -222,7 +219,7 @@ in
         };
       }
       // (
-        agents
+        cfg.vms
         |> lib.attrNames
         |> lib.map (name: {
           "microvms/keys/ssh/${name}" = {
@@ -250,7 +247,7 @@ in
 
       # systemd.tmpfiles.rules already handled dir creation
       script =
-        agents
+        cfg.vms
         |> lib.attrNames
         |> lib.map (name:
         # bash
@@ -280,27 +277,27 @@ in
       wait-online.enable = false;
 
       # Bridge device for agent microvms back to host
-      netdevs."20-${agentsBridge}".netdevConfig = {
+      netdevs."20-${vmBridge}".netdevConfig = {
         Kind = "bridge";
-        Name = agentsBridge;
+        Name = vmBridge;
       };
 
-      networks."20-${agentsBridge}" = {
-        matchConfig.Name = agentsBridge;
-        addresses = [ { Address = "${agent-lan.gateway}/${toString agent-lan.prefixLength}"; } ];
+      networks."20-${vmBridge}" = {
+        matchConfig.Name = vmBridge;
+        addresses = [ { Address = "${vm-lan.gateway}/${toString vm-lan.prefixLength}"; } ];
         networkConfig.ConfigureWithoutCarrier = true;
 
         routingPolicyRules = [
           # Allow access between the guest and the host
           {
-            From = agent-lan.cidr;
-            To = agent-lan.cidr;
+            From = vm-lan.cidr;
+            To = vm-lan.cidr;
             Table = "main";
             Priority = 999;
           }
           # Route everything else over VPN
           {
-            From = agent-lan.cidr;
+            From = vm-lan.cidr;
             Table = 42; # wg-proton-agents table
             Priority = 1000;
           }
@@ -309,9 +306,9 @@ in
 
       # Creates a tap between vbr-agents and all agent vms that follow the vm-*
       # naming pattern
-      networks."21-${agentsBridge}-tap" = {
-        matchConfig.Name = "vm-agent-*"; # NOTE: Corresponds to mkAgentVm func's microvms.interfaces
-        networkConfig.Bridge = agentsBridge;
+      networks."21-${vmBridge}-tap" = {
+        matchConfig.Name = "vm-agent-*"; # NOTE: Corresponds to mkMicrovm func's microvms.interfaces
+        networkConfig.Bridge = vmBridge;
       };
 
     };
@@ -328,12 +325,12 @@ in
                 type filter hook input priority filter; policy accept;
 
                 ct state established,related accept
-                iifname "${agentsBridge}" drop
+                iifname "${vmBridge}" drop
               }
 
               chain output {
                type filter hook output priority filter;
-               oifname "${agentsBridge}" accept
+               oifname "${vmBridge}" accept
               }
 
               chain forward {
@@ -343,7 +340,7 @@ in
                 ct state established,related accept
 
                 # Allow the VM to push outbound traffic specifically out the VPN interface
-                iifname "${agentsBridge}" oifname "agents-vpn" accept
+                iifname "${vmBridge}" oifname "agents-vpn" accept
               }
 
               # 4. NAT FOR THE VPN CONTEXT
@@ -355,8 +352,8 @@ in
       '';
     };
 
-    microvm.vms = lib.mapAttrs mkAgentVm agents;
-    microvm.autostart = lib.attrNames agents; # Ensures they boot with the host
+    microvm.vms = lib.mapAttrs mkMicrovm cfg.vms;
+    microvm.autostart = lib.attrNames cfg.vms; # Ensures they boot with the host
 
     environment = {
       systemPackages = [ inputs.microvm.packages.${pkgs.stdenv.hostPlatform.system}.microvm ];
