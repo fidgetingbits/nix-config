@@ -59,7 +59,6 @@ let
           # FIXME: This should be supplied as an extra config of whoever is setting up the system
           ./ai-agent-config.nix
         ];
-
         networking.hostName = "${name}";
 
         ${namespace}.microvm = {
