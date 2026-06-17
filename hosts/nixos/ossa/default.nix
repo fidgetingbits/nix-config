@@ -34,6 +34,7 @@
           "wireshark.nix"
           "cli.nix"
           "yubikey.nix"
+
           #"iphone-backup.nix"
 
           # Binary analysis tools
@@ -152,4 +153,11 @@
     };
   };
 
+  systemd.user.services.xdg-desktop-portal = {
+    overrideStrategy = "asDropin";
+    unitConfig = {
+      Wants = [ "xdg-desktop-portal-gnome.service" ];
+      After = [ "xdg-desktop-portal-gnome.service" ];
+    };
+  };
 }
