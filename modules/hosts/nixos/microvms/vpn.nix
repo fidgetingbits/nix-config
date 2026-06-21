@@ -60,7 +60,7 @@ in
           inherit (vpn) publicKey endpoint;
         }
       ];
-      privateKeyFile = config.sops."${cfg.privateKey}".path;
+      privateKeyFile = config.sops.secrets.${cfg.privateKey}.path;
       listenPort = cfg.port;
       postSetup = ''
         ${pkgs.iproute2}/bin/ip route add default dev ${cfg.ifname} table ${toString cfg.tableNum}
@@ -72,7 +72,7 @@ in
     environment.systemPackages = [ pkgs.wireguard-tools ];
 
     sops.secrets = {
-      "${cfg.privateKey}" = {
+      ${cfg.privateKey} = {
         sopsFile = cfg.sopsFile;
       };
     };

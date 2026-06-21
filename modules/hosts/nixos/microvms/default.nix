@@ -30,7 +30,6 @@ let
 
   vm-lan = config.hostSpec.networking.subnets.nlan;
 
-  # FIXME: This should have the base config from a separate file
   mkMicrovm = name: mvm: {
     # NOTE: Must add lib here to inject lib.custom
     specialArgs = {
@@ -44,7 +43,6 @@ let
           vm-lan
           ;
         sharedDir = aiDir;
-
       };
     };
     config = lib.mkMerge [
