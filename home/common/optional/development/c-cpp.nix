@@ -14,6 +14,8 @@
       // lib.optionalAttrs pkgs.stdenv.isLinux {
         inherit (pkgs)
           bear # For creating compilation databases for clangd
+          cscope
+          universal-ctags
           ;
       }
     );
