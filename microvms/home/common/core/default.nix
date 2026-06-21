@@ -4,7 +4,6 @@
   lib,
   user,
   inputs,
-  osConfig,
   ...
 }:
 {
@@ -70,8 +69,7 @@
       ".codex/AGENTS.md"
     ]
     |> map (path: {
-      "${path}".source =
-        (lib.toString inputs.nix-secrets) + "/prompts/${osConfig.networking.hostName}/base.md";
+      "${path}".source = (lib.toString inputs.nix-secrets) + "/prompts/nano/base.md";
     })
     |> lib.mergeAttrsList;
 }

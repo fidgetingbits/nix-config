@@ -1,6 +1,6 @@
 {
   config,
-  pkgs,
+  # pkgs,
   lib,
   # inputs,
   namespace,
@@ -21,19 +21,8 @@ in
       inherit (lan.hosts.nano) ip;
       mac = (lib.head lan.hosts.nano.mac);
       sshPort = 22;
-      packages = lib.attrValues {
-        inherit (pkgs)
-          claude-code
-          claude-agent-acp
-          codex
-          codex-acp
-          gemini-cli
-          pi-coding-agent
-
-          # zellij
-          ;
-      };
       inherit hostAuthorizedKeys;
+      packages = [ ];
       extraConfig = { };
     };
   };

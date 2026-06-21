@@ -68,9 +68,11 @@ in
       useUserPackages = true;
       extraSpecialArgs = { inherit user inputs; };
       users.${user} = {
-        imports = [
-          ./home.nix
-        ];
+        imports = (
+          map lib.custom.relativeToRoot [
+            "microvms/home/common/core"
+          ]
+        );
       };
     };
 
