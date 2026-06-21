@@ -66,6 +66,7 @@
     [
       ".claude/CLAUDE.md"
       ".config/pi/SYSTEM_APPEND.md"
+      ".codex/AGENTS.md"
     ]
     |> map (path: {
       "${path}".source = (lib.toString inputs.nix-secrets) + "/prompts/nano/base.md";
