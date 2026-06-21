@@ -142,14 +142,6 @@
       immichServers = [ hosts.ooze ]; # List of systems allowed to access ML service
     };
 
-  systemd.user.services.xdg-desktop-portal = {
-    overrideStrategy = "asDropin";
-    unitConfig = {
-      Wants = [ "xdg-desktop-portal-gnome.service" ];
-      After = [ "xdg-desktop-portal-gnome.service" ];
-    };
-  };
-
   # ${namespace}.services.monit = {
   #   enable = true;
   #   usage = {
