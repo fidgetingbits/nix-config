@@ -91,4 +91,15 @@ in
     [url "ssh://git@git.${config.hostSpec.domain}/"]
       insteadOf = ssh://olan-forge/
   '';
+
+  # This shuts up a bunch of warning spam in journal
+  # https://github.com/NixOS/nixpkgs/issues/303078
+  services.dbus = {
+    brokerPackage = pkgs.dbus-broker.overrideAttrs (old: {
+      patches = (old.patches or [ ]) ++ [
+        ./dbus-broker-logging.patch
+      ];
+    });
+  };
+
 }
