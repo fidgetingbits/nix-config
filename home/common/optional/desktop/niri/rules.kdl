@@ -39,8 +39,6 @@ layout {
     always-center-single-column
     // inside & outside
     gaps 15
-    // FIXME: with this commented out apps will determine their own starting width
-    // Need try it out and decide
     default-column-width {
         proportion 0.66667
     }
@@ -51,6 +49,7 @@ layout {
         proportion 0.5
         proportion 0.66667
         proportion 0.75
+        proportion 0.95
         proportion 1.0
     }
     // Cycled though using `switch-preset-window-height` action
@@ -60,7 +59,6 @@ layout {
         proportion 0.5
         proportion 0.66667
         proportion 0.75
-        proportion 1.0
     }
     tab-indicator {
         // Set the gap between the tab indicator and the window in pixels.
@@ -127,22 +125,19 @@ window-rule {
     opacity 0.85
 }
 // ========== Workspace Assignments ==========
-// zellij nix session
 window-rule {
     match app-id="Neovide" title="^nix |"
     open-on-workspace "1_dev"
 }
 window-rule {
     match app-id="signal"
-    open-on-workspace "3_u"
+    open-on-workspace "2_u"
 }
 window-rule {
     match app-id="^[Ss]potify$"
-    // match app-id="com.mitchellh.ghostty" title="btop"
-    open-on-workspace "3_u"
+    open-on-workspace "2_u"
 }
 // ========== Tile on launch ==========
-// FIXME: May want to make this proton vpn specific and specific starting geometry
 window-rule {
     match app-id="^(Proton VPN)$"
     open-floating false
@@ -224,18 +219,9 @@ window-rule {
     variable-refresh-rate true
     open-fullscreen true
 }
-// FIXME: Revisit these window sizes
-// ========== Signal ==========
-// Resize certain windows to specific sizes.
 window-rule {
     match app-id="^signal$"
-    default-column-width {
-        proportion 0.25
-    }
 }
 window-rule {
     match app-id="^[Ss]potify$"
-    default-column-width {
-        proportion 0.25
-    }
 }

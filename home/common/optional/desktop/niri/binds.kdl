@@ -202,6 +202,9 @@ binds {
     // Toggle the focused column between normal and tabbed display    //
     // ========== Window and column size ==========
     //
+    Super+M hotkey-overlay-title="Set maximum 95% width of window" {
+        set-window-width "95%"
+    }
     // Presets are defined in rules.kdl
     Super+R hotkey-overlay-title="Switch preset column width" {
         switch-preset-column-width
