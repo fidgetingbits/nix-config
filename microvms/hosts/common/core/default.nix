@@ -25,10 +25,7 @@ in
 {
   imports = lib.flatten [
     inputs.microvm.nixosModules.microvm
-    # FIXME: This should be supplied as an extra config of whoever is setting up the system
-    (map lib.custom.relativeToRoot [
-      "microvms/hosts/common/optional/agents.nix"
-    ])
+    mvm.extraMicrovmImports
   ];
   networking.hostName = "${name}";
 

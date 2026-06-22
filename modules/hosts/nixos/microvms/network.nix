@@ -43,10 +43,10 @@ in
       ];
     };
 
-    # Creates a tap between vbr-agents and all agent vms that follow the vm-*
+    # Creates a tap between vbr-microvms and all vms that follow the vm-microvm-*
     # naming pattern
     networks."21-${vmBridge}-tap" = {
-      matchConfig.Name = "vm-microvm-*"; # NOTE: Corresponds to mkMicrovm func's microvms.interfaces
+      matchConfig.Name = "vm-microvm-*"; # NOTE: Corresponds to microvms/common/core/default.nix's microvms.interfaces
       networkConfig.Bridge = vmBridge;
     };
   };

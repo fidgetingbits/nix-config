@@ -1,4 +1,6 @@
 # WIP module for setting up microvms, currently geared towards agents
+# but slowly migrating towards being more generic
+#
 # Inspiration from:
 # https://github.com/jasonodoom/nixos-configs/blob/17b43a1/framework-desktop/modules/ai-microvms.nix
 # https://github.com/FintanH/fintos/blob/67dd2c/microvm/base.nix
@@ -11,25 +13,20 @@
   namespace,
   ...
 }:
-
-# Each agent runs in its own microvm for host-kernel and network
-# isolation. The host reaches the guest sshd via a Linux bridge
-# (virbr-ai); bash aliases on the host ssh into the VM
-# and invoke the tool binary.
-
 let
   cfg = config.${namespace}.microvms;
 
-  sopsFolder = (lib.toString inputs.nix-secrets) + "/sops";
   user = config.hostSpec.primaryUsername;
 
   # Base directory for:
   # 1) data shared with only this microvm
   # 2) data shared across microvms
-  aiDir = "/home/${user}/dev/ai/";
+  sharedDir = "/home/${user}/dev/ai/";
 
   vm-lan = config.hostSpec.networking.subnets.nlan;
 
+  # Make a microvm based on a common set of hosts/home files, using a
+  # directory heirarchy that mirrors
   mkMicrovm = name: mvm: {
     # NOTE: Must add lib here to inject lib.custom
     specialArgs = {
@@ -42,14 +39,18 @@ let
           user
           vm-lan
           ;
-        sharedDir = aiDir;
+        sharedDir = sharedDir;
       };
     };
     config = lib.mkMerge [
       (
         { lib, ... }:
         {
-          imports = [ (lib.custom.relativeToRoot "microvms/hosts/common/core/") ];
+          imports = lib.flatten [
+            (lib.custom.relativeToRoot "microvms/hosts/common/core/")
+            # Any extra settings for the host running the microvm
+            mvm.extraMicrovmImports
+          ];
         }
       )
     ];
@@ -72,21 +73,21 @@ in
     ./network.nix
     ./vpn.nix
   ];
+  # FIXME: ugh. Should just have the defined microvm import and avoid this
+  # ++ map (name: cfg.vms.${name}.extraImports) (lib.attrNames cfg.vms);
 
   config = lib.mkIf (lib.length (lib.attrNames cfg.vms) != 0) {
-    # FIXME: Should track the uid:gid for the microvm somewhere instead of hardcoding 1000?
-    # I guess ideally we want it to match the UID on the host as well?
-    # FIXME: vm-secrets part should loop over all vms
+    # FIXME: Change "agents-shared" name, also add it to another scaffolding import
     systemd.tmpfiles.rules = [
-      "d ${aiDir}               0750 ${config.hostSpec.primaryUsername} users -"
-      "d ${aiDir}/shared        0750 ${config.hostSpec.primaryUsername} users -"
-      "d ${aiDir}/agents-shared 0750 1000 1000 -"
+      "d ${sharedDir}               0750 ${config.hostSpec.primaryUsername} users -"
+      "d ${sharedDir}/shared        0750 ${config.hostSpec.primaryUsername} users -"
+      "d ${sharedDir}/agents-shared 0750 1000 1000 -"
     ]
     ++ (
       cfg.vms
       |> lib.attrNames
       |> map (name: [
-        "d ${aiDir}/shared/${name}      0750 ${config.hostSpec.primaryUsername} users -"
+        "d ${sharedDir}/shared/${name}      0750 ${config.hostSpec.primaryUsername} users -"
         "d /run/microvm-secrets/        0750 root  kvm   -"
         "d /run/microvm-secrets/${name} 0750 root  kvm   -"
       ])
@@ -96,35 +97,25 @@ in
     # IMPORTANT: It seems templates don't work. You can set path to point
     # into a folder mounted into the VM, but it will still symlink into
     # /run/secrets/rendered/ and that folder won't actually exist on the VM
-    sops = {
-      # FIXME: Move this to specific agent definitions somewhere else
-      secrets = {
-        "tokens/claude" = {
-          sopsFile = "${sopsFolder}/agents.yaml";
-          group = "kvm";
-          mode = "0440";
+    sops.secrets = (
+      cfg.vms
+      |> lib.attrNames
+      |> lib.map (name: {
+        "microvms/keys/ssh/${name}" = {
+          owner = "root";
+          group = "root";
+          mode = "0400";
         };
-      }
-      // (
-        cfg.vms
-        |> lib.attrNames
-        |> lib.map (name: {
-          "microvms/keys/ssh/${name}" = {
-            owner = "root";
-            group = "root";
-            mode = "0400";
-          };
-        })
-        |> lib.mergeAttrsList
-      );
-    };
+      })
+      |> lib.mergeAttrsList
+    );
 
     # The secrets defined above won't be directly accessible in the virtiofs share
     # if placed with .path, because they are a symlink. So this service copies
     # the contents directly
     systemd.services.microvm-prepare-secrets = {
       description = "Stage SOPS secrets for microVM";
-      wantedBy = [ "multi-user.target" ]; # FIXME: Is this best?
+      wantedBy = [ "multi-user.target" ];
       after = [ "sops-nix.service" ];
 
       serviceConfig = {
@@ -133,7 +124,6 @@ in
       };
 
       # systemd.tmpfiles.rules already handled dir creation
-      # FIXME: non-key secrets should be system-specific
       script =
         cfg.vms
         |> lib.attrNames
@@ -143,11 +133,6 @@ in
           cp --remove-destination ${
             config.sops.secrets."microvms/keys/ssh/${name}".path
           } /run/microvm-secrets/${name}/ssh_host_ed25519_key
-          # FIXME: Move this elsewhere
-          cp --remove-destination ${
-            config.sops.secrets."tokens/claude".path
-          } /run/microvm-secrets/${name}/anthropic_api_key
-          chgrp kvm /run/microvm-secrets/${name}/anthropic_api_key
         '')
         |> lib.concatStringsSep "\n";
     };

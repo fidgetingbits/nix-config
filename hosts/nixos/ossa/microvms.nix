@@ -1,8 +1,6 @@
 {
   config,
-  # pkgs,
   lib,
-  # inputs,
   namespace,
   ...
 }:
@@ -24,7 +22,10 @@ in
         sshPort = 22;
         inherit hostAuthorizedKeys;
         packages = [ ];
-        extraConfig = { };
+        # Config for the actual microvm itself
+        extraMicrovmImports = [ (lib.custom.relativeToRoot "microvms/hosts/common/optional/agents.nix") ];
+        # Scaffolding for supporting the microvm
+        extraImports = [ (lib.custom.relativeToRoot "modules/hosts/nixos/microvms/agents.nix") ];
       };
     };
     vpn.enable = true;
