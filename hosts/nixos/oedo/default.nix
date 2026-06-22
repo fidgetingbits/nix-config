@@ -4,7 +4,7 @@
   lib,
   config,
   pkgs,
-  # namespace,
+  namespace,
   ...
 }:
 {
@@ -123,7 +123,10 @@
     wlans = [ "olan" ];
   };
 
-  services.llama.enable = true;
+  ${namespace}.services.llama = {
+    enable = true;
+    allowedHosts = [ "ossa" ];
+  };
 
   modules.hardware.radeon.enable = true;
 

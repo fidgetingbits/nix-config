@@ -20,9 +20,10 @@ in
 
     useAtticCache = highPrio true;
 
-    # FIXME: We should have like "desktop" = "hyprland" and have that auto enable the rest?
-    defaultDesktop = "niri-uwsm";
     useWayland = true;
+    defaultDesktop = "niri-uwsm";
+
     isAmdGpu = true;
+    useRocm = (lib.mkOverride 100) true;
   };
 }

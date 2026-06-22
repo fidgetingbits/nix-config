@@ -11,7 +11,9 @@
     isAdmin = (lib.mkOverride 100) true;
     isAutoStyled = (lib.mkOverride 100) true;
     isProduction = (lib.mkOverride 100) true;
+
     isAmdGpu = true;
+    useRocm = (lib.mkOverride 100) true;
 
     isImpermanent = (lib.mkOverride 100) true;
     persistFolder = (lib.mkOverride 100) "/persist";

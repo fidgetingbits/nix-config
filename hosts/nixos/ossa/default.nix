@@ -3,6 +3,7 @@
   lib,
   pkgs,
   config,
+  namespace,
   ...
 }:
 {
@@ -30,7 +31,7 @@
 
           # Miscellaneous
           "podman.nix"
-          "libvirt.nix"
+          # "libvirt.nix"
           "wireshark.nix"
           "cli.nix"
           "yubikey.nix"
@@ -160,4 +161,6 @@
       After = [ "xdg-desktop-portal-gnome.service" ];
     };
   };
+
+  ${namespace}.services.llama.enable = true;
 }
