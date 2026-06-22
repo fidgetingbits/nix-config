@@ -5,29 +5,46 @@
   pkgs,
   lib,
   config,
+  namespace,
   ...
 }:
 let
-  cfg = config.services.llama;
+  cfg = config.${namespace}.services.llama;
   time = lib.custom.time;
   modelsPath = "/var/lib/llm/models";
   cachePath = "/var/cache/private/llama-swap";
-  user = config.users.users.${config.hostSpec.primaryUsername}.name;
-  group = config.users.users.${config.hostSpec.primaryUsername}.group;
+
+  pu = config.users.users.${config.hostSpec.primaryUsername};
+  user = pu.name;
+  group = pu.group;
+
   persistFolder = config.hostSpec.persistFolder;
-  # NOTE: AMD AI 395+ with rocm 6 and rocm 7.0.1 (see overlay) both crash loading gguf files
-  #llama-cpp = pkgs.llama-cpp.override { rocmSupport = true; };
-  llama-cpp = pkgs.llama-cpp.override { vulkanSupport = true; };
+  llama-settings =
+    if config.hostSpec.useVulkan then { vulkanSupport = true; } else { rocmSupport = true; };
+  llama-cpp = pkgs.llama-cpp.override llama-settings;
   ports = config.hostSpec.networking.ports;
 in
 {
   options = {
-    services.llama = {
+    ${namespace}.services.llama = {
       enable = lib.mkEnableOption "Run llama AI services";
       ttl = lib.mkOption {
         type = lib.types.int;
         default = 0; # Persist
         description = "How long to wait before auto-unloading model from VRAM";
+      };
+      # FIXME: Add a check that the entries are inside cfg.hosts?
+      allowedHosts = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [ ];
+        example = [ "foo" ];
+        description = "List of host names that are allowed access to the llama service. Must have associated network entry";
+      };
+      hosts = lib.mkOption {
+        type = lib.types.attrsOf lib.types.anything;
+        # FIXME: Give an example of what this attrSet layout is or create a type
+        default = config.hostSpec.networking.subnets.olan.hosts;
+        description = "Attribute set of hosts used to lookup allowedHosts";
       };
     };
   };
@@ -83,6 +100,9 @@ in
               "server" = "${llama-server} --port \${PORT} -fa on --jinja --no-webui";
             };
 
+            # FIXME: Make this a set of optional entries, since not all systems running
+            # llama-swap will have the same models
+
             # NOTE: models cmds use the "server" macro defined above
             # -m is local gguf file
             # -hf is direct download: <user>/<model>[:quant]
@@ -123,13 +143,10 @@ in
         serviceConfig.CacheDirectory = "llama-swap";
       };
 
-      # FIXME: Expose the hosts as an option, expand who can talk to it
-      networking.granularFirewall =
+      # If you don't specify an allowed host, it will be localhost only
+      networking.granularFirewall = lib.optionalAttrs ((lib.length cfg.allowedHosts) != 0) (
         let
-          devices = [
-            "ossa"
-          ];
-          hosts = lib.map (d: config.hostSpec.networking.subnets.olan.hosts.${d}) devices;
+          hosts = lib.map (d: cfg.hosts.${d}) cfg.allowedHosts;
         in
         {
           enable = true;
@@ -141,7 +158,8 @@ in
               inherit hosts;
             }
           ];
-        };
+        }
+      );
     })
 
     (lib.mkIf cfg.enable {
