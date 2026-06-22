@@ -12,9 +12,7 @@
 let
   cfg = osConfig.${namespace}.microvms;
   home = config.home.homeDirectory;
-  microvmPath = "/var/lib/microvms";
-  # FIXME: Make this default configurable
-  sharedPath = "${home}/dev/ai/shared";
+  sharedDir = cfg.sharedDir;
 in
 lib.mkIf (lib.length (lib.attrNames cfg.vms) != 0) {
 
@@ -70,7 +68,7 @@ lib.mkIf (lib.length (lib.attrNames cfg.vms) != 0) {
       mv-binds = "_mv-binds";
       mvlb = "mv-binds";
       # FIXME: need to filter out the results
-      # mv-binds-all = "function _mv-binds() { findmnt --submounts --target ''${MICROVM_SHARED_PATH:-${sharedPath}} }; _mv-binds";
+      # mv-binds-all = "function _mv-binds() { findmnt --submounts --target ''${MICROVM_SHARED_PATH:-${sharedDir}} }; _mv-binds";
       mv-unbind = "mv-unbind";
       mv-unbind-all = "";
       mv-bind = "_mv-bind";
@@ -92,7 +90,7 @@ lib.mkIf (lib.length (lib.attrNames cfg.vms) != 0) {
             if [ $# -gt 0 ]; then
               echo "$1"
             else
-              ls -1 ${microvmPath}
+              ls -1 ${cfg.path}
             fi
           }
 
@@ -119,7 +117,7 @@ lib.mkIf (lib.length (lib.attrNames cfg.vms) != 0) {
           };
 
           function _mv-binds() {
-            MICROVM_SHARED_PATH=''${MICROVM_SHARED_PATH:-${sharedPath}}
+            MICROVM_SHARED_PATH=''${MICROVM_SHARED_PATH:-${sharedDir}}
             if [ "$#" -ne 1 ]; then
               vm_list=( ''${(f@)"$(get_microvms)"} )
             else
@@ -150,7 +148,7 @@ lib.mkIf (lib.length (lib.attrNames cfg.vms) != 0) {
           }
 
           function _mv-bind() {
-              MICROVM_SHARED_PATH=''${MICROVM_SHARED_PATH:-${sharedPath}}
+              MICROVM_SHARED_PATH=''${MICROVM_SHARED_PATH:-${sharedDir}}
               if [ "$#" -ne 2 ]; then
                 echo "Usage: mv-bind <microvm-name> <source_path>" >&2
                 echo "Example: mv-bind <microvm-name> ~/dev/new-project" >&2
@@ -202,9 +200,9 @@ lib.mkIf (lib.length (lib.attrNames cfg.vms) != 0) {
               echo "Usage: mv-unbind <microvm-name> <leaf_node>" >&2
               echo "Example: mv-unbind nano project" >&2
               echo
-              echo "This would unmount ${sharedPath}/nano/project"
+              echo "This would unmount ${sharedDir}/nano/project"
             fi
-            umount -l ''${MICROVM_SHARED_PATH:-${sharedPath}/$1/$2}
+            umount -l ''${MICROVM_SHARED_PATH:-${sharedDir}/$1/$2}
           };
         '';
   };

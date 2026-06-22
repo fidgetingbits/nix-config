@@ -9,7 +9,6 @@
 {
   imports = lib.flatten [
     (map lib.custom.relativeToRoot [
-      "home/common/core/zellij"
     ])
   ];
 
@@ -35,5 +34,21 @@
           (lib.toString inputs.nix-secrets) + "/prompts/${osConfig.networking.hostName}/base.md";
       })
       |> lib.mergeAttrsList;
+  };
+
+  programs = {
+    zsh = {
+      shellAliases = {
+        # Restricted microvm with no LAN access, so should be okay
+        "claude" = "claude --dangerously-skip-permissions";
+      };
+      initContent =
+        lib.mkAfter
+          # bash
+          ''
+            export ANTHROPIC_API_KEY=$(cat /run/secrets/anthropic_api_key)
+            # export OPENAI_API_KEY=$(cat /run/secrets/openai_key})
+          '';
+    };
   };
 }

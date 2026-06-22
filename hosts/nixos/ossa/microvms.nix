@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  inputs,
   namespace,
   ...
 }:
@@ -9,30 +10,48 @@ let
   hostAuthorizedKeys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBpB8D7hvlBLDbt936OljTdpNcT01pHYqnnZj5rpD+xF ossa"
   ];
-  lan = config.hostSpec.networking.subnets.nlan;
-in
-{
-  ${namespace}.microvms = {
-    vms = {
-      # Agent vm with tooling, internet access
-      nano = {
-        user = config.hostSpec.primaryUsername;
-        inherit (lan.hosts.nano) ip;
-        mac = (lib.head lan.hosts.nano.mac);
-        sshPort = 22;
-        inherit hostAuthorizedKeys;
-        packages = [ ];
-        # Config for the actual microvm itself
-        extraMicrovmImports = [ (lib.custom.relativeToRoot "microvms/hosts/common/optional/agents.nix") ];
-        # Scaffolding for supporting the microvm
-        extraImports = [ (lib.custom.relativeToRoot "modules/hosts/nixos/microvms/agents.nix") ];
-      };
-    };
-    vpn.enable = true;
+
+  vm-lan = config.hostSpec.networking.subnets.nlan;
+  nanoOpts = {
+    inherit hostAuthorizedKeys vm-lan;
+    inherit (vm-lan.hosts.nano) ip;
+    name = "nano";
+    user = config.hostSpec.primaryUsername;
+    mac = (lib.head vm-lan.hosts.nano.mac);
+    sshPort = 22;
+    sharedDir = config.${namespace}.microvms.sharedDir;
   };
 
-  # VMs running long agentic tasks shouldn't get restarted on rebuild
-  # https://github.com/microvm-nix/microvm.nix/blob/6ad601df/nixos-modules/host/options.nix#L151
-  # FIXME: Should integration this into the above somehow
-  # microvms.vms.nano.restartIfChanged = lib.mkForce false;
+  mkMicrovm = name: auto: opts: cfg: {
+    autostart = auto;
+    # VMs running long agentic tasks shouldn't get restarted on rebuild
+    # https://github.com/microvm-nix/microvm.nix/blob/6ad601df/nixos-modules/host/options.nix#L151
+    # restartIfChanged = lib.mkForce false;
+
+    specialArgs = {
+      inherit inputs lib;
+      namespace = "vm-${name}";
+      vmOpts = opts;
+    };
+    config = lib.mkMerge [
+      {
+        imports = [
+          (lib.custom.relativeToRoot "microvms/hosts/common/core/")
+        ];
+      }
+      cfg
+    ];
+  };
+in
+{
+  microvm.vms.nano = mkMicrovm "nano" true nanoOpts {
+    imports = [ (lib.custom.relativeToRoot "microvms/hosts/common/optional/agents.nix") ];
+  };
+
+  # FIXME: Revisit how we want to do this since we direct access microvms.vm now
+  # We should auto-generate some aspect of everything?
+  ${namespace}.microvms = {
+    vms.nano = nanoOpts;
+    vpn.enable = true;
+  };
 }

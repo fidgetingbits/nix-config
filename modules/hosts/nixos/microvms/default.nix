@@ -17,44 +17,6 @@ let
   cfg = config.${namespace}.microvms;
 
   user = config.hostSpec.primaryUsername;
-
-  # Base directory for:
-  # 1) data shared with only this microvm
-  # 2) data shared across microvms
-  sharedDir = "/home/${user}/dev/ai/";
-
-  vm-lan = config.hostSpec.networking.subnets.nlan;
-
-  # Make a microvm based on a common set of hosts/home files, using a
-  # directory heirarchy that mirrors
-  mkMicrovm = name: mvm: {
-    # NOTE: Must add lib here to inject lib.custom
-    specialArgs = {
-      inherit inputs lib;
-      namespace = "vm-${name}";
-      vmOpts = {
-        inherit
-          name
-          mvm
-          user
-          vm-lan
-          ;
-        sharedDir = sharedDir;
-      };
-    };
-    config = lib.mkMerge [
-      (
-        { lib, ... }:
-        {
-          imports = lib.flatten [
-            (lib.custom.relativeToRoot "microvms/hosts/common/core/")
-            # Any extra settings for the host running the microvm
-            mvm.extraMicrovmImports
-          ];
-        }
-      )
-    ];
-  };
 in
 {
   options.${namespace} = {
@@ -65,6 +27,27 @@ in
         default = { };
         description = "List of microvms to setup";
       };
+      path = lib.mkOption {
+        type = lib.types.str;
+        default = "/var/lib/microvms";
+        description = "Location used for starting microvms";
+      };
+
+      # Base directory for:
+      # 1) data shared with only this microvm
+      # 2) data shared across microvms
+      sharedDir = lib.mkOption {
+        type = lib.types.str;
+        default = "/home/${user}/dev/ai/";
+        description = "Base folder used for sharing folders with a given microvm";
+      };
+      interVmSharedDir = lib.mkOption {
+        type = lib.types.str;
+        default = "vms-shared";
+        description = "Folder name inside ${
+          config.${namespace}.microvms.sharedDir
+        } where all VMs have a shared folder";
+      };
     };
   };
 
@@ -73,21 +56,18 @@ in
     ./network.nix
     ./vpn.nix
   ];
-  # FIXME: ugh. Should just have the defined microvm import and avoid this
-  # ++ map (name: cfg.vms.${name}.extraImports) (lib.attrNames cfg.vms);
 
   config = lib.mkIf (lib.length (lib.attrNames cfg.vms) != 0) {
-    # FIXME: Change "agents-shared" name, also add it to another scaffolding import
     systemd.tmpfiles.rules = [
-      "d ${sharedDir}               0750 ${config.hostSpec.primaryUsername} users -"
-      "d ${sharedDir}/shared        0750 ${config.hostSpec.primaryUsername} users -"
-      "d ${sharedDir}/agents-shared 0750 1000 1000 -"
+      "d ${cfg.sharedDir}               0750 ${config.hostSpec.primaryUsername} users -"
+      "d ${cfg.sharedDir}/shared        0750 ${config.hostSpec.primaryUsername} users -"
+      "d ${cfg.sharedDir}/${cfg.interVmSharedDir} 0750 1000 1000 -"
     ]
     ++ (
       cfg.vms
       |> lib.attrNames
       |> map (name: [
-        "d ${sharedDir}/shared/${name}      0750 ${config.hostSpec.primaryUsername} users -"
+        "d ${cfg.sharedDir}/shared/${name}      0750 ${config.hostSpec.primaryUsername} users -"
         "d /run/microvm-secrets/        0750 root  kvm   -"
         "d /run/microvm-secrets/${name} 0750 root  kvm   -"
       ])
@@ -137,11 +117,6 @@ in
         |> lib.concatStringsSep "\n";
     };
 
-    microvm = {
-      vms = lib.mapAttrs mkMicrovm cfg.vms;
-      autostart = lib.attrNames cfg.vms; # Ensures they boot with the host
-    };
-
     environment = {
       systemPackages = [ inputs.microvm.packages.${pkgs.stdenv.hostPlatform.system}.microvm ];
     }
@@ -149,7 +124,7 @@ in
       persistence.${config.hostSpec.persistFolder}.directories =
         lib.mkIf config.introdus.impermanence.enable
           [
-            "/var/lib/microvms"
+            cfg.path
           ];
     };
   };
