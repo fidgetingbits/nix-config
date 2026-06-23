@@ -5,7 +5,7 @@
   ...
 }:
 let
-  nanoOpts = rec {
+  nanoSpecs = rec {
     vm-lan = config.hostSpec.networking.subnets.nlan;
     # FIXME(microvms): This could be some hostSpec level entry for like microvm key, so we don't duplicate?
     hostAuthorizedKeys = [
@@ -20,9 +20,17 @@ let
   };
 in
 {
+  imports = [
+    # Anonymous submodule to allow us to specify an isolated vmSpecs
+    {
+      _module.args.vmSpecs = nanoSpecs;
+      imports = [ (lib.custom.relativeToRoot "modules/hosts/nixos/microvms/agents.nix") ];
+    }
+  ];
+
   microvm.vms.nano = {
     specialArgs = {
-      vmOpts = nanoOpts;
+      vmSpecs = nanoSpecs;
     };
     config = {
       imports = [
@@ -30,7 +38,7 @@ in
       ];
       home-manager = {
         # FIXME(microvms): This would need to change if we want multiple users
-        users.${nanoOpts.user} = {
+        users.${nanoSpecs.user} = {
           imports = [ ./home.nix ];
         };
       };

@@ -23,14 +23,14 @@ lib.mkIf (lib.length (lib.attrNames cfg.vms) != 0) {
     |> map (
       name:
       let
-        vmOpts = cfg.vms.${name}.vmOpts;
+        vmSpecs = cfg.vms.${name}.vmSpecs;
       in
       {
         "${name}" = {
           match = "host ${name}";
-          hostname = vmOpts.ip;
-          port = vmOpts.sshPort;
-          user = vmOpts.user;
+          hostname = vmSpecs.ip;
+          port = vmSpecs.sshPort;
+          user = vmSpecs.user;
           identityFile = "${home}/.ssh/id_ed25519";
         };
       }

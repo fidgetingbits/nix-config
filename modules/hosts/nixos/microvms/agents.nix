@@ -3,7 +3,7 @@
   lib,
   inputs,
   config,
-  vmOpts,
+  vmSpecs,
   ...
 }:
 let
@@ -47,9 +47,9 @@ in
       ''
         cp --remove-destination ${
           config.sops.secrets."tokens/${token}".path
-        } /run/microvm-secrets/${vmOpts.name}/${token}_api_key
-        chgrp kvm /run/microvm-secrets/${vmOpts.name}/${token}_api_key
+        } /run/microvm-secrets/${vmSpecs.name}/${token}_api_key
+        chgrp kvm /run/microvm-secrets/${vmSpecs.name}/${token}_api_key
       '')
-      |> lib.concatStringSep "\n";
+      |> lib.concatStringsSep "\n";
   };
 }

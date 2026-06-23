@@ -1,7 +1,7 @@
-{ lib, vmOpts, ... }:
+{ lib, vmSpecs, ... }:
 {
   home-manager = {
-    users.${vmOpts.user} = {
+    users.${vmSpecs.user} = {
       imports = (
         map lib.custom.relativeToRoot [
           "microvms/home/common/optional/agent.nix"

@@ -3,7 +3,7 @@
   pkgs,
   lib,
   user,
-  vmOpts,
+  vmSpecs,
   ...
 }:
 {
@@ -46,7 +46,7 @@
     zsh = {
       enable = true;
       shellAliases = {
-        "cds" = "cd ${vmOpts.sharedDir}/shared/$(hostname)/";
+        "cds" = "cd ${vmSpecs.sharedDir}/shared/$(hostname)/";
       };
     };
   };

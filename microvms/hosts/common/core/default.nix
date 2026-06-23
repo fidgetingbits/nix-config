@@ -11,11 +11,11 @@
   inputs,
   lib,
   pkgs,
-  vmOpts,
+  vmSpecs,
   ...
 }:
 let
-  inherit (vmOpts)
+  inherit (vmSpecs)
     name
     user
     vm-lan
@@ -36,7 +36,7 @@ in
     home-manager = {
       useGlobalPkgs = true;
       useUserPackages = true;
-      extraSpecialArgs = { inherit user inputs vmOpts; };
+      extraSpecialArgs = { inherit user inputs vmSpecs; };
       users.${user} = {
         imports = (
           map lib.custom.relativeToRoot [
@@ -213,7 +213,7 @@ in
         {
           type = "tap";
           id = "vm-microvm-${name}"; # IMPORTANT: Before changing, read the comment above
-          mac = vmOpts.mac;
+          mac = vmSpecs.mac;
         }
       ];
 
@@ -259,8 +259,8 @@ in
     # FIXME: use dhcp? if the host is bridged through vpn, it will use
     # whatever is provided like the default VPN dns?
     systemd.network.networks."10-eth" = {
-      matchConfig.MACAddress = vmOpts.mac;
-      address = [ "${vmOpts.ip}/${toString vm-lan.prefixLength}" ];
+      matchConfig.MACAddress = vmSpecs.mac;
+      address = [ "${vmSpecs.ip}/${toString vm-lan.prefixLength}" ];
       routes = [ { Gateway = vm-lan.gateway; } ];
       dns = [
         "1.1.1.1"
