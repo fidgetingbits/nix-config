@@ -8,15 +8,25 @@
 }:
 let
   sopsFolder = (lib.toString inputs.nix-secrets) + "/sops";
+  tokens = [
+    "anthropic"
+    "openai"
+    "copilot"
+    "google"
+    "deepseek"
+  ];
 in
 {
-  sops.secrets = {
-    "tokens/claude" = {
-      sopsFile = "${sopsFolder}/agents.yaml";
-      group = "kvm";
-      mode = "0440";
-    };
-  };
+  sops.secrets =
+    tokens
+    |> map (name: {
+      "tokens/${name}" = {
+        sopsFile = "${sopsFolder}/agents.yaml";
+        group = "kvm";
+        mode = "0440";
+      };
+    })
+    |> lib.mergeAttrsList;
 
   # This service copies secrets directly into a ramfs on the microvm
   # See ./default for why
@@ -32,15 +42,15 @@ in
 
     # NOTE: ./default systemd.tmpfiles.rules already handled /run/microvm-secrets/${name} creation
     script =
-      let
-        name = vmOpts.name;
-      in
+      tokens
+      |> map (token:
       # bash
       ''
         cp --remove-destination ${
-          config.sops.secrets."tokens/claude".path
-        } /run/microvm-secrets/${name}/anthropic_api_key
-        chgrp kvm /run/microvm-secrets/${name}/anthropic_api_key
-      '';
+          config.sops.secrets."tokens/${token}".path
+        } /run/microvm-secrets/${vmOpts.name}/${token}_api_key
+        chgrp kvm /run/microvm-secrets/${vmOpts.name}/${token}_api_key
+      '')
+      |> lib.concatStringSep "\n";
   };
 }

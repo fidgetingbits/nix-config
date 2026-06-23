@@ -25,8 +25,11 @@ in
       vmOpts = nanoOpts;
     };
     config = {
+      imports = [
+        (lib.custom.relativeToRoot "microvms/hosts/common/optional/agents.nix")
+      ];
       home-manager = {
-        # FIXME(microvms): This would need to change if we want mutliple users
+        # FIXME(microvms): This would need to change if we want multiple users
         users.${nanoOpts.user} = {
           imports = [ ./home.nix ];
         };

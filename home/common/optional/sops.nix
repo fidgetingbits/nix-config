@@ -58,21 +58,26 @@ in
           sopsFile = "${sopsFolder}/olan.yaml";
         };
       }
-      # FIXME: these tokens are duplicated into agents.yaml now, so can probably move
       // lib.optionalAttrs osConfig.hostSpec.isDevelopment {
         # public read token for nixpkgs-review, etc
         "tokens/github" = {
           sopsFile = "${sopsFolder}/development.yaml";
         };
-
+        # LLM tokens, use agents.yaml since it's shared elsewhere
         "tokens/openai" = {
-          sopsFile = "${sopsFolder}/development.yaml";
+          sopsFile = "${sopsFolder}/agents.yaml";
         };
         "tokens/copilot" = {
-          sopsFile = "${sopsFolder}/development.yaml";
+          sopsFile = "${sopsFolder}/agents.yaml";
         };
-        "tokens/claude" = {
-          sopsFile = "${sopsFolder}/development.yaml";
+        "tokens/anthropic" = {
+          sopsFile = "${sopsFolder}/agents.yaml";
+        };
+        "tokens/google" = {
+          sopsFile = "${sopsFolder}/agents.yaml";
+        };
+        "tokens/deepseek" = {
+          sopsFile = "${sopsFolder}/agents.yaml";
         };
       }
       // lib.optionalAttrs osConfig.hostSpec.isWork {
