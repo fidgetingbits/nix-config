@@ -47,7 +47,9 @@
           # bash
           ''
             export ANTHROPIC_API_KEY=$(cat /run/secrets/anthropic_api_key)
-            # export OPENAI_API_KEY=$(cat /run/secrets/openai_key})
+            export OPENAI_API_KEY=$(cat /run/secrets/openai_api_key})
+            export DEEPSEEK_API_KEY=$(cat /run/secrets/deepseek_api_key})
+            export GEMINI_API_KEY=$(cat /run/secrets/gemini_api_key})
           '';
     };
   };

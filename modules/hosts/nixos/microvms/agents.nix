@@ -11,7 +11,6 @@ let
   tokens = [
     "anthropic"
     "openai"
-    "copilot"
     "google"
     "deepseek"
   ];

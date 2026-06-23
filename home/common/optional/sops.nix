@@ -67,9 +67,6 @@ in
         "tokens/openai" = {
           sopsFile = "${sopsFolder}/agents.yaml";
         };
-        "tokens/copilot" = {
-          sopsFile = "${sopsFolder}/agents.yaml";
-        };
         "tokens/anthropic" = {
           sopsFile = "${sopsFolder}/agents.yaml";
         };
