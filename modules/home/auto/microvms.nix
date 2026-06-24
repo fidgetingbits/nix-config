@@ -48,14 +48,11 @@ lib.mkIf (lib.length (lib.attrNames cfg.vms) != 0) {
       # Microvm management
       mv-start = "function _mv-start() { systemctl start microvm@$1 }; _mv-start";
       mv-stop = "function _mv-stop() { systemctl stop microvm@$1 }; _mv-stop";
-      mv-restart = "function _mv-restart() { systemctl stop microvm@$1 }; _mv-restart";
+      mv-restart = "function _mv-restart() { systemctl restart microvm@$1 }; _mv-restart";
       mv-status = "_mv-status";
       mv-status-all = "_mv-status-all";
       mv-log-all = "_mv-log-all";
       mv-deps = "function _mv-deps() { systemctl list-dependencies \"microvm@$1.service\" }; _mv-deps";
-      # FIXME: add helpers for only ones booted/running? like logs for failed only
-      # add stuff to dump the network?
-      # add zsh completions?
       mv-list = "get_microvms";
       mv-list-running = "systemctl list-units \"microvm@*.service\" --state=running";
       mv-list-stopped = "systemctl list-units \"microvm@*.service\" --state=inactive";
@@ -63,12 +60,9 @@ lib.mkIf (lib.length (lib.attrNames cfg.vms) != 0) {
       mvlr = "mv-list-running";
       mvls = "mv-list-stopped";
 
-      # I bind mount some dev folders into agent folders, so this allows easy lookup
-      # FIXME: need to filter out the VM-specific-binds
+      # I bind mount some folders into microvm view, so this allows easy lookup
       mv-binds = "_mv-binds";
       mvlb = "mv-binds";
-      # FIXME: need to filter out the results
-      # mv-binds-all = "function _mv-binds() { findmnt --submounts --target ''${MICROVM_SHARED_PATH:-${sharedDir}} }; _mv-binds";
       mv-unbind = "mv-unbind";
       mv-unbind-all = "";
       mv-bind = "_mv-bind";
