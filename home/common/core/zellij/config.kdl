@@ -1,14 +1,16 @@
+// Prefer alt, but we use alt for neovim, and zellij may be embedded, so favor ctrl
+// commands must not conflict with terminal
 keybinds clear-defaults=true {
     normal {
 
     }
     locked {
-        bind "Alt g" {
+        bind "Ctrl g" {
             SwitchToMode "Normal"
         }
     }
     pane {
-        bind "Alt p" {
+        bind "Ctrl p" {
             SwitchToMode "Normal"
         }
         bind "c" {
@@ -56,7 +58,7 @@ keybinds clear-defaults=true {
         }
     }
     tab {
-        bind "Alt t" {
+        bind "Ctrl t" {
             SwitchToMode "Normal"
         }
         bind "b" {
@@ -108,7 +110,7 @@ keybinds clear-defaults=true {
     //        bind "Enter"       { SwitchToMode "Search" ; }
     //    }
     renametab {
-        bind "Alt c" {
+        bind "Ctrl c" {
             SwitchToMode "Normal"
         }
         bind "Esc" {
@@ -117,7 +119,7 @@ keybinds clear-defaults=true {
         }
     }
     renamepane {
-        bind "Alt c" {
+        bind "Ctrl c" {
             SwitchToMode "Normal"
         }
         bind "Esc" {
@@ -126,7 +128,7 @@ keybinds clear-defaults=true {
         }
     }
     session {
-        bind "Alt o" {
+        bind "Ctrl o" {
             SwitchToMode "Normal"
         }
         bind "d" {
@@ -141,89 +143,89 @@ keybinds clear-defaults=true {
         }
     }
     shared_except "locked" {
-        bind " Alt f" {
+        bind " Ctrl f" {
             ToggleFocusFullscreen
         }
-        bind "Alt g" {
+        bind "Ctrl g" {
             SwitchToMode "Locked"
         }
-        bind "Alt q" {
+        bind "Ctrl q" {
             Quit
         }
         // Focus
-        bind "Alt h" {
+        bind "Ctrl h" {
             MoveFocusOrTab "Left"
         }
-        bind "Alt l" {
+        bind "Ctrl l" {
             MoveFocusOrTab "Right"
         }
-        bind "Alt j" {
+        bind "Ctrl j" {
             MoveFocus "Down"
         }
-        bind "Alt k" {
+        bind "Ctrl k" {
             MoveFocus "Up"
         }
-        bind "Alt ." {
+        bind "Ctrl ." {
             FocusPreviousPane
         }
-        bind "Alt 1" {
+        bind "Ctrl 1" {
             GoToTab 1
         }
-        bind "Alt 2" {
+        bind "Ctrl 2" {
             GoToTab 2
         }
-        bind "Alt 3" {
+        bind "Ctrl 3" {
             GoToTab 3
         }
-        bind "Alt 4" {
+        bind "Ctrl 4" {
             GoToTab 4
         }
-        bind "Alt 5" {
+        bind "Ctrl 5" {
             GoToTab 5
         }
-        bind "Alt 6" {
+        bind "Ctrl 6" {
             GoToTab 6
         }
-        bind "Alt 7" {
+        bind "Ctrl 7" {
             GoToTab 7
         }
-        bind "Alt 8" {
+        bind "Ctrl 8" {
             GoToTab 8
         }
-        bind "Alt 9" {
+        bind "Ctrl 9" {
             GoToTab 9
         }
         // Move
-        bind "Alt H" {
+        bind "Ctrl H" {
             MovePane "Left"
         }
-        bind "Alt J" {
+        bind "Ctrl J" {
             MovePane "Down"
         }
-        bind "Alt K" {
+        bind "Ctrl K" {
             MovePane "Up"
         }
-        bind "Alt L" {
+        bind "Ctrl L" {
             MovePane "Right"
         }
         // Resize
-        bind "Alt Left" {
+        bind "Ctrl Left" {
             Resize "Increase Left"
         }
-        bind "Alt Down" {
+        bind "Ctrl Down" {
             Resize "Increase Down"
         }
-        bind "Alt Up" {
+        bind "Ctrl Up" {
             Resize "Increase Up"
         }
-        bind "Alt Right" {
+        bind "Ctrl Right" {
             Resize "Increase Right"
         }
         // Swap
-        bind "Alt [" {
+        bind "Ctrl [" {
             PreviousSwapLayout
         }
-        bind "Alt ]" {
+        bind "Ctrl ]" {
             NextSwapLayout
         }
  // Console
@@ -235,22 +237,22 @@ keybinds clear-defaults=true {
         }
     }
     shared_except "pane" "locked" {
-        bind "Alt p" {
+        bind "Ctrl p" {
             SwitchToMode "Pane"
         }
     }
     shared_except "scroll" "locked" {
-        bind "Alt s" {
+        bind "Ctrl s" {
             SwitchToMode "Scroll"
         }
     }
     shared_except "session" "locked" {
-        bind "Alt o" {
+        bind "Ctrl o" {
             SwitchToMode "Session"
         }
     }
     shared_except "tab" "locked" {
-        bind "Alt t" {
+        bind "Ctrl t" {
             SwitchToMode "Tab"
         }
     }
@@ -260,8 +262,8 @@ keybinds clear-defaults=true {
 // not 'plugin location="zellij:compact-bar"'
 plugins {
     compact-bar location="zellij:compact-bar" {
-        // Alt+/ matches Super+/ in niri
-        tooltip "Alt /"
+        // <key>+/ matches Super+/ in niri
+        tooltip "Ctrl /"
     }
 }
 ui {
