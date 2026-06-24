@@ -9,6 +9,7 @@
   introdus.neovim = {
     enable = true;
     wrapper = "fidgetingvim";
+    fontSize = 10;
   };
 
   # My custom neovim wrapper, built on top of the introdus neovim base, is enabled by the above
