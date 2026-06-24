@@ -19,7 +19,7 @@ let
     ;
 in
 {
-  config = lib.mkIf (isLocal && isRoaming && (subnet.hosts.${hostName}.wgpk != "")) {
+  config = lib.mkIf (isLocal && isRoaming && (subnet.hosts.${hostName}.wireguardPubKey != "")) {
     ${namespace}.wireguard = {
       enable = true;
       role = "client";

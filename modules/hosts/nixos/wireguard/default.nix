@@ -28,7 +28,7 @@ let
     if keyExists then
       {
         inherit public_key;
-        peer = host.wgpk;
+        peer = host.wireguardPubKey;
         endpoint = if (role == "client") then "${cfg.endpoint}:${toString cfg.rosenpassPort}" else null;
       }
     else
@@ -117,7 +117,7 @@ in
         hostA = {
           name = "hostA";
           ip = "192.168.1.2";
-          wgpk = "abcdef";
+          wireguardPubKey = "abcdef";
         };
       };
       # FIXME: We probably want to make it so the IP address derivation is optional

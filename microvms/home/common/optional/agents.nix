@@ -19,6 +19,7 @@
         claude-agent-acp
         codex
         codex-acp
+        crush
         gemini-cli
         pi-coding-agent
         ;

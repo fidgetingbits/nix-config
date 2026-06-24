@@ -5,11 +5,12 @@
   ...
 }:
 let
+  networking = config.hostSpec.networking;
+  subnets = networking.subnets;
   nanoSpecs = rec {
-    vm-lan = config.hostSpec.networking.subnets.nlan;
-    # FIXME(microvms): This could be some hostSpec level entry for like microvm key, so we don't duplicate?
+    vm-lan = subnets.nlan;
     hostAuthorizedKeys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBpB8D7hvlBLDbt936OljTdpNcT01pHYqnnZj5rpD+xF ossa"
+      subnets.olan.hosts.${config.networking.hostName}.sshPubKey
     ];
     inherit (vm-lan.hosts.nano) ip;
     name = "nano";
@@ -17,6 +18,10 @@ let
     mac = (lib.head vm-lan.hosts.nano.mac);
     sshPort = 22;
     sharedDir = config.${namespace}.microvms.sharedDir;
+    allowedPorts = {
+      # Expose local llama-swap for use by agents
+      tcp = [ networking.ports.tcp.llama-swap ];
+    };
   };
 in
 {

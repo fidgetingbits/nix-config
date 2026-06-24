@@ -23,7 +23,7 @@ in
     # NOTE: See ./vpn.nix for additional sub option
     microvms = {
       vms = lib.mkOption {
-        type = lib.types.attrsOf (lib.types.attrsOf lib.types.anything); # FIXME: make a type
+        type = lib.types.attrsOf (lib.types.attrsOf lib.types.anything); # FIXME: make a type?
         default = { };
         description = "List of microvms to setup";
       };

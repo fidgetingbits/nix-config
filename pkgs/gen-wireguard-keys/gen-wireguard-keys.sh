@@ -111,5 +111,5 @@ done
 echo "Put the following in mkHost entry for eeach host in nix-secrets"
 echo "-----"
 for host in "${POSITIONAL_ARGS[@]}"; do
-    echo "${host}: wgpk = \"$(cat "$host"_wgpk)\";"
+    echo "${host}: wireguardPubKey = \"$(cat "$host"_wgpk)\";"
 done

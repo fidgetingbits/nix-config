@@ -11,8 +11,8 @@ let
 
   mkWireguardPeer = role: host: {
     publicKey =
-      assert lib.assertMsg (host.wgpk != "") "peer must have valid key";
-      host.wgpk;
+      assert lib.assertMsg (host.wireguardPubKey != "") "peer must have valid key";
+      host.wireguardPubKey;
     allowedIPs = [ (genWireguardIP host.name) ];
   };
   mkWireguardPeers = role: hosts: (map (host: mkWireguardPeer role host) hosts);

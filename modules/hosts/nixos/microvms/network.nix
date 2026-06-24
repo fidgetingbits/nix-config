@@ -1,4 +1,9 @@
-{ config, namespace, ... }:
+{
+  config,
+  namespace,
+  lib,
+  ...
+}:
 let
   # FIXME: This should be configurable?
   vm-lan = config.hostSpec.networking.subnets.nlan;
@@ -53,37 +58,65 @@ in
 
   # Outbound NAT only for packets going out the proton vpn
   # Allow established traffic for host -> microvm ssh session
-  networking.nftables = {
-    enable = true;
-    ruleset = ''
-      table inet vm_firewall {
-            chain input {
-              type filter hook input priority filter; policy accept;
+  networking.nftables =
+    let
+      # Add all of the allowed tcp/udp ports for a given VM to the host
+      # FIXME: What if a compromised VM maliciously changes it's ip?
+      vms = config.${namespace}.microvms.vms;
+      genAllowedInputs =
+        vms
+        |> lib.attrNames
+        |> map (
+          name:
+          let
+            specs = vms.${name}.vmSpecs;
+          in
+          if (specs ? allowedPorts) then
+            map (
+              proto:
+              map (port: ''
+                iifname "${vmBridge}" ip saddr ${specs.ip} ether saddr ${specs.mac} ${proto} dport ${toString port} accept
+              '') specs.allowedPorts.${proto}
+            ) (lib.attrNames specs.allowedPorts)
+          else
+            ""
+        )
+        |> lib.flatten
+        |> lib.concatStringsSep "\n";
+    in
+    {
+      enable = true;
+      ruleset = ''
+        table inet vm_firewall {
+              chain input {
+                type filter hook input priority filter; policy accept;
 
-              ct state established,related accept
-              iifname "${vmBridge}" drop
+                ${genAllowedInputs}
+
+                ct state established,related accept
+                iifname "${vmBridge}" drop
+              }
+
+              chain output {
+               type filter hook output priority filter;
+               oifname "${vmBridge}" accept
+              }
+
+              chain forward {
+                type filter hook forward priority filter; policy drop;
+
+                # Allow established internet traffic back to the VM
+                ct state established,related accept
+
+                # Allow the VM to route outbound traffic to the VPN interface
+                iifname "${vmBridge}" oifname "${vpnCfg.ifname}" accept
+              }
+
+              chain postrouting {
+                type nat hook postrouting priority filter; policy accept;
+                oifname "${vpnCfg.ifname}" masquerade
+              }
             }
-
-            chain output {
-             type filter hook output priority filter;
-             oifname "${vmBridge}" accept
-            }
-
-            chain forward {
-              type filter hook forward priority filter; policy drop;
-
-              # Allow established internet traffic back to the VM
-              ct state established,related accept
-
-              # Allow the VM to route outbound traffic to the VPN interface
-              iifname "${vmBridge}" oifname "${vpnCfg.ifname}" accept
-            }
-
-            chain postrouting {
-              type nat hook postrouting priority filter; policy accept;
-              oifname "${vpnCfg.ifname}" masquerade
-            }
-          }
-    '';
-  };
+      '';
+    };
 }

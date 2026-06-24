@@ -11,7 +11,7 @@ let
   cfg = config.${namespace}.wireguard;
 
   mkWireguardPeer = role: host: {
-    publicKey = host.wgpk;
+    publicKey = host.wireguardPubKey;
     allowedIPs = cfg.allowedIPs;
     endpoint = "${cfg.endpoint}:${toString cfg.wireguardPort}";
     # Needed on clients for keeping NAT open
