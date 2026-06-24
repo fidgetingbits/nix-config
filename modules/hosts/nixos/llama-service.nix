@@ -23,6 +23,114 @@ let
     if config.hostSpec.useVulkan then { vulkanSupport = true; } else { rocmSupport = true; };
   llama-cpp = pkgs.llama-cpp.override llama-settings;
   ports = config.hostSpec.networking.ports;
+
+  ttl = cfg.ttl;
+  # Different hosts may only download/enable specific models, so let them select from this list
+  # NOTE: models cmds use the "server" macro defined later in services.llama-swap.settings.macro
+  #
+  # -m is local gguf file
+  # -hf is direct download: <user>/<model>[:quant]
+  # --no-mmap : Model is larger than remaining system RAM
+  models = {
+    # DEPRECATED
+    "deepseek-r1:30b" = {
+      inherit ttl;
+      cmd = ''
+        \''${server}
+        -m ${modelsPath}/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf
+        --ctx-size 32768
+        --no-mmap
+      '';
+      aliases = [
+        "ds-big"
+        "agent"
+      ];
+    };
+    "deepseek-r1:8b" = {
+      inherit ttl;
+      cmd = ''
+        \''${server}
+        -m ${modelsPath}/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf
+        --ctx-size 8192
+      '';
+      aliases = [
+        "ds-small"
+        "completion"
+      ];
+    };
+    # UNTESTED
+    "qwen3-vl:8b" = {
+      inherit ttl;
+      cmd = ''
+        \''${server}
+        -hf unsloth/Qwen3-VL-8B-Thinking-GGUF:Q8_K_XL
+        --ctx-size 8192
+        --temp 1.0
+        --top-k 20
+        --top-p 0.95
+        --presence-penalty 0.0
+      '';
+    };
+    "qwen3-vl:8b-instruct" = {
+      inherit ttl;
+      cmd = ''
+        \''${server}
+        -hf unsloth/Qwen3-VL-8B-Instruct-GGUF:Q8_K_XL
+        --ctx-size 8192
+        --temp 0.7
+        --top-k 20
+        --top-p 0.8
+        --presence-penalty 1.5
+      '';
+    };
+    "qwen3:14b" = {
+      inherit ttl;
+      cmd = ''
+        \''${server}
+        -hf unsloth/Qwen3-14B-GGUF:UD-Q6_K_XL
+        --ctx-size 8192
+        --temp 0.6
+        --top-k 20
+        --top-p 0.95
+        --min-p 0
+        --presence-penalty 1.5'';
+    };
+    "qwen3:30b" = {
+      inherit ttl;
+      cmd = ''
+        \''${server}
+        -hf unsloth/Qwen3-30B-A3B-Thinking-2507-GGUF:UD-IQ3_XXS
+        --ctx-size 8192
+        --temp 0.6
+        --top-k 20
+        --top-p 0.95
+        --min-p 0
+        --presence-penalty 1.0'';
+    };
+    "qwen3:30b-instruct" = {
+      inherit ttl;
+      cmd = ''
+        \''${server}
+        -hf unsloth/Qwen3-30B-A3B-Instruct-2507-GGUF:UD-IQ3_XXS
+        --ctx-size 8192
+        --temp 0.7
+        --top-k 20
+        --top-p 0.8
+        --min-p 0
+        --presence-penalty 1.0'';
+    };
+    "qwen3-coder:30b" = {
+      inherit ttl;
+      cmd = ''
+        \''${server}
+        -hf unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-IQ3_XXS
+        --ctx-size 8192
+        --temp 0.7
+        --top-k 20
+        --top-p 0.8
+        --presence-penalty 1.05'';
+    };
+  };
 in
 {
   options = {
@@ -34,6 +142,7 @@ in
         description = "How long to wait before auto-unloading model from VRAM";
       };
       # FIXME: Add a check that the entries are inside cfg.hosts?
+      # FIXME: Note for microvms you need to add them manually elsewhere for now
       allowedHosts = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [ ];
@@ -45,6 +154,11 @@ in
         # FIXME: Give an example of what this attrSet layout is or create a type
         default = config.hostSpec.networking.subnets.olan.hosts;
         description = "Attribute set of hosts used to lookup allowedHosts";
+      };
+      models = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [ "all" ];
+        description = "Set of models you want to enable from the following (or \"all\" for everything): ${lib.attrNames models}";
       };
     };
   };
@@ -81,13 +195,13 @@ in
       # https://github.com/skissue/dotfiles/blob/main/hosts/windstorm/llama-swap.nix
       services.llama-swap = {
         enable = true;
+        listenAddress = "0.0.0.0"; # We listen here even if granularFirewall is off because microvms may talk to it
         openFirewall = !config.networking.granularFirewall.enable;
         port = ports.tcp.llama-swap;
 
         settings =
           let
             llama-server = lib.getExe' llama-cpp "llama-server";
-            ttl = cfg.ttl;
           in
           {
             # Pre-download larger models and use -m if you don't want massive stalls
@@ -100,47 +214,31 @@ in
               "server" = "${llama-server} --port \${PORT} -fa on --jinja --no-webui";
             };
 
-            # FIXME: Make this a set of optional entries, since not all systems running
-            # llama-swap will have the same models
-
-            # NOTE: models cmds use the "server" macro defined above
-            # -m is local gguf file
-            # -hf is direct download: <user>/<model>[:quant]
-            # --no-mmap : Model is larger than remaining system RAM
-            models = {
-              "deepseek-r1:30b" = {
-                inherit ttl;
-                cmd = ''
-                  \''${server}
-                  -m ${modelsPath}/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf
-                  --ctx-size 32768
-                  --no-mmap
-                '';
-                aliases = [
-                  "ds-big"
-                  "agent"
-                ];
-              };
-              "deepseek-r1:8b" = {
-                inherit ttl;
-                cmd = ''
-                  \''${server}
-                  -m ${modelsPath}/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf
-                  --ctx-size 8192
-                '';
-                aliases = [
-                  "ds-small"
-                  "completion"
-                ];
-              };
-            };
+            models =
+              if lib.elem "all" cfg.models then
+                models
+              else
+                cfg.models
+                |> map (model: models.model)
+                # nixfmt hack
+                |> lib.mergeAttrslist;
           };
       };
 
       # When using -hf for models, it will auto-download from HuggingFace to this cache path
       systemd.services.llama-swap = {
-        environment."LLAMA_CACHE" = cachePath;
+        environment = {
+          "LLAMA_CACHE" = cachePath;
+          "HF_HOME" = modelsPath;
+        };
         serviceConfig.CacheDirectory = "llama-swap";
+
+        # Prevent '[ERROR] failed to read sys stats: couldn't read /proc/meminfo:' spam
+        serviceConfig = {
+          # FIXME: Revisit this to figure out what is best for /proc/meminfo
+          ProtectProc = lib.mkForce "default";
+          ProcSubset = lib.mkForce "all";
+        };
       };
 
       # If you don't specify an allowed host, it will be localhost only

@@ -116,6 +116,9 @@ in
   cne = "cd ${devNix}/emergentmind-nix-config";
   cpn = "cd ${devPublic}/nix";
 
+  ## misc
+  clm = "cd /var/lib/llm/models";
+
   ## rust cargo
   cr = "cargo run";
   ch = "cargo help";

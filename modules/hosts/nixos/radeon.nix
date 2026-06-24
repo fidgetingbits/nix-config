@@ -26,9 +26,7 @@ in
       inherit (pkgs.rocmPackages)
         # ROCm Application for Reporting System Info
         rocminfo
-        # ROCm Application for Reporting System Info
-        # FIXME: currently problen in 7.x PR: https://github.com/NixOS/nixpkgs/pull/469378
-        #amdsmi
+        rocm-smi
         ;
     };
   };

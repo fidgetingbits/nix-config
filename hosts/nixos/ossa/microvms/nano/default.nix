@@ -22,6 +22,8 @@ let
       # Expose local llama-swap for use by agents
       tcp = [ networking.ports.tcp.llama-swap ];
     };
+    # Some service stuff needs synced ports, so we need to expose it
+    ports = config.hostSpec.networking.ports;
   };
 in
 {

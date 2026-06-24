@@ -75,7 +75,8 @@ in
             map (
               proto:
               map (port: ''
-                iifname "${vmBridge}" ip saddr ${specs.ip} ether saddr ${specs.mac} ${proto} dport ${toString port} accept
+                #iifname "${vmBridge}" ip saddr ${specs.ip} ether saddr ${specs.mac} ${proto} dport ${toString port} accept
+                iifname "${vmBridge}" ip saddr ${specs.ip} ${proto} dport ${toString port} accept
               '') specs.allowedPorts.${proto}
             ) (lib.attrNames specs.allowedPorts)
           else
@@ -87,36 +88,33 @@ in
     {
       enable = true;
       ruleset = ''
-        table inet vm_firewall {
-              chain input {
-                type filter hook input priority filter; policy accept;
+        table inet nixos-fw {
+          chain input-allow {
+            ${genAllowedInputs}
+          }
+        }
 
-                ${genAllowedInputs}
+        table inet vm_routing {
+          chain output {
+            type filter hook output priority filter;
+            oifname "${vmBridge}" accept
+          }
 
-                ct state established,related accept
-                iifname "${vmBridge}" drop
-              }
+          chain forward {
+            type filter hook forward priority filter; policy drop;
 
-              chain output {
-               type filter hook output priority filter;
-               oifname "${vmBridge}" accept
-              }
+            # Allow established internet traffic back to the VM
+            ct state established,related accept
 
-              chain forward {
-                type filter hook forward priority filter; policy drop;
+            # Allow the VM to route outbound traffic to the VPN interface
+            iifname "${vmBridge}" oifname "${vpnCfg.ifname}" accept
+          }
 
-                # Allow established internet traffic back to the VM
-                ct state established,related accept
-
-                # Allow the VM to route outbound traffic to the VPN interface
-                iifname "${vmBridge}" oifname "${vpnCfg.ifname}" accept
-              }
-
-              chain postrouting {
-                type nat hook postrouting priority filter; policy accept;
-                oifname "${vpnCfg.ifname}" masquerade
-              }
-            }
+          chain postrouting {
+            type nat hook postrouting priority filter; policy accept;
+            oifname "${vpnCfg.ifname}" masquerade
+          }
+        }
       '';
     };
 }

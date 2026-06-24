@@ -17,10 +17,13 @@
       ++
         # Optional common modules
         (map (f: "home/common/optional/${f}") [
-          "audio-tools.nix"
-          #"vscode"
+          # Development
+          "agents.nix"
           "development"
           "aws.nix"
+
+          "audio-tools.nix"
+          #"vscode"
           "helper-scripts"
           "sops.nix"
           "gpg.nix"
