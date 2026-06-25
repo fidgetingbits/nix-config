@@ -307,7 +307,7 @@
 
     #################### Ricing ####################
     stylix = {
-      url = "github:danth/stylix/release-25.11";
+      url = "github:danth/stylix/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     silentSDDM = {
@@ -339,5 +339,6 @@
       url = "path:///home/aa/dev/nix/introdus/aa";
       # url = "path:///home/aa/dev/nix/introdus/neovim-shared-config/";
     };
+
   };
 }
