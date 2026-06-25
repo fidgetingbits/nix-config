@@ -1,3 +1,6 @@
+# Sets up a wireguard connection to the given server and exposes an interface
+# `vm-vpn`. See the
+
 {
   pkgs,
   lib,

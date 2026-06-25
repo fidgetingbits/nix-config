@@ -19,35 +19,22 @@ let
   user = config.hostSpec.primaryUsername;
 in
 {
-  options.${namespace} = {
-    # NOTE: See ./vpn.nix for additional sub option
-    microvms = {
-      vms = lib.mkOption {
-        type = lib.types.attrsOf (lib.types.attrsOf lib.types.anything); # FIXME: make a type?
-        default = { };
-        description = "List of microvms to setup";
-      };
-      path = lib.mkOption {
-        type = lib.types.str;
-        default = "/var/lib/microvms";
-        description = "Location used for starting microvms";
-      };
-
-      # Base directory for:
-      # 1) data shared with only this microvm
-      # 2) data shared across microvms
-      sharedDir = lib.mkOption {
-        type = lib.types.str;
-        default = "/home/${user}/dev/ai/";
-        description = "Base folder used for sharing folders with a given microvm";
-      };
-      interVmSharedDir = lib.mkOption {
-        type = lib.types.str;
-        default = "vms-shared";
-        description = "Folder name inside ${
-          config.${namespace}.microvms.sharedDir
-        } where all VMs have a shared folder";
-      };
+  # NOTE: See ./vpn.nix for additional sub option
+  options.${namespace}.microvms = {
+    # Base directory for:
+    # 1) data shared with only this microvm: ${sharedDir}/shared/<vm-name>/
+    # 2) data shared across microvms ${sharedDir}/vms-shared/
+    sharedDir = lib.mkOption {
+      type = lib.types.str;
+      default = "/home/${user}/dev/ai/";
+      description = "Base folder used for sharing folders with a given microvm";
+    };
+    interVmSharedDir = lib.mkOption {
+      type = lib.types.str;
+      default = "vms-shared";
+      description = "Folder name inside ${
+        config.${namespace}.microvms.sharedDir
+      } where all VMs have a shared folder";
     };
   };
 
@@ -57,14 +44,14 @@ in
     ./vpn.nix
   ];
 
-  config = lib.mkIf (lib.length (lib.attrNames cfg.vms) != 0) {
+  config = lib.mkIf (lib.length (lib.attrNames config.microvm.vms) != 0) {
     systemd.tmpfiles.rules = [
       "d ${cfg.sharedDir}               0750 ${config.hostSpec.primaryUsername} users -"
       "d ${cfg.sharedDir}/shared        0750 ${config.hostSpec.primaryUsername} users -"
       "d ${cfg.sharedDir}/${cfg.interVmSharedDir} 0750 1000 1000 -"
     ]
     ++ (
-      cfg.vms
+      config.microvm.vms
       |> lib.attrNames
       |> map (name: [
         "d ${cfg.sharedDir}/shared/${name}      0750 ${config.hostSpec.primaryUsername} users -"
@@ -78,7 +65,7 @@ in
     # into a folder mounted into the VM, but it will still symlink into
     # /run/secrets/rendered/ and that folder won't actually exist on the VM
     sops.secrets = (
-      cfg.vms
+      config.microvm.vms
       |> lib.attrNames
       |> lib.map (name: {
         "microvms/keys/ssh/${name}" = {
@@ -105,7 +92,7 @@ in
 
       # systemd.tmpfiles.rules already handled dir creation
       script =
-        cfg.vms
+        config.microvm.vms
         |> lib.attrNames
         |> lib.map (name:
         # bash
@@ -124,7 +111,7 @@ in
       persistence.${config.hostSpec.persistFolder}.directories =
         lib.mkIf config.introdus.impermanence.enable
           [
-            cfg.path
+            config.microvm.stateDir
           ];
     };
   };

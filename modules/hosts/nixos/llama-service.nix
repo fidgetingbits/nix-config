@@ -32,6 +32,20 @@ let
   # -hf is direct download: <user>/<model>[:quant]
   # --no-mmap : Model is larger than remaining system RAM
   models = {
+    # Tested, but needs tweaks for strix halo
+    "qwen3-vl:8b" = {
+      inherit ttl;
+      cmd = ''
+        \''${server}
+        -hf unsloth/Qwen3-VL-8B-Thinking-GGUF:Q8_K_XL
+        --ctx-size 8192
+        --temp 1.0
+        --top-k 20
+        --top-p 0.95
+        --presence-penalty 0.0
+      '';
+    };
+
     # DEPRECATED
     "deepseek-r1:30b" = {
       inherit ttl;
@@ -59,18 +73,6 @@ let
       ];
     };
     # UNTESTED
-    "qwen3-vl:8b" = {
-      inherit ttl;
-      cmd = ''
-        \''${server}
-        -hf unsloth/Qwen3-VL-8B-Thinking-GGUF:Q8_K_XL
-        --ctx-size 8192
-        --temp 1.0
-        --top-k 20
-        --top-p 0.95
-        --presence-penalty 0.0
-      '';
-    };
     "qwen3-vl:8b-instruct" = {
       inherit ttl;
       cmd = ''

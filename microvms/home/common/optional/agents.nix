@@ -8,7 +8,6 @@
   ...
 }:
 let
-
   jsonFormat = pkgs.formats.json { };
   # FIXME: de-duplicate this file with home/common/optional/agents.nix
   models.providers = {

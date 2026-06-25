@@ -39,6 +39,7 @@ in
           Table = "main";
           Priority = 999;
         }
+        # FIXME: This should only get added if vpn is enabled
         # Route everything else over VPN
         {
           From = vm-lan.cidr;
@@ -62,14 +63,14 @@ in
     let
       # Add all of the allowed tcp/udp ports for a given VM to the host
       # FIXME: What if a compromised VM maliciously changes it's ip?
-      vms = config.${namespace}.microvms.vms;
+      vms = config.microvm.vms;
       genAllowedInputs =
         vms
         |> lib.attrNames
         |> map (
           name:
           let
-            specs = vms.${name}.vmSpecs;
+            specs = vms.${name}.specialArgs.vmSpecs;
           in
           if (specs ? allowedPorts) then
             map (
@@ -87,6 +88,7 @@ in
     in
     {
       enable = true;
+      # FIXME: The vm_routing part should only be added for vpn in vpn.nix?
       ruleset = ''
         table inet nixos-fw {
           chain input-allow {

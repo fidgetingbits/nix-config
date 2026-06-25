@@ -12,18 +12,18 @@
 let
   cfg = osConfig.${namespace}.microvms;
   home = config.home.homeDirectory;
-  sharedDir = cfg.sharedDir;
+  sharedDir = "${cfg.sharedDir}/shared";
 in
-lib.mkIf (lib.length (lib.attrNames cfg.vms) != 0) {
+lib.mkIf (lib.length (lib.attrNames osConfig.microvm.vms) != 0) {
 
   # Automatic ssh entries
   programs.ssh.settings =
-    cfg.vms
+    osConfig.microvm.vms
     |> lib.attrNames
     |> map (
       name:
       let
-        vmSpecs = cfg.vms.${name}.vmSpecs;
+        vmSpecs = osConfig.microvm.vms.${name}.specialArgs.vmSpecs;
       in
       {
         "${name}" = {
@@ -84,7 +84,7 @@ lib.mkIf (lib.length (lib.attrNames cfg.vms) != 0) {
             if [ $# -gt 0 ]; then
               echo "$1"
             else
-              ls -1 ${cfg.path}
+              ls -1 ${osConfig.microvm.stateDir}
             fi
           }
 
