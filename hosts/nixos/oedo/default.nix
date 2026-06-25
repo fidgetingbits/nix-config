@@ -34,7 +34,7 @@
         "podman.nix"
         "cli.nix"
         "yubikey.nix"
-        "libvirt.nix"
+        # "libvirt.nix"
 
         "wireshark.nix"
 

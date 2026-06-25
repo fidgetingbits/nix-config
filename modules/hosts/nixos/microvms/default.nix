@@ -36,6 +36,19 @@ in
         config.${namespace}.microvms.sharedDir
       } where all VMs have a shared folder";
     };
+
+    # FIXME: Eventually if we have microvms across networks, this will have to
+    # get rethought
+    vmBridge = lib.mkOption {
+      type = lib.types.str;
+      default = "vbr-microvms";
+      description = "Name of the virtual bridge used for the microvm network";
+    };
+    vmLan = lib.mkOption {
+      type = lib.types.attrsOf lib.types.anything;
+      default = config.hostSpec.networking.subnets.nlan;
+      description = "The attrset describing the network the microvms live on";
+    };
   };
 
   imports = [

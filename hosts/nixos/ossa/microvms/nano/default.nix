@@ -7,6 +7,10 @@
 let
   networking = config.hostSpec.networking;
   subnets = networking.subnets;
+  ports = networking.ports;
+  llamaSwapPort = ports.tcp.llama-swap;
+  oedoLlamaSwapPort = (ports.tcp.llama-swap + 1);
+  olan = subnets.olan;
   nanoSpecs = rec {
     vm-lan = subnets.nlan;
     hostAuthorizedKeys = [
@@ -20,7 +24,9 @@ let
     sharedDir = config.${namespace}.microvms.sharedDir;
     allowedPorts = {
       # Expose local llama-swap for use by agents
-      tcp = [ networking.ports.tcp.llama-swap ];
+      tcp = [
+        llamaSwapPort
+      ];
     };
     # Some service stuff needs synced ports, so we need to expose it
     ports = config.hostSpec.networking.ports;
@@ -54,5 +60,43 @@ in
 
   ${namespace}.microvms = {
     vpn.enable = true;
+  };
+
+  # Setup some custom rules for forwarding to oedo llama-swap
+  networking.nftables.ruleset =
+    let
+      vmBridge = "vbr-microvms";
+    in
+    ''
+      table inet vm_routing {
+
+        chain prerouting {
+            type nat hook prerouting priority dstnat; policy accept;
+            iifname "${vmBridge}" tcp dport ${toString oedoLlamaSwapPort} dnat ip to ${olan.hosts.oedo.ip}:${toString llamaSwapPort}
+        }
+
+        chain forward {
+          iifname "${vmBridge}" ip daddr ${olan.hosts.oedo.ip} accept
+        }
+
+        chain postrouting {
+          ip daddr ${olan.hosts.oedo.ip} masquerade
+        }
+      }
+    '';
+
+  # This needs to be injected because for now we manually forward a port
+  # to oedo, so it needs to not route it over vm-vpn. Priority must be below
+  # the vm-vpn entry in modules/hosts/nixos/microvms/network.nix
+  # FIXME: This needs to keep in sync with the id in the file above, so could use an option
+  systemd.network.networks."20-${config.${namespace}.microvms.vmBridge}" = {
+    routingPolicyRules = [
+      {
+        From = config.${namespace}.microvms.vmLan.cidr;
+        To = olan.cidr;
+        Table = "main";
+        Priority = 998;
+      }
+    ];
   };
 }

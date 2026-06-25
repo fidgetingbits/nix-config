@@ -5,10 +5,10 @@
   ...
 }:
 let
-  # FIXME: This should be configurable?
-  vm-lan = config.hostSpec.networking.subnets.nlan;
-  vmBridge = "vbr-microvms";
-  vpnCfg = config.${namespace}.microvms.vpn;
+  cfg = config.${namespace}.microvms;
+  vm-lan = cfg.vmLan;
+  vmBridge = cfg.vmBridge;
+  vpnCfg = cfg.vpn;
 in
 {
   boot.kernel.sysctl = {
@@ -39,13 +39,13 @@ in
           Table = "main";
           Priority = 999;
         }
-        # FIXME: This should only get added if vpn is enabled
-        # Route everything else over VPN
-        {
+        # Route everything else over VPN if enabled
+        # FIXME: This could move to vpn.nix, but then we'd need to track/sync the rule name
+        (lib.optionalAttrs cfg.vpn.enable {
           From = vm-lan.cidr;
           Table = vpnCfg.tableNum;
           Priority = 1000;
-        }
+        })
       ];
     };
 
@@ -113,7 +113,7 @@ in
           }
 
           chain postrouting {
-            type nat hook postrouting priority filter; policy accept;
+            type nat hook postrouting priority srcnat; policy accept;
             oifname "${vpnCfg.ifname}" masquerade
           }
         }
