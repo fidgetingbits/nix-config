@@ -162,5 +162,28 @@
     };
   };
 
-  ${namespace}.services.llama.enable = true;
+  ${namespace} = {
+    services.llama.enable = true;
+  };
+
+  # See:
+  #  https://www.jeffgeerling.com/blog/2025/increasing-vram-allocation-on-amd-ai-apus-under-linux/
+  #  https://github.com/ROCm/ROCm/issues/5562#issuecomment-3452179504
+  #  https://rocm.docs.amd.com/projects/radeon-ryzen/en/latest/docs/install/installryz/native_linux/install-ryzen.html#configure-shared-memory
+  #  https://blog.linux-ng.de/2025/07/13/getting-information-about-amd-apus/
+  #
+  # You can allegedly use newer amd-smi options to manually set this as well:
+  # https://github.com/ROCm/rocm-systems/pull/3636
+  boot.kernelParams =
+    let
+      # 96 GiB - 32 GiB = 64 GiB
+      sz = toString ((64 * 1024 * 1024 * 1024) / 4096);
+    in
+    [
+      "amd_iommu=off" # disables VFIO for local llm speed
+      "amdttm.pages_limit=${sz}"
+      "amdttm.page_pool_size=${sz}"
+      "ttm.pages_limit=${sz}"
+      "ttm.page_pool_size=${sz}"
+    ];
 }

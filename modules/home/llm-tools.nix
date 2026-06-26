@@ -7,7 +7,6 @@
 }:
 let
   cfg = config.llm-tools;
-  zshCfg = config.programs.zsh;
   server = "oedo.${osConfig.hostSpec.domain}";
   port = osConfig.hostSpec.networking.ports.tcp.llama-swap;
 in
@@ -22,24 +21,18 @@ in
     home = {
       packages = [
         pkgs.llama-cpp # offline inference (llama, deepseek, qwen, etc)
-        pkgs.ollama
       ];
-
-      sessionVariables = {
-        OLLAMA_HOST = server;
-        OLLAMA_API_URL = server;
-      };
-
     };
 
     # online inference (llama-swap, claude, gemini, openai, etc)
     programs.llm =
       let
+        # FIXME: This needs to get updated for ossa/oedo
         api_base = "http://${server}:${toString port}/v1";
       in
       {
         enable = true;
-        # FIXME: This should auto-add our llama-swap models somehow
+        # FIXME: This should auto-add from our llama-swap models somehow
         defaultModel = "ds-small";
         models = [
           {
@@ -54,17 +47,5 @@ in
           }
         ];
       };
-
-    programs.zsh.shellAliases = lib.mkIf zshCfg.enable {
-      ol = "ollama";
-      oli = "ollama info";
-      olpl = "ollama pull";
-      olps = "ollama ps";
-      oll = "ollama ls";
-      olrm = "ollama rm";
-      olr = "ollama run";
-      ols = "ollama stop";
-      olh = "ollama --help";
-    };
   };
 }

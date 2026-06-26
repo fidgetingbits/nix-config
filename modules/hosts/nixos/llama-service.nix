@@ -1,6 +1,5 @@
-# NOTE: ollama uses a separate storage hierarchy (sha256) than llama-swap, so it's not
-# possible (without scripting) to have them share a model folder. This means there can be
-# huge duplication if running the same models in both (eg: deepseek-r1:70b is ~40gb)
+# WARNING: This is tweaked for two AMD AI chipsets atm, so won't work on other systems
+# FIXME: This needs to get broken out into multiple files now I think
 {
   pkgs,
   lib,
@@ -9,6 +8,8 @@
   ...
 }:
 let
+
+  isHalo = config.networking.hostName == "oedo";
   cfg = config.${namespace}.services.llama;
   time = lib.custom.time;
   modelsPath = "/var/lib/llm/models";
@@ -19,118 +20,183 @@ let
   group = pu.group;
 
   persistFolder = config.hostSpec.persistFolder;
-  llama-settings =
-    if config.hostSpec.useVulkan then { vulkanSupport = true; } else { rocmSupport = true; };
-  llama-cpp = pkgs.llama-cpp.override llama-settings;
+  # Some notes taken from
+  # https://github.com/basnijholt/dotfiles/blob/6f8a47c1/configs/nixos/hosts/pc/package-overrides.nix
+  # https://github.com/blazed/cake/blob/ee606cf/profiles/ai.nix
+  llama-cpp =
+    (pkgs.llama-cpp.override {
+      rocmSupport = !config.hostSpec.useVulkan;
+      vulkanSupport = config.hostSpec.useVulkan;
+      # Enable BLAS for optimized CPU layer performance (OpenBLAS)
+      # This is crucial for models using split-mode or CPU offloading
+      blasSupport = true;
+      cudaSupport = false;
+      rocmGpuTargets = if isHalo then [ "gfx1151" ] else [ "gfx1150" ];
+    }).overrideAttrs
+      (oldAttrs: rec {
+        version = "9775";
+        src = pkgs.fetchFromGitHub {
+          owner = "ggml-org";
+          repo = "llama.cpp";
+          tag = "b${version}";
+          hash = "sha256-kTY9Pwzk8JbmlTwfCpKMenK2PB9lob69sbq8R55wCsw=";
+          leaveDotGit = true;
+          postFetch = ''
+            git -C "$out" rev-parse --short HEAD > $out/COMMIT
+            find "$out" -name .git -print0 | xargs -0 rm -rf
+          '';
+        };
+        npmRoot = "tools/ui";
+        npmDepsHash = "sha256-0dctM/apI3ysMIEVBaBXO9hZMWskpJpNpOws1gwiOYc=";
+
+        cmakeFlags =
+          (oldAttrs.cmakeFlags or [ ])
+          ++ [
+            "-DGGML_NATIVE=ON"
+            "-DGGML_HIP_NO_VMM=ON"
+            "-DCMAKE_HIP_FLAGS=-I${pkgs.rocmPackages.rocwmma}/include"
+          ]
+          ++ lib.optionals (!isHalo) [
+            # This is buggy on 1151 apparently, so disabled for now
+            # https://github.com/ggml-org/llama.cpp/issues/24437
+            "-DGGML_HIP_ROCWMMA_FATTN=ON"
+          ];
+
+        # Disable Nix's NIX_ENFORCE_NO_NATIVE which strips -march=native flags
+        # See: https://github.com/NixOS/nixpkgs/issues/357736
+        # See: https://github.com/NixOS/nixpkgs/pull/377484 (intentionally contradicts this)
+        preConfigure = ''
+          export NIX_ENFORCE_NO_NATIVE=0
+          ${oldAttrs.preConfigure or ""}
+        '';
+      });
+
   ports = config.hostSpec.networking.ports;
 
-  ttl = cfg.ttl;
-  # Different hosts may only download/enable specific models, so let them select from this list
-  # NOTE: models cmds use the "server" macro defined later in services.llama-swap.settings.macro
-  #
-  # -m is local gguf file
-  # -hf is direct download: <user>/<model>[:quant]
-  # --no-mmap : Model is larger than remaining system RAM
-  models = {
-    # Tested, but needs tweaks for strix halo
-    "qwen3-vl:8b" = {
-      inherit ttl;
-      cmd = ''
-        \''${server}
-        -hf unsloth/Qwen3-VL-8B-Thinking-GGUF:Q8_K_XL
-        --ctx-size 8192
-        --temp 1.0
-        --top-k 20
-        --top-p 0.95
-        --presence-penalty 0.0
-      '';
+  qwenSampling = [
+    "--temp 0.6"
+    "--top-p 0.95"
+    "--top-k 20"
+    "--min-p 0.00"
+  ];
+  gemmaSampling = [
+    "--temp 1.0"
+    "--top-p 0.95"
+    "--top-k 64"
+    "--min-p 0.01"
+  ];
+
+  llama-server = lib.getExe' llama-cpp "llama-server";
+
+  # KV dtype convention: q8 weights keep q8_0/q8_0 (max-context memory saving);
+  # q4/q6 weights use f16/f16 (f16 avoids the severe long-context slowdown that
+  # quantized V cache causes on gfx1151).
+  mkModel =
+    {
+      hf,
+      kv,
+      ctx ? 262144,
+      sampling ? qwenSampling,
+      mtp ? false,
+      thinking ? true,
+    }:
+    {
+      # -m is local gguf file
+      # -hf is direct download: <user>/<model>[:quant]
+      # --no-mmap : Model might be larger than remaining system RAM
+      cmd = lib.concatStringsSep "\n" (
+        [
+          llama-server
+          # FIXME: Should tweak this for optional local models?
+          "-hf ${hf}"
+          "--port \${PORT}"
+          "--ctx-size ${toString ctx}"
+          "--batch-size 4096"
+          "--ubatch-size 2048"
+          "--cache-reuse 256"
+          # FIXME: Could make this configurable
+          # "--threads 16"
+          # "--threads-batch 32"
+          "--kv-unified"
+          "-ngl 999"
+          "-fa on"
+          "--cache-type-k ${kv}"
+          "--cache-type-v ${kv}"
+          "--no-mmap"
+          "--direct-io"
+        ]
+        ++ sampling
+        ++ [
+          "--repeat-penalty 1.0"
+          "--jinja"
+          "--metrics"
+          "--slots"
+        ]
+        ++ lib.optionals mtp [
+          "--spec-type draft-mtp"
+          "--spec-draft-n-max 2"
+        ]
+        ++ lib.optionals thinking [
+          "--chat-template-kwargs '{\"preserve_thinking\":true}'"
+        ]
+      );
     };
 
-    # DEPRECATED
-    "deepseek-r1:30b" = {
-      inherit ttl;
-      cmd = ''
-        \''${server}
-        -m ${modelsPath}/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf
-        --ctx-size 32768
-        --no-mmap
-      '';
-      aliases = [
-        "ds-big"
-        "agent"
-      ];
+  # Strix Halo box has more available ram for f16 kv cache,
+  # but stick to q8 on Strix Point
+  # NOTE: realistically don't run the ones that want f16 on ossa anyway,
+  # but have it for benchmark testing
+  genQ4KV = if isHalo then "f16" else "q8_0";
+  models = {
+    "qwen3.6:27b-mtp-q8" = mkModel {
+      hf = "unsloth/Qwen3.6-27B-MTP-GGUF:UD-Q8_K_XL";
+      kv = "q8_0";
+      mtp = true;
     };
-    "deepseek-r1:8b" = {
-      inherit ttl;
-      cmd = ''
-        \''${server}
-        -m ${modelsPath}/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf
-        --ctx-size 8192
-      '';
-      aliases = [
-        "ds-small"
-        "completion"
-      ];
+    "qwen3.6:27b-mtp-q4" = mkModel {
+      hf = "unsloth/Qwen3.6-27B-MTP-GGUF:UD-Q4_K_XL";
+      kv = genQ4KV;
+      mtp = true;
     };
-    # UNTESTED
-    "qwen3-vl:8b-instruct" = {
-      inherit ttl;
-      cmd = ''
-        \''${server}
-        -hf unsloth/Qwen3-VL-8B-Instruct-GGUF:Q8_K_XL
-        --ctx-size 8192
-        --temp 0.7
-        --top-k 20
-        --top-p 0.8
-        --presence-penalty 1.5
-      '';
+    "qwen3.6:35b-a3b-mtp-q4" = mkModel {
+      hf = "unsloth/Qwen3.6-35B-A3B-MTP-GGUF:UD-Q4_K_XL";
+      kv = genQ4KV;
+      mtp = true;
     };
-    "qwen3:14b" = {
-      inherit ttl;
-      cmd = ''
-        \''${server}
-        -hf unsloth/Qwen3-14B-GGUF:UD-Q6_K_XL
-        --ctx-size 8192
-        --temp 0.6
-        --top-k 20
-        --top-p 0.95
-        --min-p 0
-        --presence-penalty 1.5'';
+    "qwen3.6:35b-a3b-mtp-q8" = mkModel {
+      hf = "unsloth/Qwen3.6-35B-A3B-MTP-GGUF:UD-Q8_K_XL";
+      kv = "q8_0";
+      mtp = true;
     };
-    "qwen3:30b" = {
-      inherit ttl;
-      cmd = ''
-        \''${server}
-        -hf unsloth/Qwen3-30B-A3B-Thinking-2507-GGUF:UD-IQ3_XXS
-        --ctx-size 8192
-        --temp 0.6
-        --top-k 20
-        --top-p 0.95
-        --min-p 0
-        --presence-penalty 1.0'';
+    "qwen3.6:27b-q8" = mkModel {
+      hf = "unsloth/Qwen3.6-27B-GGUF:UD-Q8_K_XL";
+      kv = "q8_0";
     };
-    "qwen3:30b-instruct" = {
-      inherit ttl;
-      cmd = ''
-        \''${server}
-        -hf unsloth/Qwen3-30B-A3B-Instruct-2507-GGUF:UD-IQ3_XXS
-        --ctx-size 8192
-        --temp 0.7
-        --top-k 20
-        --top-p 0.8
-        --min-p 0
-        --presence-penalty 1.0'';
+    "qwen3.6:27b-q4" = mkModel {
+      hf = "unsloth/Qwen3.6-27B-GGUF:UD-Q4_K_XL";
+      kv = genQ4KV;
     };
-    "qwen3-coder:30b" = {
-      inherit ttl;
-      cmd = ''
-        \''${server}
-        -hf unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-IQ3_XXS
-        --ctx-size 8192
-        --temp 0.7
-        --top-k 20
-        --top-p 0.8
-        --presence-penalty 1.05'';
+    "qwen3.6:35b-a3b-q4" = mkModel {
+      hf = "unsloth/Qwen3.6-35B-A3B-GGUF:UD-Q4_K_XL";
+      kv = genQ4KV;
+    };
+    "qwen3.6:35b-a3b-q8" = mkModel {
+      hf = "unsloth/Qwen3.6-35B-A3B-GGUF:UD-Q8_K_XL";
+      kv = "q8_0";
+    };
+    "gemma-4:31b-q6" = mkModel {
+      hf = "unsloth/gemma-4-31B-it-GGUF:UD-Q6_K_XL";
+      kv = "f16";
+      ctx = 200000;
+      sampling = gemmaSampling;
+      thinking = false;
+    };
+    "gemma-4:26b-a4b-q6" = mkModel {
+      hf = "unsloth/gemma-4-26B-A4B-it-GGUF:UD-Q6_K_XL";
+      kv = "f16";
+      ctx = 200000;
+      sampling = gemmaSampling;
+      thinking = false;
     };
   };
 in
@@ -143,6 +209,7 @@ in
         default = 0; # Persist
         description = "How long to wait before auto-unloading model from VRAM";
       };
+
       # FIXME: Add a check that the entries are inside cfg.hosts?
       # FIXME: Note for microvms you need to add them manually elsewhere for now
       allowedHosts = lib.mkOption {
@@ -167,20 +234,6 @@ in
 
   config = lib.mkMerge [
     (lib.mkIf cfg.enable {
-      services.ollama = {
-        enable = false;
-        # FIXME: This should be tied to if the system is using rocm or vulkan
-        package = pkgs.unstable.ollama-rocm;
-        host = "0.0.0.0";
-        openFirewall = true;
-        environmentVariables = {
-          OLLAMA_KEEP_ALIVE = "1h";
-          # Loading something like deepseek-r1:70b requires 40GB of RAM to
-          # transfer to the GPU, but system only has 32GB
-          GGML_CUDA_NO_PINNED = "1";
-        };
-      };
-
       systemd.tmpfiles.rules = [
         # Format: Type Path Mode UID GID Age Argument
         "d /var/lib/llm/models 0755 ${user} ${group} - -"
@@ -201,30 +254,21 @@ in
         openFirewall = !config.networking.granularFirewall.enable;
         port = ports.tcp.llama-swap;
 
-        settings =
-          let
-            llama-server = lib.getExe' llama-cpp "llama-server";
-          in
-          {
-            # Pre-download larger models and use -m if you don't want massive stalls
-            # high health check timeout prevents it dying mid-download
-            healthCheckTimeout = (time.minutes 60);
-            macros = {
-              # Systems using this atm are using AMD AI Max 395+ or AMD Ryzen AI 300
-              #   --jinja:    improve prompt correctness with marked-up prompt templates
-              #   --fa:       flash attention should speed up inference
-              "server" = "${llama-server} --port \${PORT} -fa on --jinja --no-webui";
-            };
+        settings = {
+          # Pre-download larger models and use -m if you don't want massive stalls
+          # high health check timeout prevents it dying mid-download
+          healthCheckTimeout = (time.minutes 60);
+          globalTTL = cfg.ttl;
 
-            models =
-              if lib.elem "all" cfg.models then
-                models
-              else
-                cfg.models
-                |> map (model: models.model)
-                # nixfmt hack
-                |> lib.mergeAttrslist;
-          };
+          models =
+            if lib.elem "all" cfg.models then
+              models
+            else
+              cfg.models
+              |> map (model: models.model)
+              # nixfmt hack
+              |> lib.mergeAttrslist;
+        };
       };
 
       # When using -hf for models, it will auto-download from HuggingFace to this cache path
@@ -233,13 +277,42 @@ in
           "LLAMA_CACHE" = cachePath;
           "HF_HOME" = modelsPath;
         };
-        serviceConfig.CacheDirectory = "llama-swap";
 
-        # Prevent '[ERROR] failed to read sys stats: couldn't read /proc/meminfo:' spam
+        # Some settings from https://github.com/blazed/cake/blob/ee606c/profiles/ai.nix#L256
         serviceConfig = {
-          # FIXME: Revisit this to figure out what is best for /proc/meminfo
-          ProtectProc = lib.mkForce "default";
+          LimitMEMLOCK = "infinity";
+          CacheDirectory = "llama-swap";
+          # The upstream module sets ProcSubset = "pid", which hides /proc/meminfo, /proc/stat
+          # and /proc/loadavg - the performance monitor's gopsutil reads need them. Relax it so
+          # system CPU/RAM/load metrics work (other processes stay hidden via ProtectProc).
+          # Fixes '[ERROR] failed to read sys stats: couldn't read /proc/meminfo:' spam
           ProcSubset = lib.mkForce "all";
+          Environment = [
+            # rocm-smi (GPU backend for the performance monitor) is appended to PATH.
+            "PATH=/run/current-system/sw/bin:${pkgs.rocmPackages.rocm-smi}/bin"
+            "LD_LIBRARY_PATH=/run/opengl-driver/lib:/run/opengl-driver-32/lib"
+            "XDG_CACHE_HOME=/var/cache"
+            # Use hipBLASLt GEMMs when loadable (rocBLAS falls back silently otherwise).
+            # FIXME: Investigate this
+            "ROCBLAS_USE_HIPBLASLT=1"
+          ]
+          ++
+            # Framework 16 1150
+            lib.optionals (config.networking.hostName == "ossa") [
+              # Avoid the buggy System Direct Memory Access (SDMA) copy path on unified memory.
+              "HSA_ENABLE_SDMA=0"
+              # Let ROCm allocate from the full unified-memory/GTT pool on this APU.
+              "GGML_CUDA_ENABLE_UNIFIED_MEMORY=1"
+              # Strix Point (gfx1150) ROCm tuning:
+              "HSA_OVERRIDE_GFX_VERSION=11.5.0"
+            ]
+          ++
+            # Beelink GR9
+            # NOTE: We have 96gb dedicated to GPU in bios, so no UMA
+            lib.optionals (config.networking.hostName == "oedo") [
+              # Strix Halo (gfx1151) ROCm tuning:
+              "HSA_OVERRIDE_GFX_VERSION=11.5.1"
+            ];
         };
       };
 
@@ -265,7 +338,6 @@ in
     (lib.mkIf cfg.enable {
       environment = lib.optionalAttrs config.introdus.impermanence.enable {
         persistence.${persistFolder}.directories = [
-          "/var/lib/ollama"
           modelsPath
           {
             # DynamicUser requires /var/cache/private

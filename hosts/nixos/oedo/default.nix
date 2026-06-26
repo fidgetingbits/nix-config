@@ -1,4 +1,8 @@
-# Dell Precision 5570
+# NOTE: Beelink GR9 BIOS dedicates 96gb to gpu and don't have the option to
+# go low and expose everything via GTT like on framework, so just leave it
+# dedicated.
+#
+# See BIOS setting: Advanced -> AMD CBS -> NBIO Common Options -> GFX Configuration
 {
   inputs,
   lib,
@@ -123,10 +127,15 @@
     wlans = [ "olan" ];
   };
 
-  ${namespace}.services.llama = {
-    enable = true;
-    allowedHosts = [ "ossa" ];
+  ${namespace} = {
+    services.llama = {
+      enable = true;
+      allowedHosts = [ "ossa" ];
+    };
   };
+  boot.kernelParams = [
+    "amd_iommu=off" # disables VFIO for local llm speed
+  ];
 
   modules.hardware.radeon.enable = true;
 

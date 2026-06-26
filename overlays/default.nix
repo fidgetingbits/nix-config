@@ -67,6 +67,7 @@ let
         neovim = final.unstable.neovim;
         neovide = final.unstable.neovide;
         vimPlugins = final.unstable.vimPlugins;
+        rocmPackages = final.unstable.rocmPackages;
       });
 
     # Override unstable entries exposed via pkgs.unstable

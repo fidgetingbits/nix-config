@@ -13,7 +13,7 @@ let
   # infer all the information from the llama-swap servers own settings
   models.providers = {
     ossa = {
-      baseUrl = "http://ossa::${toString osConfig.hostSpec.networking.ports.tcp.llama-swap}/v1";
+      baseUrl = "http://ossa:${toString osConfig.hostSpec.networking.ports.tcp.llama-swap}/v1";
       api = "openai-completions";
       apiKey = "foo";
       models = [
@@ -23,6 +23,19 @@ let
         }
       ];
     };
+    oedo = {
+      # +1 because we forward to a remote system on LAN atm
+      baseUrl = "http://ossa:${toString (osConfig.hostSpec.networking.ports.tcp.llama-swap + 1)}/v1";
+      api = "openai-completions";
+      apiKey = "foo";
+      models = [
+        {
+          id = "qwen3-coder:30b";
+          name = "Qwen 3 (30b Coder GGUF)";
+        }
+      ];
+    };
+
   };
 
   # FIXME: Make it easier to specify model/system
