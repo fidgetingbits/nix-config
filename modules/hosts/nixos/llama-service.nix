@@ -99,8 +99,12 @@ let
       sampling ? qwenSampling,
       mtp ? false,
       thinking ? true,
+      name ? "",
     }:
     {
+      meta = {
+        inherit name;
+      };
       # -m is local gguf file
       # -hf is direct download: <user>/<model>[:quant]
       # --no-mmap : Model might be larger than remaining system RAM
@@ -149,42 +153,51 @@ let
   genQ4KV = if isHalo then "f16" else "q8_0";
   models = {
     "qwen3.6:27b-mtp-q8" = mkModel {
+      name = "Qwen 3.6 27B MTP (8-bit High Precision)";
       hf = "unsloth/Qwen3.6-27B-MTP-GGUF:UD-Q8_K_XL";
       kv = "q8_0";
       mtp = true;
     };
     "qwen3.6:27b-mtp-q4" = mkModel {
+      name = "Qwen 3.6 27B MTP (4-bit Performance/Max Context)";
       hf = "unsloth/Qwen3.6-27B-MTP-GGUF:UD-Q4_K_XL";
       kv = genQ4KV;
       mtp = true;
     };
     "qwen3.6:35b-a3b-mtp-q4" = mkModel {
+      name = "Qwen 3.6 35B A3B MTP (4-bit Performance / Active Blocks)";
       hf = "unsloth/Qwen3.6-35B-A3B-MTP-GGUF:UD-Q4_K_XL";
       kv = genQ4KV;
       mtp = true;
     };
     "qwen3.6:35b-a3b-mtp-q8" = mkModel {
+      name = "Qwen 3.6 35B A3B MTP (8-bit High Precision / Active Blocks)";
       hf = "unsloth/Qwen3.6-35B-A3B-MTP-GGUF:UD-Q8_K_XL";
       kv = "q8_0";
       mtp = true;
     };
     "qwen3.6:27b-q8" = mkModel {
+      name = "Qwen 3.6 27B Standard (8-bit High Precision)";
       hf = "unsloth/Qwen3.6-27B-GGUF:UD-Q8_K_XL";
       kv = "q8_0";
     };
     "qwen3.6:27b-q4" = mkModel {
+      name = "Qwen 3.6 27B Standard (4-bit Performance/Max Context)";
       hf = "unsloth/Qwen3.6-27B-GGUF:UD-Q4_K_XL";
       kv = genQ4KV;
     };
     "qwen3.6:35b-a3b-q4" = mkModel {
+      name = "Qwen 3.6 35B A3B Standard (4-bit Performance / Active Blocks)";
       hf = "unsloth/Qwen3.6-35B-A3B-GGUF:UD-Q4_K_XL";
       kv = genQ4KV;
     };
     "qwen3.6:35b-a3b-q8" = mkModel {
+      name = "Qwen 3.6 35B A3B Standard (8-bit High Precision / Active Blocks)";
       hf = "unsloth/Qwen3.6-35B-A3B-GGUF:UD-Q8_K_XL";
       kv = "q8_0";
     };
     "gemma-4:31b-q6" = mkModel {
+      name = "Gemma 4 31B Instruct (6-bit Balanced / High Context)";
       hf = "unsloth/gemma-4-31B-it-GGUF:UD-Q6_K_XL";
       kv = "f16";
       ctx = 200000;
@@ -192,11 +205,28 @@ let
       thinking = false;
     };
     "gemma-4:26b-a4b-q6" = mkModel {
+      name = "Gemma 4 26B A4B Instruct (6-bit Balanced / Active Blocks)";
       hf = "unsloth/gemma-4-26B-A4B-it-GGUF:UD-Q6_K_XL";
       kv = "f16";
       ctx = 200000;
       sampling = gemmaSampling;
       thinking = false;
+    };
+
+    # Next Edit Suggestions
+    "qwen2.5-coder:1.5b-nes" = mkModel {
+      name = "Qwen 2.5 Coder 1.5B (Low Latency NES)";
+      hf = "unsloth/Qwen2.5-Coder-1.5B-Instruct-GGUF:Q8_0";
+      ctx = 4096;
+      kv = "f16";
+      # Inline completion must be highly deterministic to prevent syntax breakage
+      sampling = [
+        "--temp 0.0" # Greedy decoding: always pick the highest-probability token
+        "--top-k 1" # Locks selection to the single absolute best match
+        "--min-p 0.0" # Disable dynamic cutoffs; temp 0 handles it
+        "--repeat-penalty 1.0" # Disabled: prevents breaking repetitive code blocks like brackets
+        "--presence-penalty 0.0" # Disabled: allows necessary variable/syntax repetition
+      ];
     };
   };
 in

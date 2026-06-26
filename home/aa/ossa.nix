@@ -4,6 +4,7 @@
   lib,
   osConfig,
   inputs,
+  namespace,
   ...
 }:
 {
@@ -18,7 +19,8 @@
         # Optional common modules
         (map (f: "home/common/optional/${f}") [
           # Development
-          "agents.nix"
+          "llm/agents.nix"
+          "llm/utils.nix"
           "development"
           "aws.nix"
 
@@ -146,4 +148,16 @@
     };
   };
 
+  ${namespace}.pi.providers =
+    let
+      port = osConfig.hostSpec.networking.ports.tcp.llama-swap;
+      hosts = [
+        "oedo"
+        "ossa"
+      ];
+    in
+    map (host: {
+      name = host;
+      inherit host port;
+    }) hosts;
 }

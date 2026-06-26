@@ -1,47 +1,23 @@
 # Functionality common for microvm's running agent software
 {
-  pkgs,
   lib,
   inputs,
   osConfig,
   vmSpecs,
+  namespace,
   ...
 }:
-let
-  jsonFormat = pkgs.formats.json { };
-  # FIXME: de-duplicate this file with home/common/optional/agents.nix
-  models.providers = {
-    ossa = {
-      # FIXME: Need to pass ports from network into the vms, into vmSpecs I guess
-      baseUrl = "http://${vmSpecs.vm-lan.hosts.gateway.ip}:11435/v1";
-      api = "openai-completions";
-      apiKey = "foo";
-      models = [
-        {
-          id = "qwen3-vl:8b";
-          name = "Qwen 3 VL (8B Thinking GGUF)";
-        }
-      ];
-    };
-  };
-in
 {
   imports = lib.flatten [
     (map lib.custom.relativeToRoot [
+      "home/common/optional/llm/agents.nix"
+      "modules/home/pi-model-config.nix"
     ])
   ];
 
   home = {
     packages = lib.attrValues {
-      inherit (pkgs)
-        claude-code
-        claude-agent-acp
-        codex
-        codex-acp
-        crush
-        gemini-cli
-        pi-coding-agent
-        ;
+      # inherit (pkgs) ;
     };
     file =
       let
@@ -57,11 +33,21 @@ in
           })
           |> lib.mergeAttrsList;
       in
-      {
-        ".pi/agent/models.json".source = jsonFormat.generate "pi-coding-agent-models.json" models;
-      }
-      // genPrompts;
+      genPrompts;
   };
+
+  ${namespace}.pi.providers = [
+    {
+      name = "ossa";
+      host = vmSpecs.vm-lan.hosts.gateway.ip;
+      port = vmSpecs.ports.tcp.llama-swap;
+    }
+    {
+      name = "oedo";
+      host = vmSpecs.vm-lan.hosts.gateway.ip;
+      port = (vmSpecs.ports.tcp.llama-swap + 1);
+    }
+  ];
 
   programs = {
     zsh = {
@@ -69,6 +55,7 @@ in
         # Restricted microvm with no LAN access, so should be okay
         "claude" = "claude --dangerously-skip-permissions";
       };
+      # FIXME: These API keys should get abstracted by a proxy running on the host
       initContent =
         lib.mkAfter
           # bash

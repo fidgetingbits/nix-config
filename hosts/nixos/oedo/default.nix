@@ -133,9 +133,19 @@
       allowedHosts = [ "ossa" ];
     };
   };
-  boot.kernelParams = [
-    "amd_iommu=off" # disables VFIO for local llm speed
-  ];
+
+  boot.kernelParams =
+    let
+      # 96 GiB dedicated in BIOS
+      sz = toString ((96 * 1024 * 1024 * 1024) / 4096);
+    in
+    [
+      "amd_iommu=off" # disables VFIO for local llm speed
+      "amdttm.pages_limit=${sz}"
+      "amdttm.page_pool_size=${sz}"
+      "ttm.pages_limit=${sz}"
+      "ttm.page_pool_size=${sz}"
+    ];
 
   modules.hardware.radeon.enable = true;
 

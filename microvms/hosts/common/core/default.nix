@@ -12,6 +12,7 @@
   lib,
   pkgs,
   vmSpecs,
+  namespace,
   ...
 }:
 let
@@ -36,7 +37,14 @@ in
     home-manager = {
       useGlobalPkgs = true;
       useUserPackages = true;
-      extraSpecialArgs = { inherit user inputs vmSpecs; };
+      extraSpecialArgs = {
+        inherit
+          user
+          inputs
+          vmSpecs
+          namespace
+          ;
+      };
       users.${user} = {
         imports = (
           map lib.custom.relativeToRoot [
