@@ -19,14 +19,18 @@ in
         # Print all known information about all available OpenCL platforms and devices in the system
         clinfo
         # Top-like tool for viewing AMD Radeon GPU utilization
-        radeontop
+        radeontop # NOTE: Seems to struggle to detect strix halo chipset
+        amdgpu_top
         # Application to read current clocks of AMD Radeon cards
         radeon-profile
+        # Adds amd-ttm
+        amd-debug-tools
         ;
       inherit (pkgs.rocmPackages)
         # ROCm Application for Reporting System Info
         rocminfo
         rocm-smi
+        amdsmi
         ;
     };
   };
