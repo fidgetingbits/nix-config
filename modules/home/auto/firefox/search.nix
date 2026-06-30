@@ -12,7 +12,10 @@
     "crates.io" = {
       urls = [ { template = "https://crates.io/search?q={searchTerms}"; } ];
 
-      definedAliases = [ "@crates" ];
+      definedAliases = [
+        "@crates"
+        "@rc"
+      ];
     };
     "Rust Std" = {
       urls = [ { template = "https://doc.rust-lang.org/std/?search={searchTerms}"; } ];
@@ -46,7 +49,13 @@
     };
     "Hanzicraft" = {
       urls = [ { template = "https://hanzicraft.com/character/{searchTerms}"; } ];
+
       definedAliases = [ "@hc" ];
+    };
+    "openrouter" = {
+      urls = [ { template = "https://openrouter.ai/models?q={searchTerms}"; } ];
+
+      definedAliases = [ "@orm" ];
     };
   };
 }
