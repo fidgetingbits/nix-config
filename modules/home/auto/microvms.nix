@@ -51,6 +51,7 @@ lib.mkIf (lib.length (lib.attrNames osConfig.microvm.vms) != 0) {
       mv-restart = "function _mv-restart() { systemctl restart microvm@$1 }; _mv-restart";
       mv-status = "_mv-status";
       mv-status-all = "_mv-status-all";
+      mv-log = "_mv-log";
       mv-log-all = "_mv-log-all";
       mv-deps = "function _mv-deps() { systemctl list-dependencies \"microvm@$1.service\" }; _mv-deps";
       mv-list = "get_microvms";
@@ -102,6 +103,14 @@ lib.mkIf (lib.length (lib.attrNames osConfig.microvm.vms) != 0) {
             done
           };
 
+          function _mv-log() {
+            if [ $# < 1 ]; then
+              echo "Usage: mv-log <vm-name>"
+              exit 1
+            fi
+            journalctl -u microvm@$1.service
+          }
+
           function _mv-log-all() {
             local args=()
             for vm in $(get_microvms "$@"); do
@@ -140,6 +149,7 @@ lib.mkIf (lib.length (lib.attrNames osConfig.microvm.vms) != 0) {
               fi
             done
           }
+
 
           function _mv-bind() {
               MICROVM_SHARED_PATH=''${MICROVM_SHARED_PATH:-${sharedDir}}
