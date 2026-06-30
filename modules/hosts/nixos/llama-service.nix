@@ -213,9 +213,9 @@ let
       thinking = false;
     };
 
-    # Next Edit Suggestions
-    "qwen2.5-coder:1.5b-nes" = mkModel {
-      name = "Qwen 2.5 Coder 1.5B (Low Latency NES)";
+    # Fill-in-the-middle (FIM) aka Next Edit Suggestion (NES)
+    "qwen2.5-coder:1.5b-fim" = mkModel {
+      name = "Qwen 2.5 Coder 1.5B (Low Latency FIM)";
       hf = "unsloth/Qwen2.5-Coder-1.5B-Instruct-GGUF:Q8_0";
       ctx = 4096;
       kv = "f16";
