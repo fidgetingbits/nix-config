@@ -64,6 +64,7 @@ in
           sopsFile = "${sopsFolder}/development.yaml";
         };
         # LLM tokens, use agents.yaml since it's shared elsewhere
+        # FIXME: This should be automated and synced with other usages in config
         "tokens/openai" = {
           sopsFile = "${sopsFolder}/agents.yaml";
         };
@@ -76,6 +77,13 @@ in
         "tokens/deepseek" = {
           sopsFile = "${sopsFolder}/agents.yaml";
         };
+        "tokens/openrouter" = {
+          sopsFile = "${sopsFolder}/agents.yaml";
+        };
+        "tokens/nvidia" = {
+          sopsFile = "${sopsFolder}/agents.yaml";
+        };
+
       }
       // lib.optionalAttrs osConfig.hostSpec.isWork {
         # FIXME(secrets): Need an activation script to build a config.yml using multiple files (ie: work and personal)
