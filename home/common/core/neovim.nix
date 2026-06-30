@@ -1,6 +1,7 @@
 {
   lib,
   inputs,
+  config,
   osConfig,
   pkgs,
   ...
@@ -17,6 +18,37 @@
 
   wrappers.neovim = {
     package = pkgs.unstable.neovim-unwrapped;
+
+    # We need some sops-secret-based environment variables on development boxes, and
+    # won't inherit them from zsh since we are typically running neovide
+    # FIXME: This is now duplicated 3 places.. it should be templated somewhere?
+    env =
+      let
+        keys = {
+          ANTHROPIC_API_KEY = "anthropic";
+          OPENAI_API_KEY = "openai";
+          GEMINI_API_KEY = "google";
+          OPENROUTER_API_KEY = "openrouter";
+          DEEPSEEK_API_KEY = "deepseek";
+          NVIDIA_API_KEY = "nvidia";
+        };
+      in
+      (
+        keys
+        |> lib.attrNames
+        |> map (k: {
+          ${k} = {
+            data = ''"$(cat ${config.sops.secrets."tokens/${keys.${k}}".path})"'';
+            esc-fn = v: v;
+          };
+        })
+        |> lib.mergeAttrsList
+      )
+      // {
+        LLAMA_SWAP_API_KEY = {
+          data = "foo";
+        };
+      };
     settings =
       if osConfig.hostSpec.isIntrodusDev then
         {
