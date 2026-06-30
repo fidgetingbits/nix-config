@@ -162,8 +162,20 @@
     };
   };
 
+  networking.granularFirewall.enable = true;
+
+  # Only exposed to microvms, which is handled via allowedPorts in
+  # modules/hosts/nixos/microvms/network.nix rather than
+  # granularFirewall, as don't have way to specify interface yet
   ${namespace} = {
-    services.llama.enable = true;
+    services.llama = {
+      enable = true;
+      # Limit models to those that suit local Strix Point use
+      # See models set in modules/hosts/nixos/llama-service.nix for full list
+      models = [
+        "fim:qwen-1.5b"
+      ];
+    };
   };
 
   # See:

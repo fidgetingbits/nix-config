@@ -73,6 +73,7 @@ let
 
   ports = config.hostSpec.networking.ports;
 
+  # Check unsloth "Best Practices" section to find these
   qwenSampling = [
     "--temp 0.6"
     "--top-p 0.95"
@@ -95,7 +96,7 @@ let
     {
       hf,
       kv,
-      ctx ? 262144,
+      ctx ? 262144, # FIXME: Verify this default
       sampling ? qwenSampling,
       mtp ? false,
       thinking ? true,
@@ -118,9 +119,6 @@ let
           "--batch-size 4096"
           "--ubatch-size 2048"
           "--cache-reuse 256"
-          # FIXME: Could make this configurable
-          # "--threads 16"
-          # "--threads-batch 32"
           "--kv-unified"
           "-ngl 999"
           "-fa on"
@@ -151,6 +149,8 @@ let
   # NOTE: realistically don't run the ones that want f16 on ossa anyway,
   # but have it for benchmark testing
   genQ4KV = if isHalo then "f16" else "q8_0";
+  # IMPORTANT: These names are mirrored in neovim for minuet/codecompanion. If
+  # you change the naming scheme update. See lua/llms.lua
   models = {
     "qwen3.6:27b-mtp-q8" = mkModel {
       name = "Qwen 3.6 27B MTP (8-bit High Precision)";
@@ -159,7 +159,7 @@ let
       mtp = true;
     };
     "qwen3.6:27b-mtp-q4" = mkModel {
-      name = "Qwen 3.6 27B MTP (4-bit Performance/Max Context)";
+      name = "Qwen 3.6 27B MTP (4-bit Performance / Max Context)";
       hf = "unsloth/Qwen3.6-27B-MTP-GGUF:UD-Q4_K_XL";
       kv = genQ4KV;
       mtp = true;
@@ -182,7 +182,7 @@ let
       kv = "q8_0";
     };
     "qwen3.6:27b-q4" = mkModel {
-      name = "Qwen 3.6 27B Standard (4-bit Performance/Max Context)";
+      name = "Qwen 3.6 27B Standard (4-bit Performance / Max Context)";
       hf = "unsloth/Qwen3.6-27B-GGUF:UD-Q4_K_XL";
       kv = genQ4KV;
     };
@@ -196,6 +196,7 @@ let
       hf = "unsloth/Qwen3.6-35B-A3B-GGUF:UD-Q8_K_XL";
       kv = "q8_0";
     };
+
     "gemma-4:31b-q6" = mkModel {
       name = "Gemma 4 31B Instruct (6-bit Balanced / High Context)";
       hf = "unsloth/gemma-4-31B-it-GGUF:UD-Q6_K_XL";
@@ -213,13 +214,12 @@ let
       thinking = false;
     };
 
-    # Fill-in-the-middle (FIM) aka Next Edit Suggestion (NES)
-    "qwen2.5-coder:1.5b-fim" = mkModel {
+    # Fill-in-the-middle (FIM)
+    "fim:qwen-1.5b" = mkModel {
       name = "Qwen 2.5 Coder 1.5B (Low Latency FIM)";
       hf = "unsloth/Qwen2.5-Coder-1.5B-Instruct-GGUF:Q8_0";
       ctx = 4096;
       kv = "f16";
-      # Inline completion must be highly deterministic to prevent syntax breakage
       sampling = [
         "--temp 0.0" # Greedy decoding: always pick the highest-probability token
         "--top-k 1" # Locks selection to the single absolute best match
@@ -241,7 +241,7 @@ in
       };
 
       # FIXME: Add a check that the entries are inside cfg.hosts?
-      # FIXME: Note for microvms you need to add them manually elsewhere for now
+      # FIXME: Note for microvms you need to add them manually elsewhere for now because of interface
       allowedHosts = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [ ];
@@ -280,8 +280,8 @@ in
       # https://github.com/skissue/dotfiles/blob/main/hosts/windstorm/llama-swap.nix
       services.llama-swap = {
         enable = true;
-        listenAddress = "0.0.0.0"; # We listen here even if granularFirewall is off because microvms may talk to it
-        openFirewall = !config.networking.granularFirewall.enable;
+        listenAddress = "0.0.0.0";
+        openFirewall = false; # Use granualrFirewall or manual set microvm rules
         port = ports.tcp.llama-swap;
 
         settings = {
@@ -291,13 +291,7 @@ in
           globalTTL = cfg.ttl;
 
           models =
-            if lib.elem "all" cfg.models then
-              models
-            else
-              cfg.models
-              |> map (model: models.model)
-              # nixfmt hack
-              |> lib.mergeAttrslist;
+            if lib.elem "all" cfg.models then models else lib.filterAttrs (n: v: lib.elem n cfg.models) models;
         };
       };
 
@@ -346,7 +340,6 @@ in
         };
       };
 
-      # If you don't specify an allowed host, it will be localhost only
       networking.granularFirewall = lib.optionalAttrs ((lib.length cfg.allowedHosts) != 0) (
         let
           hosts = lib.map (d: cfg.hosts.${d}) cfg.allowedHosts;
