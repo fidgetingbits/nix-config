@@ -21,9 +21,9 @@
 
     # We need some sops-secret-based environment variables on development boxes, and
     # won't inherit them from zsh since we are typically running neovide
-    # FIXME: This is now duplicated 3 places.. it should be templated somewhere?
-    env =
+    env = lib.optionalAttrs osConfig.hostSpec.isDevelopment (
       let
+        # FIXME: This is now duplicated 3 places.. it should be templated somewhere?
         keys = {
           ANTHROPIC_API_KEY = "anthropic";
           OPENAI_API_KEY = "openai";
@@ -45,10 +45,22 @@
         |> lib.mergeAttrsList
       )
       // {
+        # FIXME: Some of this could be passed in nixInfo I think?
         LLAMA_SWAP_API_KEY = {
           data = "foo";
         };
-      };
+        LLAMA_SWAP_PORT = {
+          data = "${toString osConfig.hostSpec.networking.ports.tcp.llama-swap}";
+        };
+        OEDO = {
+          data = "oedo.${osConfig.hostSpec.domain}";
+        };
+        OSSA = {
+          data = "ossa.${osConfig.hostSpec.domain}";
+        };
+      }
+    );
+
     settings =
       if osConfig.hostSpec.isIntrodusDev then
         {

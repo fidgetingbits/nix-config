@@ -128,13 +128,14 @@
   };
 
   ${namespace} = {
-    services.llama = {
+    services.llama-swap = {
       enable = true;
       allowedHosts = [
         "ossa"
         "ooze" # Because we don't use NAT for wireguard atm, so roaming ossa will be this
+        "opia"
       ];
-      # See models set in modules/hosts/nixos/llama-service.nix for full list
+      # See models set in modules/hosts/nixos/llama-swap.nix for full list
       # Keep default ("all") for now, since everything should run on this box
       # FIXME: We should probably trim stuff that is "weak" and only for Strix Point
       # models = [

@@ -194,4 +194,7 @@ in
   wake-oppo = "ssh ooze 'wake-oppo'";
 
   count-extensions = "find . -type f | sed 's/.*\.//' | sort | uniq -c | sort -nr";
+
+  # Dump the llama-swap cache
+  llmls = "sudo ls /var/cache/llama-swap/ && ls /var/lib/llm/models/";
 }

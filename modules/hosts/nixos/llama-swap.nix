@@ -10,7 +10,7 @@
 let
 
   isHalo = config.networking.hostName == "oedo";
-  cfg = config.${namespace}.services.llama;
+  cfg = config.${namespace}.services.llama-swap;
   time = lib.custom.time;
   modelsPath = "/var/lib/llm/models";
   cachePath = "/var/cache/private/llama-swap";
@@ -96,7 +96,7 @@ let
     {
       hf,
       kv,
-      ctx ? 262144, # FIXME: Verify this default
+      ctx ? 262144,
       sampling ? qwenSampling,
       mtp ? false,
       thinking ? true,
@@ -112,7 +112,7 @@ let
       cmd = lib.concatStringsSep "\n" (
         [
           llama-server
-          # FIXME: Should tweak this for optional local models?
+          # FIXME: Should tweak this for optional pre-downloaded models with -m
           "-hf ${hf}"
           "--port \${PORT}"
           "--ctx-size ${toString ctx}"
@@ -145,68 +145,79 @@ let
     };
 
   # Strix Halo box has more available ram for f16 kv cache,
-  # but stick to q8 on Strix Point
-  # NOTE: realistically don't run the ones that want f16 on ossa anyway,
-  # but have it for benchmark testing
-  genQ4KV = if isHalo then "f16" else "q8_0";
+  # but stick to q8 on Strix Point. Need to test how much
+  # this actually matters in practice
+  genKV = if isHalo then "f16" else "q8_0";
   # IMPORTANT: These names are mirrored in neovim for minuet/codecompanion. If
   # you change the naming scheme update. See lua/llms.lua
   models = {
-    "qwen3.6:27b-mtp-q8" = mkModel {
-      name = "Qwen 3.6 27B MTP (8-bit High Precision)";
-      hf = "unsloth/Qwen3.6-27B-MTP-GGUF:UD-Q8_K_XL";
-      kv = "q8_0";
-      mtp = true;
+    ### UNTESTED ###
+
+    ### TESTED ###
+
+    ##
+    # QWEN
+    ##
+
+    # strix halo: pp 71.79 t/s, tg 58.24 t/s
+    # strix point: pp 36.59 t/s, tg 20.18 t/s
+    "qwen3.6:coder-30b-a3b-q6" = mkModel {
+      name = "Qwen 3.6 Coder 30B (Light)";
+      hf = "unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q6_K_XL";
+      kv = "f16";
+      sampling = [
+        "--temp 0.7"
+        "--top_p 0.95"
+        "--top_k 20 "
+      ];
+      thinking = false;
     };
-    "qwen3.6:27b-mtp-q4" = mkModel {
-      name = "Qwen 3.6 27B MTP (4-bit Performance / Max Context)";
-      hf = "unsloth/Qwen3.6-27B-MTP-GGUF:UD-Q4_K_XL";
-      kv = genQ4KV;
-      mtp = true;
-    };
+
+    # strix halo: pp 73.48 t/s, tg 68.41 t/s
+    # strix point:
     "qwen3.6:35b-a3b-mtp-q4" = mkModel {
-      name = "Qwen 3.6 35B A3B MTP (4-bit Performance / Active Blocks)";
+      name = "Qwen 3.6 General 35B Q4 (Light)";
       hf = "unsloth/Qwen3.6-35B-A3B-MTP-GGUF:UD-Q4_K_XL";
-      kv = genQ4KV;
+      kv = genKV;
       mtp = true;
     };
+
+    # strix halo: pp 71.48 t/s, tg 59.11 t/s
+    # strix point:
     "qwen3.6:35b-a3b-mtp-q8" = mkModel {
-      name = "Qwen 3.6 35B A3B MTP (8-bit High Precision / Active Blocks)";
+      name = "Qwen 3.6 General 35B Q8 (Light)";
       hf = "unsloth/Qwen3.6-35B-A3B-MTP-GGUF:UD-Q8_K_XL";
       kv = "q8_0";
       mtp = true;
     };
-    "qwen3.6:27b-q8" = mkModel {
-      name = "Qwen 3.6 27B Standard (8-bit High Precision)";
-      hf = "unsloth/Qwen3.6-27B-GGUF:UD-Q8_K_XL";
-      kv = "q8_0";
-    };
-    "qwen3.6:27b-q4" = mkModel {
-      name = "Qwen 3.6 27B Standard (4-bit Performance / Max Context)";
-      hf = "unsloth/Qwen3.6-27B-GGUF:UD-Q4_K_XL";
-      kv = genQ4KV;
-    };
-    "qwen3.6:35b-a3b-q4" = mkModel {
-      name = "Qwen 3.6 35B A3B Standard (4-bit Performance / Active Blocks)";
-      hf = "unsloth/Qwen3.6-35B-A3B-GGUF:UD-Q4_K_XL";
-      kv = genQ4KV;
-    };
-    "qwen3.6:35b-a3b-q8" = mkModel {
-      name = "Qwen 3.6 35B A3B Standard (8-bit High Precision / Active Blocks)";
-      hf = "unsloth/Qwen3.6-35B-A3B-GGUF:UD-Q8_K_XL";
-      kv = "q8_0";
+
+    # strix halo: pp 40.73 t/s, tg 19.73 t/s
+    # strix point:
+    "qwen3.6:27b-mtp-q4" = mkModel {
+      name = "Qwen 3.6 General 27B (Heavy)";
+      hf = "unsloth/Qwen3.6-27B-MTP-GGUF:UD-Q4_K_XL";
+      kv = genKV;
+      mtp = true;
     };
 
-    "gemma-4:31b-q6" = mkModel {
-      name = "Gemma 4 31B Instruct (6-bit Balanced / High Context)";
-      hf = "unsloth/gemma-4-31B-it-GGUF:UD-Q6_K_XL";
+    # strix halo: pp 695.34 t/s, tg 106.98 t/s
+    # strix point: pp 379.23 t/s, tg 36.51 t/s
+    "fim:qwen-1.5b" = mkModel {
+      name = "Qwen 2.5 Coder 1.5B (Ultra Light)";
+      hf = "unsloth/Qwen2.5-Coder-1.5B-Instruct-GGUF:Q8_0";
+      ctx = 4096;
       kv = "f16";
-      ctx = 200000;
-      sampling = gemmaSampling;
-      thinking = false;
+      sampling = qwenSampling;
     };
+
+    ##
+    # GEMMA
+    ##
+
+    # strix halo: pp 96.89 t/s, tg 42.02 t/s
+    # strix point: pp 43.88 t/s, tg 14.73 t/s
     "gemma-4:26b-a4b-q6" = mkModel {
-      name = "Gemma 4 26B A4B Instruct (6-bit Balanced / Active Blocks)";
+      name = "Gemma 4 26B (Light)";
       hf = "unsloth/gemma-4-26B-A4B-it-GGUF:UD-Q6_K_XL";
       kv = "f16";
       ctx = 200000;
@@ -214,26 +225,21 @@ let
       thinking = false;
     };
 
-    # Fill-in-the-middle (FIM)
-    "fim:qwen-1.5b" = mkModel {
-      name = "Qwen 2.5 Coder 1.5B (Low Latency FIM)";
-      hf = "unsloth/Qwen2.5-Coder-1.5B-Instruct-GGUF:Q8_0";
-      ctx = 4096;
+    # strix halo: pp 57.31 t/s, tg 7.41 t/s
+    "gemma-4:31b-q6" = mkModel {
+      name = "Gemma 4 31B (Super Heavy)";
+      hf = "unsloth/gemma-4-31B-it-GGUF:UD-Q6_K_XL";
       kv = "f16";
-      sampling = [
-        "--temp 0.0" # Greedy decoding: always pick the highest-probability token
-        "--top-k 1" # Locks selection to the single absolute best match
-        "--min-p 0.0" # Disable dynamic cutoffs; temp 0 handles it
-        "--repeat-penalty 1.0" # Disabled: prevents breaking repetitive code blocks like brackets
-        "--presence-penalty 0.0" # Disabled: allows necessary variable/syntax repetition
-      ];
+      ctx = 200000;
+      sampling = gemmaSampling;
+      thinking = false;
     };
   };
 in
 {
   options = {
-    ${namespace}.services.llama = {
-      enable = lib.mkEnableOption "Run llama AI services";
+    ${namespace}.services.llama-swap = {
+      enable = lib.mkEnableOption "Enable llama-swap";
       ttl = lib.mkOption {
         type = lib.types.int;
         default = 0; # Persist

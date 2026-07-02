@@ -168,13 +168,15 @@
   # modules/hosts/nixos/microvms/network.nix rather than
   # granularFirewall, as don't have way to specify interface yet
   ${namespace} = {
-    services.llama = {
+    services.llama-swap = {
       enable = true;
       # Limit models to those that suit local Strix Point use
-      # See models set in modules/hosts/nixos/llama-service.nix for full list
-      models = [
-        "fim:qwen-1.5b"
-      ];
+      # See models set in modules/hosts/nixos/llama-swap.nix for full list
+      # models = [
+      #   "fim:qwen-1.5b"
+      #   "gemma-4:26b-a4b-q6"
+      #   "qwen3.6:coder-30b-a3b-q6"
+      # ];
     };
   };
 

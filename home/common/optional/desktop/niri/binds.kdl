@@ -164,11 +164,20 @@ binds {
     Super+Shift+J {
         move-window-down
     }
-    Super+Shift+k {
+    Super+Shift+K {
+        move-window-up
+    }
+    Super+Shift+K {
         move-window-up
     }
     Super+Shift+L {
         move-column-right
+    }
+    Super+Control+J {
+        move-window-down-or-to-workspace-down
+    }
+    Super+Control+K {
+        move-window-up-or-to-workspace-up
     }
     Super+Semicolon hotkey-overlay-title="Move window to column left" {
         consume-or-expel-window-left
