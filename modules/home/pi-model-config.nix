@@ -36,7 +36,7 @@ in
             baseUrl = "http://${host}:${toString port}/v1";
             api = "openai-completions";
             apiKey = "foo";
-            models = lib.mapAttrsToList (k: v: mkModel k v.meta.name) models;
+            models = lib.mapAttrsToList (k: v: mkModel k k) models;
           };
         };
       models.providers = lib.mergeAttrsList (map (provider: genModels provider) cfg.providers);

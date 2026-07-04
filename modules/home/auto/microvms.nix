@@ -104,7 +104,7 @@ lib.mkIf (lib.length (lib.attrNames osConfig.microvm.vms) != 0) {
           };
 
           function _mv-log() {
-            if [ $# < 1 ]; then
+            if [ $# -lt 1 ]; then
               echo "Usage: mv-log <vm-name>"
               exit 1
             fi

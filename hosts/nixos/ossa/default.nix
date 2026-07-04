@@ -170,6 +170,9 @@
   ${namespace} = {
     services.llama-swap = {
       enable = true;
+      preload = [
+        "Qwen 2.5 Coder 1.5B (Ultra Light)"
+      ];
       # Limit models to those that suit local Strix Point use
       # See models set in modules/hosts/nixos/llama-swap.nix for full list
       # models = [

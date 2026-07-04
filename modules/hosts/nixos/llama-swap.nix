@@ -100,12 +100,10 @@ let
       sampling ? qwenSampling,
       mtp ? false,
       thinking ? true,
-      name ? "",
+      alias ? "",
     }:
     {
-      meta = {
-        inherit name;
-      };
+      aliases = lib.optional ((lib.stringLength alias) != 0) alias;
       # -m is local gguf file
       # -hf is direct download: <user>/<model>[:quant]
       # --no-mmap : Model might be larger than remaining system RAM
@@ -151,18 +149,13 @@ let
   # IMPORTANT: These names are mirrored in neovim for minuet/codecompanion. If
   # you change the naming scheme update. See lua/llms.lua
   models = {
-    ### UNTESTED ###
-
-    ### TESTED ###
-
     ##
     # QWEN
     ##
 
     # strix halo: pp 71.79 t/s, tg 58.24 t/s
     # strix point: pp 36.59 t/s, tg 20.18 t/s
-    "qwen3.6:coder-30b-a3b-q6" = mkModel {
-      name = "Qwen 3.6 Coder 30B (Light)";
+    "Qwen 3.6 Coder 30B (Light)" = mkModel {
       hf = "unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q6_K_XL";
       kv = "f16";
       sampling = [
@@ -171,43 +164,44 @@ let
         "--top_k 20 "
       ];
       thinking = false;
+      alias = "qwen3.6:coder-30b-a3b-q6";
     };
 
     # strix halo: pp 73.48 t/s, tg 68.41 t/s
-    # strix point:
-    "qwen3.6:35b-a3b-mtp-q4" = mkModel {
-      name = "Qwen 3.6 General 35B Q4 (Light)";
+    # strix point: pp 41.37 t/s, tg 18.67 t/s
+    "Qwen 3.6 General 35B Q4 (Light)" = mkModel {
       hf = "unsloth/Qwen3.6-35B-A3B-MTP-GGUF:UD-Q4_K_XL";
       kv = genKV;
       mtp = true;
+      alias = "qwen3.6:35b-a3b-mtp-q4";
     };
 
     # strix halo: pp 71.48 t/s, tg 59.11 t/s
     # strix point:
-    "qwen3.6:35b-a3b-mtp-q8" = mkModel {
-      name = "Qwen 3.6 General 35B Q8 (Light)";
+    "Qwen 3.6 General 35B Q8 (Light)" = mkModel {
       hf = "unsloth/Qwen3.6-35B-A3B-MTP-GGUF:UD-Q8_K_XL";
       kv = "q8_0";
       mtp = true;
+      alias = "qwen3.6:35b-a3b-mtp-q8";
     };
 
     # strix halo: pp 40.73 t/s, tg 19.73 t/s
     # strix point:
-    "qwen3.6:27b-mtp-q4" = mkModel {
-      name = "Qwen 3.6 General 27B (Heavy)";
+    "Qwen 3.6 General 27B (Heavy)" = mkModel {
       hf = "unsloth/Qwen3.6-27B-MTP-GGUF:UD-Q4_K_XL";
       kv = genKV;
       mtp = true;
+      alias = "qwen3.6:27b-mtp-q4";
     };
 
     # strix halo: pp 695.34 t/s, tg 106.98 t/s
     # strix point: pp 379.23 t/s, tg 36.51 t/s
-    "fim:qwen-1.5b" = mkModel {
-      name = "Qwen 2.5 Coder 1.5B (Ultra Light)";
+    "Qwen 2.5 Coder 1.5B (Ultra Light)" = mkModel {
       hf = "unsloth/Qwen2.5-Coder-1.5B-Instruct-GGUF:Q8_0";
       ctx = 4096;
       kv = "f16";
       sampling = qwenSampling;
+      alias = "fim:qwen-1.5b";
     };
 
     ##
@@ -216,23 +210,23 @@ let
 
     # strix halo: pp 96.89 t/s, tg 42.02 t/s
     # strix point: pp 43.88 t/s, tg 14.73 t/s
-    "gemma-4:26b-a4b-q6" = mkModel {
-      name = "Gemma 4 26B (Light)";
+    "Gemma 4 26B (Light)" = mkModel {
       hf = "unsloth/gemma-4-26B-A4B-it-GGUF:UD-Q6_K_XL";
       kv = "f16";
       ctx = 200000;
       sampling = gemmaSampling;
       thinking = false;
+      alias = "gemma-4:26b-a4b-q6";
     };
 
     # strix halo: pp 57.31 t/s, tg 7.41 t/s
-    "gemma-4:31b-q6" = mkModel {
-      name = "Gemma 4 31B (Super Heavy)";
+    "Gemma 4 31B (Super Heavy)" = mkModel {
       hf = "unsloth/gemma-4-31B-it-GGUF:UD-Q6_K_XL";
       kv = "f16";
       ctx = 200000;
       sampling = gemmaSampling;
       thinking = false;
+      alias = "gemma-4:31b-q6";
     };
   };
 in
@@ -265,6 +259,12 @@ in
         default = [ "all" ];
         description = "Set of models you want to enable from the following (or \"all\" for everything): ${lib.attrNames models}";
       };
+      preload = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [ ];
+        description = "List of models to preload on startup";
+      };
+
     };
   };
 
@@ -298,7 +298,10 @@ in
 
           models =
             if lib.elem "all" cfg.models then models else lib.filterAttrs (n: v: lib.elem n cfg.models) models;
+
+          hooks.on_startup.preload = cfg.preload;
         };
+
       };
 
       # When using -hf for models, it will auto-download from HuggingFace to this cache path
