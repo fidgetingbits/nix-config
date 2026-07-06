@@ -37,7 +37,13 @@ in
 
   environment = lib.optionalAttrs config.introdus.impermanence.enable {
     persistence."${config.hostSpec.persistFolder}" = {
-      directories = [ config.services.hister.dataDir ];
+      directories = [
+        {
+          directory = config.services.hister.dataDir;
+          user = "hister";
+          group = "hister";
+        }
+      ];
     };
   };
 

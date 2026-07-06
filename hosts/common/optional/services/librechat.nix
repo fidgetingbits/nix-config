@@ -10,8 +10,7 @@ let
 in
 {
   services.librechat = {
-    # enable = true;
-    enable = false;
+    enable = true;
     enableLocalDB = true;
     env = {
       HOST = "127.0.0.1";
@@ -29,6 +28,7 @@ in
       OPENROUTER_API_KEY = config.sops.secrets."tokens/openrouter".path;
     };
     settings = {
+      version = "1.3.13"; # https://www.librechat.ai/changelog/
       endpoints = {
         custom = [
           {
@@ -87,11 +87,7 @@ in
   environment = lib.optionalAttrs config.introdus.impermanence.enable {
     persistence."${config.hostSpec.persistFolder}" = {
       directories = [
-        {
-          directory = config.services.librechat.dataDir;
-          user = "hister";
-          group = "hister";
-        }
+        config.services.librechat.dataDir
       ];
     };
   };
