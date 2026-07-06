@@ -288,6 +288,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    hister = {
+      url = "github:asciimoo/hister";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     talon-nix = {
       url = "github:fidgetingbits/talon-nix?ref=overrides";
       inputs.nixpkgs.follows = "nixpkgs";

@@ -1,11 +1,15 @@
-{ lib, ... }:
+{ config, lib, ... }:
 {
   networking.useDHCP = lib.mkForce true;
+
   services.resolved = {
     enable = true;
     settings.Resolve = {
       LLMNR = "false"; # Prevent listening on 0.0.0.0:5355 as we don't need multicast DNS on LAN
-      Domains = [ "~." ];
+      Domains = [
+        "${config.hostSpec.domain}"
+        "~."
+      ];
       # dnssec breaks on ogre
       # dnssec = "true";
     };

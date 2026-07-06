@@ -100,6 +100,7 @@ let
       sampling ? qwenSampling,
       mtp ? false,
       thinking ? true,
+      embedding ? false,
       alias ? "",
     }:
     {
@@ -138,6 +139,9 @@ let
         ]
         ++ lib.optionals thinking [
           "--chat-template-kwargs '{\"preserve_thinking\":true}'"
+        ]
+        ++ lib.optionals embedding [
+          "--embedding"
         ]
       );
     };
@@ -201,7 +205,7 @@ let
       ctx = 4096;
       kv = "f16";
       sampling = qwenSampling;
-      alias = "fim:qwen-1.5b";
+      alias = "qwen2.5:coder-1.5b-q8";
     };
 
     ##
@@ -227,6 +231,16 @@ let
       sampling = gemmaSampling;
       thinking = false;
       alias = "gemma-4:31b-q6";
+    };
+
+    "Nomic Embeddings" = mkModel {
+      hf = "nomic-ai/nomic-embed-text-v1.5-GGUF:F16";
+      kv = "f16";
+      ctx = 8192; # Nomic v1.5's native max context window
+      sampling = [ ];
+      thinking = false;
+      embedding = true;
+      alias = "nomic-embed-text";
     };
   };
 in
@@ -300,6 +314,23 @@ in
             if lib.elem "all" cfg.models then models else lib.filterAttrs (n: v: lib.elem n cfg.models) models;
 
           hooks.on_startup.preload = cfg.preload;
+
+          # Define which models can be co-resident in memory
+          # https://github.com/mostlygeek/llama-swap/issues/643
+          # FIXME: This will differ on oedo vs ossa
+          matrix = {
+            vars = {
+              # "qh" = "qwen3.6:27b-mtp-q4";
+              "ql" = "Qwen 3.6 General 35B Q8 (Light)";
+              "qul" = "Qwen 2.5 Coder 1.5B (Ultra Light)";
+              "net" = "Nomic Embeddings";
+            };
+
+            sets = {
+              standard = "ql & qul & net";
+              # heavy = "qh & qul & net";
+            };
+          };
         };
 
       };
@@ -341,7 +372,7 @@ in
             ]
           ++
             # Beelink GR9
-            # NOTE: We have 96gb dedicated to GPU in bios, so no UMA
+            # NOTE: Has 96gb dedicated to GPU set in bios, so no UMA
             lib.optionals (config.networking.hostName == "oedo") [
               # Strix Halo (gfx1151) ROCm tuning:
               "HSA_OVERRIDE_GFX_VERSION=11.5.1"

@@ -132,7 +132,9 @@
       enable = true;
       allowedHosts = [
         "ossa"
-        "ooze" # Because we don't use NAT for wireguard atm, so roaming ossa will be this
+        # Because we don't use NAT for wireguard atm, so roaming ossa will be this
+        # Also used for semantic search for hister, etc
+        "ooze"
         "opia"
       ];
       # See models set in modules/hosts/nixos/llama-swap.nix for full list

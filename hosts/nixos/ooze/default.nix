@@ -49,6 +49,9 @@ in
           "services/mattermost" # chat notifications
           # "services/nitter.nix" # ad-less twitter front-end
           "services/paperless.nix" # document management
+          "services/hister.nix" # local document search
+          "services/librechat.nix" # llm webui
+          "services/searx.nix"
 
           "acme.nix"
           "remote-builder.nix"
@@ -121,6 +124,9 @@ in
 
   # FIXME: I think this is generic elsewhere?
   networking.useDHCP = lib.mkDefault true;
+  # FIXME: Not sure why I have to manually do this on ooze and not oppo
+  networking.nameservers = [ config.hostSpec.networking.subnets.olan.gateway ];
+  networking.search = [ "${config.hostSpec.domain}" ];
 
   ${namespace} = {
     wireguard =
@@ -146,6 +152,6 @@ in
   # This enables immich service with ML offload to oedo
   services.immichML = {
     enable = true;
-    remoteMachineLearningHost = "oedo";
+    remoteMachineLearningHost = "oedo.${config.hostSpec.domain}";
   };
 }
