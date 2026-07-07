@@ -1,0 +1,8 @@
+binds {
+    Super+Ctrl+j {
+        move-window-down-or-to-workspace-down
+    }
+    Super+Ctrl+k {
+        move-window-up-or-to-workspace-up
+    }
+}

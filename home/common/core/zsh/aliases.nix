@@ -56,7 +56,8 @@ in
   nbp = "nix-build -E 'with import <nixpkgs> {}; pkgs.callPackage ./package.nix {}'"; # nbp: nix build package
   nrp = "nix run -E 'with import <nixpkgs> {}; pkgs.callPackage ./package.nix {}'"; # nrp: nix run package
   nswp = "nix shell nixpkgs#"; # nsw: nix shell with package
-  nlg = "sudo nix profile history --profile /nix/var/nix/profiles/system";
+  nlg = "sudo nix-env --list-generations --profile /nix/var/nix/profiles/system"; # nlg: list generation
+  nlgc = "sudo nix-env --list-generations --profile /nix/var/nix/profiles/system | grep current "; # nlgc: list generation current
   ncs = "REPO_PATH=$PWD nh os switch --no-nom . -- --impure"; # ncs = nix config switch
   nrepl = ''
     nix repl --option experimental-features "flakes pipe-operators" \
@@ -197,4 +198,7 @@ in
 
   # Dump the llama-swap cache
   llmls = "sudo ls /var/cache/llama-swap/ && ls /var/lib/llm/models/";
+
+  # Show battery output
+  battery = "upower -i /org/freedesktop/UPower/devices/battery_BAT1";
 }

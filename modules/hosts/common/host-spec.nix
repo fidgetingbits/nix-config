@@ -258,6 +258,11 @@
           default = config.hostSpec.isAMDGpu && (!config.hostSpec.useVulkan);
           description = "On systems with AMD GPUs indicates if we should use rocm or vulkan";
         };
+        isMultiMonitor = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = "Indicates if a host uses multiple monitors";
+        };
       };
     };
   };

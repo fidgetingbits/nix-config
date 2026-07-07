@@ -349,7 +349,8 @@ noctalia-backup:
     # A noctalia update can cause an IPC incompatibility that requires restart, but restart wipes
     # recent settings changes that may have happened and have not yet been caught by noctalia-snapshot-settings
     # service. A precautionary measure, since it's happened at least once before.
-    noctalia-shell ipc call state all | jq -S .settings > ~/.cache/noctalia/backup/settings_pre_rebuild.json
+    # NOTE: If something is broken in the build, this might fail on rebuilds, but not pressing, so just ignore
+    noctalia-shell ipc call state all | jq -S .settings > ~/.cache/noctalia/backup/settings_pre_rebuild.json 2>/dev/null || true
 
 # Diff current settings against the last rebuild backup
 [group("noctalia")]

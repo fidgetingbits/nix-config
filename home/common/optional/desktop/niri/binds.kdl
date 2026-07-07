@@ -31,21 +31,6 @@ binds {
         toggle-overview
     }
     //
-    // ========== Monitor actions ==========
-    //
-    Super+Ctrl+h hotkey-overlay-title="Focus monitor left" {
-        focus-monitor-left
-    }
-    Super+Ctrl+j hotkey-overlay-title="Focus monitor down" {
-        focus-monitor-down
-    }
-    Super+Ctrl+k hotkey-overlay-title="Focus monitor up" {
-        focus-monitor-up
-    }
-    Super+Ctrl+l hotkey-overlay-title="Focus monitor right" {
-        focus-monitor-right
-    }
-    //
     // ========== Workspace actions ==========
     //
     // ========== Focus workspace ==========
@@ -167,17 +152,8 @@ binds {
     Super+Shift+K {
         move-window-up
     }
-    Super+Shift+K {
-        move-window-up
-    }
     Super+Shift+L {
         move-column-right
-    }
-    Super+Control+J {
-        move-window-down-or-to-workspace-down
-    }
-    Super+Control+K {
-        move-window-up-or-to-workspace-up
     }
     Super+Semicolon hotkey-overlay-title="Move window to column left" {
         consume-or-expel-window-left
@@ -190,18 +166,6 @@ binds {
     }
     Super+Shift+BracketRight hotkey-overlay-title="Move column to last" {
         move-column-to-last
-    }
-    Super+Ctrl+Shift+H hotkey-overlay-title="Move window to monitor left" {
-        move-window-to-monitor-left
-    }
-    Super+Ctrl+Shift+J hotkey-overlay-title="Move window to monitor down" {
-        move-window-to-monitor-down
-    }
-    Super+Ctrl+Shift+K hotkey-overlay-title="Move window to monitor up" {
-        move-window-to-monitor-up
-    }
-    Super+Ctrl+Shift+L hotkey-overlay-title="Move window to monitor right" {
-        move-window-to-monitor-right
     }
     // ========== Window Tabs ==========
     // Use `consume-or-expel-...` binds above to add/remove windows to a tabbed column
