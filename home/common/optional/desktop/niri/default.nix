@@ -49,7 +49,7 @@ in
             ./binds.kdl
             ./rules.kdl
             ./config.kdl
-            (if osConfig.hostSpec.isMultiMonitor then ./multi-monitor-binds.kdl else ./single-monitor-binds.kdl)
+            # (if osConfig.hostSpec.isMultiMonitor then ./multi-monitor-binds.kdl else ./single-monitor-binds.kdl)
           ]
           |> lib.concatMapStringsSep "\n" lib.readFile;
 

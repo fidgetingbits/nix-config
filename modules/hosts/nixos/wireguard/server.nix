@@ -30,10 +30,12 @@ lib.mkIf (cfg.enable && cfg.role == "server") {
       inherit (cfg) externalInterface;
     };
 
-    firewall.allowedUDPPorts = [
-      cfg.wireguardPort
-      cfg.rosenpassPort
-    ];
+    firewall = {
+      allowedUDPPorts = [
+        cfg.wireguardPort
+        cfg.rosenpassPort
+      ];
+    };
 
     wireguard = {
       interfaces = {

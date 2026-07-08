@@ -17,6 +17,7 @@ let
   cfg = config.${namespace}.microvms;
 
   user = config.hostSpec.primaryUsername;
+  hasMicrovms = lib.length (lib.attrNames config.microvm.vms) != 0;
 in
 {
   # NOTE: See ./vpn.nix for additional sub option
@@ -57,7 +58,8 @@ in
     ./vpn.nix
   ];
 
-  config = lib.mkIf (lib.length (lib.attrNames config.microvm.vms) != 0) {
+  config = lib.mkIf hasMicrovms {
+
     systemd.tmpfiles.rules = [
       "d ${cfg.sharedDir}               0750 ${config.hostSpec.primaryUsername} users -"
       "d ${cfg.sharedDir}/shared        0750 ${config.hostSpec.primaryUsername} users -"
