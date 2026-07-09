@@ -16,6 +16,7 @@ let
   o-lan = subnets.o-lan;
   inherit (lib.custom.network) triplet lastOctet;
   genWireguardIP = host: "${triplet wg-lan.cidr}.${lastOctet o-lan.hosts.${host}.ip}/32";
+  vmBridge = config.${namespace}.microvms.vmBridge;
 in
 {
   # We run a wireguard server that exposes access to the microvms to ossa/opia. It
@@ -69,6 +70,17 @@ in
       }
     '';
   };
+
+  # We need to inject a routing policy to avoid the vpn
+  # FIXME: could just loop over every host we want to share the vm network for?
+  systemd.network.networks."20-${vmBridge}".routingPolicyRules = [
+    {
+      From = config.${namespace}.microvms.vmLan.cidr;
+      To = inputs.self.nixosConfigurations.ossa.config.${namespace}.microvms.vmLan.cidr;
+      Table = "main";
+      Priority = 998;
+    }
+  ];
 
   sops.secrets = {
     "keys/wireguard/wgsk" = {

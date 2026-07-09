@@ -40,6 +40,7 @@ in
             Table = "main";
             Priority = 999;
           }
+
           # Route everything else over VPN if enabled
           # FIXME: This could move to vpn.nix, but then we'd need to track/sync the rule name
           (lib.optionalAttrs cfg.vpn.enable {

@@ -24,6 +24,7 @@ let
   o-lan = subnets.o-lan;
   inherit (lib.custom.network) triplet lastOctet;
   genWireguardIP = host: "${triplet wg-lan.cidr}.${lastOctet o-lan.hosts.${host}.ip}/32";
+  vmBridge = config.${namespace}.microvms.vmBridge;
 in
 {
   networking.networkmanager.enable = true;
@@ -88,10 +89,20 @@ in
     nftables.ruleset = ''
       table inet vm_routing {
         chain forward {
-          iifname "${config.${namespace}.microvms.vmBridge}" oifname "wg-microvms" accept
-          iifname "wg-microvms" oifname "${config.${namespace}.microvms.vmBridge}" accept
+          iifname "${vmBridge}" oifname "wg-microvms" accept
+          iifname "wg-microvms" oifname "${vmBridge}" accept
         }
       }
     '';
   };
+
+  # We need to inject a routing policy to avoid the vpn
+  systemd.network.networks."20-${vmBridge}".routingPolicyRules = [
+    {
+      From = config.${namespace}.microvms.vmLan.cidr;
+      To = inputs.self.nixosConfigurations.oedo.config.${namespace}.microvms.vmLan.cidr;
+      Table = "main";
+      Priority = 998;
+    }
+  ];
 }
