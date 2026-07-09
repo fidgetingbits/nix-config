@@ -25,7 +25,7 @@ lib.mkIf cfg.isAdmin {
     ];
     ykNoDomainHosts = [
       "oath_gitlab"
-      cfg.networking.subnets.olan.wildcard
+      cfg.networking.subnets.o-lan.wildcard
     ]
     ++ lib.optional cfg.isWork secrets.work.git.servers;
     # Extra git servers that take yubikey auth and user git
@@ -48,7 +48,7 @@ lib.mkIf cfg.isAdmin {
       # anything that isn't running ssh, but that's better than listing it all
       # manually imo
       olanSubnetHosts =
-        osConfig.hostSpec.networking.subnets.olan.hosts
+        osConfig.hostSpec.networking.subnets.o-lan.hosts
         |> lib.attrNames
         |> lib.filter (name: !(lib.elem name nixosHostNames));
       extraSubnetEntries =
@@ -124,5 +124,5 @@ lib.mkIf cfg.isAdmin {
         StrictHostKeyChecking = "no";
       };
     }
-    // (extraSubnetEntries olanSubnetHosts "olan");
+    // (extraSubnetEntries olanSubnetHosts "o-lan");
 }

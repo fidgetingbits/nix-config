@@ -10,7 +10,7 @@ let
   net = config.hostSpec.networking;
 
   # FIXME: Somehow check "home" LAN of a host rather than hardcode
-  subnet = net.subnets.olan;
+  subnet = net.subnets.o-lan;
   inherit (config.hostSpec)
     isLocal
     isRoaming

@@ -10,11 +10,11 @@ let
   ports = networking.ports;
   llamaSwapPort = ports.tcp.llama-swap;
   oedoLlamaSwapPort = (ports.tcp.llama-swap + 1);
-  olan = subnets.olan;
+  olan = subnets.o-lan;
   nanoSpecs = rec {
-    vm-lan = subnets.nlan;
+    vm-lan = subnets.n-lan;
     hostAuthorizedKeys = [
-      subnets.olan.hosts.${config.networking.hostName}.sshPubKey
+      olan.hosts.${config.networking.hostName}.sshPubKey
     ];
     inherit (vm-lan.hosts.nano) ip;
     name = "nano";
@@ -65,7 +65,7 @@ in
   # Setup some custom rules for forwarding to oedo llama-swap
   networking.nftables.ruleset =
     let
-      vmBridge = "vbr-microvms";
+      inherit (config.${namespace}.microvms) vmBridge;
     in
     ''
       table inet vm_routing {

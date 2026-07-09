@@ -155,7 +155,7 @@ in
 
   # systemctl services
   # FIXME: This needs to be smarter, like showing the first script or the second if it's bash, so a function
-  sc-cat-script = "f() { cat $(sc-cat $@ | grep ExecStart | awk '{print \$2}') }; f";
+  sc-cat-script = "f() { cat $(sc-cat $@ | grep ExecStart | cut -f2 -d= }; f";
 
   # journalctl
   # SYSTEMD_LESS=FRX prevents line truncation
@@ -201,4 +201,8 @@ in
 
   # Show battery output
   battery = "upower -i /org/freedesktop/UPower/devices/battery_BAT1";
+
+  # networking
+  traceroute = "tracepath";
+  tp = "tracepath";
 }

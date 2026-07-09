@@ -17,7 +17,6 @@ let
   cfg = config.${namespace}.microvms;
 
   user = config.hostSpec.primaryUsername;
-  hasMicrovms = lib.length (lib.attrNames config.microvm.vms) != 0;
 in
 {
   # NOTE: See ./vpn.nix for additional sub option
@@ -47,7 +46,6 @@ in
     };
     vmLan = lib.mkOption {
       type = lib.types.attrsOf lib.types.anything;
-      default = config.hostSpec.networking.subnets.nlan;
       description = "The attrset describing the network the microvms live on";
     };
   };
@@ -58,7 +56,7 @@ in
     ./vpn.nix
   ];
 
-  config = lib.mkIf hasMicrovms {
+  config = lib.mkIf (lib.length (lib.attrNames config.microvm.vms) != 0) {
 
     systemd.tmpfiles.rules = [
       "d ${cfg.sharedDir}               0750 ${config.hostSpec.primaryUsername} users -"

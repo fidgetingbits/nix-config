@@ -11,6 +11,7 @@ let
   cfg = config.${namespace}.wireguard;
 
   mkWireguardPeer = role: host: {
+    inherit (host) name;
     publicKey = host.wireguardPubKey;
     allowedIPs = cfg.allowedIPs;
     endpoint = "${cfg.endpoint}:${toString cfg.wireguardPort}";

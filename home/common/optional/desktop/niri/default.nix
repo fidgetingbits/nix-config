@@ -26,7 +26,7 @@ let
   };
 in
 {
-  imports = [ ../wlogout.nix ];
+  # imports = [ ../wlogout.nix ];
   home = {
     packages =
       lib.attrValues {

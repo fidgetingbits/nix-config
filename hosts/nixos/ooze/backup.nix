@@ -1,5 +1,5 @@
 # Orchestrate additional backup mirroring logic for
-# non-declarative hosts on olan
+# non-declarative hosts on o-lan
 
 # This is a wrapper around borg-backup-paths that allows us to backup folders
 # from the nas, but from ooze. This allows us to be more declarative,

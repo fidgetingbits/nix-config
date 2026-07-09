@@ -124,7 +124,7 @@
   # isRoaming and isRemote
   wifi = {
     enable = true;
-    wlans = [ "olan" ];
+    wlans = [ "o-lan" ];
   };
 
   ${namespace} = {
@@ -168,7 +168,7 @@
 
   services.immichML =
     let
-      hosts = config.hostSpec.networking.subnets.olan.hosts;
+      hosts = config.hostSpec.networking.subnets.o-lan.hosts;
     in
     {
       enable = true;
@@ -200,4 +200,5 @@
   #     };
   #   };
   # };
+
 }

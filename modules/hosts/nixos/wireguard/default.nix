@@ -1,7 +1,8 @@
 # Implement a PQ-safe client/server wireguard VPN. It is not entirely generic
 # so it may not just work without some tweaks.
 #
-# Depends on helper functions from [introdus](https://codeberg.org/fidgetingbits/introdus/src/branch/main/lib/network.nix)
+# Depends on helper functions from
+# [introdus](https://codeberg.org/fidgetingbits/introdus/src/branch/main/lib/network.nix)
 #
 {
   config,

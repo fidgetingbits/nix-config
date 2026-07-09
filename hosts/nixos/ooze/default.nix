@@ -12,7 +12,7 @@ let
     runtimeInputs = [ pkgs.wakeonlan ];
     text =
       let
-        oppo = config.hostSpec.networking.subnets.olan.hosts.oppo;
+        oppo = config.hostSpec.networking.subnets.o-lan.hosts.oppo;
       in
       "wakeonlan ${lib.elemAt oppo.mac 0} -i ${oppo.ip}";
   };
@@ -125,7 +125,7 @@ in
   # FIXME: I think this is generic elsewhere?
   networking.useDHCP = lib.mkDefault true;
   # FIXME: Not sure why I have to manually do this on ooze and not oppo
-  networking.nameservers = [ config.hostSpec.networking.subnets.olan.gateway ];
+  networking.nameservers = [ config.hostSpec.networking.subnets.o-lan.gateway ];
   networking.search = [ "${config.hostSpec.domain}" ];
 
   ${namespace} = {
@@ -141,11 +141,12 @@ in
           "ossa"
           "opia"
         ];
-        hosts = net.subnets.olan.hosts;
+        hosts = net.subnets.o-lan.hosts;
         wireguardPort = net.ports.udp.wireguard;
         rosenpassPort = net.ports.udp.rosenpass;
         rosenpassExempt = [ "opia" ];
-        subnet = net.subnets.olan.wireguard.subnet;
+        # FIXME: this wireguard thing should possibly be it's own subnet rather than a sub-subnet of o-lan? get's confusing with other wireguard networks
+        subnet = net.subnets.o-lan.wireguard.subnet;
       };
   };
 

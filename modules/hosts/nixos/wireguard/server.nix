@@ -10,11 +10,14 @@ let
   genWireguardIP = host: "${triplet cfg.subnet}.${lastOctet cfg.hosts.${host}.ip}/32";
 
   mkWireguardPeer = role: host: {
+    inherit (host) name;
     publicKey =
       assert lib.assertMsg (host.wireguardPubKey != "") "peer must have valid key";
       host.wireguardPubKey;
     allowedIPs = [ (genWireguardIP host.name) ];
   };
+
+  # FIXME: Need a way for subnet/hosts to get passed to mkWireguardPeer, if we want to abstract this
   mkWireguardPeers = role: hosts: (map (host: mkWireguardPeer role host) hosts);
 in
 lib.mkIf (cfg.enable && cfg.role == "server") {

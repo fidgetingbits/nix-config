@@ -265,7 +265,7 @@ in
       hosts = lib.mkOption {
         type = lib.types.attrsOf lib.types.anything;
         # FIXME: Give an example of what this attrSet layout is or create a type
-        default = config.hostSpec.networking.subnets.olan.hosts;
+        default = config.hostSpec.networking.subnets.o-lan.hosts;
         description = "Attribute set of hosts used to lookup allowedHosts";
       };
       models = lib.mkOption {

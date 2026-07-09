@@ -182,9 +182,14 @@ binds {
     Super+R hotkey-overlay-title="Switch preset column width" {
         switch-preset-column-width
     }
-    // Presets are defined in rules.kdl
-    Super+Shift+R hotkey-overlay-title="Switch preset column height" {
+    Super+Shift+R hotkey-overlay-title="Switch preset column width back " {
+        switch-preset-column-width-back
+    }
+    Super+U hotkey-overlay-title="Switch preset window height" {
         switch-preset-window-height
+    }
+    Super+Shift+U hotkey-overlay-title="Switch preset window height back" {
+        switch-preset-window-height-back
     }
     Super+F hotkey-overlay-title="Toggle fullscreen" {
         fullscreen-window

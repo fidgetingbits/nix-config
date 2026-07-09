@@ -75,7 +75,7 @@ in
         let
           # FIXME: Make this an option
           hosts = lib.attrValues {
-            inherit (config.hostSpec.networking.subnets.olan.hosts)
+            inherit (config.hostSpec.networking.subnets.o-lan.hosts)
               oppo
               ossa
               # opia

@@ -1,102 +1,89 @@
-# FIXME(network): Revisit this now that oedo has changed
 {
-  #  inputs,
-  #  namespace,
-  #secrets,
-  #lib,
+  inputs,
+  config,
+  lib,
+  namespace,
   ...
 }:
+let
+  secretsFolder = lib.toString inputs.nix-secrets;
+  sopsFolder = secretsFolder + "/sops/";
+  hostName = config.networking.hostName;
+  wireguardPort = 51820;
+
+  subnets = config.hostSpec.networking.subnets;
+  wg-lan = subnets.agent-lan;
+  o-lan = subnets.o-lan;
+  inherit (lib.custom.network) triplet lastOctet;
+  genWireguardIP = host: "${triplet wg-lan.cidr}.${lastOctet o-lan.hosts.${host}.ip}/32";
+in
 {
+  # We run a wireguard server that exposes access to the microvms to ossa/opia. It
+  # also allows connectivity between the microvms on oedo and ossa. Unlike wireguard
+  # for remote o-lan access, I don't use rosenpass for this.
 
-  #  ${namespace} = {
-  #    cifs-mounts = {
-  #      enable = true;
-  #      sopsFile = (lib.toString inputs.nix-secrets) + "/sops/olan.yaml";
-  #      mounts = [
-  #        {
-  #          name = "onus";
-  #        }
-  #        {
-  #          name = "oath";
-  #        }
-  #      ];
-  #    };
-  #  };
+  boot.kernel.sysctl = {
+    "net.ipv4.ip_forward" = 1;
+  };
 
-  # FIXME(network): Ideally this should be done using the networking.interfaces approach, but doesn't seem to work...
-  # In the interfaces change due to me using usb dongles, we should explicitly test if they interface being used is
-  # assign to an IP address that we expect to be the one we want their route for
-  # FIXME: re-enable eventually
-  # networking.dhcpcd.wait = "background";
-  #  networking.dhcpcd.runHook =
-  #    let
-  #      network = secrets.networking;
-  #    in
-  #    ''
-  #      if [ "$reason" = "BOUND" ]; then
-  #        if [ "$new_ip_address" = "${network.subnets.ogre.hosts.oedo.ip}" ]; then
-  #          ${lib.getBin pkgs.iproute2}/bin/ip route add \
-  #            ${network.subnets.lab.cidr} \
-  #            via ${network.subnets.olan.hosts.ottr.ip} \
-  #            dev $interface \
-  #            2>>/tmp/error
-  #        fi
-  #        # ${lib.getBin pkgs.iproute2}/bin/ip route add \
-  #        #   ${network.subnets.lab.cidr} \
-  #        #   via ${network.subnets.olan.hosts.ottr.ip} \
-  #        #   dev enp0s20f0u1u4 \
-  #        #   2>>/tmp/error
-  #    '';
+  networking = {
+    firewall = {
+      allowedUDPPorts = [
+        wireguardPort
+      ];
+    };
 
-  # not working...
-  # Setup custom routes for the lab
-  #  networking.interfaces =
-  #    let
-  #      interfaceNames = [
-  #        "enp0s13f0u1u1"
-  #        "wlp0s20f3"
-  #      ];
-  #      labRoute = {
-  #        address = secrets.networking.subnets.lab.ip;
-  #        prefixLength = secrets.networking.subnets.lab.prefixLength;
-  #        via = secrets.networking.subnets.olan.hosts.ottr.ip;
-  #      };
-  #      interfaceRoutes = lib.attrsets.mergeAttrsList (
-  #        lib.map (name: { ${name}.ipv4.routes = [ labRoute ]; }) interfaceNames
-  #      );
-  #    in
-  #    lib.trace lib.trace interfaceRoutes;
+    wireguard = {
+      interfaces = {
+        wg-microvms = {
+          listenPort = wireguardPort;
+          privateKeyFile = config.sops.secrets."keys/wireguard/wgsk".path;
+          ips = [ (genWireguardIP hostName) ];
+          peers = [
+            {
+              name = "ossa";
+              publicKey = o-lan.hosts.ossa.wireguardPubKey;
+              allowedIPs = [
+                (genWireguardIP "ossa")
+                subnets.n-lan.cidr # Ossa's microvms
+              ];
+            }
+            {
+              name = "opia";
+              publicKey = o-lan.hosts.opia.wireguardPubKey;
+              allowedIPs = [
+                (genWireguardIP "opia")
+              ];
+            }
+          ];
+        };
+      };
+    };
 
-  # FIXME: Double check these after
-  #  networking.interfaces.enp196s0f0.ipv4.routes = [
-  #    {
-  #      address = secrets.networking.subnets.lab.ip;
-  #      prefixLength = secrets.networking.subnets.lab.prefixLength;
-  #      via = secrets.networking.subnets.olan.hosts.ottr.ip;
-  #    }
-  #  ];
-  #
-  #  networking.interfaces.wlp193s0.ipv4.routes = [
-  #    {
-  #      address = secrets.networking.subnets.lab.ip;
-  #      prefixLength = secrets.networking.subnets.lab.prefixLength;
-  #      via = secrets.networking.subnets.olan.hosts.ottr.ip;
-  #    }
-  #  ];
+    nftables.ruleset = ''
+      table inet vm_routing {
+        chain forward {
+          iifname "${config.${namespace}.microvms.vmBridge}" oifname "wg-microvms" accept
+          iifname "wg-microvms" oifname "${config.${namespace}.microvms.vmBridge}" accept
+        }
+      }
+    '';
+  };
 
-  # WARNING: This prevented your internet from working...
-  #systemd.network = {
-  #  enable = true;
-  #  links."10-eth0" = {
-  #    linkConfig.Name = "eth0";
-  #    matchConfig.MACAddress = config.hostSpec.networking.foo;
-  #  };
-  #  links."11-wlan0" = {
-  #    linkConfig.Name = "wlan0";
-  #    matchConfig.MACAddress = config.hostSpec.networking.bar;
-  #  };
-  #};
-  #systemd.network.wait-online.ignoredInterfaces = [ "wlan0" ];
-  #systemd.services.NetworkManager-wait-online.enable = false;
-  #systemd.services.systemd-networkd-wait-online.enable = false;
+  sops.secrets = {
+    "keys/wireguard/wgsk" = {
+      sopsFile = "${sopsFolder}/${hostName}.yaml";
+    };
+  };
+
+  # FIXME: Not sure this is needed, but living from wireguard/default.nix
+  systemd.services.wireguard-wg-microvms = {
+    preStart = ''
+      echo "Waiting for default network gateway..."
+      until ip route show default | grep -q default; do
+        sleep 1
+      done
+      echo "Gateway found, proceeding."
+    '';
+  };
 }
