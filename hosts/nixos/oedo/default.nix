@@ -132,8 +132,7 @@
       enable = true;
       allowedHosts = [
         "ossa"
-        # Because we don't use NAT for wireguard atm, so roaming ossa will be this
-        # Also used for semantic search for hister, etc
+        # ATM roaming systems will appear as ooze when routing via wireguard
         "ooze"
         "opia"
       ];
@@ -145,6 +144,15 @@
       # ];
     };
   };
+
+  networking.granularFirewall.allowedRules.llama-swap.hosts =
+    let
+      inherit (config.hostSpec.networking) subnets;
+    in
+    [
+      { ip = subnets.n-lan.cidr; }
+      { ip = subnets.p-lan.cidr; }
+    ];
 
   boot.kernelParams =
     let

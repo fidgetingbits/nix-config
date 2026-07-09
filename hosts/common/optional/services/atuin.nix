@@ -9,14 +9,14 @@
       # currently due to granularFirewall not supporting darwin and nftables yet
       cfg = config.networking.granularFirewall;
       granularFirewallRules = lib.mkIf cfg.enable {
-        networking.granularFirewall.allowedRules = [
-          {
+        networking.granularFirewall.allowedRules = {
+          atuin = {
             serviceName = "atuin";
             protocol = "tcp";
             ports = [ atuinPort ];
             hosts = config.hostSpec.networking.rules.${config.hostSpec.hostName}.atuinAllowedHosts;
-          }
-        ];
+          };
+        };
       };
       regularFirewallRules = lib.mkIf (cfg.enable == false) {
         networking.firewall.allowedTCPPorts = [ atuinPort ];

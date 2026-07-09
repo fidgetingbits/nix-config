@@ -386,14 +386,13 @@ in
         in
         {
           enable = true;
-          allowedRules = [
-            {
-              serviceName = "llama-swap";
+          allowedRules = {
+            llama-swap = {
               protocol = "tcp";
               ports = [ ports.tcp.llama-swap ];
               inherit hosts;
-            }
-          ];
+            };
+          };
         }
       );
     })

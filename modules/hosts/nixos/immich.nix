@@ -71,7 +71,7 @@ in
       ];
 
       # FIXME: This somehow breaks because of "opia" reference?
-      networking.granularFirewall =
+      networking.granularFirewall.allowedRules.immich =
         let
           # FIXME: Make this an option
           hosts = lib.attrValues {
@@ -83,15 +83,9 @@ in
           };
         in
         {
-          # enable = true;
-          allowedRules = [
-            {
-              serviceName = "immich";
-              protocol = "tcp";
-              ports = [ ports.tcp.immich ];
-              inherit hosts;
-            }
-          ];
+          protocol = "tcp";
+          ports = [ ports.tcp.immich ];
+          inherit hosts;
         };
     })
 
@@ -116,14 +110,13 @@ in
 
       networking.granularFirewall = {
         enable = true;
-        allowedRules = [
-          {
-            serviceName = "immich-ml";
+        allowedRules = {
+          immich-ml = {
             protocol = "tcp";
             ports = [ ports.tcp.immich-ml ];
             hosts = cfg.immichServers;
-          }
-        ];
+          };
+        };
       };
 
       environment = lib.optionalAttrs config.introdus.impermanence.enable {

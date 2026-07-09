@@ -35,23 +35,21 @@ let
   ports = config.hostSpec.networking.ports;
 
   granularFirewallRules = lib.mkIf firewallCfg.enable {
-    networking.granularFirewall.allowedRules = [
-      {
-        serviceName = "syncthing";
+    networking.granularFirewall.allowedRules = {
+      syncthing-tcp = {
         protocol = "tcp";
         ports = [ ports.tcp.syncthing.sync ];
         inherit hosts;
-      }
-      {
-        serviceName = "syncthing";
+      };
+      syncthing-udp = {
         protocol = "udp";
         ports = [
           ports.udp.syncthing.sync
           ports.udp.syncthing.discovery
         ];
         inherit hosts;
-      }
-    ];
+      };
+    };
   };
   regularFirewallRules = lib.mkIf (firewallCfg.enable == false) {
     networking.firewall.allowedTCPPorts = [ ports.tcp.syncthing.sync ];

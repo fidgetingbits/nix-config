@@ -39,22 +39,24 @@ in
   options.networking.granularFirewall = {
     enable = lib.mkEnableOption "Enable granular firewall rules";
     allowedRules = lib.mkOption {
-      type = types.listOf portConfigType;
-      default = [ ];
-      description = "List of ports and IPs to allow connections from";
+      type = types.attrsOf portConfigType;
+      default = { };
+      description = "Set of ports and IPs to allow connections from";
     };
   };
   config = lib.mkIf cfg.enable {
-    networking.firewall.extraInputRules = lib.concatMapStringsSep "\n" (
-      rule:
-      let
-        ipList = "{ ${lib.concatStringsSep ", " (map (h: h.ip) rule.hosts)} }";
-        portList = "{ ${lib.concatStringsSep ", " (map toString rule.ports)} }";
-      in
-      ''
-        ip saddr ${ipList} ${rule.protocol} dport ${portList} accept comment "Allow ${rule.serviceName}"
-        ${rule.protocol} dport ${portList} drop comment "Deny others to ${rule.serviceName}"
-      ''
-    ) cfg.allowedRules;
+    networking.firewall.extraInputRules = lib.concatStringsSep "\n" (
+      lib.mapAttrsToList (
+        serviceName: rule:
+        let
+          ipList = "{ ${lib.concatStringsSep ", " (map (h: h.ip) rule.hosts)} }";
+          portList = "{ ${lib.concatStringsSep ", " (map toString (lib.unique rule.ports))} }";
+        in
+        ''
+          ip saddr ${ipList} ${rule.protocol} dport ${portList} accept comment "Allow ${rule.serviceName}"
+          ${rule.protocol} dport ${portList} drop comment "Deny others to ${rule.serviceName}"
+        ''
+      ) cfg.allowedRules
+    );
   };
 }

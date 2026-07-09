@@ -6,6 +6,9 @@
   namespace,
   ...
 }:
+let
+  inherit (config.hostSpec.networking) ports subnets;
+in
 {
   imports = lib.flatten [
     inputs.nixos-hardware.nixosModules.framework-16-amd-ai-300-series
@@ -182,6 +185,28 @@
       # ];
     };
   };
+
+  networking.nftables.tables.llama-swap-extra-hosts = {
+    enable = true;
+    family = "inet";
+    content = ''
+      chain early-input-allow {
+        type filter hook input priority -150; policy accept;
+        ip saddr {${subnets.n-lan.cidr},${subnets.p-lan.cidr}} tcp dport ${toString ports.tcp.llama-swap} accept
+      }
+    '';
+  };
+  # networking.nftables.ruleset =
+  #   let
+  #     inherit (config.${namespace}.microvms) vmBridge;
+  #   in
+  #   ''
+  #     table inet nixos-fw {
+  #       chain input-allow {
+  #         ip saddr {${subnets.n-lan.cidr},${subnets.p-lan.cidr}} tcp dport ${toString ports.tcp.llama-swap} accept
+  #       }
+  #     }
+  #   '';
 
   # See:
   #  https://www.jeffgeerling.com/blog/2025/increasing-vram-allocation-on-amd-ai-apus-under-linux/

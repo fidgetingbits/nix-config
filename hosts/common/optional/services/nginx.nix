@@ -6,9 +6,8 @@ let
   # currently due to granularFirewall not supporting darwin and nftables yet
   cfg = config.networking.granularFirewall;
   granularFirewallRules = lib.mkIf cfg.enable {
-    networking.granularFirewall.allowedRules = [
-      {
-        serviceName = "nginx";
+    networking.granularFirewall.allowedRules = {
+      nginx = {
         protocol = "tcp";
         ports = [ nginxPort ];
         hosts =
@@ -24,8 +23,8 @@ let
                 ip = "127.0.0.1";
               }
             ];
-      }
-    ];
+      };
+    };
   };
   regularFirewallRules = lib.mkIf (cfg.enable == false) {
     networking.firewall.allowedTCPPorts = [ nginxPort ];

@@ -36,16 +36,17 @@
       genPrompts;
   };
 
+  # The two providers are on wireguard network together, so we use their ips
   ${namespace}.pi.providers = [
     {
       name = "ossa";
-      host = vmSpecs.vm-lan.hosts.gateway.ip;
+      host = vmSpecs.vm-lan.hosts.ossa.ip;
       port = vmSpecs.ports.tcp.llama-swap;
     }
     {
       name = "oedo";
-      host = vmSpecs.vm-lan.hosts.gateway.ip;
-      port = (vmSpecs.ports.tcp.llama-swap + 1);
+      host = vmSpecs.vm-lan.hosts.oedo.ip;
+      port = vmSpecs.ports.tcp.llama-swap;
     }
   ];
 
