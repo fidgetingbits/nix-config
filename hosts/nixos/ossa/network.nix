@@ -92,15 +92,29 @@ in
           iifname "${vmBridge}" oifname "wg-microvms" accept
           iifname "wg-microvms" oifname "${vmBridge}" accept
         }
+
+        # Need explicit rules for now. Mark is handled by nixos-fw injection
+        # FIXME: Switch to genAllowRemoteInputs style thing for either VM, so this can auto generate...
+        chain input {
+          type filter hook input priority filter - 5; policy accept;
+          iifname "wg-microvms" ip saddr ${subnets.p-lan.cidr} tcp dport ${toString ports.tcp.llama-swap} meta mark set 0x00000001
+        }
       }
     '';
   };
 
   # We need to inject a routing policy to avoid the vpn
+  # NOTE: This is duplicated with oedo, so could put somewhere shared
   systemd.network.networks."20-${vmBridge}".routingPolicyRules = [
     {
       From = config.${namespace}.microvms.vmLan.cidr;
       To = inputs.self.nixosConfigurations.oedo.config.${namespace}.microvms.vmLan.cidr;
+      Table = "main";
+      Priority = 998;
+    }
+    {
+      From = config.${namespace}.microvms.vmLan.cidr;
+      To = config.hostSpec.networking.subnets.agent-lan.cidr;
       Table = "main";
       Priority = 998;
     }

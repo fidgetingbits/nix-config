@@ -1,3 +1,4 @@
+# NOTE: This file is for managing the microvm from the HOST side
 {
   config,
   namespace,
@@ -61,10 +62,9 @@ in
 
     # Outbound NAT only for packets going out the proton vpn
     # Allow established traffic for host -> microvm ssh session
-    networking.nftables =
+    networking =
       let
-        # Add all of the allowed tcp/udp ports for a given VM to the host
-        # FIXME: What if a compromised VM maliciously changes it's ip?
+        # Add all of the allowed tcp/udp ports for a given VM to the host, and drop everything else
         vms = config.microvm.vms;
         genAllowedInputs =
           vms
@@ -87,38 +87,60 @@ in
           )
           |> lib.flatten
           |> lib.concatStringsSep "\n";
+        microvmMark = "0x01";
       in
+
       {
-        enable = true;
-        # FIXME: The vm_routing part should only be added for vpn in vpn.nix?
-        ruleset = ''
-          table inet nixos-fw {
-            chain input-allow {
-              ${genAllowedInputs}
+        nftables = {
+          enable = true;
+          # FIXME: The vm_routing part should only be added for vpn in vpn.nix?
+
+          ruleset = ''
+            table inet microvm-input {
+              chain input {
+                # Run before nixos-fw input chain so we can drop anything not whitelisted
+                # for this interface in advance
+                type filter hook input priority filter - 5; policy accept;
+
+                # Mark packets coming from vmBridge
+                # FIXME: Change this mark value to a define
+                meta iifname "${vmBridge}" mark set ${microvmMark}
+
+                ${genAllowedInputs}
+                ${lib.concatStringsSep "\n" cfg.extraInputRules}
+
+
+                # Anything not explicitly allowed above gets dropped
+                iifname "${vmBridge}" drop
+              }
             }
-          }
 
-          table inet vm_routing {
-            chain output {
-              type filter hook output priority filter;
-              oifname "${vmBridge}" accept
+            table inet vm_routing {
+              chain output {
+                type filter hook output priority filter;
+                oifname "${vmBridge}" accept
+              }
+
+              chain forward {
+                type filter hook forward priority filter; policy drop;
+
+                # Allow established internet traffic back to the VM
+                ct state established,related accept
+
+                # Allow the VM to route outbound traffic to the VPN interface
+                iifname "${vmBridge}" oifname "${vpnCfg.ifname}" accept
+              }
+
+              chain postrouting {
+                type nat hook postrouting priority srcnat; policy accept;
+                oifname "${vpnCfg.ifname}" masquerade
+              }
             }
-
-            chain forward {
-              type filter hook forward priority filter; policy drop;
-
-              # Allow established internet traffic back to the VM
-              ct state established,related accept
-
-              # Allow the VM to route outbound traffic to the VPN interface
-              iifname "${vmBridge}" oifname "${vpnCfg.ifname}" accept
-            }
-
-            chain postrouting {
-              type nat hook postrouting priority srcnat; policy accept;
-              oifname "${vpnCfg.ifname}" masquerade
-            }
-          }
+          '';
+        };
+        firewall.extraInputRules = ''
+          # Accept packets marked by microvm-input
+          meta mark ${microvmMark} accept
         '';
       };
   };

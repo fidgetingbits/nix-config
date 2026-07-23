@@ -7,7 +7,7 @@
   ...
 }:
 let
-  inherit (config.hostSpec.networking) ports subnets;
+  inherit (config.hostSpec.networking) subnets;
 in
 {
   imports = lib.flatten [
@@ -186,28 +186,6 @@ in
     };
   };
 
-  networking.nftables.tables.llama-swap-extra-hosts = {
-    enable = true;
-    family = "inet";
-    content = ''
-      chain early-input-allow {
-        type filter hook input priority -150; policy accept;
-        ip saddr {${subnets.n-lan.cidr},${subnets.p-lan.cidr}} tcp dport ${toString ports.tcp.llama-swap} accept
-      }
-    '';
-  };
-  # networking.nftables.ruleset =
-  #   let
-  #     inherit (config.${namespace}.microvms) vmBridge;
-  #   in
-  #   ''
-  #     table inet nixos-fw {
-  #       chain input-allow {
-  #         ip saddr {${subnets.n-lan.cidr},${subnets.p-lan.cidr}} tcp dport ${toString ports.tcp.llama-swap} accept
-  #       }
-  #     }
-  #   '';
-
   # See:
   #  https://www.jeffgeerling.com/blog/2025/increasing-vram-allocation-on-amd-ai-apus-under-linux/
   #  https://github.com/ROCm/ROCm/issues/5562#issuecomment-3452179504
@@ -228,4 +206,8 @@ in
       "ttm.pages_limit=${sz}"
       "ttm.page_pool_size=${sz}"
     ];
+
+  networking.hosts = {
+    ${subnets.grove.hosts.moth.ip} = [ "moth.${config.hostSpec.domain}" ];
+  };
 }

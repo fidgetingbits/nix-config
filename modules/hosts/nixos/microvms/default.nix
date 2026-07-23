@@ -36,9 +36,6 @@ in
         config.${namespace}.microvms.sharedDir
       } where all VMs have a shared folder";
     };
-
-    # FIXME: Eventually if we have microvms across networks, this will have to
-    # get rethought
     vmBridge = lib.mkOption {
       type = lib.types.str;
       default = "vbr-microvms";
@@ -47,6 +44,43 @@ in
     vmLan = lib.mkOption {
       type = lib.types.attrsOf lib.types.anything;
       description = "The attrset describing the network the microvms live on";
+    };
+
+    extraInputRules = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      description = "Extra firewall rules to be added for the microvm network";
+    };
+
+    # FIXME: Finish this
+    remoteAllowedPorts = lib.mkOption {
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            # FIXME: Make this a type that allows set to be generated
+            interface = lib.mkOption {
+              type = lib.types.str;
+              description = "The ingress interface (e.g., wg-microvms)";
+            };
+            # FIXME: Make this a type that allows set to be generated
+            source = lib.mkOption {
+              type = lib.types.str;
+              description = "The source CIDR (e.g., 10.0.7.0/24)";
+            };
+            proto = lib.mkOption {
+              type = lib.types.str;
+              default = "tcp";
+              description = "tcp or udp";
+            };
+            # FIXME: Make this a type that allows set to be generated
+            port = lib.mkOption {
+              type = lib.types.int;
+              description = "The destination port";
+            };
+          };
+        }
+      );
+      default = [ ];
+      description = "List of ports to allow from remote networks into the microvm mark system.";
     };
   };
 

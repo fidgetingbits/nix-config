@@ -11,6 +11,7 @@ let
   hostName = config.networking.hostName;
   wireguardPort = 51820;
 
+  ports = config.hostSpec.networking.ports;
   subnets = config.hostSpec.networking.subnets;
   wg-lan = subnets.agent-lan;
   o-lan = subnets.o-lan;
@@ -67,16 +68,30 @@ in
           iifname "${config.${namespace}.microvms.vmBridge}" oifname "wg-microvms" accept
           iifname "wg-microvms" oifname "${config.${namespace}.microvms.vmBridge}" accept
         }
+
+        # Need explicit rules for now. Mark is handled by nixos-fw injection
+        chain input {
+          type filter hook input priority filter - 5; policy accept;
+          iifname "wg-microvms" ip saddr ${subnets.n-lan.cidr} tcp dport ${toString ports.tcp.llama-swap} meta mark set 0x00000001
+        }
       }
+
     '';
   };
 
-  # We need to inject a routing policy to avoid the vpn
+  # We need to inject a routing policy to avoid the vpn that may be running on the microvm
   # FIXME: could just loop over every host we want to share the vm network for?
+  # NOTE: This is duplicated with oedo, so could put somewhere shared
   systemd.network.networks."20-${vmBridge}".routingPolicyRules = [
     {
       From = config.${namespace}.microvms.vmLan.cidr;
       To = inputs.self.nixosConfigurations.ossa.config.${namespace}.microvms.vmLan.cidr;
+      Table = "main";
+      Priority = 998;
+    }
+    {
+      From = config.${namespace}.microvms.vmLan.cidr;
+      To = config.hostSpec.networking.subnets.agent-lan.cidr;
       Table = "main";
       Priority = 998;
     }
