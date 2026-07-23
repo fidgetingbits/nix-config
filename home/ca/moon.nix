@@ -26,7 +26,10 @@
     )
   );
 
-  stylix.enableReleaseChecks = false;
+  stylix = {
+    enableReleaseChecks = false;
+    targets.kde.enable = false;
+  };
 
   home.packages = lib.attrValues {
     inherit (pkgs)

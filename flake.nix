@@ -313,6 +313,7 @@
     #################### Ricing ####################
     stylix = {
       url = "github:danth/stylix/release-26.05";
+      # url = "path:///home/aa/dev/nix/nix-secrets";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     silentSDDM = {
