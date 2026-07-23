@@ -42,46 +42,6 @@ in
     vpn.enable = true;
   };
 
-  # Test to block access to most services to the bridge
-  # networking.nftables.ruleset =
-  #   let
-  #     inherit (config.${namespace}.microvms) vmBridge;
-  #     hosts = subnets.n-lan.hosts;
-  #   in
-  #   ''
-  #     table inet vm-host-isolation {
-  #       chain input {
-  #         type filter hook input priority filter - 5; policy accept;
-  #
-  #         iifname "${vmBridge}" ip saddr {${hosts.ossa.ip}, ${hosts.oedo.ip}} tcp dport ${llamaSwapPort} accept
-  #         iifname "${vmBridge}" drop
-  #       }
-  #     }
-  #   '';
-
-  # Setup some custom rules for forwarding to oedo llama-swap
-  # networking.nftables.ruleset =
-  #   let
-  #     inherit (config.${namespace}.microvms) vmBridge;
-  #   in
-  #   ''
-  #     table inet vm_routing {
-  #
-  #       chain prerouting {
-  #           type nat hook prerouting priority dstnat; policy accept;
-  #           iifname "${vmBridge}" tcp dport ${toString oedoLlamaSwapPort} dnat ip to ${olan.hosts.oedo.ip}:${toString llamaSwapPort}
-  #       }
-  #
-  #       chain forward {
-  #         iifname "${vmBridge}" ip daddr ${olan.hosts.oedo.ip} accept
-  #       }
-  #
-  #       chain postrouting {
-  #         ip daddr ${olan.hosts.oedo.ip} masquerade
-  #       }
-  #     }
-  #   '';
-
   # This needs to be injected because for now we manually forward a port
   # to oedo, so it needs to not route it over vm-vpn. Priority must be below
   # the vm-vpn entry in modules/hosts/nixos/microvms/network.nix
