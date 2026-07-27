@@ -10,6 +10,7 @@
 let
   cfg = config.${namespace}.wireguard;
 
+  # Maybe change this name since lib.custom.network has it
   mkWireguardPeer = role: host: {
     inherit (host) name;
     publicKey = host.wireguardPubKey;
@@ -42,11 +43,7 @@ lib.mkIf (cfg.enable && cfg.role == "client") {
             dynamicEndpointRefreshSeconds = 5;
 
             allowedIPsAsRoutes = false; # FIXME: Probably want this dependent on how the VPN is setup, this lets me adjust metrics for my LAN
-            peers =
-              cfg.peerNames
-              |> map (name: cfg.hosts.${name})
-              # nixfmt hack
-              |> mkWireguardPeers cfg.role;
+            peers = mkWireguardPeers cfg.role cfg.peers;
 
             # Manually manage routes so we can adjust the metric. This allows staying
             # connected to wireguard while on the LAN, but favoring routing locally. Metric just
@@ -82,7 +79,7 @@ lib.mkIf (cfg.enable && cfg.role == "client") {
               ''
                 echo "preShutdown"
                 # ${lib.concatMapStrings (ip: "ip route del ${ip} dev ${cfg.interface} metric 200") cfg.allowedIPs}
-                ip route del ${cfg.subnet} dev ${cfg.interface} metric 200
+                ip route del ${cfg.subnet.cidr} dev ${cfg.interface} metric 200
               '';
           };
         };

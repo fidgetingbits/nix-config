@@ -22,8 +22,6 @@ let
   subnets = config.hostSpec.networking.subnets;
   wg-lan = subnets.agent-lan;
   o-lan = subnets.o-lan;
-  inherit (lib.custom.network) triplet lastOctet;
-  genWireguardIP = host: "${triplet wg-lan.cidr}.${lastOctet o-lan.hosts.${host}.ip}/32";
   vmBridge = config.${namespace}.microvms.vmBridge;
 in
 {
@@ -67,7 +65,7 @@ in
       interfaces = {
         wg-microvms = {
           privateKeyFile = config.sops.secrets."keys/wireguard/wgsk".path;
-          ips = [ (genWireguardIP hostName) ];
+          ips = [ "${wg-lan.hosts.${hostName}.ip}/32" ];
           peers = [
             {
               name = "oedo";

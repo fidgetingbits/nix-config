@@ -8,9 +8,8 @@
 }:
 let
   net = config.hostSpec.networking;
-
-  # FIXME: Somehow check "home" LAN of a host rather than hardcode
   subnet = net.subnets.o-lan;
+  wg-subnet = subnet.wg-subnet;
   inherit (config.hostSpec)
     isLocal
     isRoaming
@@ -23,19 +22,18 @@ in
     ${namespace}.wireguard = {
       enable = true;
       role = "client";
-      peerNames = [ "ooze" ];
+      peers = [ subnet.hosts.ooze ];
       allowedIPs = [
-        subnet.wireguard.subnet
+        wg-subnet.cidr
         subnet.cidr
       ];
-      hosts = subnet.hosts;
       endpoint = "vpn.${domain}";
       wireguardPort = net.ports.udp.wireguard;
       rosenpassPort = net.ports.udp.rosenpass;
-      subnet = subnet.wireguard.subnet;
+      subnet = wg-subnet;
       dns = {
         enable = true;
-        server = subnet.hosts.ogre.ip;
+        server = wg-subnet.dns;
         inherit domain;
       };
     };

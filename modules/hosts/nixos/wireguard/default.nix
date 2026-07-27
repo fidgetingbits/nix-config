@@ -9,6 +9,7 @@
   lib,
   inputs,
   namespace,
+  pkgs,
   ...
 }:
 let
@@ -16,7 +17,6 @@ let
   secretsFolder = lib.toString inputs.nix-secrets;
   sopsFolder = secretsFolder + "/sops/";
   hostName = config.networking.hostName;
-  inherit (lib.custom.network) triplet lastOctet;
 
   # Not all wireguard peers will have rosenpeer support (eg: android), so check if the
   # host has a key defined, and if not they get filtered out
@@ -42,7 +42,6 @@ let
     |> map (host: mkRosenpassPeer role host)
     # nixfmt hack
     |> lib.filter (peer: lib.length (lib.attrNames peer) > 0);
-  genWireguardIP = host: "${triplet cfg.subnet}.${lastOctet cfg.hosts.${host}.ip}/32";
 in
 {
   imports = [
@@ -69,11 +68,7 @@ in
       example = "en0";
       description = "Value of external interface for server outbound routing or client DNS rules, etc";
     };
-    peerNames = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      example = [ "gibson" ];
-      description = "The list of peers. For a client, put the server only. For server, put all clients";
-    };
+
     allowedIPs = lib.mkOption {
       type = lib.types.nullOr (lib.types.listOf lib.types.str);
       default = null;
@@ -87,10 +82,9 @@ in
       description = "Server IP or domain for clients to connect to.";
     };
 
-    # FIXME: Could rename to cidr to match nix-secrets stuff, but this is more common I guess
     subnet = lib.mkOption {
-      type = lib.types.str;
-      example = "192.168.0.1/24";
+      type = lib.types.attrsOf lib.types.anything;
+      example = { }; # FIXME
       description = "Subnet of the VPN network";
     };
 
@@ -112,22 +106,10 @@ in
       description = "List of systems that won't use Rosenpass. e.g. An Android device.";
     };
 
-    hosts = lib.mkOption {
-      type = lib.types.attrsOf lib.types.anything;
-      example = {
-        hostA = {
-          name = "hostA";
-          ip = "192.168.1.2";
-          wireguardPubKey = "abcdef";
-        };
-      };
-      # FIXME: We probably want to make it so the IP address derivation is optional
-      description = ''
-        An attribute set of hosts containing IP address, wireguard public key
-
-        Note that the IP address is assumed to be the IP of the host on the LAN, and the
-        wireguard subnet IP is derived from it so the last octet is shared.
-      '';
+    peers = lib.mkOption {
+      type = lib.types.listOf (lib.types.attrsOf lib.types.anything);
+      example = [ { } ]; # FIXME
+      description = "The list of peers. For a client, put the server only. For server, put all clients";
     };
 
     # FIXME: Finish the server-side part of this
@@ -156,7 +138,9 @@ in
         interfaces = {
           ${cfg.interface} = {
             listenPort = cfg.wireguardPort;
-            ips = [ (genWireguardIP hostName) ];
+            ips = [
+              "${cfg.subnet.hosts.${hostName}.ip}/32"
+            ];
             privateKeyFile = config.sops.secrets."keys/wireguard/wgsk".path;
           };
         };
@@ -167,7 +151,7 @@ in
     # but I guess network-online.target is flagged as done, so wireguard fails to start. This tries to
     # fix that by waiting for at least a default route to apply wireguard
     # FIXME: This might be only necessary on the clients? Not sure it matters
-    systemd.services.wireguard-wg0 = {
+    systemd.services."wireguard-${cfg.interface}" = {
       preStart = ''
         echo "Waiting for default network gateway..."
         until ip route show default | grep -q default; do
@@ -184,18 +168,24 @@ in
         verbosity = "Verbose";
         public_key = secretsFolder + "/keys/${hostName}_pqpk";
         secret_key = config.sops.secrets."${hostName}_pqsk".path;
-        peers =
-          cfg.peerNames
-          |> map (name: cfg.hosts.${name})
-          # nixfmt hack
-          |> mkRosenpassPeers cfg.role;
+        peers = mkRosenpassPeers cfg.role cfg.peers;
       };
     };
 
     systemd.services.rosenpass = {
-      # Wait for wireguard to be up first, which ensures we can pull out the default interface
-      # in our preStart script
-      after = [ "wireguard-wg0.service" ];
+      # Wait for wireguard to sop reStart can pull out the default interface
+      # Also restart when wireguard goes down, otherwise seems to stall
+      requires = [ "wireguard-${cfg.interface}.service" ];
+      partOf = [ "wireguard-${cfg.interface}.service" ];
+
+      serviceConfig = {
+        # Often fails after resume from suspend, but should work eventually
+        # so don't give up else we have no vpn and have to manually do it...
+        #  8月 02 06:52:01 ossa rosenpass-start[3449421]: [2026-08-01T22:52:01Z ERROR rosenpass] peer 0 endpoint <domain>:<port> can not be parsed to a so
+        Restart = "always";
+        RestartSec = "1s";
+        StartLimitIntervalSec = 0;
+      };
     };
 
     sops.secrets = {
@@ -206,6 +196,26 @@ in
         sopsFile = sopsFolder + "${hostName}_pqsk";
         format = "binary";
       };
+    };
+
+    environment.etc = {
+      "wireguard/peer-names.json".text = lib.toJSON (
+        lib.listToAttrs (
+          map (p: {
+            name = p.publicKey;
+            value = if (lib.stringLength p.name) <= (lib.stringLength p.publicKey) then p.name else "unknown";
+          }) config.networking.wireguard.interfaces.wg0.peers
+        )
+      );
+
+      "systemd/resolved.conf.d/10-vpn-routing.conf".source =
+        (pkgs.formats.ini { }).generate "10-vpn-routing"
+          {
+            Resolve = {
+              DNS = "1.1.1.1";
+              Domains = "~vpn.${config.hostSpec.domain}";
+            };
+          };
     };
   };
 }

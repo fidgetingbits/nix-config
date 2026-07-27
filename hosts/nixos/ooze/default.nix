@@ -7,16 +7,18 @@
   ...
 }:
 let
+  net = config.hostSpec.networking;
   wake-oppo = pkgs.writeShellApplication {
     name = "wake-oppo";
     runtimeInputs = [ pkgs.wakeonlan ];
     text =
       let
-        oppo = config.hostSpec.networking.subnets.o-lan.hosts.oppo;
+        oppo = net.subnets.o-lan.hosts.oppo;
       in
       "wakeonlan ${lib.elemAt oppo.mac 0} -i ${oppo.ip}";
   };
-
+  olan = net.subnets.o-lan;
+  wg-subnet = olan.wg-subnet;
 in
 {
   imports =
@@ -65,13 +67,11 @@ in
     borgBackupStartTime = "*-*-* 05:00:00"; # Daily at 5am
   };
 
-  # If we setup postfix, this conflicts
+  # Conflicts with postfix
   programs.msmtp.setSendmail = lib.mkForce false;
 
   boot.initrd.availableKernelModules = [ "r8169" ];
 
-  # Allow remote luks unlock over ssh and email admins when the system is ready
-  # to unlock
   services.remoteLuksUnlock = {
     enable = true;
     unlockOnly = true;
@@ -93,6 +93,7 @@ in
   services.heartbeat-check = {
     enable = true;
     interval = 10 * 60;
+    # FIXME: This should be updated to use host attr sets now
     hosts = [
       "ottr"
       "ogre"
@@ -122,37 +123,90 @@ in
     wake-oppo
   ];
 
-  # FIXME: I think this is generic elsewhere?
-  networking.useDHCP = lib.mkDefault true;
-  # FIXME: Not sure why I have to manually do this on ooze and not oppo
-  networking.nameservers = [ config.hostSpec.networking.subnets.o-lan.gateway ];
-  networking.search = [ "${config.hostSpec.domain}" ];
-
   ${namespace} = {
-    wireguard =
+    wireguard = {
+      enable = true;
+      role = "server";
+      externalInterface = "enp3s0";
+      peers = [
+        wg-subnet.hosts.ossa
+        wg-subnet.hosts.opia
+        wg-subnet.hosts.moon
+      ];
+      wireguardPort = net.ports.udp.wireguard;
+      rosenpassPort = net.ports.udp.rosenpass;
+      rosenpassExempt = [
+        "opia"
+        "moxy"
+      ];
+      subnet = wg-subnet;
+    };
+  };
+
+  # Extra peers not on o-lan subnet that can't be auto-generated
+  networking = {
+    useDHCP = lib.mkDefault true;
+    # FIXME: Not sure why I have to manually do this on ooze and not oppo
+    nameservers = [ config.hostSpec.networking.subnets.o-lan.gateway ];
+    search = [ "${config.hostSpec.domain}" ];
+
+    wireguard.interfaces.${config.${namespace}.wireguard.interface}.peers =
       let
-        net = config.hostSpec.networking;
+        inherit (lib.custom.network) mkWireguardPeer;
+      in
+      [
+        (mkWireguardPeer wg-subnet.hosts.moon)
+        (mkWireguardPeer wg-subnet.hosts.moxy)
+      ];
+
+    nftables =
+      let
+        oozeIP = "${wg-subnet.hosts.ooze.ip}/32";
+        iif = "wg0";
       in
       {
         enable = true;
-        role = "server";
-        externalInterface = "enp3s0";
-        peerNames = [
-          "ossa"
-          "opia"
-        ];
-        hosts = net.subnets.o-lan.hosts;
-        wireguardPort = net.ports.udp.wireguard;
-        rosenpassPort = net.ports.udp.rosenpass;
-        rosenpassExempt = [ "opia" ];
-        # FIXME: this wireguard thing should possibly be it's own subnet rather than a sub-subnet of o-lan? get's confusing with other wireguard networks
-        subnet = net.subnets.o-lan.wireguard.subnet;
+        ruleset =
+          let
+            moonIP = wg-subnet.hosts.moon.ip;
+          in
+          ''
+            table inet moon_lan_routing {
+              chain input {
+                type filter hook input priority -10; policy accept;
+                iifname "${iif}" ip saddr ${moonIP} ct state vmap { established : accept, related : accept };
+                iifname "${iif}" ip saddr ${moonIP} ip daddr ${oozeIP} tcp dport ${toString net.ports.tcp.nginx} accept;
+                # iifname "${iif}" ip saddr ${moonIP} icmp type echo-request accept;
+                iifname "${iif}" ip saddr ${moonIP} log prefix "WG MOON DROP" drop;
+              }
+              chain forward {
+                type filter hook forward priority -10; policy accept;
+                iifname "wg0" ip saddr ${moonIP} ip daddr ${oozeIP} accept
+                iifname "${iif}" ip saddr ${moonIP} log prefix "WG MOON DROP" drop;
+              }
+            }
+          '';
       };
   };
 
-  # This enables immich service with ML offload to oedo
+  # Enable immich service with ML offload to oedo
   services.immichML = {
     enable = true;
     remoteMachineLearningHost = "oedo.${config.hostSpec.domain}";
   };
+
+  services.nginxProxy = {
+    defaultAllowList = [
+      olan.cidr
+      olan.wg-subnet.hosts.ossa.ip
+      olan.wg-subnet.hosts.opia.ip
+    ];
+    defaultDenyList = [ "all" ];
+  };
+
+  services.nginx.virtualHosts."photos.${config.hostSpec.domain}".locations."/".extraConfig =
+    lib.mkBefore ''
+      allow ${olan.wg-subnet.hosts.moon.ip};
+      allow ${olan.wg-subnet.hosts.moxy.ip};
+    '';
 }

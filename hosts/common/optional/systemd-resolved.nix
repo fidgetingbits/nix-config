@@ -10,8 +10,6 @@
         "${config.hostSpec.domain}"
         "~."
       ];
-      # dnssec breaks on ogre
-      # dnssec = "true";
     };
 
     # FIXME: Fix fallbacks so it definitely goes through LAN dns first...

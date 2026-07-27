@@ -184,6 +184,7 @@
   inputs = {
 
     #################### Core Nix Sources ####################
+
     nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     #nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.11";
@@ -313,7 +314,6 @@
     #################### Ricing ####################
     stylix = {
       url = "github:danth/stylix/release-26.05";
-      # url = "path:///home/aa/dev/nix/nix-secrets";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     silentSDDM = {
@@ -341,9 +341,7 @@
     };
 
     introdus = {
-      # url = "git+ssh://git@codeberg.org/fidgetingbits/introdus?ref=aa";
       url = "path:///home/aa/dev/nix/introdus/aa";
-      # url = "path:///home/aa/dev/nix/introdus/neovim-shared-config/";
     };
 
   };

@@ -6,18 +6,7 @@
 }:
 let
   cfg = config.${namespace}.wireguard;
-  inherit (lib.custom.network) triplet lastOctet;
-  genWireguardIP = host: "${triplet cfg.subnet}.${lastOctet cfg.hosts.${host}.ip}/32";
-
-  mkWireguardPeer = role: host: {
-    inherit (host) name;
-    publicKey =
-      assert lib.assertMsg (host.wireguardPubKey != "") "peer must have valid key";
-      host.wireguardPubKey;
-    allowedIPs = [ (genWireguardIP host.name) ];
-  };
-
-  # FIXME: Need a way for subnet/hosts to get passed to mkWireguardPeer, if we want to abstract this
+  inherit (lib.custom.network) mkWireguardPeer;
   mkWireguardPeers = role: hosts: (map (host: mkWireguardPeer role host) hosts);
 in
 lib.mkIf (cfg.enable && cfg.role == "server") {
@@ -43,11 +32,7 @@ lib.mkIf (cfg.enable && cfg.role == "server") {
     wireguard = {
       interfaces = {
         ${cfg.interface} = {
-          peers =
-            cfg.peerNames
-            |> map (name: cfg.hosts.${name})
-            # nixfmt hack
-            |> mkWireguardPeers cfg.role;
+          peers = mkWireguardPeers cfg.role cfg.peers;
         };
       };
     };
@@ -59,7 +44,7 @@ lib.mkIf (cfg.enable && cfg.role == "server") {
   assertions = [
     {
       assertion = cfg.allowedIPs == null;
-      message = "The allowedIPs option shouldn't be set for the server, as it is automatically configured using cfg.hosts.";
+      message = "The allowedIPs option shouldn't be set for the server, as it is automatically configured using peers";
     }
     {
       assertion = cfg.endpoint == null;

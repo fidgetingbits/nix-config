@@ -35,6 +35,7 @@
         openssh
         neovim # FIXME: (overlay our neovim package, etc?)
         strace
+        wget
         ;
     };
   };

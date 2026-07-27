@@ -208,6 +208,7 @@ in
     ];
 
   networking.hosts = {
-    ${subnets.grove.hosts.moth.ip} = [ "moth.${config.hostSpec.domain}" ];
+    # ${subnets.grove.hosts.moth.ip} = [ "moth.${config.hostSpec.domain}" ];
+    ${subnets.moon.hosts.moon.ip} = [ "moon.${config.hostSpec.domain}" ];
   };
 }

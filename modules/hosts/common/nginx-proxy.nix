@@ -1,6 +1,19 @@
 { config, lib, ... }:
 {
   options.services.nginxProxy = {
+    defaultAllowList = lib.mkOption {
+      type = lib.types.nullOr (lib.types.listOf lib.types.str);
+      default = null;
+      example = [ "all" ];
+      description = "List of allowed hosts for all virtualhosts";
+    };
+
+    defaultDenyList = lib.mkOption {
+      type = lib.types.nullOr (lib.types.listOf lib.types.str);
+      default = null;
+      example = [ "all" ];
+      description = "List of denied hosts for all virtualhosts";
+    };
     services = lib.mkOption {
       type = lib.types.listOf (
         lib.types.submodule {
@@ -72,11 +85,30 @@
               listenAddresses = [ "0.0.0.0" ];
               onlySSL = true;
               useACMEHost = if isAcmeDomain domain then domain else null;
-              locations."/" = {
-                recommendedProxySettings = true;
-                proxyPass = "${uri}://127.0.0.1:${toString service.port}";
-              }
-              // service.extraLocationSettings;
+              locations."/" = lib.mkMerge [
+                {
+                  recommendedProxySettings = true;
+                  proxyPass = "${uri}://127.0.0.1:${toString service.port}";
+                  # Add optional white/black listing
+                  extraConfig = lib.mkAfter (
+                    lib.optionalString (cfg.defaultAllowList != null || cfg.defaultAllowsList != null) ''
+                      ${
+                        if cfg.defaultAllowList != null then
+                          lib.concatStringsSep "\n" (map (host: "allow ${host};") cfg.defaultAllowList)
+                        else
+                          ""
+                      }
+                      ${
+                        if cfg.defaultDenyList != null then
+                          lib.concatStringsSep "\n" (map (host: "deny ${host};") cfg.defaultDenyList)
+                        else
+                          ""
+                      }
+                    ''
+                  );
+                }
+                service.extraLocationSettings
+              ];
             }
             // service.extraHostSettings;
           }) domains

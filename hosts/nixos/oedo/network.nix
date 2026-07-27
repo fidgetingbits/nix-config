@@ -15,8 +15,6 @@ let
   subnets = config.hostSpec.networking.subnets;
   wg-lan = subnets.agent-lan;
   o-lan = subnets.o-lan;
-  inherit (lib.custom.network) triplet lastOctet;
-  genWireguardIP = host: "${triplet wg-lan.cidr}.${lastOctet o-lan.hosts.${host}.ip}/32";
   vmBridge = config.${namespace}.microvms.vmBridge;
 in
 {
@@ -40,13 +38,14 @@ in
         wg-microvms = {
           listenPort = wireguardPort;
           privateKeyFile = config.sops.secrets."keys/wireguard/wgsk".path;
-          ips = [ (genWireguardIP hostName) ];
+          ips = [ "${wg-lan.hosts.${hostName}.ip}/32" ];
+
           peers = [
             {
               name = "ossa";
               publicKey = o-lan.hosts.ossa.wireguardPubKey;
               allowedIPs = [
-                (genWireguardIP "ossa")
+                "${wg-lan.hosts.ossa.ip}/32"
                 subnets.n-lan.cidr # Ossa's microvms
               ];
             }
@@ -54,7 +53,7 @@ in
               name = "opia";
               publicKey = o-lan.hosts.opia.wireguardPubKey;
               allowedIPs = [
-                (genWireguardIP "opia")
+                "${wg-lan.hosts.opia.ip}/32"
               ];
             }
           ];

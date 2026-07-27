@@ -139,11 +139,11 @@ in
             # ])
             [
               "https://cache.nixos.org" # Official global cache
-              "https://nix-community.cachix.org" # Community packages
+              # "https://nix-community.cachix.org" # Community packages
             ]
           ];
           extra-trusted-public-keys = [
-            "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+            # "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
           ];
 
           # Limit which users can use nix.

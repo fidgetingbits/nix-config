@@ -129,8 +129,8 @@ in
     # the contents directly
     systemd.services.microvm-prepare-secrets = {
       description = "Stage SOPS secrets for microVM";
-      wantedBy = [ "multi-user.target" ];
-      after = [ "sops-nix.service" ];
+      requires = [ "sysinit-reactivation.target" ];
+      partOf = [ "sysinit-reactivation.target" ];
 
       serviceConfig = {
         Type = "oneshot";
