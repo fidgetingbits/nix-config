@@ -108,7 +108,7 @@ for host in "${POSITIONAL_ARGS[@]}"; do
     gen_keys "$host"
 done
 
-echo "Put the following in mkHost entry for eeach host in nix-secrets"
+echo "Put the following in mkHost entry for each host in nix-secrets"
 echo "-----"
 for host in "${POSITIONAL_ARGS[@]}"; do
     echo "${host}: wireguardPubKey = \"$(cat "$host"_wgpk)\";"
