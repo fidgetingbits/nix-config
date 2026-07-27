@@ -4,7 +4,7 @@ Quick structural overview:
 
 `hosts/nixos/<host>/microvms/` - One or more microvms to run on <host>
 `modules/hosts/nixos/microvms` - Functionality for managing microvms on the host (secrets, network, vpn, etc)
-`modules/home/nixos/auto/microvms.nix` - Automatic home-level helpers for microvm management, like zsh aliases, etc.
+`modules/home//auto/microvms.nix` - Automatic home-level helpers for microvm management, like zsh aliases, etc.
 `microvms/` - Configuration for host/home level on the microvm itself
 
 The design tries to mimic the idea of isolated "hosts" and "home"
