@@ -53,6 +53,9 @@ in
   # System-wide packages, in case we log in as root
   environment.systemPackages = [ pkgs.openssh ];
 
+  # FIXME: Need to see if this is better than gnome, etc
+  programs.ssh.askPassword = pkgs.lib.mkForce "${pkgs.kdePackages.ksshaskpass.out}/bin/ksshaskpass";
+
   # If there is a conflict file that is backed up, use this extension
   home-manager.backupFileExtension = "bk";
 
