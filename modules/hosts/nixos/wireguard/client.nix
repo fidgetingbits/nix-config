@@ -85,4 +85,53 @@ lib.mkIf (cfg.enable && cfg.role == "client") {
         };
     };
   };
+
+  # FIXME: tweak threshold, only enable with option, specify peer for handshakes
+  # Watchdog: restart the tunnel if the WireGuard handshake goes stale.
+  # When the wireguard server doesn't have a static IP, and it changes,
+  # the client won't periodically check the updated DNS entry on it's
+  # own. If the last handshake is older than 4 min the peer is unreachable.
+  systemd.services."wireguard-${cfg.interface}-watchdog" = {
+    description = "WireGuard tunnel health check";
+    serviceConfig.Type = "oneshot";
+    script = # bash
+      ''
+        # FIXME: Change this to a multiplier of the configured keepalive
+        STALE_THRESHOLD=240 # 4min
+
+        if ! systemctl is-active --quiet wireguard-${cfg.interface}.service; then
+          echo "Wireguard service not active, restarting..."
+          systemctl restart wireguard-${cfg.interface}.service
+          exit 0
+        fi
+
+        HANDSHAKE=$(${pkgs.wireguard-tools}/bin/wg show wg0 latest-handshakes 2>/dev/null \
+          | ${pkgs.gawk}/bin/awk '{print $2}' | sort -n | tail -1)
+
+        if [ -z "$HANDSHAKE" ] || [ "$HANDSHAKE" = "0" ]; then
+          echo "No handshake recorded yet, restarting..."
+          systemctl restart wireguard-${cfg.interface}.service
+          exit 0
+        fi
+
+        NOW=$(date +%s)
+        AGE=$((NOW - HANDSHAKE))
+
+        if [ "$AGE" -gt "$STALE_THRESHOLD" ]; then
+          echo "Handshake is ''${AGE}s old (threshold: ''${STALE_THRESHOLD}s), restarting..."
+          systemctl restart wireguard-${cfg.interface}.service
+        else
+          echo "Handshake is ''${AGE}s old, tunnel OK"
+        fi
+      '';
+  };
+
+  systemd.timers."wireguard-${cfg.interface}-watchdog" = {
+    description = "Periodic WireGuard health check";
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnBootSec = "2min";
+      OnUnitActiveSec = "1min";
+    };
+  };
 }
