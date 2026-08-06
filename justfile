@@ -47,14 +47,16 @@ check HOST=`hostname` ARGS="":
     cp -R . "$BUILD_FOLDER"
     trap 'rm -rf $BUILD_FOLDER' EXIT
     cd $BUILD_FOLDER
-    just copy-lock-in {{ HOST }}
+    # just copy-lock-in {{ HOST }}
 
     NIXPKGS_ALLOW_UNFREE=1 REPO_PATH=$(pwd) nix flake check \
         --impure \
         --keep-going \
         --show-trace \
+        --reference-lock-file locks/{{ HOST }}.lock
+        --output-lock-file locks/{{ HOST }}.lock
         {{ ARGS }}
-    just copy-lock-out {{ HOST }}
+    # just copy-lock-out {{ HOST }}
 
 # Rebuild specified host
 [group("building")]
@@ -77,9 +79,13 @@ rebuild-full HOST=`hostname`: && rebuild-post
 # Update all flake inputs for the specified host or the current host if none specified
 [group("update")]
 update HOST=`hostname` *INPUT:
-    @just copy-lock-in {{ HOST }}
-    nix flake update {{ INPUT }} --timeout 5
-    @just copy-lock-out {{ HOST }}
+    # @just copy-lock-in {{ HOST }}
+    nix flake update \
+        --reference-lock-file locks/{{ HOST }}.lock \
+        --timeout 5 \
+        --output-lock-file locks/{{ HOST }}.lock \
+        {{ INPUT }}
+    # @just copy-lock-out {{ HOST }}
 
 # Update current systems flake lock and then copy to every other host
 [group("update")]
@@ -88,7 +94,8 @@ update-all:
     HOST=$(hostname)
     just update
     for lock in $(ls locks/); do
-        cp locks/$HOST.lock locks/$lock
+        # This can fail if a lock file didn't actually update, so discard result
+        : cp locks/$HOST.lock locks/$lock 2>/dev/null
     done
 
 # Update and then rebuild
@@ -126,7 +133,11 @@ rebuild-extensions-lite:
 iso HOST=`hostname`:
     # If we dont remove this folder, libvirtd VM doesnt run with the new iso
     rm -rf result
-    nix build --impure .#nixosConfigurations.iso.config.system.build.isoImage --reference-lock-file locks/{{ HOST }}.lock && ln -sf result/iso/*.iso latest_{{ HOST }}.iso
+    nix build \
+        --impure \
+        .#nixosConfigurations.iso.config.system.build.isoImage \
+        --reference-lock-file locks/{{ HOST }}.lock \
+        && ln -sf result/iso/*.iso latest_{{ HOST }}.iso
     echo "Built latest_{{ HOST }}.iso"
 
 # Install the latest iso to a flash drive
