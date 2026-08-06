@@ -301,7 +301,8 @@
 
     noctalia = {
       # Pin until v5 is out of alpha
-      url = "github:noctalia-dev/noctalia?ref=v4.7.7";
+      # url = "github:noctalia-dev/noctalia?ref=v4.7.7";
+      url = "github:noctalia-dev/noctalia";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
