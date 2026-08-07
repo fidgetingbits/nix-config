@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 set -euo pipefail
 
-if [ -n "$NIX_BUILD_TOP" ]; then
+if [ -n "${NIX_BUILD_TOP:-}" ]; then
     echo "Running in Nix sandbox (nix flake check). Skipping."
     exit 0
 fi
