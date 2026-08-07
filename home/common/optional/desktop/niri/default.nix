@@ -35,7 +35,9 @@ in
           xwayland-satellite # xwayland support
           ;
       }
-      ++ [ spawn-noctalia-settings ];
+      ++ [
+        spawn-noctalia-settings
+      ];
     file =
       let
         hostPath = "hosts/nixos/${osConfig.hostSpec.hostName}/niri";

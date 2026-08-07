@@ -155,10 +155,10 @@ binds {
     Super+Shift+L {
         move-column-right
     }
-    Super+Semicolon hotkey-overlay-title="Move window to column left" {
+    Super+BracketLeft hotkey-overlay-title="Move window to column left" {
         consume-or-expel-window-left
     }
-    Super+Apostrophe hotkey-overlay-title="Move window to column right" {
+    Super+BracketRight hotkey-overlay-title="Move window to column right" {
         consume-or-expel-window-right
     }
     Super+Shift+BracketLeft hotkey-overlay-title="Move column to first" {
@@ -207,19 +207,18 @@ binds {
     Super+Shift+Ctrl+F hotkey-overlay-title="Expand column to available width" {
         expand-column-to-available-width
     }
-    Super+BracketLeft {
+    Super+Left {
         set-column-width "-1"
     }
-    Super+BracketRight {
+    Super+Right {
         set-column-width "+1"
     }
-    Super+Minus {
+    Super+Up {
         set-window-height "-1"
     }
-    Super+Plus {
+    Super+Down {
         set-window-height "+1"
     }
-    //
     // ========== System controls ==========
     //
     // ========== Brightness ==========
@@ -334,7 +333,7 @@ binds {
     }
     // ========== Quick Launch ==========
     //
-    Super+Shift+G hotkey-overlay-title="Open non-neovim terminal" {
+    Super+Shift+Return hotkey-overlay-title="Open non-neovim terminal" {
         spawn "ghostty"
     }
     Super+V hotkey-overlay-title="Open neovide" {
@@ -344,10 +343,6 @@ binds {
     Super+Return hotkey-overlay-title="New neovide terminal" {
         spawn "nvim-neovide" "--" "-c" "term"
     }
-    // Thunar
-    Super+Ctrl+O hotkey-overlay-title="Spawn file explorer" {
-        spawn "thunar"
-    }
     //
     // ========== Clipboard ==========
     //
@@ -355,21 +350,16 @@ binds {
         // spawn "rofi-copyq"
         spawn-sh "noctalia msg panel-toggle clipboard"
     }
- // FIXME(niri): setup with copyq
-	// Select from the clipboard.
-	//Super+Shift+V { spawn "dash" "-c" "clipman pick -t CUSTOM -T 'fuzzel -d --no-icons --width 60'"; }
-	// Clear the clipboard.
-	//Super+Ctrl+V { spawn "dash" "-c" "clipman clear --all && dunstify 'Clipboard cleared.'"; }
-	// Opan a permanent "clipboard" file.
-	//Alt+Shift+V { spawn "dash" "-c" "$TERMINAL -e micro $HOME/Documents/Clipboard.txt"; }
-
-	// Applications such as remote-desktop clients and software KVM switches may
-	// request that niri stops processing the keyboard shortcuts defined here
-	// so they may, for example, forward the key presses as-is to a remote machine.
-	// It's a good idea to bind an escape hatch to toggle the inhibitor,
-	// so a buggy application can't hold your session hostage.
-	//
-	// The allow-inhibiting=false property can be applied to other binds as well,
-	// which ensures niri always processes them, even when an inhibitor is active.
-	// Super+Escape allow-inhibiting=false { toggle-keyboard-shortcuts-inhibit; }
+    //
+    // ========== Nirius ==========
+    //
+    Super+Semicolon hotkey-overlay-title="Scratchpad Show/Hide" {
+        spawn-sh "nirius scratchpad-show"
+    }
+    Super+Shift+Semicolon hotkey-overlay-title="Scratchpad Add/Remove Window" {
+        spawn-sh "nirius scratchpad-toggle"
+    }
+    Super+Apostrophe hotkey-overlay-title="Center window" {
+        center-window
+    }
 }
