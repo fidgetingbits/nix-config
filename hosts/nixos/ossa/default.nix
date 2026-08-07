@@ -6,9 +6,6 @@
   namespace,
   ...
 }:
-let
-  inherit (config.hostSpec.networking) subnets;
-in
 {
   imports = lib.flatten [
     inputs.nixos-hardware.nixosModules.framework-16-amd-ai-300-series
@@ -207,8 +204,14 @@ in
       "ttm.page_pool_size=${sz}"
     ];
 
-  networking.hosts = {
-    # ${subnets.grove.hosts.moth.ip} = [ "moth.${config.hostSpec.domain}" ];
-    ${subnets.moon.hosts.moon.ip} = [ "moon.${config.hostSpec.domain}" ];
-  };
+  networking.hosts =
+    let
+      # inherit (config.hostSpec.networking) subnets;
+    in
+    {
+      # Uncomment when on grove
+      # ${subnets.grove.hosts.moth.ip} = [ "moth.${config.hostSpec.domain}" ];
+      # Uncomment when on moat
+      # ${subnets.moon.hosts.moon.ip} = [ "moon.${config.hostSpec.domain}" ];
+    };
 }
