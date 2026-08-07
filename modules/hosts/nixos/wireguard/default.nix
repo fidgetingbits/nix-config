@@ -184,7 +184,8 @@ in
         #  8月 02 06:52:01 ossa rosenpass-start[3449421]: [2026-08-01T22:52:01Z ERROR rosenpass] peer 0 endpoint <domain>:<port> can not be parsed to a so
         Restart = "always";
         RestartSec = "1s";
-        StartLimitIntervalSec = 0;
+        # Restart always
+        StartLimitInterval = 0;
       };
     };
 
