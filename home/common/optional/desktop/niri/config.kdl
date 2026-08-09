@@ -21,7 +21,8 @@ overview {
 spawn-at-startup "niriusd"
 spawn-at-startup "firefox"
 spawn-sh-at-startup "uwsm finalize NIRI_SOCKET"
-spawn-sh-at-startup "nvim-neovide -- -c 'lua require([[resession]]).load([[nix]])'"
+spawn-sh-at-startup "spawn-nvim-scratchpad"
+// spawn-sh-at-startup "nvim-neovide -- -c 'lua require([[resession]]).load([[nix]])'"
 hotkey-overlay {
     skip-at-startup
 }

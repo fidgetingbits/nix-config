@@ -24,9 +24,37 @@ let
         fi
       '';
   };
+  spawn-nvim-scratchpad = pkgs.writeShellApplication {
+    name = "spawn-nvim-scratchpad";
+    runtimeInputs = lib.attrValues {
+      inherit (pkgs) nirius;
+    };
+    text =
+      # bash
+      ''
+        APP_ID="neovide-scratchpad"
+        if ! niri msg --json windows | jq -e --arg app "$APP_ID" '.[] | select(.app_id == $app)' > /dev/null; then
+            NEOVIDE_APP_ID="$APP_ID" nvim-neovide -- -c 'lua require([[resession]]).load([[nix]])' &
+
+            # Poll for window creation (up to 2 seconds max)
+            for _ in $(seq 1 20); do
+                if niri msg --json windows | jq -e --arg app "$APP_ID" '.[] | select(.app_id == $app)' > /dev/null; then
+                    break
+                fi
+                sleep 0.1
+            done
+
+            # WINDOW_ID=$(niri msg --json windows | jq -r --arg app "$APP_ID" '.[] | select(.app_id == $app) | .id' | head -n 1)
+            # if [ -n "$WINDOW_ID" ]; then
+            #     niri msg action center-window --id "$WINDOW_ID"
+            # fi
+
+            nirius scratchpad-toggle -a "$APP_ID"
+        fi
+      '';
+  };
 in
 {
-  # imports = [ ../wlogout.nix ];
   home = {
     packages =
       lib.attrValues {
@@ -37,6 +65,7 @@ in
       }
       ++ [
         spawn-noctalia-settings
+        spawn-nvim-scratchpad
       ];
     file =
       let

@@ -343,6 +343,10 @@ binds {
     Super+Return hotkey-overlay-title="New neovide terminal" {
         spawn "nvim-neovide" "--" "-c" "term"
     }
+    // Maybe better to auto-load the session as well?
+    Super+S hotkey-overlay-title="Neovide Scratchpad" {
+        spawn "spawn-nvim-scratchpad"
+    }
     //
     // ========== Clipboard ==========
     //
