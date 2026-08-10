@@ -7,9 +7,12 @@
   ...
 }:
 {
+  # This is required here now because introdus stopped using mkInstallModule,
+  # otherwise introdus will infinite recurse
+  imports = [ inputs.fidgetingvim.wrappers.neovim.install ];
+
   introdus.neovim = {
     enable = true;
-    wrapper = "fidgetingvim";
     fontSize = 10;
   };
 
