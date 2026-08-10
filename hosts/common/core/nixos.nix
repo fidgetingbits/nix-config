@@ -91,6 +91,12 @@
   # Stop blocking on network interfaces not needed for boot
   systemd.network.wait-online.enable = false;
   systemd.services.NetworkManager-wait-online.enable = false;
+  # Try to avoid shutdown delays
+  systemd.services.NetworkManager.serviceConfig = {
+    TimeoutStopSec = "10s";
+    SendSIGKILL = true;
+    Restart = "always";
+  };
   networking.nftables.enable = true;
 
   environment = {

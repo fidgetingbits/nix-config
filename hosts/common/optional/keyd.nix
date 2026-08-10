@@ -26,4 +26,7 @@
       };
     };
   };
+
+  # Sometimes shits itself, so make it restart
+  systemd.services.key.serviceConfig.Restart = "always";
 }
