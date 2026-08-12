@@ -105,4 +105,13 @@ in
     });
   };
 
+  # This is a catch all. Some roaming hosts when on the VPN might resolve their
+  # own domain to the wrong IP, so just force it to localhost.
+  networking.hosts =
+    let
+      inherit (config.hostSpec) domain hostName;
+    in
+    {
+      "127.0.0.1" = [ "${hostName}.${domain}" ];
+    };
 }
