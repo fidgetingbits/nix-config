@@ -35,10 +35,10 @@ binds {
     //
     // ========== Focus workspace ==========
     Super+1 {
-        focus-workspace "1_dev"
+        focus-workspace 1
     }
     Super+2 {
-        focus-workspace "2_web"
+        focus-workspace 2
     }
     Super+3 {
         focus-workspace 3
@@ -63,9 +63,6 @@ binds {
     }
     Super+0 {
         focus-workspace 0
-    }
-    Super+Y {
-        focus-workspace "Y_qrs"
     }
     Super+Period hotkey-overlay-title="Focus workspace previous" {
         focus-workspace-previous
@@ -111,10 +108,10 @@ binds {
     }
     // ========== Move windows/columns ==========
     Super+Shift+1 {
-        move-window-to-workspace "1_dev"
+        move-window-to-workspace 1
     }
     Super+Shift+2 {
-        move-window-to-workspace "2_web"
+        move-window-to-workspace 2
     }
     Super+Shift+3 {
         move-window-to-workspace 3
@@ -140,17 +137,14 @@ binds {
     Super+Shift+0 {
         move-window-to-workspace 0
     }
-    Super+Shift+Y {
-        move-window-to-workspace "Y_qrs"
-    }
     Super+Shift+H {
         move-column-left
     }
     Super+Shift+J {
-        move-window-down
+        move-window-down-or-to-workspace-down
     }
     Super+Shift+K {
-        move-window-up
+        move-window-up-or-to-workspace-up
     }
     Super+Shift+L {
         move-column-right
@@ -192,11 +186,14 @@ binds {
         switch-preset-window-height-back
     }
     Super+F hotkey-overlay-title="Toggle fullscreen" {
-        fullscreen-window
+        // fullscreen-window
+        // use custom helper to smartly handle nirius scratchpads
+        spawn "niri-fullscreen-window"
     }
-    Super+Alt+F hotkey-overlay-title="Toggle windowed fullscreen" {
-        toggle-windowed-fullscreen
-    }
+    // FIXME: This doesn't work?
+    // Super+Alt+F hotkey-overlay-title="Toggle windowed fullscreen" {
+    //     toggle-windowed-fullscreen
+    // }
     Super+Shift+F hotkey-overlay-title="Toggle floating" {
         toggle-window-floating
     }

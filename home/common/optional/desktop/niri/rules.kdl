@@ -149,15 +149,15 @@ window-rule {
 // ========== Workspace Assignments ==========
 window-rule {
     match app-id="Neovide" title="^nix |"
-    open-on-workspace "1_dev"
+ // open-on-workspace "1_dev"
 }
 window-rule {
     match app-id="signal"
-    open-on-workspace "2_u"
+ // open-on-workspace "2_u"
 }
 window-rule {
     match app-id="^[Ss]potify$"
-    open-on-workspace "2_u"
+ // open-on-workspace "2_u"
 }
 // ========== Tile on launch ==========
 window-rule {
