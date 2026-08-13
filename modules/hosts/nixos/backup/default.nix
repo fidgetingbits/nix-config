@@ -686,7 +686,10 @@ in
           `borg-backup-list`
 
         - List all existing archives in the repository, for a different host:
+          bash:
           `read -s -p "Passphrase:" BORG_PASSPHRASE && BORG_HOST=oedo borg-backup-list`
+          zsh:
+          `read -rs "BORG_PASSPHRASE?Passphrase:" && BORG_HOST=oedo borg-backup-list`
 
         - Start a manual backup of the @persist btrfs subvolume:
           `borg-backup-btrfs-subvolume`
