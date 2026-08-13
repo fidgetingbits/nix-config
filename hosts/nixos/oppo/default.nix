@@ -44,7 +44,6 @@ in
         "gnome.nix"
 
         # "libvirt.nix"
-        "cli.nix"
         "yubikey.nix"
 
         # Network management

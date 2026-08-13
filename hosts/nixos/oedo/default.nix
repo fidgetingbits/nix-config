@@ -36,7 +36,6 @@
         "locale.nix"
         "sound.nix"
         "podman.nix"
-        "cli.nix"
         "yubikey.nix"
         # "libvirt.nix"
 

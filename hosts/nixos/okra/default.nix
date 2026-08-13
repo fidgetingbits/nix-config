@@ -23,7 +23,6 @@
           "x11.nix"
           "sound.nix"
           "gnome.nix"
-          "cli.nix"
           "yubikey.nix"
         ])
     ))

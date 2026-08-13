@@ -33,7 +33,6 @@
 
           # Misc
           "sound.nix"
-          "cli.nix"
           "fonts.nix"
           "logind.nix"
         ])

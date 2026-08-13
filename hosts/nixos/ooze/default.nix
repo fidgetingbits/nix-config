@@ -39,7 +39,6 @@ in
         # Optional common modules
         (map (f: "hosts/common/optional/${f}") [
           "keyd.nix"
-          "cli.nix"
           "services/atuin.nix"
           "services/atticd.nix" # Nix cache
           "services/postfix-proton-relay.nix"

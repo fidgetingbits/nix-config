@@ -38,7 +38,6 @@ rec {
           "podman.nix"
           "libvirt.nix"
           "wireshark.nix"
-          "cli.nix"
           "yubikey.nix"
           #"iphone-backup.nix"
 

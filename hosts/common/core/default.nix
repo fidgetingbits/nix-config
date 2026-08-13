@@ -28,6 +28,7 @@ in
       "modules/hosts/${platform}"
 
       "hosts/common/core/sops.nix" # Core because it's used for backups, mail
+      "hosts/common/core/cli.nix"
       "hosts/common/core/${platform}.nix"
 
       "hosts/common/users"

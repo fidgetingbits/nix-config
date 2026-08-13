@@ -25,7 +25,6 @@
 
           # Misc
           "logind.nix"
-          "cli.nix"
         ])
     ))
   ];

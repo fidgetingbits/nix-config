@@ -103,13 +103,17 @@ in
   };
 
   # FIXME: Not sure this is needed, but living from wireguard/default.nix
-  systemd.services.wireguard-wg-microvms = {
-    preStart = ''
-      echo "Waiting for default network gateway..."
-      until ip route show default | grep -q default; do
-        sleep 1
-      done
-      echo "Gateway found, proceeding."
-    '';
-  };
+  # FIXME: This fails because for whatever reason oedo didn't get a default network
+  # setup _before_ it ran, so hung indefinitely. So likely needs to wait on network-online instead?
+  # and also maybe with a sane timeout
+
+  # systemd.services.wireguard-wg-microvms = {
+  #   preStart = ''
+  #     echo "Waiting for default network gateway..."
+  #     until ip route show default | grep -q default; do
+  #       sleep 1
+  #     done
+  #     echo "Gateway found, proceeding."
+  #   '';
+  # };
 }

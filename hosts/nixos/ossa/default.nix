@@ -33,7 +33,6 @@
           "podman.nix"
           # "libvirt.nix"
           "wireshark.nix"
-          "cli.nix"
           "yubikey.nix"
 
           #"iphone-backup.nix"
@@ -206,7 +205,7 @@
 
   networking.hosts =
     let
-      # inherit (config.hostSpec.networking) subnets;
+      # inherit (config.hostSpec) domain;
     in
     {
       # Uncomment when on grove
