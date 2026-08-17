@@ -307,7 +307,7 @@ binds {
     Super+Space hotkey-overlay-title="Launcher" {
         spawn-sh "noctalia msg panel-toggle launcher"
     }
-    // FIXME
+    // FIXME: Not sure how this works in noctalia v5
     Super+Shift+Space hotkey-overlay-title="Command Launcher" {
         spawn-sh "noctalia msg launcher command"
     }
@@ -320,7 +320,7 @@ binds {
     Super+Ctrl+S hotkey-overlay-title="Suspend" {
         spawn-sh "noctalia msg session lock-and-suspend"
     }
-    // FIXME
+    // FIXME: Not sure how this works in noctalia v5
     Super+Ctrl+M hotkey-overlay-title="System Monitor" {
         spawn-sh "noctalia msg systemMonitor toggle"
     }
@@ -340,9 +340,18 @@ binds {
     Super+Return hotkey-overlay-title="New neovide terminal" {
         spawn "nvim-neovide" "--" "-c" "term"
     }
-    // Maybe better to auto-load the session as well?
-    Super+S hotkey-overlay-title="Neovide Scratchpad" {
-        spawn "spawn-nvim-scratchpad"
+    // ========== Focus Or Launch ==========
+    Super+Shift+S hotkey-overlay-title="Scratchpad" {
+        spawn "nirius focus-or-spawn --app-id neovide-scratchpad spawn-nvim-scratchpad"
+    }
+    Super+Shift+B hotkey-overlay-title="Focus or Launch Browser" {
+        spawn "nirius focus-or-spawn --app-id firefox firefox"
+    }
+    Super+Shift+M hotkey-overlay-title="Focus or Launch Music Player" {
+        spawn "nirius focus-or-spawn --app-id spotify spotify"
+    }
+    Super+Shift+C hotkey-overlay-title="Focus or Launch Chat" {
+        spawn "nirius focus-or-spawn --app-id signal signal"
     }
     //
     // ========== Clipboard ==========
