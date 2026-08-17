@@ -9,7 +9,7 @@ let
   subnets = networking.subnets;
   ports = networking.ports;
   llamaSwapPort = ports.tcp.llama-swap;
-  picoSpecs = rec {
+  vmSpecs = rec {
     vm-lan = subnets.p-lan;
     hostAuthorizedKeys = [
       subnets.o-lan.hosts.${config.networking.hostName}.sshPubKey
@@ -40,7 +40,7 @@ in
       import (lib.custom.relativeToRoot "modules/hosts/nixos/microvms/agents.nix") (
         args
         // {
-          vmSpecs = picoSpecs;
+          inherit vmSpecs;
         }
       )
     )
@@ -48,17 +48,18 @@ in
 
   microvm.vms.pico = {
     specialArgs = {
-      vmSpecs = picoSpecs;
+      inherit vmSpecs;
     };
     config = {
       imports = [
         (lib.custom.relativeToRoot "microvms/hosts/common/optional/agents.nix")
       ];
       home-manager = {
-        users.${picoSpecs.user} = {
+        users.${vmSpecs.user} = {
           imports = [ ./home.nix ];
         };
       };
+      microvm.vsock.cid = 4 + (lib.toInt (lib.custom.network.lastOctet vmSpecs.ip));
     };
   };
 }

@@ -71,8 +71,6 @@ lib.mkIf (lib.length (lib.attrNames osConfig.microvm.vms) != 0) {
       # FIXME: finish
       mv-umount-all = "";
 
-      # VM-specific helpers that need to be moved
-      agent = "ssh nano zla agents"; # Attach to agent session
     };
     # Helper functions for aliases that are annoying to inline
     initContent =

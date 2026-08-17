@@ -153,7 +153,7 @@ in
       let
         inherit (lib.custom.network) mkWireguardPeer;
       in
-      [
+      lib.trace wg-subnet.hosts.moon [
         (mkWireguardPeer wg-subnet.hosts.moon)
         (mkWireguardPeer wg-subnet.hosts.moxy)
       ];

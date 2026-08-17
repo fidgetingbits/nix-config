@@ -12,7 +12,10 @@ microvm -s <name> -- -i ~/.ssh/id_ed25519
 
 ## New Microvm
 
-Remember to add a `microvms/keys/ssh/<name>` entry to the host's SOPs file
+Remember to:
+    - add a `microvms/keys/ssh/<name>` entry to the host's SOPs file
+    - add a network for the new host in the appropriate nix-secrets subnet
+    - ensure the `microvm.vsock.cid` is unique to the host
 
 ## Overview
 

@@ -7,24 +7,22 @@
 let
   networking = config.hostSpec.networking;
   subnets = networking.subnets;
-  ports = networking.ports;
-  llamaSwapPort = ports.tcp.llama-swap;
+  olan = subnets.o-lan;
   vmSpecs = rec {
-    vm-lan = subnets.p-lan;
+    vm-lan = subnets.n-lan;
     hostAuthorizedKeys = [
-      subnets.o-lan.hosts.${config.networking.hostName}.sshPubKey
-      subnets.o-lan.hosts."ossa".sshPubKey
+      olan.hosts.${config.networking.hostName}.sshPubKey
     ];
-    inherit (vm-lan.hosts.pika) ip;
-    name = "pika";
+    inherit (vm-lan.hosts.neko) ip;
+    name = "neko";
     user = config.hostSpec.primaryUsername;
-    mac = (lib.head vm-lan.hosts.pika.mac);
+    mac = (lib.head vm-lan.hosts.neko.mac);
     sshPort = 22;
     sharedDir = config.${namespace}.microvms.sharedDir;
     allowedPorts = {
       # Expose local llama-swap for use by agents
       tcp = [
-        llamaSwapPort
+        # llamaSwapPort
       ];
     };
     # Some service stuff needs synced ports, so we need to expose it
@@ -46,7 +44,8 @@ in
     )
   ];
 
-  microvm.vms.pika = {
+  # NOTE: Below this line is the config of the VM itself
+  microvm.vms.neko = {
     specialArgs = {
       inherit vmSpecs;
     };
@@ -55,10 +54,14 @@ in
         (lib.custom.relativeToRoot "microvms/hosts/common/optional/agents.nix")
       ];
       home-manager = {
+        # FIXME(microvms): This would need to change if we want multiple users
         users.${vmSpecs.user} = {
           imports = [ ./home.nix ];
         };
       };
+      # FIXME: Should we auto-assign these?
+      # Starts at 3 for guests, and need to be unique per vm. So we use their LAN address
+      # https://www.man7.org/linux/man-pages/man7/vsock.7.html
       microvm.vsock.cid = 4 + (lib.toInt (lib.custom.network.lastOctet vmSpecs.ip));
     };
   };

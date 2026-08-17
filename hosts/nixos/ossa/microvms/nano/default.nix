@@ -8,7 +8,7 @@ let
   networking = config.hostSpec.networking;
   subnets = networking.subnets;
   olan = subnets.o-lan;
-  nanoSpecs = rec {
+  vmSpecs = rec {
     vm-lan = subnets.n-lan;
     hostAuthorizedKeys = [
       olan.hosts.${config.networking.hostName}.sshPubKey
@@ -38,7 +38,7 @@ in
       import (lib.custom.relativeToRoot "modules/hosts/nixos/microvms/agents.nix") (
         args
         // {
-          vmSpecs = nanoSpecs;
+          inherit vmSpecs;
         }
       )
     )
@@ -47,7 +47,7 @@ in
   # NOTE: Below this line is the config of the VM itself
   microvm.vms.nano = {
     specialArgs = {
-      vmSpecs = nanoSpecs;
+      inherit vmSpecs;
     };
     config = {
       imports = [
@@ -55,11 +55,11 @@ in
       ];
       home-manager = {
         # FIXME(microvms): This would need to change if we want multiple users
-        users.${nanoSpecs.user} = {
+        users.${vmSpecs.user} = {
           imports = [ ./home.nix ];
         };
       };
-      microvm.vsock.cid = 5;
+      microvm.vsock.cid = 4 + (lib.toInt (lib.custom.network.lastOctet vmSpecs.ip));
     };
   };
 }

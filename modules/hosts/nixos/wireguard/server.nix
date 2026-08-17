@@ -6,8 +6,7 @@
 }:
 let
   cfg = config.${namespace}.wireguard;
-  inherit (lib.custom.network) mkWireguardPeer;
-  mkWireguardPeers = role: hosts: (map (host: mkWireguardPeer role host) hosts);
+  inherit (lib.custom.network) mkWireguardPeers;
 in
 lib.mkIf (cfg.enable && cfg.role == "server") {
   boot.kernel.sysctl = {
@@ -32,7 +31,7 @@ lib.mkIf (cfg.enable && cfg.role == "server") {
     wireguard = {
       interfaces = {
         ${cfg.interface} = {
-          peers = mkWireguardPeers cfg.role cfg.peers;
+          peers = mkWireguardPeers cfg.peers;
         };
       };
     };
