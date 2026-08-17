@@ -93,8 +93,6 @@ in
       {
         nftables = {
           enable = true;
-          # FIXME: The vm_routing part should only be added for vpn in vpn.nix?
-
           ruleset = ''
             table inet microvm-input {
               chain input {
@@ -109,31 +107,8 @@ in
                 ${genAllowedInputs}
                 ${lib.concatStringsSep "\n" cfg.extraInputRules}
 
-
-                # Anything not explicitly allowed above gets dropped
+                iifname "${vmBridge}" ct state established,related accept
                 iifname "${vmBridge}" drop
-              }
-            }
-
-            table inet vm_routing {
-              chain output {
-                type filter hook output priority filter;
-                oifname "${vmBridge}" accept
-              }
-
-              chain forward {
-                type filter hook forward priority filter; policy drop;
-
-                # Allow established internet traffic back to the VM
-                ct state established,related accept
-
-                # Allow the VM to route outbound traffic to the VPN interface
-                iifname "${vmBridge}" oifname "${vpnCfg.ifname}" accept
-              }
-
-              chain postrouting {
-                type nat hook postrouting priority srcnat; policy accept;
-                oifname "${vpnCfg.ifname}" masquerade
               }
             }
           '';

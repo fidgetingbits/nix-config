@@ -14,10 +14,21 @@ let
   sopsFolder = secretsFolder + "/sops/";
   cfg = config.${namespace}.microvms.vpn;
   vpn = config.hostSpec.networking.vpn.wg-proton-microvms;
+
+  vmcfg = config.${namespace}.microvms;
+  vmBridge = vmcfg.vmBridge;
+  vpnCfg = vmcfg.vpn;
 in
 {
   options.${namespace}.microvms.vpn = {
-    enable = lib.mkEnableOption "Enable outgoing microvm VPN bridge";
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default =
+        config.microvm.vms
+        |> lib.attrNames
+        |> lib.any (name: config.microvm.vms.${name}.specialArgs.vmSpecs.vpn or false);
+      description = "Enable outgoing microvm VPN bridge";
+    };
     ifname = lib.mkOption {
       type = lib.types.str;
       default = "vm-vpn";
@@ -79,5 +90,49 @@ in
         sopsFile = cfg.sopsFile;
       };
     };
+
+    # Only allow outgoing activity from microvms using the VPN
+    # FIXME: Should create wan bridge that only VPNs with VPN access use
+    # otherwise _technically_ the offline VM could spoof to get outbound
+    networking.nftables.ruleset = ''
+      table inet vm_routing {
+        chain output {
+          type filter hook output priority filter;
+          oifname "${vmBridge}" accept
+        }
+
+        chain forward {
+          type filter hook forward priority filter; policy drop;
+
+          # Allow established internet traffic back to the VM
+          ct state established,related accept
+
+          # Allow the VM to route outbound traffic to the VPN interface
+          ${
+            config.microvm.vms
+            |> lib.attrNames
+            |> map (
+              name:
+              let
+                vm = config.microvm.vms.${name};
+                ip = vm.specialArgs.vmSpecs.ip;
+              in
+              if (vm.specialArgs.vmSpecs.vpn or false) then
+                ''
+                  iifname "${vmBridge}" ip saddr "${ip}" oifname "${vpnCfg.ifname}" accept
+                ''
+              else
+                ""
+            )
+            |> lib.concatStringsSep "\n"
+          }
+        }
+
+        chain postrouting {
+          type nat hook postrouting priority srcnat; policy accept;
+          oifname "${vpnCfg.ifname}" masquerade
+        }
+      }
+    '';
   };
 }

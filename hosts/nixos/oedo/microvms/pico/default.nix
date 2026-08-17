@@ -29,15 +29,21 @@ let
     };
     # Some service stuff needs synced ports, so we need to expose it
     ports = config.hostSpec.networking.ports;
+    vpn = true;
   };
 in
 {
   imports = [
     # Anonymous submodule to allow us to specify an isolated vmSpecs
-    {
-      _module.args.vmSpecs = picoSpecs;
-      imports = [ (lib.custom.relativeToRoot "modules/hosts/nixos/microvms/agents.nix") ];
-    }
+    (
+      args:
+      import (lib.custom.relativeToRoot "modules/hosts/nixos/microvms/agents.nix") (
+        args
+        // {
+          vmSpecs = picoSpecs;
+        }
+      )
+    )
   ];
 
   microvm.vms.pico = {
@@ -54,9 +60,5 @@ in
         };
       };
     };
-  };
-
-  ${namespace}.microvms = {
-    vpn.enable = true;
   };
 }

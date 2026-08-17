@@ -161,5 +161,13 @@ in
             config.microvm.stateDir
           ];
     };
+
+    networking.hosts =
+      config.microvm.vms
+      |> lib.attrNames
+      |> lib.map (name: {
+        "${config.microvm.vms.${name}.specialArgs.vmSpecs.ip}" = [ name ];
+      })
+      |> lib.mergeAttrsList;
   };
 }

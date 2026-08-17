@@ -7,27 +7,29 @@
 let
   networking = config.hostSpec.networking;
   subnets = networking.subnets;
-  olan = subnets.o-lan;
-  nanoSpecs = rec {
-    vm-lan = subnets.n-lan;
+  ports = networking.ports;
+  llamaSwapPort = ports.tcp.llama-swap;
+  pikaSpecs = rec {
+    vm-lan = subnets.p-lan;
     hostAuthorizedKeys = [
-      olan.hosts.${config.networking.hostName}.sshPubKey
+      subnets.o-lan.hosts.${config.networking.hostName}.sshPubKey
+      subnets.o-lan.hosts."ossa".sshPubKey
     ];
-    inherit (vm-lan.hosts.nano) ip;
-    name = "nano";
+    inherit (vm-lan.hosts.pika) ip;
+    name = "pika";
     user = config.hostSpec.primaryUsername;
-    mac = (lib.head vm-lan.hosts.nano.mac);
+    mac = (lib.head vm-lan.hosts.pika.mac);
     sshPort = 22;
     sharedDir = config.${namespace}.microvms.sharedDir;
     allowedPorts = {
       # Expose local llama-swap for use by agents
       tcp = [
-        # llamaSwapPort
+        llamaSwapPort
       ];
     };
     # Some service stuff needs synced ports, so we need to expose it
     ports = config.hostSpec.networking.ports;
-    vpn = true;
+    vpn = false;
   };
 in
 {
@@ -38,28 +40,25 @@ in
       import (lib.custom.relativeToRoot "modules/hosts/nixos/microvms/agents.nix") (
         args
         // {
-          vmSpecs = nanoSpecs;
+          vmSpecs = pikaSpecs;
         }
       )
     )
   ];
 
-  # NOTE: Below this line is the config of the VM itself
-  microvm.vms.nano = {
+  microvm.vms.pika = {
     specialArgs = {
-      vmSpecs = nanoSpecs;
+      vmSpecs = pikaSpecs;
     };
     config = {
       imports = [
         (lib.custom.relativeToRoot "microvms/hosts/common/optional/agents.nix")
       ];
       home-manager = {
-        # FIXME(microvms): This would need to change if we want multiple users
-        users.${nanoSpecs.user} = {
+        users.${pikaSpecs.user} = {
           imports = [ ./home.nix ];
         };
       };
-      microvm.vsock.cid = 5;
     };
   };
 }

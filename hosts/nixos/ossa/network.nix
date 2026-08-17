@@ -23,6 +23,7 @@ let
   wg-lan = subnets.agent-lan;
   o-lan = subnets.o-lan;
   vmBridge = config.${namespace}.microvms.vmBridge;
+  oedoConfig = inputs.self.nixosConfigurations.oedo.config;
 in
 {
   networking.networkmanager.enable = true;
@@ -106,7 +107,7 @@ in
   systemd.network.networks."20-${vmBridge}".routingPolicyRules = [
     {
       From = config.${namespace}.microvms.vmLan.cidr;
-      To = inputs.self.nixosConfigurations.oedo.config.${namespace}.microvms.vmLan.cidr;
+      To = oedoConfig.${namespace}.microvms.vmLan.cidr;
       Table = "main";
       Priority = 998;
     }
@@ -117,4 +118,13 @@ in
       Priority = 998;
     }
   ];
+
+  # Add /etc/hosts entries for VMs we have access to on oedo
+  networking.hosts =
+    lib.trace (lib.trace oedoConfig.microvm.vms.pika.specialArgs oedoConfig.microvm.vms.pico.specialArgs) oedoConfig.microvm.vms
+    |> lib.attrNames
+    |> lib.map (name: {
+      "${oedoConfig.microvm.vms.${name}.specialArgs.vmSpecs.ip}" = [ name ];
+    })
+    |> lib.mergeAttrsList;
 }

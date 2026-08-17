@@ -108,6 +108,7 @@ let
       # -m is local gguf file
       # -hf is direct download: <user>/<model>[:quant]
       # --no-mmap : Model might be larger than remaining system RAM
+      # FIXME: Add fix-ctx
       cmd = lib.concatStringsSep "\n" (
         [
           llama-server
@@ -156,6 +157,18 @@ let
     ##
     # QWEN
     ##
+
+    "Qwen 3.8 27B (Heavy)" = mkModel {
+      hf = "unsloth/Qwen3.8-27B-GGUF:UD-Q5_K_XL";
+      kv = genKV;
+      sampling = [
+        "--temp 1.0"
+        "--top_p 0.95"
+        "--top_k 20 "
+      ];
+      thinking = true;
+      alias = "qwen3.8:27b-q5";
+    };
 
     # strix halo: pp 71.79 t/s, tg 58.24 t/s
     # strix point: pp 36.59 t/s, tg 20.18 t/s

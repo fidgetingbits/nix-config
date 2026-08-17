@@ -58,15 +58,20 @@ in
       mutableUsers = false;
       allowNoPasswordLogin = true;
 
-      users.${user} = {
-        isNormalUser = true;
-        uid = 1000; # FIXME: Needs to be configurable? Needs to be relayed to shared folders somehow
-        home = "/home/${user}";
-        createHome = true;
-        shell = pkgs.zsh;
-        openssh.authorizedKeys.keys = hostAuthorizedKeys;
-        # Secrets exposed in /run/micromv-secrets/{name} are scoped to this group
-        extraGroups = [ "kvm" ];
+      users = {
+        ${user} = {
+          isNormalUser = true;
+          uid = 1000; # FIXME: Needs to be configurable? Needs to be relayed to shared folders somehow
+          home = "/home/${user}";
+          createHome = true;
+          shell = pkgs.zsh;
+          openssh.authorizedKeys.keys = hostAuthorizedKeys;
+          # Secrets exposed in /run/micromv-secrets/{name} are scoped to this group
+          extraGroups = [ "kvm" ];
+        };
+        root = {
+          openssh.authorizedKeys.keys = hostAuthorizedKeys;
+        };
       };
 
       groups.${user}.gid = 1000;
@@ -117,7 +122,7 @@ in
       enable = true;
       ports = [ sshPort ];
       settings = {
-        PermitRootLogin = "no";
+        PermitRootLogin = "yes";
         PasswordAuthentication = false;
         KbdInteractiveAuthentication = false;
 

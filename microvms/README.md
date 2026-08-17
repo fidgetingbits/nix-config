@@ -1,5 +1,21 @@
 This repo uses [microvm.nix](https://microvm-nix.github.io/) with some additional automation around it.
 
+## Cheatsheet
+
+If you have `microvm.vsock.cid` declared for a microvm `<name>` you can use the
+tool `microvm` to ssh using a vsock. This is useful if you run into some
+routing bug where you can't connect to the network otherwise.
+
+```bash
+microvm -s <name> -- -i ~/.ssh/id_ed25519
+```
+
+## New Microvm
+
+Remember to add a `microvms/keys/ssh/<name>` entry to the host's SOPs file
+
+## Overview
+
 Quick structural overview:
 
 `hosts/nixos/<host>/microvms/` - One or more microvms to run on <host>
