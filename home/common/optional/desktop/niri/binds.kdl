@@ -342,16 +342,16 @@ binds {
     }
     // ========== Focus Or Launch ==========
     Super+Shift+S hotkey-overlay-title="Scratchpad" {
-        spawn "nirius focus-or-spawn --app-id neovide-scratchpad spawn-nvim-scratchpad"
+        spawn-sh "nirius focus-or-spawn --app-id neovide-scratchpad spawn-nvim-scratchpad"
     }
     Super+Shift+B hotkey-overlay-title="Focus or Launch Browser" {
-        spawn "nirius focus-or-spawn --app-id firefox firefox"
+        spawn-sh "nirius focus-or-spawn --app-id firefox firefox"
     }
     Super+Shift+M hotkey-overlay-title="Focus or Launch Music Player" {
-        spawn "nirius focus-or-spawn --app-id spotify spotify"
+        spawn-sh "nirius focus-or-spawn --app-id spotify spotify"
     }
     Super+Shift+C hotkey-overlay-title="Focus or Launch Chat" {
-        spawn "nirius focus-or-spawn --app-id signal signal"
+        spawn-sh "nirius focus-or-spawn --app-id signal signal"
     }
     //
     // ========== Clipboard ==========
