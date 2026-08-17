@@ -361,7 +361,8 @@ noctalia-backup:
     # recent settings changes that may have happened and have not yet been caught by noctalia-snapshot-settings
     # service. A precautionary measure, since it's happened at least once before.
     # NOTE: If something is broken in the build, this might fail on rebuilds, but not pressing, so just ignore
-    noctalia-shell ipc call state all | jq -S .settings > ~/.cache/noctalia/backup/settings_pre_rebuild.json 2>/dev/null || true
+    # FIXME: This doesn't work with v5
+    # noctalia ipc call state all | jq -S .settings > ~/.cache/noctalia/backup/settings_pre_rebuild.json 2>/dev/null || true
 
 # Diff current settings against the last rebuild backup
 [group("noctalia")]
