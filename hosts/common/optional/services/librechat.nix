@@ -36,7 +36,7 @@ in
             apiKey = "foo";
             baseURL = "http://oedo.${config.hostSpec.domain}:${toString ports.tcp.llama-swap}/v1";
             models = {
-              default = [ "Qwen 3.6 Coder 30B (Light)" ];
+              default = [ "Qwen 3.8 27B (Heavy)" ];
               fetch = false;
             };
             titleConvo = true;
