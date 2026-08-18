@@ -185,8 +185,9 @@ in
         Restart = "always";
         RestartSec = "1s";
         # Restart always
-        StartLimitInterval = 0;
       };
+
+      startLimitIntervalSec = 0;
     };
 
     sops.secrets = {

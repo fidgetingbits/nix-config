@@ -121,7 +121,7 @@ in
 
   # Add /etc/hosts entries for VMs we have access to on oedo
   networking.hosts =
-    lib.trace (lib.trace oedoConfig.microvm.vms.pika.specialArgs oedoConfig.microvm.vms.pico.specialArgs) oedoConfig.microvm.vms
+    oedoConfig.microvm.vms
     |> lib.attrNames
     |> lib.map (name: {
       "${oedoConfig.microvm.vms.${name}.specialArgs.vmSpecs.ip}" = [ name ];
