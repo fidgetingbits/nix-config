@@ -57,5 +57,10 @@
 
       definedAliases = [ "@orm" ];
     };
+    "kernelconfig" = {
+      urls = [ { template = "https://www.kernelconfig.io/{searchTerms}"; } ];
+
+      definedAliases = [ "@kc" ];
+    };
   };
 }
