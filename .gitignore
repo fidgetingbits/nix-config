@@ -16,5 +16,5 @@ binaryninja_linux_stable_commercial.zip
 # Backup files for temporary changes
 *.bk
 
-/.git-crypt.key
+.git-crypt.key
 /flake.lock
