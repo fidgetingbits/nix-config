@@ -344,6 +344,10 @@
     introdus = {
       url = "path:///home/aa/dev/nix/introdus/aa";
     };
+    neovim-nightly-overlay = {
+      url = "github:nix-community/neovim-nightly-overlay";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
 
   };
 }

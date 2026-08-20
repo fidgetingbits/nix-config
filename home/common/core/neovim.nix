@@ -20,7 +20,8 @@
   # and exposed in the config as wrappers.neovim.
 
   wrappers.neovim = {
-    package = pkgs.unstable.neovim-unwrapped;
+    # package = pkgs.unstable.neovim-unwrapped;
+    package = inputs.neovim-nightly-overlay.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
     # We need some sops-secret-based environment variables on development boxes, and
     # won't inherit them from zsh since we are typically running neovide
