@@ -37,7 +37,7 @@ configuration, and can also be used to store any other home-level customization
 as well, like in `home.nix`.
 
 The creation of said per-host microvms is handled by a function called
-`lib.custom.microvms.mkMicrovm` which is called by
+`lib.custom.microvm.mkMicrovm` which is called by
 `hosts/nixos/ossa/microvms/default.nix`, though this will eventually be moved
 so it is more generic. This file gets auto-parsed because `mkHost` for a given
 nixos system already has automation such that every .nix file or

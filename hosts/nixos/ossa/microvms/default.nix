@@ -13,7 +13,7 @@ let
 in
 {
   imports = [
-    (lib.custom.microvms.mkMicrovms ./.)
+    (lib.custom.microvm.mkMicrovms ./.)
   ];
   ${namespace}.microvms = {
     vmLan = subnets.n-lan;
