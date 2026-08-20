@@ -1,4 +1,5 @@
 {
+  pkgs,
   lib,
   osConfig,
   ...
@@ -63,6 +64,9 @@ in
     nix repl --option experimental-features "flakes pipe-operators" \
     --expr 'rec { pkgs = import <nixpkgs>{}; lib = pkgs.lib; }'
   '';
+  toml2nix = "${pkgs.writeScript "toml2nix" ''
+    nix eval --impure --expr 'builtins.fromTOML (builtins.readFile "'$1'")' | ${lib.getExe pkgs.nixfmt} -
+  ''}";
 
   # nftables
   nftls = "sudo nft -at list ruleset"; # list all tables and chains

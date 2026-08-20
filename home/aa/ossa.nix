@@ -82,6 +82,51 @@
       }))
     ];
 
+  home.file.".config/nox/nox.toml".source = (pkgs.formats.toml { }).generate "config.toml" {
+    # auto_refresh_cache = true;
+    # cache_dir = "/home/aa/.cache/nox";
+    # cache_duration = "1week";
+    # enable_logging = true;
+    # log_file = "/home/aa/.local/share/nox/nox.log";
+    # log_level = "error";
+    sources = [
+      {
+        name = "NixOS";
+        url = "https://nixos.org/manual/nixos/stable/options";
+        version_url = "https://nixos.org/manual/nixos/stable/";
+      }
+      {
+        name = "NixOS Unstable";
+        url = "https://nixos.org/manual/nixos/unstable/options";
+        version_url = "https://nixos.org/manual/nixos/unstable/";
+      }
+      {
+        name = "Home Manager";
+        url = "https://nix-community.github.io/home-manager/options.xhtml";
+        version_url = "https://nix-community.github.io/home-manager/";
+      }
+      {
+        name = "Home Manager NixOS";
+        url = "https://nix-community.github.io/home-manager/nixos-options.xhtml";
+        version_url = "https://nix-community.github.io/home-manager/";
+      }
+      # {
+      #   name = "Home Manager Nix-Darwin";
+      #   url = "https://nix-community.github.io/home-manager/nix-darwin-options.xhtml";
+      #   version_url = "https://nix-community.github.io/home-manager/";
+      # }
+      # {
+      #   name = "Nix-Darwin";
+      #   url = "https://nix-darwin.github.io/nix-darwin/manual/index.html";
+      # }
+      {
+        name = "Nix Built-ins";
+        url = "https://nix.dev/manual/nix/2.28/language/builtins.html";
+      }
+    ];
+    use_cache = true;
+  };
+
   # FIXME: Could setup some sort of auto-upload to immich for dumping into a specific folder
   # like https://github.com/kiriwalawren/dotnix/blob/2f8d698c88fdb8ed260be077f4b2bbd00fdb063b/modules/system/immich-upload.nix#L39
   sops.secrets = {
