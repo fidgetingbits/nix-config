@@ -52,7 +52,36 @@ in
   networking.enableIPv6 = false;
 
   # System-wide packages, in case we log in as root
-  environment.systemPackages = [ pkgs.openssh ];
+  # FIXME: This is somewhat duplicated with home
+  environment.systemPackages = lib.attrValues {
+    inherit (pkgs)
+      openssh
+      eza # ls replacement
+      zoxide # cd replacement
+      fd # tree-style ls
+      procs # ps replacement
+      duf # df replacement
+      ripgrep # grep replacement
+      dust # du replacement
+      p7zip # archive
+      pstree # tree-style ps
+      lsof # list open files
+      eva # cli calculator
+      hexyl # hexdump replacement
+      grc # colorize output
+      fastfetch
+      jq # json
+      gnupg
+      yq-go # yaml
+      dig
+
+      findutils # find
+      file # file type analysis
+
+      # network utilities
+      iputils # ping, traceroute, etc
+      ;
+  };
 
   # FIXME: Need to see if this is better than gnome, etc
   programs.ssh.askPassword = pkgs.lib.mkForce "${pkgs.kdePackages.ksshaskpass.out}/bin/ksshaskpass";
