@@ -6,10 +6,58 @@
   pkgs,
   ...
 }:
+let
+  # When debugging neovim issues it's handy to automate some stuff so you can
+  # quickly get going.
+  nvim-debug-gdb = pkgs.writeTextFile {
+    name = "nvim-debug.gdb";
+    text = ''
+      set follow-fork-mode parent
+      set $home = $_getenv("HOME")
+
+      # Use eval to construct and execute commands dynamically
+      eval "directory %s/dev/neovim/neovim/", $home
+      eval "set substitute-path /build/source/ %s/dev/neovim/neovim/", $home
+
+      # Shut up [Detaching after fork from child process 902905] spam
+      set print inferior-events off
+
+      continue
+    '';
+  };
+  nvim-debug = pkgs.writeShellApplication {
+    name = "nvim-debug";
+    runtimeInputs = lib.attrValues {
+      inherit (pkgs)
+        pwndbg
+        gawk
+        pstree
+        procps
+        ;
+    };
+    text = # bash
+      ''
+        cd ${config.home.homeDirectory}/dev/neovim/neovim || exit 1
+        HASH=$(nvim --version | grep nightly | cut -f2 -d+)
+        git checkout "$HASH"
+        cd - || exit 1
+        PID=''${1:-"$(pstree "$(pgrep neovide | tail -1)" | grep "/bin/nvim" | grep -v grep | tail -1 | awk '{print $2}')"}
+        if [ -z "$PID" ]; then
+          echo "No PID found, or specified, for neovim. Can't debug"
+          echo "Usage: ./$0 [PID]"
+          echo "If no PID is supplied, tries to debug the /bin/nvim child of the most recent neovide instance"
+          exit 1
+        fi
+        pwndbg -q -x ${nvim-debug-gdb} -p "$PID"
+      '';
+  };
+in
 {
   # This is required here now because introdus stopped using mkInstallModule,
   # otherwise introdus will infinite recurse
   imports = [ inputs.fidgetingvim.wrappers.neovim.install ];
+
+  home.packages = lib.optionals osConfig.hostSpec.isDevelopment [ nvim-debug ];
 
   introdus.neovim = {
     enable = true;
@@ -21,7 +69,12 @@
 
   wrappers.neovim = {
     # package = pkgs.unstable.neovim-unwrapped;
-    package = inputs.neovim-nightly-overlay.packages.${pkgs.stdenv.hostPlatform.system}.default;
+    # package = inputs.neovim-nightly-overlay.packages.${pkgs.stdenv.hostPlatform.system}.default;
+    package =
+      let
+        nightly = inputs.neovim-nightly-overlay.packages.${pkgs.stdenv.hostPlatform.system};
+      in
+      if osConfig.hostSpec.isDevelopment then nightly.neovim-debug else nightly.default;
 
     # We need some sops-secret-based environment variables on development boxes, and
     # won't inherit them from zsh since we are typically running neovide
@@ -79,4 +132,5 @@
           baseConfig = lib.mkForce "${inputs.introdus-git}/wrappers/neovim";
         };
   };
+
 }
