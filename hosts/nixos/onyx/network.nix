@@ -31,7 +31,6 @@
     };
     services.per-network-services = {
       enable = true;
-      debug = true; # FIXME(onyx): Remove this
       # FIXME: This should be synchronized with the code that renames it
       networkDevices = [ "wlo1" ];
       trustedNetworks = lib.flatten [
