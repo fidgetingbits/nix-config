@@ -86,6 +86,8 @@ let
     "--top-k 64"
     "--min-p 0.01"
   ];
+  # ??
+  ornithSampling = qwenSampling;
 
   llama-server = lib.getExe' llama-cpp "llama-server";
 
@@ -160,7 +162,9 @@ let
 
     "Qwen 3.8 27B (Heavy)" = mkModel {
       hf = "unsloth/Qwen3.8-27B-GGUF:UD-Q5_K_XL";
-      kv = genKV;
+      # bf16 I get 10t/s on strix, which is a bit meh
+      # kv = genKV;
+      kv = "q8_0";
       sampling = [
         "--temp 1.0"
         "--top_p 0.95"
@@ -244,6 +248,26 @@ let
       sampling = gemmaSampling;
       thinking = false;
       alias = "gemma-4:31b-q6";
+    };
+
+    ##
+    # Other
+    ##
+
+    # They mention enabling RoPE here https://huggingface.co/ornith-ai/Ornith-1.5-35B-A3B-GGUF
+    # which may be useful?
+    "Ornith 1.5-35b-a3b" = mkModel {
+      hf = "ornith-ai/Ornith-1.5-35B-A3B-GGUF:Q5_K_M";
+      kv = "f16";
+      sampling = ornithSampling;
+      alias = "ornith-1.5:35b-a3b";
+    };
+
+    "Ornith 1.5-9b" = mkModel {
+      hf = "ornith-ai/Ornith-1.5-9B-GGUF:BF16";
+      kv = "f16";
+      sampling = ornithSampling;
+      alias = "ornith-1.5:9b";
     };
 
     "Nomic Embeddings" = mkModel {
