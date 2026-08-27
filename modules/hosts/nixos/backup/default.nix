@@ -44,7 +44,7 @@ let
     # /home/*/<foo> entries
     (lib.map (path: "${homeBase}/${path}") [
       # Common home cache files/directories
-      "*/.mozilla/firefox/*/storage"
+      # "*/.mozilla/firefox/*/storage"
       "*/Android"
       "*/mount"
       "*/mnt"
@@ -70,6 +70,7 @@ let
     "/var/lib/containerd"
     "/var/lib/docker/"
     "/var/lib/systemd"
+    # FIXME(borg): The llama-swap -hf models download into here... not sure if we want them backed up?
     "/var/cache"
     "/var/tmp"
   ];
