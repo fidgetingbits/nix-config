@@ -312,6 +312,11 @@
 
     pwndbg.url = "github:pwndbg/pwndbg";
 
+    omp-nix = {
+      url = "github:can1357/oh-my-pi";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
+
     #################### Ricing ####################
     stylix = {
       url = "github:danth/stylix/release-26.05";

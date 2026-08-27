@@ -166,6 +166,16 @@ in
   jc = "SYSTEMD_LESS=FRX journalctl";
   jcu = "SYSTEMD_LESS=FRX journalctl --user";
 
+  # backup
+  bbi = "borg-backup-init";
+  bbl = "borg-backup-list";
+  bbbl = "borg-backup-break-lock";
+  bbm = "borg-backup-mount";
+  bbu = "borg-backup-umount";
+  bbh = "borg-backup-help";
+  bbr = "borg-backup-restore";
+  bbt = "tldr borg-backup";
+
   # top
   top = "btm";
   htop = "btm";
