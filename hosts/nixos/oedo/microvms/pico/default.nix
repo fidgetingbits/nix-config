@@ -10,6 +10,7 @@ let
   ports = networking.ports;
   llamaSwapPort = ports.tcp.llama-swap;
   vmSpecs = rec {
+    description = "Agent runner with internet";
     vm-lan = subnets.p-lan;
     hostAuthorizedKeys = [
       subnets.o-lan.hosts.${config.networking.hostName}.sshPubKey

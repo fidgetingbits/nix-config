@@ -13,28 +13,21 @@ let
   cfg = osConfig.${namespace}.microvms;
   home = config.home.homeDirectory;
   sharedDir = "${cfg.sharedDir}/shared";
+  inherit (lib.custom.microvm) mapHostMicrovms;
 in
 lib.mkIf (lib.length (lib.attrNames osConfig.microvm.vms) != 0) {
 
   # Automatic ssh entries
   programs.ssh.settings =
-    osConfig.microvm.vms
-    |> lib.attrNames
-    |> map (
-      name:
-      let
-        vmSpecs = osConfig.microvm.vms.${name}.specialArgs.vmSpecs;
-      in
-      {
-        "${name}" = {
-          match = "host ${name}";
-          hostname = vmSpecs.ip;
-          port = vmSpecs.sshPort;
-          user = vmSpecs.user;
-          identityFile = "${home}/.ssh/id_ed25519";
-        };
-      }
-    )
+    mapHostMicrovms osConfig.microvm.vms (vmSpecs: {
+      "${vmSpecs.name}" = {
+        match = "host ${vmSpecs.name}";
+        hostname = vmSpecs.ip;
+        port = vmSpecs.sshPort;
+        user = vmSpecs.user;
+        identityFile = "${home}/.ssh/id_ed25519";
+      };
+    })
     |> lib.mergeAttrsList;
 
   home.packages = lib.attrValues {
@@ -60,6 +53,7 @@ lib.mkIf (lib.length (lib.attrNames osConfig.microvm.vms) != 0) {
       mvl = "mv-list";
       mvlr = "mv-list-running";
       mvls = "mv-list-stopped";
+      mvs = "_mv-summary";
 
       # I bind mount some folders into microvm view, so this allows easy lookup
       mv-binds = "_mv-binds";
@@ -205,6 +199,16 @@ lib.mkIf (lib.length (lib.attrNames osConfig.microvm.vms) != 0) {
               echo "This would unmount ${sharedDir}/nano/project"
             fi
             umount -l ''${MICROVM_SHARED_PATH:-${sharedDir}/$1/$2}
+          };
+
+          function _mv-summary() {
+            ${
+              mapHostMicrovms osConfig.microvm.vms (
+                vm: "echo \"${osConfig.networking.hostName}: ${vm.name} - ${vm.description}\""
+              )
+              |> lib.concatStringsSep "\n"
+            }
+            ${lib.concatStringsSep "\n" (map (line: "echo \"${line}\"") cfg.extraDescriptions)}
           };
         '';
   };

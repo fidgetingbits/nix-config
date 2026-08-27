@@ -25,6 +25,7 @@ let
       // {
         nix-sweep = inputs.nix-sweep.packages.${system}.default;
         pwndbg = inputs.pwndbg.packages.${system}.default;
+        omp = inputs.omp-nix.packages.${system}.default;
       };
 
     linuxModifications =

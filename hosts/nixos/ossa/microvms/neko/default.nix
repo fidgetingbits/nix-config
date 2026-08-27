@@ -9,6 +9,7 @@ let
   subnets = networking.subnets;
   olan = subnets.o-lan;
   vmSpecs = rec {
+    description = "Agent runner without internet";
     vm-lan = subnets.n-lan;
     hostAuthorizedKeys = [
       olan.hosts.${config.networking.hostName}.sshPubKey

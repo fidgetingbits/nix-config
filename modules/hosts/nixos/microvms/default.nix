@@ -51,6 +51,12 @@ in
       description = "Extra firewall rules to be added for the microvm network";
     };
 
+    extraDescriptions = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      description = "List of extra microvm description in addition to local host";
+      default = [ ];
+    };
+
     # FIXME: Finish this
     remoteAllowedPorts = lib.mkOption {
       type = lib.types.listOf (

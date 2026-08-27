@@ -7,6 +7,9 @@
   namespace,
   ...
 }:
+let
+  inherit (lib.custom.microvm) mapHostMicrovms;
+in
 {
   imports = (
     map lib.custom.relativeToRoot (
@@ -212,25 +215,14 @@
 
   # Automatic ssh entries for oedo microvms on shared network
   programs.ssh.settings =
-    let
-      oedo_vms = inputs.self.nixosConfigurations.oedo.config.microvm.vms;
-    in
-    oedo_vms
-    |> lib.attrNames
-    |> map (
-      name:
-      let
-        vmSpecs = oedo_vms.${name}.specialArgs.vmSpecs;
-      in
-      {
-        "${name}" = {
-          match = "host ${name}";
-          hostname = vmSpecs.ip;
-          port = vmSpecs.sshPort;
-          user = vmSpecs.user;
-          identityFile = "${config.home.homeDirectory}/.ssh/id_ed25519";
-        };
-      }
-    )
+    mapHostMicrovms inputs.self.nixosConfigurations.oedo.config.microvm.vms (vmSpecs: {
+      "${vmSpecs.name}" = {
+        match = "host ${vmSpecs.name}";
+        hostname = vmSpecs.ip;
+        port = vmSpecs.sshPort;
+        user = vmSpecs.user;
+        identityFile = "${config.home.homeDirectory}/.ssh/id_ed25519";
+      };
+    })
     |> lib.mergeAttrsList;
 }

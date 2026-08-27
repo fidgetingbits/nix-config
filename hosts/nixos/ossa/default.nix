@@ -180,6 +180,14 @@
       #   "qwen3.6:coder-30b-a3b-q6"
       # ];
     };
+
+    # Add in descriptions for VMs we use from other hosts, so we can auto generate some commands
+    # FIXME: This should just be some generated part of microvm where we say "we use host foo"
+    microvms.extraDescriptions = (
+      lib.custom.microvm.mapHostMicrovms inputs.self.nixosConfigurations.oedo.config.microvm.vms (
+        vmSpecs: "oedo: ${vmSpecs.name} - ${vmSpecs.description}"
+      )
+    );
   };
 
   # See:
@@ -213,4 +221,5 @@
       # Uncomment when on moat
       # ${subnets.moon.hosts.moon.ip} = [ "moon.${config.hostSpec.domain}" ];
     };
+
 }

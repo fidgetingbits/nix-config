@@ -21,6 +21,7 @@ in
   config =
     let
       jsonFormat = pkgs.formats.json { };
+      # yamlFormat = pkgs.formats.yaml { };
       mkModel = id: name: { inherit id name; };
       genModels =
         {
@@ -40,10 +41,13 @@ in
           };
         };
       models.providers = lib.mergeAttrsList (map (provider: genModels provider) cfg.providers);
+      modelsJson = jsonFormat.generate "pi-coding-agent-models.json" models;
     in
     lib.mkIf ((lib.length cfg.providers) != 0) {
       home.file = {
-        ".pi/agent/models.json".source = jsonFormat.generate "pi-coding-agent-models.json" models;
+        ".pi/agent/models.json".source = modelsJson;
+        # FIXME: omp uses yaml by default I think, so could switch
+        ".omp/agent/models.json".source = modelsJson;
       };
     };
 }

@@ -15,6 +15,7 @@
         crush
         gemini-cli
         pi-coding-agent
+        omp
         ;
     };
   };
