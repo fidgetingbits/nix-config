@@ -46,7 +46,7 @@ in
         "keys/age" = {
           owner = config.users.users.${config.hostSpec.primaryUsername}.name;
           group =
-            if pkgs.stdenv.isLinux then
+            if pkgs.stdenv.hostPlatform.isLinux then
               config.users.users.${config.hostSpec.primaryUsername}.group
             else
               "staff";
@@ -72,12 +72,12 @@ in
       (lib.mkIf config.services.backup.enable {
         "passwords/borg" = {
           owner = "root";
-          group = if pkgs.stdenv.isLinux then "root" else "wheel";
+          group = if pkgs.stdenv.hostPlatform.isLinux then "root" else "wheel";
           mode = "0600";
           path = "/etc/borg/passphrase";
         };
       })
-      (lib.mkIf pkgs.stdenv.isLinux linuxEntries)
+      (lib.mkIf pkgs.stdenv.hostPlatform.isLinux linuxEntries)
     ];
 
   # The containing folders are created as root, and if this is the first ~/.config/ entry,
@@ -93,7 +93,10 @@ in
       ageFolder = "${config.hostSpec.home}/.config/sops/age";
       user = config.users.users.${config.hostSpec.username}.name;
       group =
-        if pkgs.stdenv.isLinux then config.users.users.${config.hostSpec.username}.group else "staff";
+        if pkgs.stdenv.hostPlatform.isLinux then
+          config.users.users.${config.hostSpec.username}.group
+        else
+          "staff";
     in
     ''
       mkdir -p ${ageFolder} || true

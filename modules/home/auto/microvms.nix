@@ -64,8 +64,14 @@ lib.mkIf (lib.length (lib.attrNames osConfig.microvm.vms) != 0) {
       mvb = "mv-bind";
       # FIXME: finish
       mv-umount-all = "";
+    }
+    // (
+      mapHostMicrovms osConfig.microvm.vms (vm: {
+        "cd${vm.name}" = "cd ${sharedDir}/shared/${vm.name}";
+      })
+      |> lib.mergeAttrsList
+    );
 
-    };
     # Helper functions for aliases that are annoying to inline
     initContent =
       lib.mkAfter

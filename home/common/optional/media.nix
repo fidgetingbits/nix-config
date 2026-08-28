@@ -4,7 +4,7 @@
   ...
 }:
 let
-  videoPlayers = if pkgs.stdenv.isDarwin then [ pkgs.mpv ] else [ pkgs.vlc ];
+  videoPlayers = if pkgs.stdenv.hostPlatform.isDarwin then [ pkgs.mpv ] else [ pkgs.vlc ];
 in
 {
   home.packages = lib.flatten [

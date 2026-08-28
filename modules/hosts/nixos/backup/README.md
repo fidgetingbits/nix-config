@@ -78,7 +78,7 @@ hosts/common/core/sops.nix
 +    # borg password required by nix-config/modules/nixos/backup
 +    "passwords/borg" = {
 +      owner = "root";
-+      group = if pkgs.stdenv.isLinux then "root" else "wheel";
++      group = if pkgs.stdenv.hostPlatform.isLinux then "root" else "wheel";
 +      mode = "*-*-* 0600";
 +      path = "/etc/borg/passphrase";
 +    };

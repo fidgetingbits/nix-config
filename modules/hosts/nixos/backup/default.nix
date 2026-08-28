@@ -16,9 +16,9 @@ let
   hasImpermanence = config.introdus.impermanence.enable;
 
   hostName = config.networking.hostName;
-  homeBase = if pkgs.stdenv.isLinux then "/home" else "/Users";
+  homeBase = if pkgs.stdenv.hostPlatform.isLinux then "/home" else "/Users";
   homeDirectory = config.hostSpec.home;
-  rootHome = if pkgs.stdenv.isLinux then config.users.users.root.home else "/var/root";
+  rootHome = if pkgs.stdenv.hostPlatform.isLinux then config.users.users.root.home else "/var/root";
   excludes = lib.flatten [
     "**/.direnv"
     "**/.cache"
@@ -350,7 +350,7 @@ in
               #shellcheck disable=SC2086
               if borg create --remote-path $BORG_REMOTE_PATH -v --stats --exclude-caches "$BORG_REMOTE::$BORG_BACKUP_NAME" $PWD \
                 --exclude-if-present .nobackup \
-                ${if pkgs.stdenv.isDarwin then "--exclude-from ${darwinExcludesFile}" else " "} \
+                ${if pkgs.stdenv.hostPlatform.isDarwin then "--exclude-from ${darwinExcludesFile}" else " "} \
                 --exclude-from ${borgExcludesFile}; then
                 # NOTE: --glob-archives works like a tag, so we can rename pinned backups with a none matching prefix like pinned-...
                 borg prune --remote-path $BORG_REMOTE_PATH -v --list "$BORG_REMOTE" --glob-archives "$BORG_HOST-*" $BORG_EXPIRY
@@ -748,7 +748,7 @@ in
           "keys/ssh/borg" = {
             # FIXME: ATM this is required by nix-darwin PR I'm using
             owner = "root";
-            group = if pkgs.stdenv.isLinux then "root" else "wheel";
+            group = if pkgs.stdenv.hostPlatform.isLinux then "root" else "wheel";
             path = "${rootHome}/.ssh/id_borg";
           };
         };
@@ -764,7 +764,7 @@ in
 
       }
       # lib.mkIf needed here to avoid infinite recursion
-      (lib.mkIf pkgs.stdenv.isLinux {
+      (lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
         # Linux specific
         systemd =
           let

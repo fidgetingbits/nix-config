@@ -48,7 +48,7 @@
       ++ [ pkgs.unstable.imhex ]
     )
 
-    (lib.optionals pkgs.stdenv.isLinux (
+    (lib.optionals pkgs.stdenv.hostPlatform.isLinux (
       lib.attrValues {
         inherit (pkgs)
           gdb

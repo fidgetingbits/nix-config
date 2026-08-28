@@ -11,7 +11,7 @@
           clang-tools # Provides clangd lsp
           ;
       }
-      // lib.optionalAttrs pkgs.stdenv.isLinux {
+      // lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
         inherit (pkgs)
           bear # For creating compilation databases for clangd
           cscope

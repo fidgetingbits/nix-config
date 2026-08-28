@@ -290,7 +290,8 @@
     };
 
     hister = {
-      url = "github:asciimoo/hister";
+      # charmbracelet libs broken on main
+      url = "github:asciimoo/hister?ref=v0.18.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

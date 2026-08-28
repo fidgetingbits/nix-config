@@ -8,7 +8,7 @@
 let
   cfg = config.${namespace}.cifs-mounts;
   homeDirectory =
-    if pkgs.stdenv.isLinux then
+    if pkgs.stdenv.hostPlatform.isLinux then
       "/home/${config.hostSpec.username}"
     else
       "/Users/${config.hostSpec.username}";

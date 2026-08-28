@@ -39,7 +39,7 @@ lib.mkMerge [
       };
     };
   }
-  (lib.mkIf pkgs.stdenv.isLinux {
+  (lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
     systemd.user.tmpfiles.rules = [
       # https://www.man7.org/linux/man-pages/man5/tmpfiles.d.5.html
       "d %h/${ghidra_dir} 0700 - - -"

@@ -15,7 +15,7 @@
 let
   cfg = config.programs.copyq;
   configDir =
-    if (pkgs.stdenv.isDarwin && !config.xdg.enable) then
+    if (pkgs.stdenv.hostPlatform.isDarwin && !config.xdg.enable) then
       # FIXME: Confirm this
       "Library/Preferences/copyq"
     else

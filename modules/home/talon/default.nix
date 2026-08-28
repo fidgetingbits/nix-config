@@ -7,7 +7,7 @@
 let
   cfg = config.talon;
 in
-# linuxPackages = lib.optional pkgs.stdenv.isLinux [
+# linuxPackages = lib.optional pkgs.stdenv.hostPlatform.isLinux [
 #   pkgs.xsel
 #   pkgs.xdg-utils
 # ];
@@ -55,7 +55,7 @@ in
 
         # FIXME: Double check these are actually needed anymore?
         (pkgs.python311.withPackages (p: (lib.attrValues { inherit (p) lxml beautifulsoup4 requests; })))
-        (lib.optional pkgs.stdenv.isLinux [
+        (lib.optional pkgs.stdenv.hostPlatform.isLinux [
           pkgs.xsel
           pkgs.xdg-utils
         ])

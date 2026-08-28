@@ -30,7 +30,7 @@ let
 
     linuxModifications =
       final: prev:
-      lib.optionalAttrs prev.stdenv.isLinux ({
+      lib.optionalAttrs prev.stdenv.hostPlatform.isLinux ({
         # FIXME: note why I overlayed this
         zsh-edit = prev.zsh-edit.overrideAttrs (oldAttrs: {
           src = prev.fetchFromGitHub {
