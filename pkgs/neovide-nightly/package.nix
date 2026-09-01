@@ -37,7 +37,7 @@ rustPlatform.buildRustPackage.override { stdenv = clangStdenv; } (finalAttrs: re
     repo = "neovide";
     # tag = finalAttrs.version;
     rev = version;
-    hash = "sha256-t/ayXFn2hXrSgAGZKn6FpZLbrMXekXL/+xhOXdsZvKU=";
+    hash = "sha256-T+N8kYsLFbPe5sP6I8y5iK4EaonYCWYit+qQXGn16no=";
   };
 
   cargoHash = "sha256-kl1TXq2CDahMCWRReWxAJqDpH4Gx0xwWkZKcDCHQWUM=";
