@@ -198,6 +198,7 @@ in
     defaultAllowList = [
       olan.cidr
       olan.wg-subnet.hosts.ossa.ip
+      olan.wg-subnet.hosts.onyx.ip
       olan.wg-subnet.hosts.opia.ip
     ];
     defaultDenyList = [ "all" ];

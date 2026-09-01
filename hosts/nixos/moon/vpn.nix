@@ -1,3 +1,5 @@
+# IMPORTANT: For roaming o-lan systems, this is automatic
+# via modules/hosts/nixos/auto/wireguard.nix
 {
   config,
   namespace,
@@ -47,7 +49,7 @@ in
   };
 
   # FIXME: This should just already be part of using the wireguard module no?
-  # Also an issue on ooze
+  # Also an issue on ooze, onyx
   sops.secrets = {
     "keys/wireguard/wgsk" = {
       sopsFile = "${sopsFolder}/${hostName}.yaml";

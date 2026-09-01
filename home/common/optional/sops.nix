@@ -50,8 +50,6 @@ in
     defaultSopsFile = "${sopsFolder}/${osConfig.hostSpec.hostName}.yaml";
     validateSopsFiles = false;
 
-    # FIXME: Confirm this prevents the moth warning and if so then rekey
-    # nix-secrets again
     secrets =
       lib.optionalAttrs (osConfig.hostSpec.isLocal || osConfig.hostSpec.useAtticCache) {
         "keys/git-crypt" = {
@@ -64,7 +62,8 @@ in
           sopsFile = "${sopsFolder}/development.yaml";
         };
         # LLM tokens, use agents.yaml since it's shared elsewhere
-        # FIXME: This should be automated and synced with other usages in config
+        # FIXME: This should be automated and synced with other usages in
+        # config
         "tokens/openai" = {
           sopsFile = "${sopsFolder}/agents.yaml";
         };
@@ -83,10 +82,10 @@ in
         "tokens/nvidia" = {
           sopsFile = "${sopsFolder}/agents.yaml";
         };
-
       }
       // lib.optionalAttrs osConfig.hostSpec.isWork {
-        # FIXME(secrets): Need an activation script to build a config.yml using multiple files (ie: work and personal)
+        # FIXME(secrets): Need an activation script to build a config.yml using
+        # multiple files (ie: work and personal)
         "config/glab" = {
           sopsFile = "${sopsFolder}/development.yaml";
           path = "${homeDirectory}/.config/glab/config.yml";

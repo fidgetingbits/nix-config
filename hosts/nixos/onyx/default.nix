@@ -28,9 +28,7 @@ rec {
           "sound.nix"
 
           # Desktop environment and login manager
-          # "gdm.nix"
           "gnome.nix"
-          # "i3wm.nix"
 
           "icons.nix"
 
@@ -39,12 +37,7 @@ rec {
           "libvirt.nix"
           "wireshark.nix"
           "yubikey.nix"
-          #"iphone-backup.nix"
 
-          # Binary analysis tools
-          # "binaryninja.nix"
-          # FIXME: Temporary to work around build error on update
-          #"cynthion.nix"
           "saleae.nix"
 
           # Network management

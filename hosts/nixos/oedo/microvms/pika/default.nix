@@ -15,6 +15,7 @@ let
     hostAuthorizedKeys = [
       subnets.o-lan.hosts.${config.networking.hostName}.sshPubKey
       subnets.o-lan.hosts."ossa".sshPubKey
+      subnets.o-lan.hosts."onyx".sshPubKey
     ];
     inherit (vm-lan.hosts.pika) ip;
     name = "pika";

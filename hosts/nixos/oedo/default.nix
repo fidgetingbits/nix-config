@@ -131,6 +131,7 @@
       enable = true;
       allowedHosts = [
         "ossa"
+        "onyx"
         # ATM roaming systems will appear as ooze when routing via wireguard
         "ooze"
         "opia"

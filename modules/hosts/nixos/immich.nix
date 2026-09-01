@@ -78,6 +78,7 @@ in
             inherit (config.hostSpec.networking.subnets.o-lan.hosts)
               oppo
               ossa
+              onyx
               # opia
               ;
           };
