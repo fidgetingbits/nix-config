@@ -7,46 +7,47 @@
   imports = lib.custom.scanPaths ./.;
 
   home.packages = lib.flatten [
-    (
-      lib.attrValues {
-        inherit (pkgs)
-          # Development
-          devenv
-          direnv
-          act # github workflow runner
-          gh # github cli
-          glab # gitlab cli
-          yq-go # Parser for Yaml and Toml Files, that mirrors jq
-          git-crypt
-          # reversing
-          radare2
-          binwalk
+    (lib.attrValues {
+      inherit (pkgs)
+        # Development
+        direnv
+        act # github workflow runner
+        gh # github cli
+        glab # gitlab cli
+        yq-go # Parser for Yaml and Toml Files, that mirrors jq
+        git-crypt
+        # reversing
+        radare2
+        binwalk
 
-          # nix
-          nixpkgs-review
+        # nix
+        nixpkgs-review
 
-          # networking
-          nmap
+        # networking
+        nmap
 
-          # Diffing
-          difftastic
+        # Diffing
+        difftastic
 
-          # serial debugging
-          screen
-          picocom
+        # serial debugging
+        screen
+        picocom
 
-          # Standard man pages for linux API
-          man-pages
-          man-pages-posix
+        # Standard man pages for linux API
+        man-pages
+        man-pages-posix
 
-          # rust (global for when browsing public projects)
-          cargo
-          rust-analyzer
-          rustc
-          ;
-      }
-      ++ [ pkgs.unstable.imhex ]
-    )
+        # rust (global for when browsing public projects)
+        cargo
+        rust-analyzer
+        rustc
+        ;
+      inherit (pkgs.unstable)
+        # Development
+        devenv
+        imhex
+        ;
+    })
 
     (lib.optionals pkgs.stdenv.hostPlatform.isLinux (
       lib.attrValues {
