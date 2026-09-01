@@ -39,9 +39,9 @@ lib.mkIf (lib.length (lib.attrNames osConfig.microvm.vms) != 0) {
   programs.zsh = {
     shellAliases = {
       # Microvm management
-      mv-start = "function _mv-start() { systemctl start microvm@$1 }; _mv-start";
-      mv-stop = "function _mv-stop() { systemctl stop microvm@$1 }; _mv-stop";
-      mv-restart = "function _mv-restart() { systemctl restart microvm@$1 }; _mv-restart";
+      mv-start = "function _mv-start() { sudo systemctl start microvm@$1 }; _mv-start";
+      mv-stop = "function _mv-stop() { sudo systemctl stop microvm@$1 }; _mv-stop";
+      mv-restart = "function _mv-restart() { sudo systemctl restart microvm@$1 }; _mv-restart";
       mv-status = "_mv-status";
       mv-status-all = "_mv-status-all";
       mv-log = "_mv-log";
