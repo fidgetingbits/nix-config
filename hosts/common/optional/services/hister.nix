@@ -1,15 +1,12 @@
 {
   lib,
   config,
-  inputs,
   ...
 }:
 let
   ports = config.hostSpec.networking.ports;
 in
 {
-  imports = [ inputs.hister.nixosModules.default ];
-
   services.hister = {
     enable = true;
     port = ports.tcp.hister;
