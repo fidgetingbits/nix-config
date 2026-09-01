@@ -1,5 +1,6 @@
 # Functionality common for microvm's running agent software
 {
+  pkgs,
   lib,
   inputs,
   osConfig,
@@ -21,15 +22,28 @@
     };
     file =
       let
+        perHostPromptFile =
+          (lib.toString inputs.nix-secrets) + "/llm/prompts/${osConfig.networking.hostName}/base.md";
+        basePrompt =
+          [
+            (lib.readFile ((lib.toString inputs.nix-secrets) + "/llm/prompts/base.md"))
+
+            (lib.optionalString (lib.pathExists perHostPromptFile) (lib.readFile perHostPromptFile))
+          ]
+          |> lib.flatten
+          |> lib.concatStringsSep "\n"
+          |> (pkgs.writeText "base-prompt.md");
         genPrompts =
           [
             ".claude/CLAUDE.md"
             ".pi/SYSTEM_APPEND.md"
+            ".omp/APPEND_SYSTEM.md"
             ".codex/AGENTS.md"
           ]
           |> map (path: {
-            "${path}".source =
-              (lib.toString inputs.nix-secrets) + "/prompts/${osConfig.networking.hostName}/base.md";
+            # "${path}".source =
+            #   (lib.toString inputs.nix-secrets) + "/llm/prompts/${osConfig.networking.hostName}/base.md";
+            "${path}".source = basePrompt;
           })
           |> lib.mergeAttrsList;
       in

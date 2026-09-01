@@ -289,11 +289,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    hister = {
-      # charmbracelet libs broken on main
-      url = "github:asciimoo/hister?ref=v0.18.0";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # hister = {
+    #   # charmbracelet libs broken on main
+    #   url = "github:asciimoo/hister?ref=v0.18.0";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
 
     talon-nix = {
       url = "github:fidgetingbits/talon-nix?ref=overrides";
@@ -314,7 +314,7 @@
     pwndbg.url = "github:pwndbg/pwndbg";
 
     omp-nix = {
-      url = "github:can1357/oh-my-pi";
+      url = "github:can1357/oh-my-pi?ref=v18.0.11";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
@@ -333,6 +333,11 @@
       url = "git+ssh://olan-forge/fidgetingbits/nix-secrets.git";
       # url = "path:///home/aa/dev/nix/nix-secrets";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    fidgeting-skills = {
+      url = "git+ssh://olan-forge/fidgetingbits/skills.git?ref=main";
+      flake = false;
     };
 
     fidgetingvim = {

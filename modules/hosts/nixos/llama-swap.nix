@@ -88,6 +88,11 @@ let
   ];
   # ??
   ornithSampling = qwenSampling;
+  # Scale context from 128k to 256k
+  ornithRope = [
+    "--rope-scaling yarn"
+    "--rope-scale 2"
+  ];
 
   llama-server = lib.getExe' llama-cpp "llama-server";
 
@@ -104,6 +109,7 @@ let
       thinking ? true,
       embedding ? false,
       alias ? "",
+      extra ? null,
     }:
     {
       aliases = lib.optional ((lib.stringLength alias) != 0) alias;
@@ -146,6 +152,7 @@ let
         ++ lib.optionals embedding [
           "--embedding"
         ]
+        ++ lib.optionals (extra != null) extra
       );
     };
 
@@ -160,10 +167,11 @@ let
     # QWEN
     ##
 
+    # 2026-08-31
+    # strix halo: pp 120.59 t/s tg 10.14 t/s
+    # strix point:
     "Qwen 3.8 27B (Heavy)" = mkModel {
       hf = "unsloth/Qwen3.8-27B-GGUF:UD-Q5_K_XL";
-      # bf16 I get 10t/s on strix, which is a bit meh
-      # kv = genKV;
       kv = "q8_0";
       sampling = [
         "--temp 1.0"
@@ -172,6 +180,18 @@ let
       ];
       thinking = true;
       alias = "qwen3.8:27b-q5";
+    };
+
+    "Qwen 3.8 Flash (Heavy)" = mkModel {
+      hf = "unsloth/Qwen3.8-Flash-Next-GGUF:UD-Q2_K_XL";
+      kv = "q8_0";
+      sampling = [
+        "--temp 1.0"
+        "--top_p 0.95"
+        "--top_k 20 "
+      ];
+      thinking = true;
+      alias = "qwen3.8:flash-q2";
     };
 
     # strix halo: pp 71.79 t/s, tg 58.24 t/s
@@ -188,6 +208,7 @@ let
       alias = "qwen3.6:coder-30b-a3b-q6";
     };
 
+    # FIXME: candidate for deletion in favor of ornith 1.5 35b
     # strix halo: pp 73.48 t/s, tg 68.41 t/s
     # strix point: pp 41.37 t/s, tg 18.67 t/s
     "Qwen 3.6 General 35B Q4 (Light)" = mkModel {
@@ -197,6 +218,7 @@ let
       alias = "qwen3.6:35b-a3b-mtp-q4";
     };
 
+    # FIXME: candidate for deletion in favor of ornith 1.5 35b
     # strix halo: pp 71.48 t/s, tg 59.11 t/s
     # strix point:
     "Qwen 3.6 General 35B Q8 (Light)" = mkModel {
@@ -251,29 +273,45 @@ let
     };
 
     ##
-    # Other
+    # ORNITH
+    #
+    # Docs mention: --rope-scaling '{"rope_type":"yarn","factor":2.0,"original_max_position_embeddings":32768}' \
     ##
 
-    # They mention enabling RoPE here https://huggingface.co/ornith-ai/Ornith-1.5-35B-A3B-GGUF
-    # which may be useful?
+    # 2026-08-31
+    # strix halo: pp 110.01 t/s tg 57.38 t/s
+    # strix point:
     "Ornith 1.5-35b-a3b" = mkModel {
       hf = "ornith-ai/Ornith-1.5-35B-A3B-GGUF:Q5_K_M";
       kv = "f16";
+      ctx = 200000;
       sampling = ornithSampling;
+      mtp = true;
       alias = "ornith-1.5:35b-a3b";
+      extra = ornithRope;
     };
 
+    # 2026-08-31
+    # strix halo: pp 52.18 t/s tg 12.00 t/s
+    # strix point:
     "Ornith 1.5-9b" = mkModel {
       hf = "ornith-ai/Ornith-1.5-9B-GGUF:BF16";
       kv = "f16";
       sampling = ornithSampling;
+      mtp = true;
       alias = "ornith-1.5:9b";
+      extra = ornithRope;
     };
 
+    ##
+    # Other
+    ##
+
+    # This is used by hister for semantic search
     "Nomic Embeddings" = mkModel {
       hf = "nomic-ai/nomic-embed-text-v1.5-GGUF:F16";
       kv = "f16";
-      ctx = 8192; # Nomic v1.5's native max context window
+      ctx = 8192;
       sampling = [ ];
       thinking = false;
       embedding = true;
