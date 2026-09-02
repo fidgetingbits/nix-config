@@ -82,4 +82,11 @@
     enabled = true;
     default.path = "${inputs.nix-assets}/images/wallpapers/astronaut.webp";
   };
+
+  # https://github.com/noctalia-dev/noctalia/issues/3132#issuecomment-4884242113
+  lockscreen = {
+    enabled = true;
+    fingerprint = false; # FIXME: ossa has a builtin fingerprint reader iirc... hostSpec maybe?
+    allow_empty_password = true;
+  };
 }
