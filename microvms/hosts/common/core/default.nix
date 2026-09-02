@@ -280,5 +280,10 @@ in
         "8.8.8.8"
       ];
     };
+
+    # Disable log spam when where is no network
+    services.resolved = {
+      enable = vmSpecs.vpn;
+    };
   };
 }
