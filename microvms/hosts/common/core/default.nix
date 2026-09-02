@@ -179,7 +179,7 @@ in
         install esp6           ${false}
         install rxrpc          ${false}
       '';
-    time.timeZone = "UTC";
+    time.timeZone = "Asia/Taipei";
 
     networking.hostName = "${name}";
 
