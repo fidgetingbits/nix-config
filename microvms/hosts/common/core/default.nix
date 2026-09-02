@@ -194,8 +194,17 @@ in
       # when not defining microvms as stand-alone flake outputs
       systemSymlink = true;
 
-      # Writable nix store overlay (tmpfs — ephemeral).
-      writableStoreOverlay = "/nix/.rw-store";
+      # This is preferable to the shared /nix/store in my case for a few reasons:
+      # - store optimize/gc won't break a running vm
+      # - soft secrets in host store won't be exposed to vm's
+      #
+      # NOTE: This will generate an erofs image on rebuild. This is fast
+      # normally but if you happen to be roaming and have remote builders, it
+      # is AWFUL. It seems to copy the build erofs (~2gb) from local box to the
+      # remote, despite the build itself being local. The solution if you run
+      # into that is to run `NIX_CONFIG="builders =" jr` to avoid using the
+      # remote builders for this build
+      storeOnDisk = true;
 
       # Persistent volumes (stored in /var/lib/microvms/<name>/)
       # FIXME: These will need to be optional, so some microvms are ramfs only,
@@ -205,11 +214,6 @@ in
           mountPoint = "/var";
           image = "var.img";
           size = 102400; # 100 GB
-        }
-        {
-          mountPoint = "/nix/.rw-store";
-          image = "nix-store.img";
-          size = 61440; # 60 GB for nix store
         }
         {
           mountPoint = "/home/${user}";
@@ -231,16 +235,6 @@ in
       ];
 
       shares = [
-        # Host's /nix/store (avoids building a squashfs image)
-        # FIXME: Blacklist some files if possible?
-        # There is a wifi password in /nix/store on some systems due to initrd ssh unlock
-        {
-          proto = "virtiofs";
-          tag = "ro-store";
-          source = "/nix/store";
-          mountPoint = "/nix/.ro-store";
-        }
-
         # Development folder for agent-specific projects
         {
           source = "${sharedDir}/shared/${name}";
