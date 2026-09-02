@@ -10,6 +10,7 @@
 {
   imports = [
     inputs.introdus.nixosModules.default
+    inputs.nix-secrets.nixosModules.default
   ];
 
   time.timeZone = lib.mkDefault config.hostSpec.timeZone;

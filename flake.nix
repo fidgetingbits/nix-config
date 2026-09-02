@@ -147,6 +147,7 @@
             inherit system;
             overlays = [
               introdus.overlays.default
+              nix-secrets.overlays.default
               self.overlays.default
             ];
           };
