@@ -1,10 +1,14 @@
 {
+  inputs,
   config,
   pkgs,
   lib,
   osConfig,
   ...
 }:
+let
+  inherit (lib.custom.microvm) mapHostMicrovms;
+in
 {
   imports = (
     map lib.custom.relativeToRoot (
@@ -77,27 +81,7 @@
     MESA_LOG_FILE = "/dev/null";
   };
 
-  introdus.services.awww = {
-    enable = true;
-    interval = lib.custom.time.days 1;
-    wallpaperDir = "${config.home.homeDirectory}/images/wallpaper/catppuccin-mocha";
-  };
-
-  # Allows to show talon icon in system tray on X11
-  services.snixembed.enable = osConfig.hostSpec.voiceCoding;
-
-  # FIXME: Make this part of a module
-  services.copyq.enable = true;
-
   system.ssh-motd.enable = true;
-
-  sops = {
-    secrets = {
-      "tokens/fly" = {
-        path = "${config.home.homeDirectory}/.config/fly.io/token";
-      };
-    };
-  };
 
   stylix = {
     cursor = lib.mkForce {
@@ -105,27 +89,29 @@
       package = lib.mkForce pkgs.catppuccin-cursors.mochaLight;
       size = lib.mkForce 40;
     };
-    # override = {
-    #   scheme = "miasma";
-    #   author = "xero"; # https://github.com/xero/miasma.nvim/blob/main/extras/miasma.Xresources
-    #   base00 = "#222222";
-    #   base01 = "#685742";
-    #   base02 = "#5f875f";
-    #   base03 = "#b36d43";
-    #   base04 = "#78824b";
-    #   base05 = "#bb7744";
-    #   base06 = "#c9a554";
-    #   base07 = "#d7c483";
-    #   base08 = "#666666";
-    #   base09 = "#685742";
-    #   base0A = "#5f875f";
-    #   base0B = "#b36d43";
-    #   base0C = "#78824b";
-    #   base0D = "#bb7744";
-    #   base0E = "#c9a554";
-    #   base0F = "#d7c483";
-    # };
     targets.neovide.enable = true;
   };
 
+  # Automatic ssh entries for oedo/ossa microvms on shared network
+  programs.ssh.settings =
+    [
+      "oedo"
+      "ossa"
+    ]
+    |> map (
+      host:
+      (
+        mapHostMicrovms inputs.self.nixosConfigurations.${host}.config.microvm.vms (vmSpecs: {
+          "${vmSpecs.name}" = {
+            match = "host ${vmSpecs.name}";
+            hostname = vmSpecs.ip;
+            port = vmSpecs.sshPort;
+            user = vmSpecs.user;
+            identityFile = "${config.home.homeDirectory}/.ssh/id_ed25519";
+          };
+        })
+        |> lib.mergeAttrsList
+      )
+    )
+    |> lib.mergeAttrsList;
 }
