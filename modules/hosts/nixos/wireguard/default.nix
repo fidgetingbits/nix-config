@@ -18,7 +18,7 @@ let
   sopsFolder = secretsFolder + "/sops/";
   hostName = config.networking.hostName;
 
-  # Not all wireguard peers will have rosenpeer support (eg: android), so check if the
+  # Not all wireguard peers will have rosenpass support (eg: android), so check if the
   # host has a key defined, and if not they get filtered out
   mkRosenpassPeer =
     role: host:

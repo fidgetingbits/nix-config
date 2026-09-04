@@ -130,6 +130,7 @@ in
       peers = [
         wg-subnet.hosts.ossa
         wg-subnet.hosts.opia
+        wg-subnet.hosts.onyx
         wg-subnet.hosts.moon
       ];
       wireguardPort = net.ports.udp.wireguard;

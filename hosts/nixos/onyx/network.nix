@@ -8,7 +8,7 @@
 #  };
 {
   lib,
-  inputs,
+  # inputs,
   namespace,
   secrets,
   ...
@@ -17,18 +17,18 @@
   networking.networkmanager.enable = true;
 
   ${namespace} = {
-    cifs-mounts = {
-      enable = true;
-      sopsFile = (lib.toString inputs.nix-secrets) + "/sops/olan.yaml";
-      mounts = [
-        {
-          name = "onus";
-        }
-        {
-          name = "oath";
-        }
-      ];
-    };
+    # cifs-mounts = {
+    #   enable = true;
+    #   sopsFile = (lib.toString inputs.nix-secrets) + "/sops/olan.yaml";
+    #   mounts = [
+    #     {
+    #       name = "onus";
+    #     }
+    #     {
+    #       name = "oath";
+    #     }
+    #   ];
+    # };
     services.per-network-services = {
       enable = true;
       # FIXME: This should be synchronized with the code that renames it

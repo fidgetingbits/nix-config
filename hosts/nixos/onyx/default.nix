@@ -23,7 +23,6 @@ rec {
         (map (f: "hosts/common/optional/${f}") [
           # Host-specific stuff
           "keyd.nix"
-          "printing.nix"
           "locale.nix"
           "sound.nix"
 
@@ -34,11 +33,8 @@ rec {
 
           # Miscellaneous
           "podman.nix"
-          "libvirt.nix"
           "wireshark.nix"
           "yubikey.nix"
-
-          "saleae.nix"
 
           # Network management
           "systemd-resolved.nix"
@@ -48,14 +44,10 @@ rec {
 
           "startpage.nix"
 
-          # Gaming
-          "gaming.nix"
-
           "distributed-builds.nix"
           "fonts.nix"
 
           "logind.nix"
-
         ])
     ))
   ];
@@ -130,5 +122,4 @@ rec {
 
   # Bluetooth
   services.blueman.enable = true;
-
 }
