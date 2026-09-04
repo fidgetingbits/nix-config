@@ -35,10 +35,11 @@
           |> (pkgs.writeText "base-prompt.md");
         genPrompts =
           [
-            ".claude/CLAUDE.md"
-            ".pi/SYSTEM_APPEND.md"
-            ".omp/APPEND_SYSTEM.md"
-            ".codex/AGENTS.md"
+            # ".claude/CLAUDE.md"
+            # ".pi/SYSTEM_APPEND.md"
+            # ".omp/APPEND_SYSTEM.md"
+            # ".codex/AGENTS.md"
+            ".agents/AGENTS.md"
           ]
           |> map (path: {
             # "${path}".source =

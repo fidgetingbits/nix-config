@@ -48,12 +48,12 @@ in
     ]
     ++ (lib.attrValues {
       inherit (pkgs)
-        claude-code
-        claude-agent-acp
-        codex
-        codex-acp
+        # claude-code
+        # claude-agent-acp
+        # codex
+        # codex-acp
         crush
-        gemini-cli
+        # gemini-cli
         pi-coding-agent
         ;
     });
