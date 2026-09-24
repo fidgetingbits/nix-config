@@ -39,20 +39,21 @@ in
         # Optional common modules
         (map (f: "hosts/common/optional/${f}") [
           "keyd.nix"
-          "services/atuin.nix"
+          "services/anki-sync-server.nix"
           "services/atticd.nix" # Nix cache
-          "services/postfix-proton-relay.nix"
-          "services/unifi.nix" # Unifi Controller
-          "services/forgejo.nix" # git forge
-          "services/webdav.nix" # for grapheneos seedvault backups
+          "services/atuin.nix"
           "services/calibre-web.nix" # ebook management
           "services/commafeed.nix" # rss reader
+          "services/forgejo.nix" # git forge
+          "services/hister.nix" # local document search
+          "services/librechat.nix" # llm webui
           "services/mattermost" # chat notifications
           # "services/nitter.nix" # ad-less twitter front-end
           "services/paperless.nix" # document management
-          "services/hister.nix" # local document search
-          "services/librechat.nix" # llm webui
-          "services/searx.nix"
+          "services/postfix-proton-relay.nix"
+          "services/searx.nix" # Meta-search
+          "services/unifi.nix" # Unifi Controller
+          "services/webdav.nix" # for grapheneos seedvault backups
 
           "acme.nix"
           "remote-builder.nix"

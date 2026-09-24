@@ -31,8 +31,8 @@
   },
   "icu": {
     "url": "https://chromium.googlesource.com/chromium/deps/icu.git",
-    "rev": "364118a1d9da24bb5b770ac3d762ac144d6da5a4",
-    "sha256": "1y4y24xamafvghs4n2rjz477r7zsg5fgf15va122q5i2hg0jdfvy",
+    "rev": "d578f2e8b7bd5938e21cfb6bf15c079e0aa5b738",
+    "sha256": "1p161vbxx33dr81cpglancjfw2v6kcd4qnaima9bf5c56992vj8f",
     "fetchSubmodules": false
   },
   "libjpeg-turbo": {
@@ -55,8 +55,8 @@
   },
   "vulkanmemoryallocator": {
     "url": "https://chromium.googlesource.com/external/github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator",
-    "rev": "a6bfc237255a6bac1513f7c1ebde6d8aed6b5191",
-    "sha256": "1hpzjwl5bgqv9hmf1fdldihfllcbdg515f391a200klg0rnixdds",
+    "rev": "eb744ea7a2b17040121b4bbb4d6f9e8a77e3cae7",
+    "sha256": "1wyh7wym8dyr42wpxsxj04kh150hjmbm2afw2ydbj6xvi5r4j5ic",
     "fetchSubmodules": false
   },
   "spirv-cross": {

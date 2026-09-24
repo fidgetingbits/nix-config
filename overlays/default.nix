@@ -26,6 +26,8 @@ let
         nix-sweep = inputs.nix-sweep.packages.${system}.default;
         pwndbg = inputs.pwndbg.packages.${system}.default;
         omp = inputs.omp-nix.packages.${system}.default;
+        # Only using this on AMD systems atm
+        voxtype = inputs.voxtype.packages.${system}.rocm;
       };
 
     linuxModifications =
@@ -40,6 +42,11 @@ let
             sha256 = "sha256-l6qGSxj/lZ+jUaAFC2LYMwARwQpXmKdvii4jbVR1Kqo=";
           };
         });
+        # FIXME: Prevent firefox recompile
+        # For something like voxtype that _does_ use onnxruntime, don't we want rocm?
+        # onnxruntime = prev.onnxruntime.override {
+        #   rocmSupport = false;
+        # };
 
         # FIXME: patch doesn't apply cleanly..
         # add --print-targets support, since it may be years until a release

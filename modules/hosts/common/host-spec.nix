@@ -229,7 +229,7 @@
         };
         defaultMediaPlayer = lib.mkOption {
           type = lib.types.str;
-          default = "vlc";
+          default = "mpv";
           description = "The default video player to use on the host";
         };
         defaultDesktop = lib.mkOption {

@@ -221,5 +221,4 @@
       # Uncomment when on moat
       # ${subnets.moon.hosts.moon.ip} = [ "moon.${config.hostSpec.domain}" ];
     };
-
 }

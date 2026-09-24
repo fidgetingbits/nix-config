@@ -1,0 +1,30 @@
+# Can get zhuyin cc-cedict library from here
+# https://github.com/MarvNC/cc-cedict-yomitan/releases/tag/2026-09-23
+{
+  pkgs,
+  config,
+  lib,
+  namespace,
+  ...
+}:
+let
+  cfg = config.${namespace}.translation;
+in
+{
+  options.${namespace}.translation = {
+    enable = lib.mkEnableOption "Add translation tooling";
+  };
+
+  config = lib.mkIf cfg.enable {
+    # To generate mandarin subtitles for video
+    # whisper-ctranslate2 <video> --model large-v3 --language zh
+    home.packages = lib.attrValues {
+      inherit (pkgs.unstable)
+        yt-dlp
+        whisper-ctranslate2
+        whisperx
+        voxtype
+        ;
+    };
+  };
+}

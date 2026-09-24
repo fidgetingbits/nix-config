@@ -1,6 +1,7 @@
 {
   pkgs,
   lib,
+  namespace,
   ...
 }:
 {
@@ -50,4 +51,5 @@
       power-button-action = lib.mkForce "suspend";
     };
   };
+  ${namespace}.translation.enable = true;
 }

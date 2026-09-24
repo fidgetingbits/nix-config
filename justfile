@@ -67,7 +67,7 @@ rebuild HOST=`hostname` NO_SWITCH="0": && rebuild-post
 # Rebuild specified host, but don't auto-switch
 [group("building")]
 boot HOST=`hostname`:
-    @just rebuild-host {{ HOST }} no_switch
+    @just rebuild-host {{ HOST }} 1
 
 # Rebuild specified host and then run a flake check
 [group("")]

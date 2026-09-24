@@ -77,7 +77,6 @@ in
     }
     ++ [
       inputs.nix-options-search.packages.${pkgs.stdenv.hostPlatform.system}.default
-      inputs.optnix.packages.${pkgs.stdenv.hostPlatform.system}.optnix
       (pkgs.long-rsync.overrideAttrs (_: {
         recipients = osConfig.hostSpec.email.olanAdmins;
         deliverer = osConfig.hostSpec.email.notifier;
@@ -200,18 +199,21 @@ in
     };
   };
 
-  ${namespace}.pi.providers =
-    let
-      port = osConfig.hostSpec.networking.ports.tcp.llama-swap;
-      hosts = [
-        "oedo"
-        "ossa"
-      ];
-    in
-    map (host: {
-      name = host;
-      inherit host port;
-    }) hosts;
+  ${namespace} = {
+    pi.providers =
+      let
+        port = osConfig.hostSpec.networking.ports.tcp.llama-swap;
+        hosts = [
+          "oedo"
+          "ossa"
+        ];
+      in
+      map (host: {
+        name = host;
+        inherit host port;
+      }) hosts;
+    translation.enable = true;
+  };
 
   # Automatic ssh entries for oedo microvms on shared network
   programs.ssh.settings =
@@ -225,4 +227,8 @@ in
       };
     })
     |> lib.mergeAttrsList;
+
+  # FIXME: This is building firefox-unwrapped, which is failing...
+  programs.anki.enable = true; # see module
+  programs.firefox.package = pkgs.unstable.firefox;
 }

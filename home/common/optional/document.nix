@@ -34,7 +34,7 @@
       })
     ];
 
-  programs.zsh.aliases = {
+  programs.zsh.shellAliases = {
     # Handles Chinese, European characters, etc together fine
     # Add -o output.pdf input.md  to the end
     md2pdf = "pandoc -f markdown+hard_line_breaks --pdf-engine=typst -V mainfont='Liberation Sans' -V CJKmainfont='Noto Sans CJK SC'";

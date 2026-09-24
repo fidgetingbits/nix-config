@@ -1,4 +1,4 @@
-# Example ofo a network to add to trustedNetworks:
+# Example of a network to add to trustedNetworks:
 #  my-network = {
 #    type = "wireless";
 #    ssid = "my-ssid";

@@ -148,4 +148,5 @@ in
     {
       "127.0.0.1" = [ "${hostName}.${domain}" ];
     };
+  nixpkgs.config.rocmSupport = config.hostSpec.useRocm;
 }

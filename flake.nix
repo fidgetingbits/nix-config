@@ -186,10 +186,8 @@
 
     #################### Core Nix Sources ####################
 
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
-    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    #nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.11";
-
+    nixpkgs.url = "https://channels.nixos.org/nixos-26.05/nixexprs.tar.zst";
+    nixpkgs-unstable.url = "https://channels.nixos.org/nixos-unstable/nixexprs.tar.zst";
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
@@ -253,9 +251,10 @@
       url = "github:madsbv/nix-options-search";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
-    # Another TUI for local option searching
-    optnix = {
-      url = "sourcehut:~watersucks/optnix";
+
+    # Voice dictation. Allows using rocm builds not in nixpkgs
+    voxtype = {
+      url = "github:peteonrails/voxtype/v1.0.1";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
@@ -290,20 +289,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # hister = {
-    #   # charmbracelet libs broken on main
-    #   url = "github:asciimoo/hister?ref=v0.18.0";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
-
     talon-nix = {
       url = "github:fidgetingbits/talon-nix?ref=overrides";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     noctalia = {
-      # Pin until v5 is out of alpha
-      # url = "github:noctalia-dev/noctalia?ref=v4.7.7";
       url = "github:noctalia-dev/noctalia";
       inputs.nixpkgs.follows = "nixpkgs";
     };

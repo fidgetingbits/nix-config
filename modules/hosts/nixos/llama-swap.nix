@@ -34,12 +34,12 @@ let
       rocmGpuTargets = if isHalo then [ "gfx1151" ] else [ "gfx1150" ];
     }).overrideAttrs
       (oldAttrs: rec {
-        version = "9775";
+        version = "11095";
         src = pkgs.fetchFromGitHub {
           owner = "ggml-org";
           repo = "llama.cpp";
           tag = "b${version}";
-          hash = "sha256-kTY9Pwzk8JbmlTwfCpKMenK2PB9lob69sbq8R55wCsw=";
+          hash = "sha256-NGkiFhVPYvnZn+Qi5Qze80bO2w8bTiqOsVdZjTVCmvc=";
           leaveDotGit = true;
           postFetch = ''
             git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -47,13 +47,15 @@ let
           '';
         };
         npmRoot = "tools/ui";
-        npmDepsHash = "sha256-0dctM/apI3ysMIEVBaBXO9hZMWskpJpNpOws1gwiOYc=";
+        npmDepsHash = "sha256-2Q7XhaLAArmviOLdQsNbYTfdyDE5pW9lR26cRHEVl9k=";
 
         cmakeFlags =
           (oldAttrs.cmakeFlags or [ ])
           ++ [
             "-DGGML_NATIVE=ON"
+            "-DGGML_HIP_ROCWMMA_FATTN=ON"
             "-DGGML_HIP_NO_VMM=ON"
+            "-DGGML_HIP_MMQ_MFMA=ON"
             "-DCMAKE_HIP_FLAGS=-I${pkgs.rocmPackages.rocwmma}/include"
           ]
           ++ lib.optionals (!isHalo) [
