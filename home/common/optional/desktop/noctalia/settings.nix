@@ -89,4 +89,10 @@
     fingerprint = false; # FIXME: ossa has a builtin fingerprint reader iirc... hostSpec maybe?
     allow_empty_password = true;
   };
+
+  widget.status.type = "aroman/voxtype:status";
+  plugins = {
+    auto_update = "all";
+    enabled = [ "gabedunn/voxtype" ];
+  };
 }

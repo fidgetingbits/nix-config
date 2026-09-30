@@ -306,7 +306,7 @@
     pwndbg.url = "github:pwndbg/pwndbg";
 
     omp-nix = {
-      url = "github:can1357/oh-my-pi?ref=v18.0.11";
+      url = "github:can1357/oh-my-pi?ref=v18.4.4";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
@@ -351,6 +351,5 @@
       url = "github:nix-community/neovim-nightly-overlay";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
-
   };
 }

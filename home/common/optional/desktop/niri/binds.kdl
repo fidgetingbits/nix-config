@@ -354,6 +354,9 @@ binds {
     Super+Shift+C hotkey-overlay-title="Focus or Launch Chat" {
         spawn-sh "nirius focus-or-spawn --app-id signal signal"
     }
+    XF86Tools hotkey-overlay-title="Toggle voxtype" {
+        spawn "voxtype" "record" "toggle"
+    }
     //
     // ========== Clipboard ==========
     //

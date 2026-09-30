@@ -31,6 +31,19 @@ in
       };
     };
     programs.anki = {
+      # anki is unstable when opening from systray, so use xwayland
+      # ```
+      # Qt warning: Failed to create popup. Ensure popup  QWidgetWindow(0x58989729bd60, name="CustomLabelClassWindow") has a transientParent set.
+      # xdg_surface#32: error 3: must ack the initial configure before attaching buffer
+      # Qt warning: The Wayland connection experienced a fatal error: Protocol error
+      # ```
+      package = pkgs.anki.overrideAttrs (oldAttrs: {
+        nativeBuildInputs = (oldAttrs.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
+        postInstall = (oldAttrs.postInstall or "") + ''
+          wrapProgram $out/bin/anki \
+            --set QT_QPA_PLATFORM xcb
+        '';
+      });
       language = "en_US";
       answerKeys = [
         {
