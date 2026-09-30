@@ -228,7 +228,9 @@ in
     })
     |> lib.mergeAttrsList;
 
-  # FIXME: This is building firefox-unwrapped, which is failing...
   programs.anki.enable = true; # see module
   programs.firefox.package = pkgs.unstable.firefox;
+
+  # catppuccin makes some fields unreadable for whatever reason
+  stylix.targets.anki.enable = false;
 }
