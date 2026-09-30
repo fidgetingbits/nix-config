@@ -26,8 +26,9 @@ let
         nix-sweep = inputs.nix-sweep.packages.${system}.default;
         pwndbg = inputs.pwndbg.packages.${system}.default;
         omp = inputs.omp-nix.packages.${system}.default;
-        # Only using this on AMD systems atm
-        voxtype = inputs.voxtype.packages.${system}.rocm;
+        # Only using this on AMD systems atm. rocm crashes
+        # voxtype = inputs.voxtype.packages.${system}.rocm;
+        voxtype = inputs.voxtype.packages.${system}.vulkan;
       };
 
     linuxModifications =
