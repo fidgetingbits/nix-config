@@ -82,4 +82,25 @@
       };
     };
   };
+  xdg.configFile = {
+    "mpv/scripts/copy_subs.lua".text = # lua
+      ''
+        local mp = require 'mp'
+
+        local function copy_subtitle()
+            local subtitle = mp.get_property("sub-text")
+
+            if not subtitle or subtitle == "" then
+                mp.osd_message("No visible subtitle to copy")
+                return
+            end
+
+            mp.commandv("run", "${pkgs.wl-clipboard}/bin/wl-copy", subtitle)
+            mp.osd_message("Copied subtitle: " .. subtitle)
+        end
+
+        -- Yank
+        mp.add_key_binding("Ctrl+y", "copy-subtitle", copy_subtitle)
+      '';
+  };
 }
