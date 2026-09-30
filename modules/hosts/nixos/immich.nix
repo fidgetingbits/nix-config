@@ -1,6 +1,11 @@
 # This is sets up two services. One that is used for remote machine learning
 # and the primary immich server
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.services.immichML;
   ports = config.hostSpec.networking.ports;
@@ -32,6 +37,7 @@ in
         in
         {
           enable = true;
+          package = pkgs.unstable.immich;
           port = ports.tcp.immich;
           openFirewall = !config.networking.granularFirewall.enable;
           machine-learning = {
