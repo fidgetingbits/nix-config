@@ -3,12 +3,14 @@
   osConfig,
   pkgs,
   lib,
+  inputs,
   ...
 }:
 {
   imports = [
     # FIXME: Move this to trash module that we enable for users instead
     ./timers/trash-empty.nix
+    inputs.sops-nix.homeManagerModules.sops
   ];
   home = {
     packages = lib.optionals (osConfig.hostSpec.isProduction) (
