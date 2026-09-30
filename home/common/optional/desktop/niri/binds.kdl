@@ -373,4 +373,7 @@ binds {
     Super+Apostrophe hotkey-overlay-title="Center window" {
         center-window
     }
+    Super+a hotkey-overlay-title="Spawn anki" {
+        spawn "anki"
+    }
 }

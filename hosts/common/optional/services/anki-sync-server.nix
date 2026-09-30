@@ -29,9 +29,10 @@ in
     services.anki-sync-server = {
       enable = true;
       address = "127.0.0.1";
+      port = config.hostSpec.networking.ports.tcp.anki-sync-server;
       users = [
         {
-          username = config.hostSpec.primaryUser;
+          username = config.hostSpec.primaryUsername;
           passwordFile = config.sops.secrets."passwords/anki".path;
         }
       ];
@@ -50,7 +51,7 @@ in
       persistence = {
         "${config.hostSpec.persistFolder}".directories = [
           {
-            directory = "/var/lib/anki-sync-server";
+            directory = "/var/lib/private/anki-sync-server";
             user = "nobody";
             group = "nogroup";
           }

@@ -247,3 +247,21 @@ window-rule {
 window-rule {
     match app-id="^[Ss]potify$"
 }
+// There is a weird glitchy window open/close loop if the history/lookup
+// windows are auto-focused
+// History window pops up on subtitle hover or explicit press
+window-rule {
+    match title="Yomipv History"
+    open-floating true
+    open-focused false
+}
+// Dictionary lookup for word
+window-rule {
+    match title="Yomipv Lookup"
+    open-floating true
+    open-focused false
+}
+window-rule {
+    match app-id="^mpv$"
+    variable-refresh-rate true
+}

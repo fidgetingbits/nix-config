@@ -17,12 +17,16 @@ in
 
   config = lib.mkIf cfg.enable {
     # To generate mandarin subtitles for video
-    # whisper-ctranslate2 <video> --model large-v3 --language zh
+    # whisper-ctranslate2 <video> --model large-v3 --language zh --output_format srt
     home.packages = lib.attrValues {
       inherit (pkgs.unstable)
         yt-dlp
         whisper-ctranslate2
         whisperx
+        ;
+      # NOTE: voxtype is coming from an external flake via overlay, so we don't want
+      # pkgs.unstable to get the latest
+      inherit (pkgs)
         voxtype
         ;
     };
