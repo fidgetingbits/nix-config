@@ -129,14 +129,11 @@ in
       ];
     file =
       let
-        hostPath = "hosts/nixos/${osConfig.hostSpec.hostName}/niri";
+        hostPath = lib.custom.relativeToRoot "hosts/nixos/${osConfig.hostSpec.hostName}/niri";
         finalConfig =
           lib.flatten [
             ./inputs.kdl
-            (map lib.custom.relativeToRoot [
-              "${hostPath}/outputs.kdl"
-              # "${hostPath}/workspaces.kdl"
-            ])
+            (lib.custom.scanPathForFileExtensions hostPath "kdl")
             ./binds.kdl
             ./rules.kdl
             ./config.kdl
