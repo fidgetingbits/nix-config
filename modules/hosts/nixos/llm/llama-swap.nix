@@ -9,11 +9,26 @@
 }:
 let
 
-  isHalo = config.networking.hostName == "oedo";
+  inherit (config.networking) hostName;
+  isHalo = hostName == "oedo";
   cfg = config.${namespace}.services.llama-swap;
   time = lib.custom.time;
   modelsPath = "/var/lib/llm/models";
   cachePath = "/var/cache/private/llama-swap";
+
+  net = config.hostSpec.networking;
+  olan = net.subnets.o-lan;
+  inherit (net) ports;
+  llamaSwapPort = toString ports.tcp.llama-swap;
+
+  # --cors-origins domains until I switch to reverse proxy
+  origins = [
+    "http://localhost:${llamaSwapPort}"
+    "http://127.0.0.1:${llamaSwapPort}"
+    "http://${hostName}.${config.hostSpec.domain}:${llamaSwapPort}"
+    "http://${hostName}:${llamaSwapPort}"
+    "http://${olan.hosts.${hostName}.ip}:${llamaSwapPort}"
+  ];
 
   pu = config.users.users.${config.hostSpec.primaryUsername};
   user = pu.name;
@@ -72,8 +87,6 @@ let
           ${oldAttrs.preConfigure or ""}
         '';
       });
-
-  ports = config.hostSpec.networking.ports;
 
   # Check unsloth "Best Practices" section to find these
   qwenSampling = [
@@ -134,8 +147,8 @@ let
           "-fa on"
           "--cache-type-k ${kv}"
           "--cache-type-v ${kv}"
-          "--no-mmap"
-          "--direct-io"
+          "--load-mode none"
+          "--cors-origins ${lib.concatStringsSep "," origins}"
         ]
         ++ sampling
         ++ [
@@ -184,9 +197,14 @@ let
       alias = "qwen3.8:27b-q5";
     };
 
+    # FIXME: This doesn't load on strix point. Maybe better to reduce ctx size?
+    # 2026-10-01
+    # strix halo:
+    # strix point:
     "Qwen 3.8 Flash (Heavy)" = mkModel {
       hf = "unsloth/Qwen3.8-Flash-Next-GGUF:UD-Q2_K_XL";
       kv = "q8_0";
+      ctx = 16384;
       sampling = [
         "--temp 1.0"
         "--top_p 0.95"
@@ -439,7 +457,7 @@ in
           ]
           ++
             # Framework 16 1150
-            lib.optionals (config.networking.hostName == "ossa") [
+            lib.optionals (hostName == "ossa") [
               # Avoid the buggy System Direct Memory Access (SDMA) copy path on unified memory.
               "HSA_ENABLE_SDMA=0"
               # Let ROCm allocate from the full unified-memory/GTT pool on this APU.
@@ -450,7 +468,7 @@ in
           ++
             # Beelink GR9
             # NOTE: Has 96gb dedicated to GPU set in bios, so no UMA
-            lib.optionals (config.networking.hostName == "oedo") [
+            lib.optionals (hostName == "oedo") [
               # Strix Halo (gfx1151) ROCm tuning:
               "HSA_OVERRIDE_GFX_VERSION=11.5.1"
             ];
