@@ -7,7 +7,10 @@
   ...
 }:
 let
+
   net = config.hostSpec.networking;
+  olan = net.subnets.o-lan;
+  wg-subnet = olan.wg-subnet;
   wake-oppo = pkgs.writeShellApplication {
     name = "wake-oppo";
     runtimeInputs = [ pkgs.wakeonlan ];
@@ -17,8 +20,6 @@ let
       in
       "wakeonlan ${lib.elemAt oppo.mac 0} -i ${oppo.ip}";
   };
-  olan = net.subnets.o-lan;
-  wg-subnet = olan.wg-subnet;
 in
 {
   imports =
