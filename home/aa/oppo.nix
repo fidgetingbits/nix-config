@@ -51,5 +51,5 @@
       power-button-action = lib.mkForce "suspend";
     };
   };
-  ${namespace}.translation.enable = true;
+  ${namespace}.language-learning.enable = true;
 }

@@ -58,8 +58,6 @@ in
     )
   );
 
-  llm-tools.enable = true;
-
   home.packages =
     lib.attrValues {
       inherit (pkgs)
@@ -200,7 +198,7 @@ in
   };
 
   ${namespace} = {
-    pi.providers =
+    llm.providers =
       let
         port = osConfig.hostSpec.networking.ports.tcp.llama-swap;
         hosts = [
@@ -212,7 +210,10 @@ in
         name = host;
         inherit host port;
       }) hosts;
-    translation.enable = true;
+
+    llm.cli-tools.enable = true;
+    language-learning.enable = true;
+    dictation.enable = true;
   };
 
   # Automatic ssh entries for oedo microvms on shared network

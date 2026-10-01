@@ -4,6 +4,7 @@
   pkgs,
   lib,
   osConfig,
+  namespace,
   ...
 }:
 let
@@ -51,7 +52,7 @@ in
     )
   );
 
-  llm-tools.enable = true;
+  ${namespace}.llm.cli-tools.enable = true;
 
   home.packages =
     lib.attrValues {

@@ -12,7 +12,8 @@
   imports = lib.flatten [
     (map lib.custom.relativeToRoot [
       "home/common/optional/llm/agents.nix"
-      "modules/home/pi-model-config.nix"
+      "modules/home/auto/llm/local-providers.nix"
+      "modules/home/auto/llm/pi-config.nix"
     ])
   ];
 
@@ -52,7 +53,7 @@
   };
 
   # The two providers are on wireguard network together, so we use their ips
-  ${namespace}.pi.providers = [
+  ${namespace}.llm.providers = [
     {
       name = "ossa";
       host = vmSpecs.vm-lan.hosts.ossa.ip;

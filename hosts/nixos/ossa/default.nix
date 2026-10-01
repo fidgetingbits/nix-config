@@ -169,6 +169,7 @@
   ${namespace} = {
     services.llama-swap = {
       enable = true;
+      # FIXME: This should also be associated with some default model, with classes
       preload = [
         "Qwen 2.5 Coder 1.5B (Ultra Light)"
       ];
