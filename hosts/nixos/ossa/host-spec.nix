@@ -14,6 +14,7 @@
 
     isAmdGpu = true;
     useRocm = (lib.mkOverride 100) true;
+    rocmTarget = "gfx1150";
 
     isImpermanent = (lib.mkOverride 100) true;
     persistFolder = (lib.mkOverride 100) "/persist";

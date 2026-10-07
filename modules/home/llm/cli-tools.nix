@@ -33,6 +33,7 @@ in
           PATTERNS_LOADER_GIT_REPO_PATTERNS_FOLDER="patterns"
         '';
         ".config/fabric/openai_api_key".text = "foo";
+        ".config/fabric/patterns/.keep".text = "# Managed by Home Manager";
       };
     };
 
@@ -48,9 +49,10 @@ in
         enable = true;
         package = pkgs.unstable.fabric-ai;
         enableZshIntegration = true;
-        enablePatternsAliases = true;
+        # enablePatternsAliases = true;
       };
     };
+
   };
 
 }

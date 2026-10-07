@@ -26,6 +26,7 @@
     wallpaper = "${inputs.nix-assets}/images/wallpapers/spirited_away_reflection.webp";
     isAMDGpu = true;
     useRocm = (lib.mkOverride 100) true;
+    rocmTarget = "gfx1201";
   };
 
 }

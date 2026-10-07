@@ -1,5 +1,4 @@
 # WARNING: This is tweaked for two AMD AI chipsets atm, so won't work on other systems
-# FIXME: This needs to get broken out into multiple files now I think
 {
   pkgs,
   lib,
@@ -38,45 +37,45 @@ let
   # Some notes taken from
   # https://github.com/basnijholt/dotfiles/blob/6f8a47c1/configs/nixos/hosts/pc/package-overrides.nix
   # https://github.com/blazed/cake/blob/ee606cf/profiles/ai.nix
+  # FIXME: Should maybe enable vulkan at the same time to test differences
   llama-cpp =
-    (pkgs.llama-cpp.override {
+    (pkgs.unstable.llama-cpp.override {
       rocmSupport = !config.hostSpec.useVulkan;
       vulkanSupport = config.hostSpec.useVulkan;
       # Enable BLAS for optimized CPU layer performance (OpenBLAS)
       # This is crucial for models using split-mode or CPU offloading
       blasSupport = true;
       cudaSupport = false;
-      rocmGpuTargets = if isHalo then [ "gfx1151" ] else [ "gfx1150" ];
+      rocmGpuTargets = [ config.hostSpec.rocmTarget ];
     }).overrideAttrs
       (oldAttrs: rec {
-        version = "11095";
-        src = pkgs.fetchFromGitHub {
-          owner = "ggml-org";
-          repo = "llama.cpp";
-          tag = "b${version}";
-          hash = "sha256-NGkiFhVPYvnZn+Qi5Qze80bO2w8bTiqOsVdZjTVCmvc=";
-          leaveDotGit = true;
-          postFetch = ''
-            git -C "$out" rev-parse --short HEAD > $out/COMMIT
-            find "$out" -name .git -print0 | xargs -0 rm -rf
-          '';
-        };
-        npmRoot = "tools/ui";
-        npmDepsHash = "sha256-2Q7XhaLAArmviOLdQsNbYTfdyDE5pW9lR26cRHEVl9k=";
+        # version = "11095";
+        # src = pkgs.fetchFromGitHub {
+        #   owner = "ggml-org";
+        #   repo = "llama.cpp";
+        #   tag = "b${version}";
+        #   hash = "sha256-NGkiFhVPYvnZn+Qi5Qze80bO2w8bTiqOsVdZjTVCmvc=";
+        #   leaveDotGit = true;
+        #   postFetch = ''
+        #     git -C "$out" rev-parse --short HEAD > $out/COMMIT
+        #     find "$out" -name .git -print0 | xargs -0 rm -rf
+        #   '';
+        # };
+        # npmRoot = "tools/ui";
+        # npmDepsHash = "sha256-2Q7XhaLAArmviOLdQsNbYTfdyDE5pW9lR26cRHEVl9k=";
 
         cmakeFlags =
           (oldAttrs.cmakeFlags or [ ])
           ++ [
+            # NOTE: This apparently makes builds non-deterministic
             "-DGGML_NATIVE=ON"
-            "-DGGML_HIP_ROCWMMA_FATTN=ON"
             "-DGGML_HIP_NO_VMM=ON"
-            "-DGGML_HIP_MMQ_MFMA=ON"
-            "-DCMAKE_HIP_FLAGS=-I${pkgs.rocmPackages.rocwmma}/include"
           ]
           ++ lib.optionals (!isHalo) [
             # This is buggy on 1151 apparently, so disabled for now
             # https://github.com/ggml-org/llama.cpp/issues/24437
             "-DGGML_HIP_ROCWMMA_FATTN=ON"
+            "-DCMAKE_HIP_FLAGS=-I${pkgs.rocmPackages.rocwmma}/include"
           ];
 
         # Disable Nix's NIX_ENFORCE_NO_NATIVE which strips -march=native flags
@@ -129,30 +128,25 @@ let
     {
       aliases = lib.optional ((lib.stringLength alias) != 0) alias;
       # -m is local gguf file
-      # -hf is direct download: <user>/<model>[:quant]
-      # --no-mmap : Model might be larger than remaining system RAM
-      # FIXME: Add fix-ctx
       cmd = lib.concatStringsSep "\n" (
         [
           llama-server
-          # FIXME: Should tweak this for optional pre-downloaded models with -m
-          "-hf ${hf}"
+          "-hf ${hf}" # Download direct from huggingface
           "--port \${PORT}"
           "--ctx-size ${toString ctx}"
           "--batch-size 4096"
           "--ubatch-size 2048"
           "--cache-reuse 256"
-          "--kv-unified"
           "-ngl 999"
           "-fa on"
           "--cache-type-k ${kv}"
           "--cache-type-v ${kv}"
-          "--load-mode none"
+          "--load-mode none" # Don't mmap as model might be larger than RAM
           "--cors-origins ${lib.concatStringsSep "," origins}"
         ]
         ++ sampling
         ++ [
-          "--repeat-penalty 1.0"
+          "--repeat-penalty 1.05" # Helps prevent infinite loops
           "--jinja"
           "--metrics"
           "--slots"
@@ -257,6 +251,22 @@ let
       alias = "qwen3.6:27b-mtp-q4";
     };
 
+    "Qwen 2.5 Coder 7B (Light)" = mkModel {
+      hf = "unsloth/Qwen2.5-Coder-7B-Instruct-128K-GGUF";
+      ctx = 32768;
+      kv = "q8_0";
+      sampling = qwenSampling;
+      alias = "qwen2.5:coder-7b-q8";
+    };
+
+    "Qwen 2.5 Coder 14B (Light)" = mkModel {
+      hf = "unsloth/Qwen2.5-Coder-14B-Instruct-128K-GGUF";
+      ctx = 32768;
+      kv = "q8_0";
+      sampling = qwenSampling;
+      alias = "qwen2.5:coder-14b-q8";
+    };
+
     # strix halo: pp 695.34 t/s, tg 106.98 t/s
     # strix point: pp 379.23 t/s, tg 36.51 t/s
     "Qwen 2.5 Coder 1.5B (Ultra Light)" = mkModel {
@@ -336,6 +346,21 @@ let
       thinking = false;
       embedding = true;
       alias = "nomic-embed-text";
+    };
+
+    # Testing for meeting summarization
+    # FIXME: Double check params
+    # NOTE: This will fit on strix halo only I think
+    "Llama 3.3 70B Instruct Q4 (Heavy)" = mkModel {
+      hf = "unsloth/Llama-3.3-70B-Instruct-GGUF:UD-Q4_K_XL";
+      kv = "q8_0";
+      ctx = 32768;
+      sampling = [
+        "--temp 0.6"
+        "--top_p 0.9"
+      ];
+      thinking = false;
+      alias = "llama-3.3:70b-q4";
     };
   };
 in
@@ -456,7 +481,7 @@ in
             "ROCBLAS_USE_HIPBLASLT=1"
           ]
           ++
-            # Framework 16 1150
+            # Framework 16 - Strix Point gfx1150
             lib.optionals (hostName == "ossa") [
               # Avoid the buggy System Direct Memory Access (SDMA) copy path on unified memory.
               "HSA_ENABLE_SDMA=0"
@@ -466,11 +491,16 @@ in
               "HSA_OVERRIDE_GFX_VERSION=11.5.0"
             ]
           ++
-            # Beelink GR9
+            # Beelink GR9 - Strix Halo gfx1151
             # NOTE: Has 96gb dedicated to GPU set in bios, so no UMA
             lib.optionals (hostName == "oedo") [
               # Strix Halo (gfx1151) ROCm tuning:
               "HSA_OVERRIDE_GFX_VERSION=11.5.1"
+            ]
+          ++
+            # 9070 XT - gfx1201
+            lib.optionals (hostName == "oppo") [
+              "HSA_OVERRIDE_GFX_VERSION=12.0.1"
             ];
         };
       };

@@ -7,7 +7,6 @@
   ...
 }:
 let
-
   net = config.hostSpec.networking;
   olan = net.subnets.o-lan;
   wg-subnet = olan.wg-subnet;

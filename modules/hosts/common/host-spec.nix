@@ -258,6 +258,12 @@
           default = config.hostSpec.isAMDGpu && (!config.hostSpec.useVulkan);
           description = "On systems with AMD GPUs indicates if we should use rocm or vulkan";
         };
+        rocmtarget = lib.mkOption {
+          type = lib.types.str;
+          example = "gfx1201";
+          description = "AMD GPU target name";
+        };
+
         isMultiMonitor = lib.mkOption {
           type = lib.types.bool;
           default = false;

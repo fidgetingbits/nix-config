@@ -25,5 +25,6 @@ in
 
     isAmdGpu = true;
     useRocm = (lib.mkOverride 100) true;
+    rocmTarget = "gfx1151";
   };
 }

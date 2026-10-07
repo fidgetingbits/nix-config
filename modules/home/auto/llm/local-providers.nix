@@ -64,9 +64,9 @@ in
   options.${namespace}.llm = {
     defaultModel = lib.mkOption {
       type = lib.types.str;
-      default = "Ornith 1.5-35b-a3b";
+      default = "Qwen 2.5 Coder 7B (Light)";
       example = "foo";
-      description = "The default model to use in tools. See llama-swap for list";
+      description = "The default model to use in cli tools (ie: llm, fabric). See llama-swap for list";
     };
 
     defaultProvider = lib.mkOption {
