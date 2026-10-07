@@ -95,4 +95,10 @@
     auto_update = "all";
     enabled = [ "gabedunn/voxtype" ];
   };
+
+  plugin_settings = {
+    "gabedunn/voxtype" = {
+      show_extended = true;
+    };
+  };
 }
