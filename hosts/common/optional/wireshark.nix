@@ -2,19 +2,16 @@
 {
 
   boot.kernelModules = [ "usbmon" ];
-  services.udev.extraRules = ''
-    SUBSYSTEM=="usbmon", GROUP="wireshark", MODE="640"
-  '';
 
-  environment.systemPackages = [
-    pkgs.unstable.wireshark # 4.2.x is broken with latest QT
-  ];
+  programs.wireshark = {
+    enable = true;
+    package = pkgs.unstable.wireshark;
+    dumpcap.enable = true;
+    usbmon.enable = true;
+  };
 
-  users.users.${config.hostSpec.username} = {
+  users.users.${config.hostSpec.primaryUsername} = {
     extraGroups = [ "wireshark" ];
   };
 
-  users.extraGroups = {
-    wireshark = { };
-  };
 }
