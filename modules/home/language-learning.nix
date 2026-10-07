@@ -42,11 +42,36 @@ in
       note_tag=yomipv
       miscinfo_episode_label=集
       miscinfo_season_label=季
+
+      # Switched definition_handlebar from selected-dict, as I don't select dictoinaries
+      # not entirely clear why: https://github.com/BrenoAqua/Yomipv/blob/main/docs/field_handlebars.md
+      definition_handlebar=glossary
     '';
     /*
       # Preferred dictionary (Senren only)
-      dictionary_pref_value=
+      dictionary_pref_value=single-glossary-cc-cedict-zhuyin-2026-09-22
       #dictionary_pref_value=Jitendex
+
+      # Note fields
+      expression_field=word
+      expression_furigana_field=
+      reading_field=reading
+      pitch_accents_field=pitchAccents
+      pitch_position_field=pitchPositions
+      pitch_categories_field=pitchCategories
+      sentence_field=sentence
+      sentence_furigana_field=sentenceFurigana
+      secondary_sentence_field=sentenceTranslation
+      expression_audio_field=wordAudio
+      sentence_audio_field=sentenceAudio
+      selection_text_field=selectionText
+      definition_field=definition
+      glossary_field=glossary
+      image_field=picture
+      freq_sort_field=freqSort
+      freq_field=frequencies
+      miscinfo_field=miscInfo
+      dictionary_pref_field=dictionaryPreference
 
       # Keybindings
       key_toggle_colorizer="S";
