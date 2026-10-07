@@ -377,6 +377,6 @@ binds {
         center-window
     }
     Super+a hotkey-overlay-title="Spawn anki" {
-        spawn "anki"
+        spawn-sh "QT_QPA_PLATFORM=xgb anki"
     }
 }

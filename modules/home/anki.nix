@@ -30,6 +30,12 @@ in
         sopsFile = "${sopsFolder}/${osConfig.hostSpec.hostName}.yaml";
       };
     };
+    home.packages = lib.attrValues {
+      inherit (pkgs.introdus)
+        anki-cli
+        ;
+    };
+
     programs.anki = {
       # anki is unstable when opening from systray, so use xwayland
       # ```
@@ -38,12 +44,12 @@ in
       # Qt warning: The Wayland connection experienced a fatal error: Protocol error
       # ```
       package = pkgs.anki.overrideAttrs (oldAttrs: {
-        nativeBuildInputs = (oldAttrs.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
         postInstall = (oldAttrs.postInstall or "") + ''
           wrapProgram $out/bin/anki \
-            --set QT_QPA_PLATFORM xcb
+            --set QT_QPA_PLATFORM xcb \
         '';
       });
+      # extraPackages or addons can still be managed here declaratively!
       language = "en_US";
       answerKeys = [
         {
@@ -90,5 +96,6 @@ in
           })
         ];
     };
+    programs.anki-cli.enable = true;
   };
 }
