@@ -248,6 +248,11 @@
           default = false;
           description = "Indicate system has a AMD GPUs";
         };
+        isNvidiaGpu = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = "Indicate system has a AMD GPUs";
+        };
         useVulkan = lib.mkOption {
           type = lib.types.bool;
           default = config.hostSpec.isAMDGpu;
