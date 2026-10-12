@@ -20,8 +20,11 @@
         "volume"
         "brightness"
         "battery"
+        "voxtype"
+        "voxtype-meeting"
       ];
       start = [
+        "date"
         "clock"
         "media"
       ];
@@ -90,15 +93,44 @@
     allow_empty_password = true;
   };
 
-  widget.status.type = "aroman/voxtype:status";
+  # FIXME: The voxtype stuff should be limited to only specific systems...
   plugins = {
     auto_update = "all";
-    enabled = [ "gabedunn/voxtype" ];
+    enabled = [
+      "gabedunn/voxtype"
+      "fidgetingbits/voxtype-meeting"
+    ];
+
+    # Ordered by load preference
+    source = [
+      {
+        enabled = true;
+        kind = "git";
+        location = "https://github.com/noctalia-dev/community-plugins";
+        name = "community";
+      }
+      {
+        enabled = true;
+        kind = "git";
+        location = "https://github.com/noctalia-dev/official-plugins";
+        name = "official";
+      }
+      {
+        enabled = true;
+        kind = "path";
+        location = "~/dev/noctalia/community-plugins";
+        name = "fidgetingbits-plugins";
+      }
+    ];
   };
 
   plugin_settings = {
     "gabedunn/voxtype" = {
       show_extended = true;
     };
+
+    "fidgetingbits/voxtype-meeting" = { };
   };
+
+  widget.date.format = "{:%Y.%m.%d}";
 }

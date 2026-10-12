@@ -45,9 +45,13 @@ in
         hostConfigPath = lib.custom.relativeToRoot "hosts/nixos/${osConfig.hostSpec.hostName}/noctalia.nix";
         hostSettings = if lib.pathExists hostConfigPath then import hostConfigPath else { };
       in
-      lib.recursiveUpdate baseSettings hostSettings
-      # nixfmt hack
-      |> lib.mapAttrs (n: v: lib.mkForce v);
+      # lib.recursiveUpdate baseSettings hostSettings;
+      lib.mkMerge [
+        baseSettings
+        hostSettings
+      ];
+    # nixfmt hack
+    # |> lib.mapAttrs (n: v: lib.mkForce v);
     # colors = {
     #   mPrimary = lib.mkForce mocha.mauve;
     #   mOnPrimary = lib.mkForce mocha.base;
