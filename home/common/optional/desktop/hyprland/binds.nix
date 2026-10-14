@@ -101,7 +101,7 @@
           # ========== Wallpaper ==========
           #
           # FIXME: This should be a waybar widget really...
-          # Cycle to the next wallaper
+          # Cycle to the next wallpaper
           "${mainMod}, equals, exec, awww-next"
           # Set the primary wallpaper
           "${mainMod} SHIFT, equals, exec, awww img ${osConfig.hostSpec.wallpaper}"
