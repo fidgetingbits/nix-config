@@ -101,7 +101,8 @@ in
       enable = true;
       package = pkgs.mpv.override {
         mpv-unwrapped = pkgs.mpv-unwrapped.override {
-          ffmpeg = pkgs.ffmpeg-full;
+          # FIXME: Not sure we actually need this? Full build is failing, so trying without
+          # ffmpeg = pkgs.ffmpeg-full;
         };
 
         scripts = lib.attrValues {
