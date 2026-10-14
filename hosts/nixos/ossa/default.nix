@@ -222,4 +222,7 @@
       # Uncomment when on moat
       # ${subnets.moon.hosts.moon.ip} = [ "moon.${config.hostSpec.domain}" ];
     };
+
+  # FIXME: This is a big sketchy, but works for the ossa packages okay (fails on others)
+  nixpkgs.config.rocmSupport = config.hostSpec.useRocm;
 }

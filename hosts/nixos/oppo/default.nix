@@ -218,6 +218,13 @@ in
         RemainAfterExit = true;
       };
     };
+
+    # Don't break a rebuild if wifi was disabled in the gui
+    # seems like rf-kill will timeout
+    dhcpcd = {
+      stopIfChanged = false;
+      restartIfChanged = false;
+    };
   };
 
   # Enable WoL port
@@ -226,10 +233,12 @@ in
   };
 
   modules.hardware.radeon.enable = true;
+  # nixpkgs.config.rocmSupport = config.hostSpec.useRocm;
 
   introdus = {
     # WARNING: Needs retest. Used to block on boot on both gpus
     # Granite Ridge and 9070XT
     plymouth.enable = false; # Was
   };
+
 }
