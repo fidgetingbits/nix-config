@@ -43,6 +43,10 @@
       ffmpeg # mp4 -> gif conversion, etc
       amdgpu_top # AMD GPU monitoring
       ;
+
+    inherit (pkgs.introdus)
+      wolven-kit-cli
+      ;
   };
 
   # FIXME: Make this gnome-specific
