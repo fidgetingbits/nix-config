@@ -177,7 +177,7 @@ rebuild-host HOST=`hostname` NO_SWITCH="0":
         rebuild-host --no-switch {{ HOST }}
     fi
     just copy-lock-out {{ HOST }}
-    cd -
+    cd - >/dev/null
 
 #
 # ========== Nix-Secrets manipulation recipes ==========
