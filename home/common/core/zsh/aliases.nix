@@ -205,7 +205,6 @@ in
 
   count-extensions = "find . -type f | sed 's/.*\.//' | sort | uniq -c | sort -nr";
   ak = "anki-cli";
-
 }
 // lib.optionalAttrs (osConfig.hostSpec.hostName != "ooze") {
   # The WoL packet has to come from a box that is on the same wired network as oppo
