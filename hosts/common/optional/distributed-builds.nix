@@ -15,6 +15,10 @@
 
   nix.buildMachines =
     let
+      # I keep maxJobs low to try to more easily split between systems. Sometimes I get a job
+      # on oppo that pins all CPU cores, but it's only 1-2 jobs, and so it sits waiting for the
+      # next lock on oppo, rather than using oedo. FIXME: Need to see if there is a way to setup
+      # smarter job scheduling from nix
       buildMachines = [
         {
           hostName = "oppo";
@@ -28,7 +32,7 @@
             "kvm"
           ];
           speedFactor = 5;
-          maxJobs = 32;
+          maxJobs = 2;
         }
         {
           hostName = "oedo";
@@ -41,8 +45,8 @@
             "big-parallel"
             "kvm"
           ];
-          speedFactor = 5;
-          maxJobs = 32;
+          speedFactor = 4; # Favor oppo since oedo runs models
+          maxJobs = 2;
         }
         # Seems slower than it's worth
         # {
