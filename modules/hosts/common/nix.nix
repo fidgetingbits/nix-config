@@ -134,7 +134,7 @@ in
           fallback = true; # Don't hard fail if a binary cache isn't available, since some systems roam
           substituters = lib.flatten [
             (lib.optional (lib.substring 0 4 hostSpec.timeZone == "Asia") [
-              "https://mirror.sjtu.edu.cn/nix-channels/store" # Shanghai Jiao Tong University
+              # "https://mirror.sjtu.edu.cn/nix-channels/store" # Shanghai Jiao Tong University
               "https://mirrors.ustc.edu.cn/nix-channels/store" # USTC backup mirror
             ])
             [
@@ -166,7 +166,7 @@ in
             # Roaming systems may not have access to builders or caches, and nix doesn't gracefully
             # handle when they are inaccessible. These overrides are dropped by a network
             # dispatcher script and selectively disable some settings
-            !include /etc/nix/network-overrides
+            !include ${overridesFile}
           ''}
         '';
 
