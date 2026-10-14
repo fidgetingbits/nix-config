@@ -39,53 +39,64 @@ let
   # https://github.com/blazed/cake/blob/ee606cf/profiles/ai.nix
   # FIXME: Should maybe enable vulkan at the same time to test differences
   llama-cpp =
-    (pkgs.unstable.llama-cpp.override {
-      rocmSupport = !config.hostSpec.useVulkan;
-      vulkanSupport = config.hostSpec.useVulkan;
-      # Enable BLAS for optimized CPU layer performance (OpenBLAS)
-      # This is crucial for models using split-mode or CPU offloading
-      blasSupport = true;
-      cudaSupport = false;
-      rocmGpuTargets = [ config.hostSpec.rocmTarget ];
-    }).overrideAttrs
-      (oldAttrs: rec {
-        # version = "11095";
-        # src = pkgs.fetchFromGitHub {
-        #   owner = "ggml-org";
-        #   repo = "llama.cpp";
-        #   tag = "b${version}";
-        #   hash = "sha256-NGkiFhVPYvnZn+Qi5Qze80bO2w8bTiqOsVdZjTVCmvc=";
-        #   leaveDotGit = true;
-        #   postFetch = ''
-        #     git -C "$out" rev-parse --short HEAD > $out/COMMIT
-        #     find "$out" -name .git -print0 | xargs -0 rm -rf
-        #   '';
-        # };
-        # npmRoot = "tools/ui";
-        # npmDepsHash = "sha256-2Q7XhaLAArmviOLdQsNbYTfdyDE5pW9lR26cRHEVl9k=";
+    let
+      amdSettings = {
+        rocmSupport = !config.hostSpec.useVulkan;
+        vulkanSupport = config.hostSpec.useVulkan;
+        # Enable BLAS for optimized CPU layer performance (OpenBLAS)
+        # This is crucial for models using split-mode or CPU offloading
+        blasSupport = true;
+        cudaSupport = false;
+        rocmGpuTargets = [ config.hostSpec.rocmTarget ];
+      };
+      nvidiaSettings = {
+        cudaSupport = true;
+      };
+      overrideSettings = if config.hostSpec.isAMDGpu then amdSettings else nvidiaSettings;
+      amdCmakeFlags = [
+        "-DGGML_HIP_NO_VMM=ON"
+      ]
+      ++ lib.optionals (!isHalo) [
+        # This is buggy on 1151 apparently, so disabled for now
+        # https://github.com/ggml-org/llama.cpp/issues/24437
+        "-DGGML_HIP_ROCWMMA_FATTN=ON"
+        "-DCMAKE_HIP_FLAGS=-I${pkgs.rocmPackages.rocwmma}/include"
+      ];
+      nvidiaCmakeFlags = [ ];
+      extraCmakeFlags = if config.hostSpec.isAMDGpu then amdCmakeFlags else nvidiaCmakeFlags;
+    in
+    (pkgs.unstable.llama-cpp.override overrideSettings).overrideAttrs (oldAttrs: rec {
+      # version = "11095";
+      # src = pkgs.fetchFromGitHub {
+      #   owner = "ggml-org";
+      #   repo = "llama.cpp";
+      #   tag = "b${version}";
+      #   hash = "sha256-NGkiFhVPYvnZn+Qi5Qze80bO2w8bTiqOsVdZjTVCmvc=";
+      #   leaveDotGit = true;
+      #   postFetch = ''
+      #     git -C "$out" rev-parse --short HEAD > $out/COMMIT
+      #     find "$out" -name .git -print0 | xargs -0 rm -rf
+      #   '';
+      # };
+      # npmRoot = "tools/ui";
+      # npmDepsHash = "sha256-2Q7XhaLAArmviOLdQsNbYTfdyDE5pW9lR26cRHEVl9k=";
 
-        cmakeFlags =
-          (oldAttrs.cmakeFlags or [ ])
-          ++ [
-            # NOTE: This apparently makes builds non-deterministic
-            "-DGGML_NATIVE=ON"
-            "-DGGML_HIP_NO_VMM=ON"
-          ]
-          ++ lib.optionals (!isHalo) [
-            # This is buggy on 1151 apparently, so disabled for now
-            # https://github.com/ggml-org/llama.cpp/issues/24437
-            "-DGGML_HIP_ROCWMMA_FATTN=ON"
-            "-DCMAKE_HIP_FLAGS=-I${pkgs.rocmPackages.rocwmma}/include"
-          ];
+      cmakeFlags =
+        (oldAttrs.cmakeFlags or [ ])
+        ++ [
+          # NOTE: This apparently makes builds non-deterministic
+          "-DGGML_NATIVE=ON"
+        ]
+        ++ extraCmakeFlags;
 
-        # Disable Nix's NIX_ENFORCE_NO_NATIVE which strips -march=native flags
-        # See: https://github.com/NixOS/nixpkgs/issues/357736
-        # See: https://github.com/NixOS/nixpkgs/pull/377484 (intentionally contradicts this)
-        preConfigure = ''
-          export NIX_ENFORCE_NO_NATIVE=0
-          ${oldAttrs.preConfigure or ""}
-        '';
-      });
+      # Disable Nix's NIX_ENFORCE_NO_NATIVE which strips -march=native flags
+      # See: https://github.com/NixOS/nixpkgs/issues/357736
+      # See: https://github.com/NixOS/nixpkgs/pull/377484 (intentionally contradicts this)
+      preConfigure = ''
+        export NIX_ENFORCE_NO_NATIVE=0
+        ${oldAttrs.preConfigure or ""}
+      '';
+    });
 
   # Check unsloth "Best Practices" section to find these
   qwenSampling = [
@@ -421,7 +432,7 @@ in
       services.llama-swap = {
         enable = true;
         listenAddress = "0.0.0.0";
-        openFirewall = false; # Use granualrFirewall or manual set microvm rules
+        openFirewall = false; # Use granularFirewall or manual set microvm rules
         port = ports.tcp.llama-swap;
 
         settings = {
