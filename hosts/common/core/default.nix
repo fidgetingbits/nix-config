@@ -148,6 +148,8 @@ in
     {
       "127.0.0.1" = [ "${hostName}.${domain}" ];
     };
-  nixpkgs.config.rocmSupport = config.hostSpec.useRocm;
-  nixpkgs.config.cudaSupport = config.hostSpec.isNvidiaGpu;
+
+  # WARNING: This inevitably caused to many build issues, as per warnings I read before hand lol
+  # nixpkgs.config.rocmSupport = config.hostSpec.useRocm;
+  # nixpkgs.config.cudaSupport = config.hostSpec.isNvidiaGpu;
 }
