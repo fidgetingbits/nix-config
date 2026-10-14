@@ -7,9 +7,7 @@
     widgets = {
       background_opacity = 0.75;
       center = [
-        "session"
         "workspaces"
-        "control-center"
       ];
       end = [
         "tray"
@@ -20,8 +18,9 @@
         "volume"
         "brightness"
         "battery"
-        "voxtype"
-        "voxtype-meeting"
+        "status"
+        "meeting"
+        "yubikey-sound"
       ];
       start = [
         "date"
@@ -81,7 +80,7 @@
     source = "builtin";
   };
 
-  wallaper = {
+  wallpaper = {
     enabled = true;
     default.path = "${inputs.nix-assets}/images/wallpapers/astronaut.webp";
   };
@@ -94,6 +93,7 @@
   };
 
   # FIXME: The voxtype stuff should be limited to only specific systems...
+  # See introdus for more plugin settings
   plugins = {
     auto_update = "all";
     enabled = [
@@ -128,9 +128,11 @@
     "gabedunn/voxtype" = {
       show_extended = true;
     };
-
-    "fidgetingbits/voxtype-meeting" = { };
   };
 
-  widget.date.format = "{:%Y.%m.%d}";
+  widget = {
+    date.format = "{:%Y.%m.%d}";
+    meeting.type = "fidgetingbits/voxtype-meeting:meeting";
+    status.type = "gabedunn/voxtype:status";
+  };
 }

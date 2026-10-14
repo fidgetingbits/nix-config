@@ -24,10 +24,6 @@ let
   # };
 in
 {
-  imports = [
-    inputs.noctalia.homeModules.default
-  ];
-
   home.packages = [
     pkgs.adwaita-icon-theme
   ];

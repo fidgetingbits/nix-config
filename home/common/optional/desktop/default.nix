@@ -1,4 +1,8 @@
-{ pkgs, lib, ... }:
+{
+  pkgs,
+  lib,
+  ...
+}:
 {
   # FIXME: This should import based on wayland or not if it ever matters
   imports = [
