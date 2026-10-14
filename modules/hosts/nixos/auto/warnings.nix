@@ -30,6 +30,8 @@
       # This has nothing directly to do with our config afaict
       "Skipping hindent because it "
       "Skipping phpstan because it "
+      "evaluation warning: stdenv.isDarwin is deprecated, use stdenv.hostPlatform.isDarwin instead"
+      "evaluation warning: stdenv.isLinux is deprecated, use stdenv.hostPlatform.isLinux instead"
     ];
   };
 }
