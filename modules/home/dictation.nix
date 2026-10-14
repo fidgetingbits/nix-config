@@ -10,7 +10,7 @@
 let
   cfg = config.${namespace}.dictation;
   llamaSwapPort = osConfig.hostSpec.networking.ports.tcp.llama-swap;
-  summaryEndpointPort = 8080;
+  summaryEndpointPort = osConfig.hostSpec.networking.ports.tcp.voxtype-summary-api;
   meetingSummaryEndpoint =
     pkgs.writers.writePython3Bin "meeting-summary"
       { libraries = lib.attrValues { inherit (pkgs.python3Packages) flask requests; }; } # python
@@ -60,13 +60,9 @@ in
       enable = true;
       service.enable = true;
 
-      # Only using this on AMD systems atm. rocm crashes
+      # Only using this on AMD systems atm (NOTE: rocm crashes)
       # package = inputs.voxtype.packages.${pkgs.stdenv.hostPlatform.system}.vulkan;
       package = inputs.voxtype.packages.${pkgs.stdenv.hostPlatform.system}.onnx-migraphx;
-      # inputs.voxtype.packages.${pkgs.stdenv.hostPlatform.system}.onnx-migraphx.overrideAttrs
-      #   (oldAttrs: {
-      #     cargoFeatures = (oldAttrs.cargoFeatures or [ ]) ++ [ "ml-diarization" ];
-      #   });
 
       # FIXME: there is an alibaba model that does chinese/english, which we may want to situationally have?
       settings = {
@@ -94,6 +90,10 @@ in
             backend = "remote";
             remote_endpoint = "http://localhost:${toString summaryEndpointPort}/api/summarize";
             remote_api_key = "foo";
+          };
+          diarization = {
+            enabled = true;
+            backend = "ml";
           };
         };
 
