@@ -186,8 +186,14 @@
 
     #################### Core Nix Sources ####################
 
-    nixpkgs.url = "https://channels.nixos.org/nixos-26.05/nixexprs.tar.zst";
-    nixpkgs-unstable.url = "https://channels.nixos.org/nixos-unstable/nixexprs.tar.zst";
+    # People recommend using the tarball but, channels.nixos.org is _awfully_ slow
+    # and the chinese mirror has wacky dates that fuck up the boot entries
+    # nixpkgs.url = "https://channels.nixos.org/nixos-26.05/nixexprs.tar.zst";
+    # nixpkgs.url = "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/nixos-26.05/nixexprs.tar.zst";
+    # nixpkgs-unstable.url = "https://channels.nixos.org/nixos-unstable/nixexprs.tar.zst";
+    # nixpkgs-unstable.url = "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/nixos-unstable/nixexprs.tar.zst";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
@@ -219,6 +225,7 @@
 
     impermanence = {
       url = "github:nix-community/impermanence";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     disko = {
@@ -230,6 +237,7 @@
     nixos-facter-modules.url = "github:nix-community/nixos-facter-modules";
     nixos-hardware = {
       url = "github:nixos/nixos-hardware";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     microvm = {
@@ -261,7 +269,7 @@
 
     nix-sweep = {
       url = "github:jzbor/nix-sweep/v0.7.0";
-      # inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # Allows most third-party vscode extensions
@@ -304,10 +312,14 @@
       url = "github:fidgetingbits/nix-assets";
     };
 
-    pwndbg.url = "github:pwndbg/pwndbg";
+    pwndbg = {
+      url = "github:pwndbg/pwndbg";
+
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
 
     omp-nix = {
-      url = "github:can1357/oh-my-pi?ref=v18.4.4";
+      url = "github:can1357/oh-my-pi?ref=v18.10.0";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
