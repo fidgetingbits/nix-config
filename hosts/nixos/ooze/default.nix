@@ -142,6 +142,13 @@ in
       ];
       subnet = wg-subnet;
     };
+
+    services.llama-swap = {
+      enable = true;
+      preload = [
+        "Nomic Embeddings"
+      ];
+    };
   };
 
   # Extra peers not on o-lan subnet that can't be auto-generated
@@ -211,4 +218,8 @@ in
       allow ${olan.wg-subnet.hosts.moon.ip};
       allow ${olan.wg-subnet.hosts.moxy.ip};
     '';
+
+  # FIXME: prefer global, but breaks other systems (2026-10-13)
+  # This also causes cuda rebuilds that fail on the builders :/
+  # nixpkgs.config.cudaSupport = true;
 }

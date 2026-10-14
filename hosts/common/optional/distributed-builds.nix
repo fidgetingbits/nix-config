@@ -32,7 +32,7 @@
             "kvm"
           ];
           speedFactor = 5;
-          maxJobs = 2;
+          maxJobs = 5;
         }
         {
           hostName = "oedo";

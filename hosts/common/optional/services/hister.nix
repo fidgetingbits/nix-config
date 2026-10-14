@@ -22,7 +22,9 @@ in
       };
       semantic_search = {
         enable = true;
-        embedding_endpoint = "http://oedo.${config.hostSpec.domain}:${toString ports.tcp.llama-swap}/v1/embeddings";
+        # FIXME: Using localhost now. This should be configurable though
+        embedding_endpoint = "http://ooze.${config.hostSpec.domain}:${toString ports.tcp.llama-swap}/v1/embeddings";
+        # embedding_endpoint = "http://oedo.${config.hostSpec.domain}:${toString ports.tcp.llama-swap}/v1/embeddings";
         embedding_model = "nomic-embed-text";
         #   dimensions = 768;
         #   maxContextLength = 512;
