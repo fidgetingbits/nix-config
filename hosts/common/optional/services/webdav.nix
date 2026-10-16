@@ -8,7 +8,6 @@ let
   servicePort = config.hostSpec.networking.ports.tcp.webdav;
 in
 {
-
   sops.secrets."passwords/webdav" = {
     owner = "webdav";
     group = "webdav";
@@ -48,6 +47,12 @@ in
       subDomain = "webdav";
       port = servicePort;
       ssl = false;
+      # Some grapheneos app backups fail without larger body
+      extraLocationSettings = {
+        extraConfig = ''
+          client_max_body_size 10G;
+        '';
+      };
     }
   ];
 

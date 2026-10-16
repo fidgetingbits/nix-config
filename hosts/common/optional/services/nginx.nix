@@ -40,6 +40,8 @@ lib.mkMerge [
 
       appendHttpConfig = "
         sendfile_max_chunk 1m;
+        proxy_headers_hash_max_size 1024;
+        proxy_headers_hash_bucket_size 128;
       ";
     };
 
