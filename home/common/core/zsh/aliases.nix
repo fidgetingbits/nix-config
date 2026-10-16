@@ -67,6 +67,7 @@ in
   toml2nix = "${pkgs.writeScript "toml2nix" ''
     nix eval --impure --expr 'builtins.fromTOML (builtins.readFile "'$1'")' | ${lib.getExe pkgs.nixfmt} -
   ''}";
+  noctalia2nix = "noctalia config export > /tmp/noctalia.toml; toml2nix /tmp/noctalia.toml";
 
   # nftables
   nftls = "sudo nft -at list ruleset"; # list all tables and chains
