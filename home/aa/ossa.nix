@@ -214,6 +214,7 @@ in
     llm.cli-tools.enable = true;
     language-learning.enable = true;
     dictation.enable = true;
+    rclone.wiki.enable = true;
   };
 
   # Automatic ssh entries for oedo microvms on shared network
