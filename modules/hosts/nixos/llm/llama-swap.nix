@@ -316,8 +316,6 @@ let
     ##
     # ORNITH
     #
-    # Docs mention: --rope-scaling '{"rope_type":"yarn","factor":2.0,"original_max_position_embeddings":32768}' \
-    ##
 
     # 2026-08-31
     # strix halo: pp 110.01 t/s tg 57.38 t/s
