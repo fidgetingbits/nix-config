@@ -12,6 +12,13 @@
 # that both the connection names and passwords are hidden. The nmconnection
 # approach is "easier" because I can manually connect with NetworkManager
 # and then quickly copy the whole file (minus the interface) elsewhere.
+#
+# This assumes your sops files have a structure:
+# wifi:
+#   ap1: secret
+#   ap2: secret
+# ...
+# As we read out the ap entries under wifi using readSectionKeys below
 {
   inputs,
   lib,
@@ -23,15 +30,42 @@ let
   sopsFolder = (lib.toString inputs.nix-secrets) + "/sops";
   cfg = config.wifi;
 
-  # Return a list of all Access Point (AP) names from the given WLAN secret file
-  # NOTE: This uses IFD in order to read SOPS yaml keys
-  readAPNames =
-    file:
-    pkgs.runCommand "${getWLAN file}-ap-names.txt" { } ''
-      ${pkgs.yq}/bin/yq -r '.wifi | keys[]' ${sopsFolder}/${file}> "$out"
-    ''
-    |> lib.readFile
-    |> lib.splitString "\n";
+  # Collect the key names of the top-level sections of a small YAML subset:
+  #   section:            <- unindented, becomes a list of key names
+  #       key: value      <- indented entries; values are discarded
+  readSectionKeys =
+    yaml:
+    let
+      step =
+        {
+          section ? null,
+          sections ? { },
+        }:
+        line:
+        let
+          top = lib.match "([^ :#]+):[ \t]*(#.*)?" line;
+          entry = lib.match "[ \t]+([^ :#]+):.*" line;
+        in
+        if top != null then
+          {
+            section = lib.head top;
+            sections = sections // {
+              ${lib.head top} = sections.${lib.head top} or [ ];
+            };
+          }
+        else if section != null && entry != null then
+          {
+            inherit section;
+            sections = sections // {
+              ${section} = sections.${section} ++ [ (lib.head entry) ];
+            };
+          }
+        else
+          { inherit section sections; };
+    in
+    (lib.foldl step { } (lib.splitString "\n" yaml)).sections;
+
+  readAPNames = file: (readSectionKeys (lib.readFile (sopsFolder + "/${file}"))).wifi or [ ];
 
   # The WLAN name 'foo' part of a file name such as 'wifi.foo.yaml'
   getWLAN = f: lib.elemAt (lib.splitString "." f) 1;
