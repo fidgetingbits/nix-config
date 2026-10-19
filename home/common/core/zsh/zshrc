@@ -410,3 +410,31 @@ function flake_lock_dates() {
             printf "%-20s %s\n" "$name" "$(date -d @"$ts" '+%Y-%m-%d %H:%M:%S %Z')"
         done
 }
+
+# The jc aliases didn't work with completion correctly, and in the case of --user
+# weren't showing the right services, so this fixes that
+function jc() {
+    SYSTEMD_LESS=FRX command journalctl "$@"
+}
+
+function jcu() {
+    SYSTEMD_LESS=FRX command journalctl --user "$@"
+}
+compdef _journalctl jc
+
+function _jcu_units() {
+    local -a services
+    services=(${(f)"$(systemctl --user list-units --type=service --no-legend --plain | awk '{print $1}')"})
+    _describe 'user service' services
+}
+
+function _jcu() {
+    if [[ $words[CURRENT-1] == "-u" ]]; then
+        _jcu_units
+    else
+        words=(journalctl --user "${words[@]:1}")
+        ((CURRENT++))
+        _journalctl
+    fi
+}
+compdef _jcu jcu

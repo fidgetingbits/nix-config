@@ -164,8 +164,8 @@ in
 
   # journalctl
   # SYSTEMD_LESS=FRX prevents line truncation
-  jc = "SYSTEMD_LESS=FRX journalctl";
-  jcu = "SYSTEMD_LESS=FRX journalctl --user";
+  # jc = "SYSTEMD_LESS=FRX journalctl";
+  # jcu = "SYSTEMD_LESS=FRX journalctl --user";
 
   # backup
   bbi = "borg-backup-init";

@@ -3,6 +3,10 @@
 { pkgs }:
 [
   {
+    name = "fzf-tab";
+    src = "${pkgs.zsh-fzf-tab}/share/fzf-tab";
+  }
+  {
     name = "zhooks";
     src = "${pkgs.zsh-zhooks}/share/zsh/zhooks";
   }
