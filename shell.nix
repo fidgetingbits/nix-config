@@ -1,5 +1,6 @@
 # Shell for bootstrapping flake-enabled nix and other tooling
 {
+  inputs,
   pkgs,
   checks,
   lib,
@@ -58,6 +59,7 @@
         }))
         # New enough to get memory management improvements
         pkgs.unstable.nixVersions.git
+        inputs.iets.packages.${pkgs.stdenv.hostPlatform.system}.default
       ];
 
     shellHook =

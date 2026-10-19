@@ -233,6 +233,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    iets = {
+      url = "github:numtide/iets";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Modern nixos-hardware alternative
     nixos-facter-modules.url = "github:nix-community/nixos-facter-modules";
     nixos-hardware = {
