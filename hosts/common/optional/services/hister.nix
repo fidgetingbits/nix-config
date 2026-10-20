@@ -1,5 +1,6 @@
 {
   lib,
+  pkgs,
   config,
   ...
 }:
@@ -9,6 +10,7 @@ in
 {
   services.hister = {
     enable = true;
+    package = pkgs.unstable.hister; # FIXME: Need > 0.17 to fix https://github.com/asciimoo/hister/issues/739. Maybe after 26.11 switch back
     port = ports.tcp.hister;
     dataDir = "/var/lib/hister";
 
@@ -22,14 +24,12 @@ in
       };
       semantic_search = {
         enable = true;
-        # FIXME: Using localhost now. This should be configurable though
         embedding_endpoint = "http://ooze.${config.hostSpec.domain}:${toString ports.tcp.llama-swap}/v1/embeddings";
-        # embedding_endpoint = "http://oedo.${config.hostSpec.domain}:${toString ports.tcp.llama-swap}/v1/embeddings";
         embedding_model = "nomic-embed-text";
-        #   dimensions = 768;
-        #   maxContextLength = 512;
-        #   queryPrefix = "search_query: ";
-        #   documentPrefix = "search_document: ";
+        dimensions = 768;
+        max_context_length = 512;
+        query_prefix = "search_query: ";
+        document_prefix = "search_document: ";
       };
     };
   };
