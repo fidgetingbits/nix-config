@@ -1,5 +1,6 @@
 # WARNING: This is tweaked for two AMD AI chipsets atm, so won't work on other systems
 {
+  inputs,
   pkgs,
   lib,
   config,
@@ -32,12 +33,13 @@ let
   pu = config.users.users.${config.hostSpec.primaryUsername};
   user = pu.name;
   group = pu.group;
-
   persistFolder = config.hostSpec.persistFolder;
-  # Some notes taken from
-  # https://github.com/basnijholt/dotfiles/blob/6f8a47c1/configs/nixos/hosts/pc/package-overrides.nix
-  # https://github.com/blazed/cake/blob/ee606cf/profiles/ai.nix
-  # FIXME: Should maybe enable vulkan at the same time to test differences
+
+  # Gufo setup for Strix Halo (oedo)
+  gufoFlake = lib.optionalAttrs isHalo inputs.gufo;
+  gufo = lib.optionalAttrs isHalo gufoFlake.packages.${pkgs.system}.default;
+
+  # Standard llama-cpp build for non-halo hosts
   llama-cpp =
     let
       amdSettings = {
@@ -66,21 +68,6 @@ let
       extraCmakeFlags = if config.hostSpec.isAMDGpu then amdCmakeFlags else nvidiaCmakeFlags;
     in
     (pkgs.unstable.llama-cpp.override overrideSettings).overrideAttrs (oldAttrs: rec {
-      # version = "11095";
-      # src = pkgs.fetchFromGitHub {
-      #   owner = "ggml-org";
-      #   repo = "llama.cpp";
-      #   tag = "b${version}";
-      #   hash = "sha256-NGkiFhVPYvnZn+Qi5Qze80bO2w8bTiqOsVdZjTVCmvc=";
-      #   leaveDotGit = true;
-      #   postFetch = ''
-      #     git -C "$out" rev-parse --short HEAD > $out/COMMIT
-      #     find "$out" -name .git -print0 | xargs -0 rm -rf
-      #   '';
-      # };
-      # npmRoot = "tools/ui";
-      # npmDepsHash = "sha256-2Q7XhaLAArmviOLdQsNbYTfdyDE5pW9lR26cRHEVl9k=";
-
       cmakeFlags =
         (oldAttrs.cmakeFlags or [ ])
         ++ [
@@ -97,6 +84,8 @@ let
         ${oldAttrs.preConfigure or ""}
       '';
     });
+
+  llama-server = lib.getExe' llama-cpp "llama-server";
 
   # Check unsloth "Best Practices" section to find these
   qwenSampling = [
@@ -118,8 +107,6 @@ let
     "--rope-scaling yarn"
     "--rope-scale 2"
   ];
-
-  llama-server = lib.getExe' llama-cpp "llama-server";
 
   # KV dtype convention: q8 weights keep q8_0/q8_0 (max-context memory saving);
   # q4/q6 weights use f16/f16 (f16 avoids the severe long-context slowdown that
@@ -176,202 +163,253 @@ let
       );
     };
 
+  # FIXME: revisit this after initial testing
+  # Switch cachedisk to just use llama-swap's folder? otherwise need persistence
+  # Gufo-backed model builder for Strix Halo
+  mkGufoModel =
+    {
+      modelPath,
+      servedModelName,
+      ctx ? 262144,
+      speculative ? null,
+      mtpModel ? null,
+      draftTokens ? 7,
+      think ? "on",
+      alias ? "",
+    }:
+    {
+      aliases = lib.optional ((lib.stringLength alias) != 0) alias;
+      cmd = lib.getExe (
+        gufoFlake.lib.${pkgs.system}.mkGufoServe {
+          inherit gufo;
+          host = "127.0.0.1";
+          port = "\${PORT}";
+          sessions = 1;
+          model = modelPath;
+          inherit servedModelName;
+          context = ctx;
+          inherit speculative mtpModel draftTokens;
+          minDraftTokens = 1;
+          inherit think;
+          reasoningEffort = "low";
+          preserveThinking = "on";
+          cacheDisk = "/var/lib/gufo/cache";
+          cacheDiskBytes = 8589934592;
+          cacheDiskStagingBytes = 8589934592;
+          extraArgs = [ "--log-progress" ];
+        }
+      );
+    };
+
   # Strix Halo box has more available ram for f16 kv cache,
   # but stick to q8 on Strix Point. Need to test how much
   # this actually matters in practice
   genKV = if isHalo then "f16" else "q8_0";
   # IMPORTANT: These names are mirrored in neovim for minuet/codecompanion. If
   # you change the naming scheme update. See lua/llms.lua
-  models = {
-    ##
-    # QWEN
-    ##
+  # FIXME: We need to build out the list of models for the halo
+  models =
+    if isHalo then
+      {
+        "Qwen 3.8 27B" = mkGufoModel {
+          modelPath = "${cachePath}/models--unsloth--Qwen3.8-27B-GGUF/snapshots/4ca720788d1e01f1bff70c033e0d0028fd02e502/Qwen3.8-27B-UD-Q5_K_XL.gguf";
+          servedModelName = "qwen3.8:27b-q5";
+          alias = "qwen3.8:27b-q5";
+        };
 
-    # 2026-08-31
-    # strix halo: pp 120.59 t/s tg 10.14 t/s
-    # strix point:
-    "Qwen 3.8 27B (Heavy)" = mkModel {
-      hf = "unsloth/Qwen3.8-27B-GGUF:UD-Q5_K_XL";
-      kv = "q8_0";
-      sampling = [
-        "--temp 1.0"
-        "--top_p 0.95"
-        "--top_k 20 "
-      ];
-      thinking = true;
-      alias = "qwen3.8:27b-q5";
-    };
+        # Regular (non-strix-halo) models
+      }
+    else
+      {
+        ##
+        # QWEN
+        ##
 
-    # FIXME: This doesn't load on strix point. Maybe better to reduce ctx size?
-    # 2026-10-01
-    # strix halo:
-    # strix point:
-    "Qwen 3.8 Flash (Heavy)" = mkModel {
-      hf = "unsloth/Qwen3.8-Flash-Next-GGUF:UD-Q2_K_XL";
-      kv = "q8_0";
-      ctx = 16384;
-      sampling = [
-        "--temp 1.0"
-        "--top_p 0.95"
-        "--top_k 20 "
-      ];
-      thinking = true;
-      alias = "qwen3.8:flash-q2";
-    };
+        # 2026-08-31
+        # strix halo: pp 120.59 t/s tg 10.14 t/s
+        # strix point:
+        "Qwen 3.8 27B (Heavy)" = mkModel {
+          hf = "unsloth/Qwen3.8-27B-GGUF:UD-Q5_K_XL";
+          kv = "q8_0";
+          sampling = [
+            "--temp 1.0"
+            "--top_p 0.95"
+            "--top_k 20 "
+          ];
+          thinking = true;
+          alias = "qwen3.8:27b-q5";
+        };
 
-    # strix halo: pp 71.79 t/s, tg 58.24 t/s
-    # strix point: pp 36.59 t/s, tg 20.18 t/s
-    "Qwen 3.6 Coder 30B (Light)" = mkModel {
-      hf = "unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q6_K_XL";
-      kv = "f16";
-      sampling = [
-        "--temp 0.7"
-        "--top_p 0.95"
-        "--top_k 20 "
-      ];
-      thinking = false;
-      alias = "qwen3.6:coder-30b-a3b-q6";
-    };
+        # FIXME: This doesn't load on strix point. Maybe better to reduce ctx size?
+        # 2026-10-01
+        # strix halo:
+        # strix point:
+        "Qwen 3.8 Flash (Heavy)" = mkModel {
+          hf = "unsloth/Qwen3.8-Flash-Next-GGUF:UD-Q2_K_XL";
+          kv = "q8_0";
+          ctx = 16384;
+          sampling = [
+            "--temp 1.0"
+            "--top_p 0.95"
+            "--top_k 20 "
+          ];
+          thinking = true;
+          alias = "qwen3.8:flash-q2";
+        };
 
-    # FIXME: candidate for deletion in favor of ornith 1.5 35b
-    # strix halo: pp 73.48 t/s, tg 68.41 t/s
-    # strix point: pp 41.37 t/s, tg 18.67 t/s
-    "Qwen 3.6 General 35B Q4 (Light)" = mkModel {
-      hf = "unsloth/Qwen3.6-35B-A3B-MTP-GGUF:UD-Q4_K_XL";
-      kv = genKV;
-      mtp = true;
-      alias = "qwen3.6:35b-a3b-mtp-q4";
-    };
+        # strix halo: pp 71.79 t/s, tg 58.24 t/s
+        # strix point: pp 36.59 t/s, tg 20.18 t/s
+        "Qwen 3.6 Coder 30B (Light)" = mkModel {
+          hf = "unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q6_K_XL";
+          kv = "f16";
+          sampling = [
+            "--temp 0.7"
+            "--top_p 0.95"
+            "--top_k 20 "
+          ];
+          thinking = false;
+          alias = "qwen3.6:coder-30b-a3b-q6";
+        };
 
-    # FIXME: candidate for deletion in favor of ornith 1.5 35b
-    # strix halo: pp 71.48 t/s, tg 59.11 t/s
-    # strix point:
-    "Qwen 3.6 General 35B Q8 (Light)" = mkModel {
-      hf = "unsloth/Qwen3.6-35B-A3B-MTP-GGUF:UD-Q8_K_XL";
-      kv = "q8_0";
-      mtp = true;
-      alias = "qwen3.6:35b-a3b-mtp-q8";
-    };
+        # FIXME: candidate for deletion in favor of ornith 1.5 35b
+        # strix halo: pp 73.48 t/s, tg 68.41 t/s
+        # strix point: pp 41.37 t/s, tg 18.67 t/s
+        "Qwen 3.6 General 35B Q4 (Light)" = mkModel {
+          hf = "unsloth/Qwen3.6-35B-A3B-MTP-GGUF:UD-Q4_K_XL";
+          kv = genKV;
+          mtp = true;
+          alias = "qwen3.6:35b-a3b-mtp-q4";
+        };
 
-    # strix halo: pp 40.73 t/s, tg 19.73 t/s
-    # strix point:
-    "Qwen 3.6 General 27B (Heavy)" = mkModel {
-      hf = "unsloth/Qwen3.6-27B-MTP-GGUF:UD-Q4_K_XL";
-      kv = genKV;
-      mtp = true;
-      alias = "qwen3.6:27b-mtp-q4";
-    };
+        # FIXME: candidate for deletion in favor of ornith 1.5 35b
+        # strix halo: pp 71.48 t/s, tg 59.11 t/s
+        # strix point:
+        "Qwen 3.6 General 35B Q8 (Light)" = mkModel {
+          hf = "unsloth/Qwen3.6-35B-A3B-MTP-GGUF:UD-Q8_K_XL";
+          kv = "q8_0";
+          mtp = true;
+          alias = "qwen3.6:35b-a3b-mtp-q8";
+        };
 
-    "Qwen 2.5 Coder 7B (Light)" = mkModel {
-      hf = "unsloth/Qwen2.5-Coder-7B-Instruct-128K-GGUF";
-      ctx = 32768;
-      kv = "q8_0";
-      sampling = qwenSampling;
-      alias = "qwen2.5:coder-7b-q8";
-    };
+        # strix halo: pp 40.73 t/s, tg 19.73 t/s
+        # strix point:
+        "Qwen 3.6 General 27B (Heavy)" = mkModel {
+          hf = "unsloth/Qwen3.6-27B-MTP-GGUF:UD-Q4_K_XL";
+          kv = genKV;
+          mtp = true;
+          alias = "qwen3.6:27b-mtp-q4";
+        };
 
-    "Qwen 2.5 Coder 14B (Light)" = mkModel {
-      hf = "unsloth/Qwen2.5-Coder-14B-Instruct-128K-GGUF";
-      ctx = 32768;
-      kv = "q8_0";
-      sampling = qwenSampling;
-      alias = "qwen2.5:coder-14b-q8";
-    };
+        "Qwen 2.5 Coder 7B (Light)" = mkModel {
+          hf = "unsloth/Qwen2.5-Coder-7B-Instruct-128K-GGUF";
+          ctx = 32768;
+          kv = "q8_0";
+          sampling = qwenSampling;
+          alias = "qwen2.5:coder-7b-q8";
+        };
 
-    # strix halo: pp 695.34 t/s, tg 106.98 t/s
-    # strix point: pp 379.23 t/s, tg 36.51 t/s
-    "Qwen 2.5 Coder 1.5B (Ultra Light)" = mkModel {
-      hf = "unsloth/Qwen2.5-Coder-1.5B-Instruct-GGUF:Q8_0";
-      ctx = 4096;
-      kv = "f16";
-      sampling = qwenSampling;
-      alias = "qwen2.5:coder-1.5b-q8";
-    };
+        "Qwen 2.5 Coder 14B (Light)" = mkModel {
+          hf = "unsloth/Qwen2.5-Coder-14B-Instruct-128K-GGUF";
+          ctx = 32768;
+          kv = "q8_0";
+          sampling = qwenSampling;
+          alias = "qwen2.5:coder-14b-q8";
+        };
 
-    ##
-    # GEMMA
-    ##
+        # strix halo: pp 695.34 t/s, tg 106.98 t/s
+        # strix point: pp 379.23 t/s, tg 36.51 t/s
+        "Qwen 2.5 Coder 1.5B (Ultra Light)" = mkModel {
+          hf = "unsloth/Qwen2.5-Coder-1.5B-Instruct-GGUF:Q8_0";
+          ctx = 4096;
+          kv = "f16";
+          sampling = qwenSampling;
+          alias = "qwen2.5:coder-1.5b-q8";
+        };
 
-    # strix halo: pp 96.89 t/s, tg 42.02 t/s
-    # strix point: pp 43.88 t/s, tg 14.73 t/s
-    "Gemma 4 26B (Light)" = mkModel {
-      hf = "unsloth/gemma-4-26B-A4B-it-GGUF:UD-Q6_K_XL";
-      kv = "f16";
-      ctx = 200000;
-      sampling = gemmaSampling;
-      thinking = false;
-      alias = "gemma-4:26b-a4b-q6";
-    };
+        ##
+        # GEMMA
+        ##
 
-    # strix halo: pp 57.31 t/s, tg 7.41 t/s
-    "Gemma 4 31B (Super Heavy)" = mkModel {
-      hf = "unsloth/gemma-4-31B-it-GGUF:UD-Q6_K_XL";
-      kv = "f16";
-      ctx = 200000;
-      sampling = gemmaSampling;
-      thinking = false;
-      alias = "gemma-4:31b-q6";
-    };
+        # strix halo: pp 96.89 t/s, tg 42.02 t/s
+        # strix point: pp 43.88 t/s, tg 14.73 t/s
+        "Gemma 4 26B (Light)" = mkModel {
+          hf = "unsloth/gemma-4-26B-A4B-it-GGUF:UD-Q6_K_XL";
+          kv = "f16";
+          ctx = 200000;
+          sampling = gemmaSampling;
+          thinking = false;
+          alias = "gemma-4:26b-a4b-q6";
+        };
 
-    ##
-    # ORNITH
-    #
+        # strix halo: pp 57.31 t/s, tg 7.41 t/s
+        "Gemma 4 31B (Super Heavy)" = mkModel {
+          hf = "unsloth/gemma-4-31B-it-GGUF:UD-Q6_K_XL";
+          kv = "f16";
+          ctx = 200000;
+          sampling = gemmaSampling;
+          thinking = false;
+          alias = "gemma-4:31b-q6";
+        };
 
-    # 2026-08-31
-    # strix halo: pp 110.01 t/s tg 57.38 t/s
-    # strix point:
-    "Ornith 1.5-35b-a3b" = mkModel {
-      hf = "ornith-ai/Ornith-1.5-35B-A3B-GGUF:Q5_K_M";
-      kv = "f16";
-      ctx = 200000;
-      sampling = ornithSampling;
-      mtp = true;
-      alias = "ornith-1.5:35b-a3b";
-      extra = ornithRope;
-    };
+        ##
+        # ORNITH
+        #
 
-    # 2026-08-31
-    # strix halo: pp 52.18 t/s tg 12.00 t/s
-    # strix point:
-    "Ornith 1.5-9b" = mkModel {
-      hf = "ornith-ai/Ornith-1.5-9B-GGUF:BF16";
-      kv = "f16";
-      sampling = ornithSampling;
-      mtp = true;
-      alias = "ornith-1.5:9b";
-      extra = ornithRope;
-    };
+        # 2026-08-31
+        # strix halo: pp 110.01 t/s tg 57.38 t/s
+        # strix point:
+        "Ornith 1.5-35b-a3b" = mkModel {
+          hf = "ornith-ai/Ornith-1.5-35B-A3B-GGUF:Q5_K_M";
+          kv = "f16";
+          ctx = 200000;
+          sampling = ornithSampling;
+          mtp = true;
+          alias = "ornith-1.5:35b-a3b";
+          extra = ornithRope;
+        };
 
-    ##
-    # Other
-    ##
+        # 2026-08-31
+        # strix halo: pp 52.18 t/s tg 12.00 t/s
+        # strix point:
+        "Ornith 1.5-9b" = mkModel {
+          hf = "ornith-ai/Ornith-1.5-9B-GGUF:BF16";
+          kv = "f16";
+          sampling = ornithSampling;
+          mtp = true;
+          alias = "ornith-1.5:9b";
+          extra = ornithRope;
+        };
 
-    # This is used by hister for semantic search
-    "Nomic Embeddings" = mkModel {
-      hf = "nomic-ai/nomic-embed-text-v1.5-GGUF:F16";
-      kv = "f16";
-      ctx = 8192;
-      sampling = [ ];
-      thinking = false;
-      embedding = true;
-      alias = "nomic-embed-text";
-    };
+        ##
+        # Other
+        ##
 
-    # Testing for meeting summarization
-    # FIXME: Double check params
-    # NOTE: This will fit on strix halo only I think
-    "Llama 3.3 70B Instruct Q4 (Heavy)" = mkModel {
-      hf = "unsloth/Llama-3.3-70B-Instruct-GGUF:UD-Q4_K_XL";
-      kv = "q8_0";
-      ctx = 32768;
-      sampling = [
-        "--temp 0.6"
-        "--top_p 0.9"
-      ];
-      thinking = false;
-      alias = "llama-3.3:70b-q4";
-    };
-  };
+        # This is used by hister for semantic search
+        "Nomic Embeddings" = mkModel {
+          hf = "nomic-ai/nomic-embed-text-v1.5-GGUF:F16";
+          kv = "f16";
+          ctx = 8192;
+          sampling = [ ];
+          thinking = false;
+          embedding = true;
+          alias = "nomic-embed-text";
+        };
+
+        # Testing for meeting summarization
+        # FIXME: Double check params
+        # NOTE: This will fit on strix halo only I think
+        "Llama 3.3 70B Instruct Q4 (Heavy)" = mkModel {
+          hf = "unsloth/Llama-3.3-70B-Instruct-GGUF:UD-Q4_K_XL";
+          kv = "q8_0";
+          ctx = 32768;
+          sampling = [
+            "--temp 0.6"
+            "--top_p 0.9"
+          ];
+          thinking = false;
+          alias = "llama-3.3:70b-q4";
+        };
+      };
 in
 {
   options = {
@@ -416,11 +454,12 @@ in
       systemd.tmpfiles.rules = [
         # Format: Type Path Mode UID GID Age Argument
         "d /var/lib/llm/models 0755 ${user} ${group} - -"
+      ]
+      ++ lib.optionals isHalo [
+        "d /var/lib/gufo/cache 0755 ${user} ${group} - -"
       ];
 
-      environment.systemPackages = [
-        llama-cpp # manual llama-server/llama-cli tests
-      ];
+      environment.systemPackages = [ llama-cpp ] ++ lib.optionals isHalo [ gufo ];
 
       # Good example of settings here:
       # yaml-based settings
@@ -505,6 +544,8 @@ in
             lib.optionals (hostName == "oedo") [
               # Strix Halo (gfx1151) ROCm tuning:
               "HSA_OVERRIDE_GFX_VERSION=11.5.1"
+              # FIXME: this is suggested from llm, investigate
+              "GPU_MAX_HW_QUEUES=2"
             ]
           ++
             # 9070 XT - gfx1201
