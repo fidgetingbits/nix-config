@@ -1,6 +1,7 @@
 # Generate local llm provider lists
 {
   config,
+  osConfig,
   lib,
   namespace,
   inputs,
@@ -58,44 +59,49 @@ let
         models = lib.mapAttrsToList (k: v: mkModel k k) rawModels;
       }
     ];
-
 in
 {
-  options.${namespace}.llm = {
-    defaultModel = lib.mkOption {
-      type = lib.types.str;
-      default = "Qwen 2.5 Coder 7B (Light)";
-      example = "foo";
-      description = "The default model to use in cli tools (ie: llm, fabric). See llama-swap for list";
-    };
+  # FIXME: We should assert that the model exists in the models array for the defaultProvider
+  options.${namespace}.llm =
+    let
+      inherit (osConfig.${namespace}.services.llama-swap) defaultModels;
+      inherit (config.${namespace}.llm) defaultProvider;
+    in
+    {
+      defaultModel = lib.mkOption {
+        type = lib.types.str;
+        default = defaultModels."${defaultProvider}".light;
+        example = "foo";
+        description = "The default model to use in cli tools (ie: llm, fabric). See llama-swap for list";
+      };
 
-    defaultProvider = lib.mkOption {
-      type = lib.types.str;
-      default = "oedo";
-      example = "foo";
-      description = "The default host running llama-swap to use the model on";
-    };
-    providers = lib.mkOption {
-      type = lib.types.listOf (
-        lib.types.submodule {
-          options = {
-            name = lib.mkOption { type = lib.types.str; };
-            host = lib.mkOption { type = lib.types.str; };
-            port = lib.mkOption { type = lib.types.port; };
-          };
-        }
-      );
-      default = [ ];
-      description = "List of local llama-swap providers to track";
-    };
+      defaultProvider = lib.mkOption {
+        type = lib.types.str;
+        default = "oedo";
+        example = "foo";
+        description = "The default host running llama-swap to use the model on";
+      };
+      providers = lib.mkOption {
+        type = lib.types.listOf (
+          lib.types.submodule {
+            options = {
+              name = lib.mkOption { type = lib.types.str; };
+              host = lib.mkOption { type = lib.types.str; };
+              port = lib.mkOption { type = lib.types.port; };
+            };
+          }
+        );
+        default = [ ];
+        description = "List of local llama-swap providers to track";
+      };
 
-    providerModels = lib.mkOption {
-      type = lib.types.listOf providerSubmodule;
-      default = lib.concatMap genLocalModels cfg.providers;
-      internal = true;
-      visible = false;
-      readOnly = true;
-      description = "Internal list of LLM models aggregated from local providers";
+      providerModels = lib.mkOption {
+        type = lib.types.listOf providerSubmodule;
+        default = lib.concatMap genLocalModels cfg.providers;
+        internal = true;
+        visible = false;
+        readOnly = true;
+        description = "Internal list of LLM models aggregated from local providers";
+      };
     };
-  };
 }

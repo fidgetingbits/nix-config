@@ -14,7 +14,13 @@ let
     baseUrl = provider.api_base;
     api = "openai-completions";
     apiKey = provider.api_key;
-    models = provider.models;
+    discovery = {
+      type = "openai-models-list";
+    };
+    # NOTE: Used to auto-generate this, but dynamic discovery
+    # makes more sense unless we want to restrict what models
+    # some microvms can use in the future or something
+    # models = provider.models;
   };
 
   models = {

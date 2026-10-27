@@ -13,7 +13,9 @@ let
   isHalo = hostName == "oedo";
   cfg = config.${namespace}.services.llama-swap;
   time = lib.custom.time;
+  # Explicit downloads, used by gufo or explicit model path entries
   modelsPath = "/var/lib/llm/models";
+  # Auto-downloads via huggingface
   cachePath = "/var/cache/private/llama-swap";
 
   net = config.hostSpec.networking;
@@ -163,24 +165,20 @@ let
       );
     };
 
-  # FIXME: revisit this after initial testing
-  # Switch cachedisk to just use llama-swap's folder? otherwise need persistence
   # Gufo-backed model builder for Strix Halo
   mkGufoModel =
     {
       modelPath,
       servedModelName,
       ctx ? 262144,
-      speculative ? null,
-      mtpModel ? null,
-      draftTokens ? 7,
       think ? "on",
       alias ? "",
+      extraAttrs ? { },
     }:
     {
       aliases = lib.optional ((lib.stringLength alias) != 0) alias;
-      cmd = lib.getExe (
-        gufoFlake.lib.${pkgs.system}.mkGufoServe {
+      cmd = gufoFlake.lib.${pkgs.system}.mkGufoServe (
+        {
           inherit gufo;
           host = "127.0.0.1";
           port = "\${PORT}";
@@ -188,16 +186,16 @@ let
           model = modelPath;
           inherit servedModelName;
           context = ctx;
-          inherit speculative mtpModel draftTokens;
           minDraftTokens = 1;
           inherit think;
-          reasoningEffort = "low";
+          reasoningEffort = "low"; # FIXME:
           preserveThinking = "on";
-          cacheDisk = "/var/lib/gufo/cache";
+          cacheDisk = cachePath;
           cacheDiskBytes = 8589934592;
           cacheDiskStagingBytes = 8589934592;
           extraArgs = [ "--log-progress" ];
         }
+        // extraAttrs
       );
     };
 
@@ -205,21 +203,73 @@ let
   # but stick to q8 on Strix Point. Need to test how much
   # this actually matters in practice
   genKV = if isHalo then "f16" else "q8_0";
+
+  # light: tab completion / title generation
+  # heavy: everything else
+  defaultHostModels = {
+    oedo = {
+      ultraLight = "Qwen 2.5 Coder 1.5B (Ultra Light)";
+      light = "Qwen 2.5 Coder 7B (Light)";
+      heavy = "Qwen 3.8 27B (Heavy)"; # gufo only
+    };
+    ossa = {
+      ultraLight = "Qwen 2.5 Coder 1.5B (Ultra Light)";
+      light = "Qwen 2.5 Coder 7B (Light)";
+      heavy = "Qwen 3.6 General 27B (Heavy)"; # FIXME: filler
+    };
+    # FIXME: This will need whatever runs on strata
+    oppo = {
+      ultraLight = "";
+      light = "Qwen 2.5 Coder 7B (Light)";
+      heavy = "";
+    };
+    ooze = {
+      ultraLight = "Nomic Embeddings";
+      light = "Qwen 2.5 Coder 7B (Light)";
+      heavy = "Qwen 3.6 General 27B (Heavy)"; # FIXME: filler
+    };
+  };
+
+  # easier reference when working on models for different systems.
   # IMPORTANT: These names are mirrored in neovim for minuet/codecompanion. If
   # you change the naming scheme update. See lua/llms.lua
   # FIXME: We need to build out the list of models for the halo
   models =
     if isHalo then
+      # gufo options: https://github.com/gufo-org/gufo/blob/main/docs/CLI.md
       {
-        "Qwen 3.8 27B" = mkGufoModel {
-          modelPath = "${cachePath}/models--unsloth--Qwen3.8-27B-GGUF/snapshots/4ca720788d1e01f1bff70c033e0d0028fd02e502/Qwen3.8-27B-UD-Q5_K_XL.gguf";
-          servedModelName = "qwen3.8:27b-q5";
-          alias = "qwen3.8:27b-q5";
+        "Qwen 3.8 27B (Heavy)" = mkGufoModel {
+          modelPath = "${modelsPath}/Qwen3.8-27B-UD-Q5_K_XL.gguf";
+          servedModelName = "Qwen 3.8 27B (Heavy)";
+          alias = "qwen3.8:27b";
+          extraAttrs = {
+            mtpModel = "${modelsPath}/MTP/mtp-Qwen3.8-27B-Q4_0.gguf";
+            speculative = "dflash2";
+            draftTokens = 7;
+            dflashModel = "${modelsPath}/Qwen3.8-27B-DFlash2-Q4_K_M.gguf";
+          };
         };
 
-        # Regular (non-strix-halo) models
+        # FIXME: Deduplicate this
+        "Qwen 2.5 Coder 7B (Light)" = mkModel {
+          hf = "unsloth/Qwen2.5-Coder-7B-Instruct-128K-GGUF";
+          ctx = 32768;
+          kv = "q8_0";
+          sampling = qwenSampling;
+          alias = "qwen2.5:coder-7b";
+        };
+
+        # FIXME: Since this gets duplicated elsewhere, we should abstract it
+        "Qwen 2.5 Coder 1.5B (Ultra Light)" = mkModel {
+          hf = "unsloth/Qwen2.5-Coder-1.5B-Instruct-GGUF:Q8_0";
+          ctx = 4096;
+          kv = "f16";
+          sampling = qwenSampling;
+          alias = "qwen2.5:coder-1.5b-q8";
+        };
       }
     else
+      # Regular (non-strix-halo) models
       {
         ##
         # QWEN
@@ -238,23 +288,6 @@ let
           ];
           thinking = true;
           alias = "qwen3.8:27b-q5";
-        };
-
-        # FIXME: This doesn't load on strix point. Maybe better to reduce ctx size?
-        # 2026-10-01
-        # strix halo:
-        # strix point:
-        "Qwen 3.8 Flash (Heavy)" = mkModel {
-          hf = "unsloth/Qwen3.8-Flash-Next-GGUF:UD-Q2_K_XL";
-          kv = "q8_0";
-          ctx = 16384;
-          sampling = [
-            "--temp 1.0"
-            "--top_p 0.95"
-            "--top_k 20 "
-          ];
-          thinking = true;
-          alias = "qwen3.8:flash-q2";
         };
 
         # strix halo: pp 71.79 t/s, tg 58.24 t/s
@@ -323,7 +356,7 @@ let
           ctx = 4096;
           kv = "f16";
           sampling = qwenSampling;
-          alias = "qwen2.5:coder-1.5b-q8";
+          alias = "qwen2.5:coder-1.5b";
         };
 
         ##
@@ -410,6 +443,7 @@ let
           alias = "llama-3.3:70b-q4";
         };
       };
+
 in
 {
   options = {
@@ -440,6 +474,13 @@ in
         default = [ "all" ];
         description = "Set of models you want to enable from the following (or \"all\" for everything): ${lib.attrNames models}";
       };
+      defaultModels = lib.mkOption {
+        type = lib.types.attrsOf (lib.types.attrsOf lib.types.str);
+        # This is an internal only
+        default = defaultHostModels;
+        internal = true;
+        description = "Default models for use on this service. Referenced by other client tools (librechat, neovim, etc)";
+      };
       preload = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [ ];
@@ -453,10 +494,8 @@ in
     (lib.mkIf cfg.enable {
       systemd.tmpfiles.rules = [
         # Format: Type Path Mode UID GID Age Argument
+        "d /var/lib/llm/ 0755 ${user} ${group} - -"
         "d /var/lib/llm/models 0755 ${user} ${group} - -"
-      ]
-      ++ lib.optionals isHalo [
-        "d /var/lib/gufo/cache 0755 ${user} ${group} - -"
       ];
 
       environment.systemPackages = [ llama-cpp ] ++ lib.optionals isHalo [ gufo ];
@@ -485,18 +524,16 @@ in
 
           # Define which models can be co-resident in memory
           # https://github.com/mostlygeek/llama-swap/issues/643
-          # FIXME: This will differ on oedo vs ossa
+          # FIXME: We could auto-generate these vars based on the defaultHostModels keys
+          # and then only add them to the sets if they are actually set?
           matrix = {
             vars = {
-              # "qh" = "qwen3.6:27b-mtp-q4";
-              "ql" = "Qwen 3.6 General 35B Q8 (Light)";
-              "qul" = "Qwen 2.5 Coder 1.5B (Ultra Light)";
-              "net" = "Nomic Embeddings";
+              "heavy" = defaultHostModels.${hostName}.heavy;
+              "light" = defaultHostModels.${hostName}.light;
+              "ul" = defaultHostModels.${hostName}.ultraLight;
             };
-
             sets = {
-              standard = "ql & qul & net";
-              # heavy = "qh & qul & net";
+              standard = "heavy & light & ul";
             };
           };
         };
@@ -552,6 +589,7 @@ in
             lib.optionals (hostName == "oppo") [
               "HSA_OVERRIDE_GFX_VERSION=12.0.1"
             ];
+
         };
       };
 

@@ -47,6 +47,7 @@ let
         if __name__ == "__main__":
             app.run(host="127.0.0.1", port=${toString summaryEndpointPort})
       '';
+
 in
 {
   options.${namespace}.dictation = {
@@ -106,6 +107,15 @@ in
             on_recording_stop = true;
             on_transcription = false;
           };
+        };
+        text = {
+          spoken_punctuation = true;
+          replacements = {
+            "Vox type" = "voxtype";
+            "Neary" = "niri";
+            "Entalia" = "noctalia";
+          };
+
         };
         # using noctalia plugin
         osd.enabled = false;

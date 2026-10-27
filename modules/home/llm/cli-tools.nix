@@ -22,6 +22,9 @@ in
         inherit (pkgs.unstable)
           llama-cpp
           ;
+        inherit (pkgs.unstable.python3Packages)
+          huggingface-hub # hf cli tool
+          ;
       };
 
       file = {

@@ -2,11 +2,13 @@
   lib,
   config,
   inputs,
+  namespace,
   ...
 }:
 let
   sopsFolder = (lib.toString inputs.nix-secrets) + "/sops";
   ports = config.hostSpec.networking.ports;
+  defaultModels = config.${namespace}.services.llama-swap.defaultModels;
 in
 {
   services.librechat = {
@@ -36,11 +38,15 @@ in
             apiKey = "foo";
             baseURL = "http://oedo.${config.hostSpec.domain}:${toString ports.tcp.llama-swap}/v1";
             models = {
-              default = [ "Qwen 3.8 27B (Heavy)" ];
-              fetch = false;
+              default = [
+                defaultModels."oedo".heavy
+              ];
+              fetch = true; # Let librechat dynamically find the other models
             };
             titleConvo = true;
-            titleModule = "meta-llama/llama-3-70b-instruct";
+            titleTiming = "final"; # Only name the conversation after at least one response
+            # FIXME: This needs to change to whatever is assigned "ultra fast" for the service I guess
+            titleModel = defaultModels."oedo".light;
             modelDisplayLabel = "oedo";
           }
           {
