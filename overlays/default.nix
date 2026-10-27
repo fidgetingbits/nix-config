@@ -74,6 +74,19 @@ let
         neovide = final.neovide-nightly; # see pkgs/
         vimPlugins = final.unstable.vimPlugins;
         rocmPackages = final.unstable.rocmPackages;
+
+        # anki is unstable when opening from systray, so use xwayland
+        # ```
+        # Qt warning: Failed to create popup. Ensure popup  QWidgetWindow(0x58989729bd60, name="CustomLabelClassWindow") has a transientParent set.
+        # xdg_surface#32: error 3: must ack the initial configure before attaching buffer
+        # Qt warning: The Wayland connection experienced a fatal error: Protocol error
+        # ```
+        anki = prev.anki.overrideAttrs (old: {
+          postInstall = (old.postInstall or "") + ''
+            wrapProgram $out/bin/anki \
+              --set QT_QPA_PLATFORM xcb
+          '';
+        });
       });
 
     # Override unstable entries exposed via pkgs.unstable
