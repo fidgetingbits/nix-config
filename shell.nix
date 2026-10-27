@@ -26,6 +26,9 @@
         inherit (pkgs.unstable)
           # unstable new enough to have --list --group
           just
+          # apply PRs to nixpkgs
+          # https://discourse.nixos.org/t/patch-nixpkgs-using-cherry-picks-without-local-clone/76925
+          ghcherry
           ;
         inherit (pkgs)
           home-manager
