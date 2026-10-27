@@ -61,6 +61,9 @@ in
         "tokens/github" = {
           sopsFile = "${sopsFolder}/development.yaml";
         };
+        "tokens/ghcherry" = {
+          sopsFile = "${sopsFolder}/development.yaml";
+        };
         # LLM tokens, use agents.yaml since it's shared elsewhere
         # FIXME: This should be automated and synced with other usages in
         # config
@@ -80,6 +83,9 @@ in
           sopsFile = "${sopsFolder}/agents.yaml";
         };
         "tokens/nvidia" = {
+          sopsFile = "${sopsFolder}/agents.yaml";
+        };
+        "tokens/huggingface" = {
           sopsFile = "${sopsFolder}/agents.yaml";
         };
       }

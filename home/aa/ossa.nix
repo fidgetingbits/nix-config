@@ -151,11 +151,13 @@ in
       # bash
       ''
         export GITHUB_TOKEN=$(cat ${config.sops.secrets."tokens/github".path})
+        export GHCHERRY_TOKEN=$(cat ${config.sops.secrets."tokens/ghcherry".path})
         export IMMICH_API_KEY=$(cat ${config.sops.secrets."keys/immich".path})
         export OPENAI_API_KEY=$(cat ${config.sops.secrets."tokens/openai".path})
         export ANTHROPIC_API_KEY=$(cat ${config.sops.secrets."tokens/anthropic".path})
         export GEMINI_API_KEY=$(cat ${config.sops.secrets."tokens/google".path})
         export NVIDIA_API_KEY=$(cat ${config.sops.secrets."tokens/nvidia".path})
+        export HF_TOKEN=$(cat ${config.sops.secrets."tokens/huggingface".path})
         export LLAMA_SWAP_API_KEY="foo"
       '';
 
