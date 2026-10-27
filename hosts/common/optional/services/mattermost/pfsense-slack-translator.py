@@ -1,7 +1,8 @@
 import os
 import sys
-import requests
 from http.server import BaseHTTPRequestHandler, HTTPServer
+
+import requests
 from werkzeug.formparser import parse_form_data
 
 
@@ -64,6 +65,6 @@ class TranslateHandler(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     print("Starting local translation layer...")
-    translator_port = int(os.environ.get("TRANSLATOR_PORT", 8066))
+    translator_port = int(os.environ.get("TRANSLATOR_PORT", "8066"))
     HTTPServer(("127.0.0.1", translator_port),
                TranslateHandler).serve_forever()
