@@ -47,7 +47,6 @@ check HOST=`hostname` ARGS="":
     cp -R . "$BUILD_FOLDER"
     trap 'rm -rf $BUILD_FOLDER' EXIT
     cd $BUILD_FOLDER
-    # just copy-lock-in {{ HOST }}
 
     NIXPKGS_ALLOW_UNFREE=1 REPO_PATH=$(pwd) nix flake check \
         --impure \
@@ -56,7 +55,6 @@ check HOST=`hostname` ARGS="":
         --reference-lock-file locks/{{ HOST }}.lock
         --output-lock-file locks/{{ HOST }}.lock
         {{ ARGS }}
-    # just copy-lock-out {{ HOST }}
 
 # Rebuild specified host
 [group("building")]
@@ -79,13 +77,14 @@ rebuild-full HOST=`hostname`: && rebuild-post
 # Update all flake inputs for the specified host or the current host if none specified
 [group("update")]
 update HOST=`hostname` *INPUT:
-    # @just copy-lock-in {{ HOST }}
+    #!/usr/bin/env bash
     nix flake update \
         --reference-lock-file locks/{{ HOST }}.lock \
         --timeout 5 \
         --output-lock-file locks/{{ HOST }}.lock \
         {{ INPUT }}
-    # @just copy-lock-out {{ HOST }}
+    # If no INPUT (ie: regular just update), re-update unstable with our PRs/patches
+    [ -z "{{ INPUT }}" ] && scripts/patch-nixpkgs.sh {{ HOST }} || true
 
 # Update current systems flake lock and then copy to every other host
 [group("update")]
@@ -95,7 +94,7 @@ update-all:
     just update
     for lock in $(ls locks/); do
         # This can fail if a lock file didn't actually update, so discard result
-        : cp locks/$HOST.lock locks/$lock 2>/dev/null
+        cp locks/$HOST.lock locks/$lock 2>/dev/null
     done
 
 # Update and then rebuild

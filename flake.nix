@@ -193,7 +193,9 @@
     # nixpkgs-unstable.url = "https://channels.nixos.org/nixos-unstable/nixexprs.tar.zst";
     # nixpkgs-unstable.url = "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/nixos-unstable/nixexprs.tar.zst";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
-    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
+    # See scripts/patch-nixpkgs.sh
+    nixpkgs-unstable.url = "github:fidgetingbits/nixpkgs/patched";
+    nixpkgs-unstable-upstream.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
@@ -272,6 +274,22 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
+    ##
+    # LLM
+    ##
+
+    # Strix Halo optimized inference engine
+    gufo = {
+      url = "github:gufo-org/gufo";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
+
+    # Qwen 3.8 Flash Next on oppo
+    strata = {
+      url = "github:Niko1221/Strata";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
+
     nix-sweep = {
       url = "github:jzbor/nix-sweep/v0.7.0";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -310,6 +328,11 @@
 
     noctalia = {
       url = "github:noctalia-dev/noctalia";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    noctalia-greeter = {
+      url = "github:noctalia-dev/noctalia-greeter";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
