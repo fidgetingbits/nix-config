@@ -347,7 +347,7 @@
     };
 
     omp-nix = {
-      url = "github:can1357/oh-my-pi?ref=v18.10.0";
+      url = "github:can1357/oh-my-pi?ref=v18.13.1";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
