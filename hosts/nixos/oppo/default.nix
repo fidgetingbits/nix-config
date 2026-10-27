@@ -25,6 +25,8 @@ in
     { config.facter.reportPath = ./facter.json; }
     (lib.custom.scanPaths ./.) # Load all extra host-specific *.nix files
 
+    inputs.noctalia-greeter.nixosModules.default
+
     (map lib.custom.relativeToRoot (
       [
         "hosts/common/core"
@@ -38,7 +40,7 @@ in
         "sound.nix"
 
         # Desktop environment and login manager
-        "x11.nix"
+        # "x11.nix"
 
         #"hyprland.nix"
         "gnome.nix"
@@ -60,6 +62,20 @@ in
       ])
     ))
   ];
+
+  # FIXME: Move this
+  services.displayManager.noctalia-greeter = {
+    enable = true;
+    settings = {
+      cursor = {
+        theme = "Bibata-Modern-Ice";
+        size = 24;
+        path = pkgs.bibata-cursors;
+      };
+    };
+  };
+
+  introdus.services.silent-sddm.enable = lib.mkForce false;
 
   services.lgtv-control =
     let
@@ -96,7 +112,7 @@ in
     steam-hardware.enable = true;
 
     # Prevent crashes in steam on the Radeon 9070 XT
-    graphics.package = pkgs.unstable.mesa;
+    # graphics.package = pkgs.unstable.mesa;
   };
 
   # Just set the console font, don't mess with the font settings

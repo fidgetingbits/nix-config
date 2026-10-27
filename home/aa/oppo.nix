@@ -26,7 +26,7 @@
           "networking/protonvpn.nix"
           "atuin.nix"
 
-          "desktop/gnome"
+          "desktop"
           "gnome-terminal.nix"
           "fcitx5"
 
