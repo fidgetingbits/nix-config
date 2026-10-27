@@ -52,8 +52,8 @@ check HOST=`hostname` ARGS="":
         --impure \
         --keep-going \
         --show-trace \
-        --reference-lock-file locks/{{ HOST }}.lock
-        --output-lock-file locks/{{ HOST }}.lock
+        --reference-lock-file locks/{{ HOST }}.lock \
+        --output-lock-file locks/{{ HOST }}.lock \
         {{ ARGS }}
 
 # Rebuild specified host
