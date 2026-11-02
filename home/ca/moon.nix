@@ -1,5 +1,4 @@
 {
-  # config,
   pkgs,
   lib,
   ...
@@ -83,24 +82,7 @@
     };
   };
 
-  # Keep firefox running if it's closed
-  systemd.user.services.firefox = {
-    Unit = {
-      description = "Firefox Browser";
-      After = [
-        "graphical-session.target"
-        "graphical-session-pre.target"
-      ];
-      PartOf = [ "graphical-session.target" ];
-    };
-    Install.WantedBy = [ "graphical-session.target" ];
-    Service = {
-      Type = "simple";
-      ExecStart = "/home/ca/.nix-profile/bin/firefox";
-      Restart = "always";
-      RestartSec = 5;
-    };
-  };
+  introdus.firefox.autoRestart = true;
 
   #  stylix.cursor = lib.mkForce {
   #    name = lib.mkForce "Breeze_Hacked";
