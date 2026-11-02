@@ -179,7 +179,9 @@
       hosts = config.hostSpec.networking.subnets.o-lan.hosts;
     in
     {
-      enable = true;
+
+      # FIXME: Temporary so I can update the rest of the system
+      enable = false;
       isRemoteMachineLearningServer = true; # Host ML parsing server onlyallowed
       immichServers = [ hosts.ooze ]; # List of systems allowed to access ML service
     };
