@@ -17,6 +17,7 @@
     isIntrodusDev = (lib.mkOverride 100) false;
     isImpermanent = (lib.mkOverride 100) true;
 
+    defaultDesktop = "niri-uwsm";
     persistFolder = (lib.mkOverride 100) "/persist";
     useWayland = (lib.mkOverride 100) true;
     users = (lib.mkOverride 100) [

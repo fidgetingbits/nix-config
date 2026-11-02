@@ -43,7 +43,7 @@ in
         # "x11.nix"
 
         #"hyprland.nix"
-        "gnome.nix"
+        # "gnome.nix"
 
         # "libvirt.nix"
         "yubikey.nix"
@@ -64,18 +64,16 @@ in
   ];
 
   # FIXME: Move this
-  services.displayManager.noctalia-greeter = {
-    enable = true;
-    settings = {
-      cursor = {
-        theme = "Bibata-Modern-Ice";
-        size = 24;
-        path = pkgs.bibata-cursors;
-      };
-    };
-  };
-
-  introdus.services.silent-sddm.enable = lib.mkForce false;
+  # services.displayManager.noctalia-greeter = {
+  #   enable = true;
+  #   settings = {
+  #     cursor = {
+  #       theme = "Bibata-Modern-Ice";
+  #       size = 24;
+  #       path = pkgs.bibata-cursors;
+  #     };
+  #   };
+  # };
 
   services.lgtv-control =
     let
@@ -146,6 +144,9 @@ in
   environment.systemPackages = lib.attrValues {
     inherit (pkgs)
       liquidctl # control nxzt kraken rgb, not in home-manager because of udev rules
+      ;
+    inherit (pkgs.introdus)
+      strata
       ;
   };
 
@@ -252,9 +253,21 @@ in
   # nixpkgs.config.rocmSupport = config.hostSpec.useRocm;
 
   introdus = {
-    # WARNING: Needs retest. Used to block on boot on both gpus
-    # Granite Ridge and 9070XT
-    plymouth.enable = false; # Was
+    niri.enable = true;
+    plymouth.enable = true;
+    # services.silent-sddm.enable = lib.mkForce false;
   };
+
+  # ${namespace} = {
+  #   services.llama-swap = {
+  #     enable = true;
+  #     preload = [
+  #       "Strata Qwen IQ2_XS"
+  #     ];
+  #     allowedHosts = [
+  #       "ossa"
+  #     ];
+  #   };
+  # };
 
 }
