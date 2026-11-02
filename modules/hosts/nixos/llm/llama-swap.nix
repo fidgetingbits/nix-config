@@ -1,4 +1,4 @@
-# WARNING: This is tweaked for two AMD AI chipsets atm, so won't work on other systems
+# WARNING: This is tweaked for AMD AI chipsets atm, so won't work on other systems
 {
   inputs,
   pkgs,
@@ -13,6 +13,7 @@ let
   isHalo = hostName == "oedo";
   cfg = config.${namespace}.services.llama-swap;
   time = lib.custom.time;
+
   # Explicit downloads, used by gufo or explicit model path entries
   modelsPath = "/var/lib/llm/models";
   # Auto-downloads via huggingface
@@ -208,23 +209,22 @@ let
   # heavy: everything else
   defaultHostModels = {
     oedo = {
-      ultraLight = "Qwen 2.5 Coder 1.5B (Ultra Light)";
+      feather = "Qwen 2.5 Coder 1.5B (Ultra Light)";
       light = "Qwen 2.5 Coder 7B (Light)";
       heavy = "Qwen 3.8 27B (Heavy)"; # gufo only
     };
     ossa = {
-      ultraLight = "Qwen 2.5 Coder 1.5B (Ultra Light)";
+      feather = "Qwen 2.5 Coder 1.5B (Ultra Light)";
       light = "Qwen 2.5 Coder 7B (Light)";
       heavy = "Qwen 3.6 General 27B (Heavy)"; # FIXME: filler
     };
-    # FIXME: This will need whatever runs on strata
     oppo = {
-      ultraLight = "";
-      light = "Qwen 2.5 Coder 7B (Light)";
-      heavy = "";
+      feather = "";
+      light = "";
+      heavy = "Strata Qwen IQ2_XS"; # FIXME: Won't be IQ2 long run
     };
     ooze = {
-      ultraLight = "Nomic Embeddings";
+      feather = "Nomic Embeddings";
       light = "Qwen 2.5 Coder 7B (Light)";
       heavy = "Qwen 3.6 General 27B (Heavy)"; # FIXME: filler
     };
@@ -268,6 +268,19 @@ let
           alias = "qwen2.5:coder-1.5b-q8";
         };
       }
+    #    else if hostName == "oppo" then
+    #      {
+    #        ##
+    #        # STRATA
+    #        ##
+    #
+    #        "Strata Qwen IQ2_XS" = mkStrataModel {
+    #          family = "qwen";
+    #          model = "IQ2_XS";
+    #          ctx = 32768;
+    #          alias = "strata-qwen:iq2_xs";
+    #        };
+    #      }
     else
       # Regular (non-strix-halo) models
       {
@@ -449,6 +462,17 @@ in
   options = {
     ${namespace}.services.llama-swap = {
       enable = lib.mkEnableOption "Enable llama-swap";
+      withStrata = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Enable strata server and models ";
+      };
+      withGufo = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Enable gufo server and models ";
+      };
+
       ttl = lib.mkOption {
         type = lib.types.int;
         default = 0; # Persist
@@ -497,7 +521,6 @@ in
         "d /var/lib/llm/ 0755 ${user} ${group} - -"
         "d /var/lib/llm/models 0755 ${user} ${group} - -"
       ];
-
       environment.systemPackages = [ llama-cpp ] ++ lib.optionals isHalo [ gufo ];
 
       # Good example of settings here:
@@ -524,20 +547,23 @@ in
 
           # Define which models can be co-resident in memory
           # https://github.com/mostlygeek/llama-swap/issues/643
-          # FIXME: We could auto-generate these vars based on the defaultHostModels keys
-          # and then only add them to the sets if they are actually set?
-          matrix = {
-            vars = {
-              "heavy" = defaultHostModels.${hostName}.heavy;
-              "light" = defaultHostModels.${hostName}.light;
-              "ul" = defaultHostModels.${hostName}.ultraLight;
+          matrix =
+            let
+              entries = lib.filterAttrs (n: v: v != "") defaultHostModels.${hostName};
+            in
+            rec {
+              vars =
+                entries
+                |> lib.attrNames
+                |> map (key: {
+                  "${key}" = entries.${key};
+                })
+                |> lib.mergeAttrsList;
+              sets = {
+                standard = lib.concatStringsSep " & " (lib.attrNames entries);
+              };
             };
-            sets = {
-              standard = "heavy & light & ul";
-            };
-          };
         };
-
       };
 
       # When using -hf for models, it will auto-download from HuggingFace to this cache path
@@ -589,7 +615,24 @@ in
             lib.optionals (hostName == "oppo") [
               "HSA_OVERRIDE_GFX_VERSION=12.0.1"
             ];
-
+        }
+        // lib.optionalAttrs (hostName == "oppo") {
+          RestrictNamespaces = lib.mkForce false; # when running strata
+          CapabilityBoundingSet = "";
+          AmbientCapabilities = "";
+          #           CapabilityBoundingSet = [ "CAP_SYS_ADMIN" "CAP_SETUID" "CAP_SETGID" ];
+          # AmbientCapabilities = [ "CAP_SYS_ADMIN" ];
+          #SystemCallFilter = [ "@system-service" "~@privileged" ];
+          SystemCallFilter = [
+            "@system-service"
+            "~@privileged"
+            "capset"
+            "personality"
+          ];
+          LockPersonality = lib.mkForce false;
+          PrivateUsers = lib.mkForce false;
+          PrivateMounts = lib.mkForce false;
+          #       SystemCallArchitectures = "native";
         };
       };
 
