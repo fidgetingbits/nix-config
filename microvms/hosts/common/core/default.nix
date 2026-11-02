@@ -46,11 +46,9 @@ in
           ;
       };
       users.${user} = {
-        imports = (
-          map lib.custom.relativeToRoot [
-            "microvms/home/common/core"
-          ]
-        );
+        imports = map lib.custom.relativeToRoot [
+          "microvms/home/common/core"
+        ];
       };
     };
 
@@ -230,7 +228,7 @@ in
         {
           type = "tap";
           id = "vm-microvm-${name}"; # IMPORTANT: Before changing, read the comment above
-          mac = vmSpecs.mac;
+          inherit (vmSpecs) mac;
         }
       ];
 

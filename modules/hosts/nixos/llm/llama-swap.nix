@@ -35,7 +35,7 @@ let
 
   pu = config.users.users.${config.hostSpec.primaryUsername};
   user = pu.name;
-  group = pu.group;
+  inherit (pu) group;
   persistFolder = config.hostSpec.persistFolder;
 
   # Gufo setup for Strix Halo (oedo)
@@ -537,7 +537,7 @@ in
         settings = {
           # Pre-download larger models and use -m if you don't want massive stalls
           # high health check timeout prevents it dying mid-download
-          healthCheckTimeout = (time.minutes 60);
+          healthCheckTimeout = time.minutes 60;
           globalTTL = cfg.ttl;
 
           models =

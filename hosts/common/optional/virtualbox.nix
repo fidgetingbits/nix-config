@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   virtualisation = {
     virtualbox = {
       host = {

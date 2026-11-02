@@ -4,25 +4,23 @@
   ...
 }:
 {
-  imports = (
-    map lib.custom.relativeToRoot (
-      # FIXME: remove after fixing user/home values in HM
-      [
-        "home/common/core"
-        "home/common/core/nixos.nix"
-      ]
-      ++
-        # Optional common modules
-        (map (f: "home/common/optional/${f}") [
-          "gpg.nix"
-          "ghostty.nix"
-          "media.nix"
-          "networking/protonvpn.nix"
+  imports = map lib.custom.relativeToRoot (
+    # FIXME: remove after fixing user/home values in HM
+    [
+      "home/common/core"
+      "home/common/core/nixos.nix"
+    ]
+    ++
+      # Optional common modules
+      (map (f: "home/common/optional/${f}") [
+        "gpg.nix"
+        "ghostty.nix"
+        "media.nix"
+        "networking/protonvpn.nix"
 
-          "desktop/gnome"
-          "gnome-terminal.nix"
-        ])
-    )
+        "desktop/gnome"
+        "gnome-terminal.nix"
+      ])
   );
 
   stylix = {

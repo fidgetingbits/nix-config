@@ -111,7 +111,7 @@ in
     # an already running microvm may be "optimized" by shuffling links, and this can result in the /nix/store
     # mount being disrupted. You end up with an unusable system due to stale file handle errors everywhere
     # This is only true (I think) if you map the host /nix/store into the microvm, but atm that's what I do.
-    automatic = (lib.length (lib.attrNames config.microvm.vms) == 0);
+    automatic = lib.length (lib.attrNames config.microvm.vms) == 0;
     dates = [ "03:45" ]; # Periodically optimize the store
   };
 

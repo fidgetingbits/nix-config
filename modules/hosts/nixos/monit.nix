@@ -19,7 +19,7 @@ let
   secretConfig = "monit/secret-config";
   mail =
     assert (
-      lib.assertMsg (config.introdus.mail-delivery.enable) "monit currently requires config.mail-delivery configured"
+      lib.assertMsg config.introdus.mail-delivery.enable "monit currently requires config.mail-delivery configured"
     );
     config.introdus.mail-delivery;
 

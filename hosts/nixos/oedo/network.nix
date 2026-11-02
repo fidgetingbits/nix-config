@@ -14,7 +14,7 @@ let
   ports = config.hostSpec.networking.ports;
   subnets = config.hostSpec.networking.subnets;
   wg-lan = subnets.agent-lan;
-  o-lan = subnets.o-lan;
+  inherit (subnets) o-lan;
   vmBridge = config.${namespace}.microvms.vmBridge;
 in
 {

@@ -2,11 +2,9 @@
 {
   home-manager = {
     users.${vmSpecs.user} = {
-      imports = (
-        map lib.custom.relativeToRoot [
-          "microvms/home/common/optional/agents.nix"
-        ]
-      );
+      imports = map lib.custom.relativeToRoot [
+        "microvms/home/common/optional/agents.nix"
+      ];
     };
   };
 }

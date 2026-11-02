@@ -76,7 +76,7 @@ let
     |> lib.attrNames
     |> lib.filter (name: lib.match "wifi\..*\.yaml" name != null);
 
-  allWLANs = allWLANFiles |> map (file: getWLAN file);
+  allWLANs = allWLANFiles |> map getWLAN;
 
   # Return a list of all WLAN secret files applicable to the system
   filteredWLANFiles = allWLANFiles |> lib.filter (name: cfg.roaming || (isWLANUsed name));
@@ -189,7 +189,7 @@ in
     ];
     assertions = [
       {
-        assertion = (cfg.roaming || lib.length cfg.wlans != 0);
+        assertion = cfg.roaming || lib.length cfg.wlans != 0;
         message = "config.wifi.roaming must be true or config.wifi.wlans should be set to one of:\n  ${toString allWLANs}";
       }
     ];

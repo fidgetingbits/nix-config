@@ -28,16 +28,14 @@ in
   # the age key.
   sops.secrets =
     let
-      linuxEntries = (
-        lib.mergeAttrsList (
-          map (user: {
-            # FIXME: This might end up not being linux-specific depending on nix-darwin sops PR
-            "passwords/${user}" = {
-              sopsFile = "${sopsFolder}/shared.yaml";
-              neededForUsers = true;
-            };
-          }) config.hostSpec.users
-        )
+      linuxEntries = lib.mergeAttrsList (
+        map (user: {
+          # FIXME: This might end up not being linux-specific depending on nix-darwin sops PR
+          "passwords/${user}" = {
+            sopsFile = "${sopsFolder}/shared.yaml";
+            neededForUsers = true;
+          };
+        }) config.hostSpec.users
       );
     in
     lib.mkMerge [

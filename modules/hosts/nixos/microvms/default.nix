@@ -117,7 +117,7 @@ in
     # IMPORTANT: It seems templates don't work. You can set path to point
     # into a folder mounted into the VM, but it will still symlink into
     # /run/secrets/rendered/ and that folder won't actually exist on the VM
-    sops.secrets = (
+    sops.secrets =
       config.microvm.vms
       |> lib.attrNames
       |> lib.map (name: {
@@ -127,8 +127,7 @@ in
           mode = "0400";
         };
       })
-      |> lib.mergeAttrsList
-    );
+      |> lib.mergeAttrsList;
 
     # The secrets defined above won't be directly accessible in the virtiofs share
     # if placed with .path, because they are a symlink. So this service copies

@@ -1,6 +1,6 @@
 # NOTE: Adding a new authorized key here will require the remote build machines
 # to be rebuilt.
-{ ... }:
+_:
 let
   builderName = "builder";
 in

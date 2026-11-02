@@ -11,15 +11,14 @@ let
     name = "unbound-zones-adblock";
 
     # FIXME: This should just use the flake input we setup
-    src = (
+    src =
       pkgs.fetchFromGitHub {
         owner = "StevenBlack";
         repo = "hosts";
         rev = "3.13.11";
         sha256 = "sha256-4UXzwq/vsOlcmZYOeeEDEm2hX93q4pBA8axA+S1eUZ8=";
       }
-      + "/hosts"
-    );
+      + "/hosts";
 
     phases = [ "installPhase" ];
 

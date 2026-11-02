@@ -6,8 +6,8 @@
     in
     {
       enable = true;
-      blocktime = (time.hours 1);
-      detection_time = (time.days 2);
+      blocktime = time.hours 1;
+      detection_time = time.days 2;
       blacklist_threshold = 30; # 3 strikes
     };
   systemd.services.sshguard.serviceConfig = {

@@ -117,7 +117,7 @@
         };
         isDesktop = lib.mkOption {
           type = lib.types.bool;
-          default = !(config.hostSpec.isServer);
+          default = !config.hostSpec.isServer;
           description = "Indicate a systeming using a desktop environment";
         };
         isWork = lib.mkOption {
@@ -148,7 +148,7 @@
         };
         isLocal = lib.mkOption {
           type = lib.types.bool;
-          default = (!config.hostSpec.isRemote);
+          default = !config.hostSpec.isRemote;
           description = "Used to indicate a host that is locally managed";
         };
         isAdmin = lib.mkOption {
@@ -301,13 +301,12 @@
           message = "config.introdus.impermanence.enable is true but no persistFolder path is provided";
         }
         {
-          assertion = (
+          assertion =
             isImpermanent
             || (
               !isImpermanent
               && (config.hostSpec.persistFolder == null || "${config.hostSpec.persistFolder}" == "")
-            )
-          );
+            );
           message = "config.introdus.impermanence.enable is ${toString config.introdus.impermanence.enable} but a persistFolder path is provided: ${config.hostSpec.persistFolder}";
         }
         {

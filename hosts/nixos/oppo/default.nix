@@ -81,7 +81,7 @@ in
     in
     {
       enable = true;
-      ip = ogle.ip;
+      inherit (ogle) ip;
       mac = lib.elemAt ogle.mac 0;
     };
   services.blueman.enable = true;

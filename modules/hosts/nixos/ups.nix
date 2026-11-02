@@ -10,7 +10,7 @@
 }:
 let
   cfg = config.services.ups;
-  useUps = (cfg.client.enable || cfg.server.enable);
+  useUps = cfg.client.enable || cfg.server.enable;
 
   upsmonNotifyTypes = {
     ONLINE = "UPS is back online";
@@ -159,7 +159,7 @@ in
   };
 
   # imports = lib.optional useUps [ ./upssched.nix ];
-  config = lib.mkIf (useUps) {
+  config = lib.mkIf useUps {
     # Shared NUT logic for server and client
 
     systemd.tmpfiles.rules = [
@@ -195,7 +195,7 @@ in
         owner = config.power.ups.upsmon.user;
         group = config.power.ups.upsmon.group;
         mode = "0600";
-        sopsFile = cfg.sopsFile;
+        inherit (cfg) sopsFile;
       };
     };
 
@@ -298,7 +298,7 @@ in
         listen = [
           {
             address = "0.0.0.0";
-            port = cfg.port;
+            inherit (cfg) port;
           }
         ];
       };
@@ -311,11 +311,9 @@ in
 
     };
     # Make sure that power.ups.ups.<device> was defined for the server
-    assertions = (
-      lib.optional cfg.server.enable {
-        assertion = (lib.length (lib.attrNames config.power.ups.ups) != 0);
-        message = "NUT servers must specify config.power.ups.ups.<device> to define your UPS device";
-      }
-    );
+    assertions = lib.optional cfg.server.enable {
+      assertion = lib.length (lib.attrNames config.power.ups.ups) != 0;
+      message = "NUT servers must specify config.power.ups.ups.<device> to define your UPS device";
+    };
   };
 }

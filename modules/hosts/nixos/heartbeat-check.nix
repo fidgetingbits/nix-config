@@ -64,7 +64,7 @@ in
       description = "Number of pings to send to each host";
     };
   };
-  config = lib.mkIf cfg.enable ({
+  config = lib.mkIf cfg.enable {
     systemd = {
       services."heartbeat-check" = {
         description = "Check if other systems on the LAN are still alive";
@@ -87,5 +87,5 @@ in
         };
       };
     };
-  });
+  };
 }

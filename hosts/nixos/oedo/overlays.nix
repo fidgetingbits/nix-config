@@ -1,8 +1,4 @@
-{
-  #inputs,
-  ...
-}:
-{
+_: {
   nixpkgs.overlays = [
     (final: prev: {
     })

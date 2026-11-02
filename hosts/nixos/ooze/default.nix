@@ -9,7 +9,7 @@
 let
   net = config.hostSpec.networking;
   olan = net.subnets.o-lan;
-  wg-subnet = olan.wg-subnet;
+  inherit (olan) wg-subnet;
   wake-oppo = pkgs.writeShellApplication {
     name = "wake-oppo";
     runtimeInputs = [ pkgs.wakeonlan ];

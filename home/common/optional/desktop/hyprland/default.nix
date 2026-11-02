@@ -84,9 +84,7 @@
         };
       };
 
-      exec-once = [
-      ]
-      ++ lib.optional config.introdus.services.awww.enable "awww img ${osConfig.hostSpec.wallpaper}";
+      exec-once = lib.optional config.introdus.services.awww.enable "awww img ${osConfig.hostSpec.wallpaper}";
 
     };
 

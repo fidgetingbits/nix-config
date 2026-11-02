@@ -1,7 +1,7 @@
 { config, lib, ... }:
 let
-  hostSpec = config.hostSpec;
-  email = hostSpec.email;
+  inherit (config) hostSpec;
+  inherit (hostSpec) email;
 in
 lib.mkIf ((hostSpec.isMinimal == false) && hostSpec.isProduction) {
   # FIXME: When isRoaming but using wireguard, we could still use the internal server

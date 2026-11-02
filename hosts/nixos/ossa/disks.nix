@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   system.disks = {
     primary = "/dev/nvme0n1";
     primaryDiskoLabel = "disk0";

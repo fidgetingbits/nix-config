@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   default = "ddg";
   engines = {
     "Awesome Lists" = {

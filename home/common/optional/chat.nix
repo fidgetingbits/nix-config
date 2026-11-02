@@ -1,7 +1,4 @@
-{
-  # pkgs,
-  ...
-}:
+_:
 # FIXME(signal):
 #  - This should get set only if we are using catppuccin on the host
 #  - Dark theme isn't set on new install, so figure out how to specify that for hyprland, etc

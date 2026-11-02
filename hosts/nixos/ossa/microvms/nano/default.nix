@@ -6,7 +6,7 @@
 }:
 let
   networking = config.hostSpec.networking;
-  subnets = networking.subnets;
+  inherit (networking) subnets;
   olan = subnets.o-lan;
   vmSpecs = rec {
     description = "Agent runner with internet";
@@ -17,7 +17,7 @@ let
     inherit (vm-lan.hosts.nano) ip;
     name = "nano";
     user = config.hostSpec.primaryUsername;
-    mac = (lib.head vm-lan.hosts.nano.mac);
+    mac = lib.head vm-lan.hosts.nano.mac;
     sshPort = 22;
     sharedDir = config.${namespace}.microvms.sharedDir;
     allowedPorts = {

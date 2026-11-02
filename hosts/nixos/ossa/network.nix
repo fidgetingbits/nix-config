@@ -21,7 +21,7 @@ let
 
   subnets = config.hostSpec.networking.subnets;
   wg-lan = subnets.agent-lan;
-  o-lan = subnets.o-lan;
+  inherit (subnets) o-lan;
   vmBridge = config.${namespace}.microvms.vmBridge;
   oedoConfig = inputs.self.nixosConfigurations.oedo.config;
 in

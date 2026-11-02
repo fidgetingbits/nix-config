@@ -24,7 +24,7 @@ lib.mkIf (lib.length (lib.attrNames osConfig.microvm.vms) != 0) {
         match = "host ${vmSpecs.name}";
         hostname = vmSpecs.ip;
         port = vmSpecs.sshPort;
-        user = vmSpecs.user;
+        inherit (vmSpecs) user;
         identityFile = "${home}/.ssh/id_ed25519";
       };
     })

@@ -9,7 +9,7 @@ let
   useWpaSupplicant = config.hostSpec.isRoaming && (!config.hostSpec.isRemote);
 in
 {
-  imports = (
+  imports =
     lib.map lib.custom.relativeToRoot [
 
       "modules/hosts/common"
@@ -26,8 +26,7 @@ in
       # FIXME: could probably move this so it's shared?
       inputs.sops-nix.nixosModules.sops
       inputs.introdus.nixosModules.default
-    ]
-  );
+    ];
 
   config = lib.mkMerge [
     {
@@ -96,7 +95,7 @@ in
       };
 
       networking = {
-        networkmanager.enable = (useWpaSupplicant == false);
+        networkmanager.enable = useWpaSupplicant == false;
       };
 
       services.openssh = {

@@ -11,45 +11,43 @@ let
   inherit (lib.custom.microvm) mapHostMicrovms;
 in
 {
-  imports = (
-    map lib.custom.relativeToRoot (
-      # FIXME: remove after fixing user/home values in HM
-      [
-        "home/common/core"
-        "home/common/core/nixos.nix"
-      ]
-      ++
-        # Optional common modules
-        (map (f: "home/common/optional/${f}") [
-          "audio-tools.nix"
-          #"vscode"
-          "development"
-          "aws.nix"
-          "helper-scripts"
-          "sops.nix"
-          "gpg.nix"
-          "ghostty.nix"
-          "gnome-terminal.nix"
-          "media.nix"
-          "graphics.nix"
-          "ebooks.nix"
-          "networking/protonvpn.nix"
-          "atuin.nix"
-          "remmina.nix"
-          "yazi.nix"
+  imports = map lib.custom.relativeToRoot (
+    # FIXME: remove after fixing user/home values in HM
+    [
+      "home/common/core"
+      "home/common/core/nixos.nix"
+    ]
+    ++
+      # Optional common modules
+      (map (f: "home/common/optional/${f}") [
+        "audio-tools.nix"
+        #"vscode"
+        "development"
+        "aws.nix"
+        "helper-scripts"
+        "sops.nix"
+        "gpg.nix"
+        "ghostty.nix"
+        "gnome-terminal.nix"
+        "media.nix"
+        "graphics.nix"
+        "ebooks.nix"
+        "networking/protonvpn.nix"
+        "atuin.nix"
+        "remmina.nix"
+        "yazi.nix"
 
-          # === Window Managers ===
-          "desktop/"
+        # === Window Managers ===
+        "desktop/"
 
-          "fcitx5"
-          # Maybe more role-specific stuff
-          "document.nix" # document editing
-          "gui-utilities.nix" # core for any desktop
-          "chat.nix"
-          "reversing"
-          # "wine.nix"
-        ])
-    )
+        "fcitx5"
+        # Maybe more role-specific stuff
+        "document.nix" # document editing
+        "gui-utilities.nix" # core for any desktop
+        "chat.nix"
+        "reversing"
+        # "wine.nix"
+      ])
   );
 
   # ${namespace}.llm.cli-tools.enable = true;
@@ -107,7 +105,7 @@ in
             match = "host ${vmSpecs.name}";
             hostname = vmSpecs.ip;
             port = vmSpecs.sshPort;
-            user = vmSpecs.user;
+            inherit (vmSpecs) user;
             identityFile = "${config.home.homeDirectory}/.ssh/id_ed25519";
           };
         })

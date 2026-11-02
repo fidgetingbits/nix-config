@@ -43,7 +43,7 @@ in
           machine-learning = {
             enable = true;
             environment = {
-              IMMICH_PORT = lib.mkForce (mlPort);
+              IMMICH_PORT = lib.mkForce mlPort;
             };
           };
 

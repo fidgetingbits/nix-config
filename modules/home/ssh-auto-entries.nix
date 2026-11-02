@@ -81,7 +81,7 @@ in
 
   config =
     let
-      isCoreHost = (n: ((n != "iso") && !(lib.hasSuffix "Minimal" n)));
+      isCoreHost = n: ((n != "iso") && !(lib.hasSuffix "Minimal" n));
       nixosHostNames =
         inputs.self.nixosConfigurations
         |> lib.attrNames

@@ -17,7 +17,7 @@
               criteria = name;
               status = if value.enabled then "enable" else "disabled";
               mode = "${toString value.width}x${toString value.height}@${toString value.refreshRate}Hz";
-              scale = value.scale;
+              inherit (value) scale;
               adaptiveSync = value.vrr != 0;
               position = "${toString value.x},${toString value.y}";
             }

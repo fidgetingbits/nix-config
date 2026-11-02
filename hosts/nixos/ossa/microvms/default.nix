@@ -7,8 +7,8 @@
 let
   vmBridge = config.${namespace}.microvms.vmBridge;
   networking = config.hostSpec.networking;
-  subnets = networking.subnets;
-  ports = networking.ports;
+  inherit (networking) subnets;
+  inherit (networking) ports;
   llamaSwapPort = ports.tcp.llama-swap;
 in
 {

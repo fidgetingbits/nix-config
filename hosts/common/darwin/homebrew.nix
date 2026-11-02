@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   # This is required to install yubico packages, but it doesn't actually work
   # because we need it to run first..., so for now I use the bootstrap script
   # system.activationScripts.extraActivation.text = ''

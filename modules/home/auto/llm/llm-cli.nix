@@ -17,7 +17,7 @@ let
   modelToAttrs = model: {
     model_id = model.id;
     model_name = model.name;
-    api_base = model.api_base;
+    inherit (model) api_base;
   };
 
   # Convert our local provider model format into llm config format

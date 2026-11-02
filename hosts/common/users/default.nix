@@ -14,7 +14,7 @@ let
   genPubKeyList =
     user:
     let
-      keyPath = (lib.custom.relativeToRoot "hosts/common/users/${user}/keys/");
+      keyPath = lib.custom.relativeToRoot "hosts/common/users/${user}/keys/";
     in
     if (lib.pathExists keyPath) then
       lib.lists.forEach (lib.filesystem.listFilesRecursive keyPath) (key: lib.readFile key)
@@ -123,33 +123,30 @@ in
           map (user: {
             "${user}".imports = lib.flatten [
               (lib.optional (!hostSpec.isMinimal) (
-                map (fullPathIfExists) [
+                map fullPathIfExists [
                   "home/${user}/${hostSpec.hostName}.nix"
                   "home/${user}/common/"
                   "home/${user}/common/${platform}.nix"
                 ]
               ))
               # At least keep a nice shell on minimal
-              (lib.optional (hostSpec.isMinimal) (
-                map (fullPathIfExists) [
+              (lib.optional hostSpec.isMinimal (
+                map fullPathIfExists [
                   "modules/home/p10k"
                   "home/common/core/zsh"
                 ]
               ))
               # Static module with common values avoids duplicate file per user
-              (
-                { ... }:
-                {
-                  #inherit hostSpec monitors; # Bring nixos option values into hm copy
+              (_: {
+                #inherit hostSpec monitors; # Bring nixos option values into hm copy
 
-                  # User just replicates system nix settings
-                  home = {
-                    stateVersion = "23.05";
-                    homeDirectory = if isDarwin then "/Users/${user}" else "/home/${user}";
-                    username = "${user}";
-                  };
-                }
-              )
+                # User just replicates system nix settings
+                home = {
+                  stateVersion = "23.05";
+                  homeDirectory = if isDarwin then "/Users/${user}" else "/home/${user}";
+                  username = "${user}";
+                };
+              })
               # sharedModules
             ];
           }) config.hostSpec.users
@@ -159,13 +156,13 @@ in
             home.stateVersion = "23.05"; # Avoid error
 
             imports = lib.flatten (
-              (lib.optional (!hostSpec.isMinimal) (
+              lib.optional (!hostSpec.isMinimal) (
                 map lib.custom.relativeToRoot [
                   "modules/home/starship.nix"
                   "modules/home/p10k"
                   "home/common/core/zsh"
                 ]
-              ))
+              )
             );
 
             # programs.starship = {

@@ -239,10 +239,9 @@ in
       };
     assertions = [
       {
-        assertion = (
+        assertion =
           config.services.remoteLuksUnlock.enable
-          && lib.pathExists "${config.services.remoteLuksUnlock.ssh.key}"
-        );
+          && lib.pathExists "${config.services.remoteLuksUnlock.ssh.key}";
         message = ''
           You must generate an ssh key:
             ssh-keygen -t ed25519 -f ${config.services.remoteLuksUnlock.ssh.key}

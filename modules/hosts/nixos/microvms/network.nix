@@ -8,7 +8,7 @@
 let
   cfg = config.${namespace}.microvms;
   vm-lan = cfg.vmLan;
-  vmBridge = cfg.vmBridge;
+  inherit (cfg) vmBridge;
   vpnCfg = cfg.vpn;
 in
 {

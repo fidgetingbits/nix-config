@@ -126,7 +126,7 @@
             # some redirect tricks for other public domains we don't want to generate certs for.
             # FIXME: Make the set of domains to generate certs for configurable, in case a host
             # has multiples
-            ++ (lib.filter (domain: isAcmeDomain domain) service.extraDomains);
+            ++ (lib.filter isAcmeDomain service.extraDomains);
           in
           map (domain: {
             "${domain}" = {

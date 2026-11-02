@@ -28,18 +28,13 @@ let
     };
   };
   ompConfigFile = yamlFormat.generate "omp-overlay.yaml" ompConfig;
-  ompWrapped = inputs.wrappers.lib.wrapPackage (
-    {
-      ...
-    }:
-    {
-      inherit pkgs;
-      package = pkgs.omp;
-      flags = {
-        "--config" = "${ompConfigFile}";
-      };
-    }
-  );
+  ompWrapped = inputs.wrappers.lib.wrapPackage (_: {
+    inherit pkgs;
+    package = pkgs.omp;
+    flags = {
+      "--config" = "${ompConfigFile}";
+    };
+  });
 in
 {
   home = {

@@ -13,7 +13,7 @@
     inputs.sops-nix.homeManagerModules.sops
   ];
   home = {
-    packages = lib.optionals (osConfig.hostSpec.isProduction) (
+    packages = lib.optionals osConfig.hostSpec.isProduction (
       lib.attrValues {
         inherit (pkgs)
           e2fsprogs # lsattr, chattr

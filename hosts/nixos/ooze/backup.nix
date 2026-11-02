@@ -15,8 +15,6 @@
   namespace,
   ...
 }:
-let
-in
 {
   ${namespace}.backup-external-host = {
     enable = true;

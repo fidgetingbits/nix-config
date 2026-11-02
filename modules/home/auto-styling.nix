@@ -1,10 +1,4 @@
-{
-  # inputs,
-  # lib,
-  # osConfig,
-  ...
-}:
-{
+_: {
   # imports = [
   #   inputs.stylix.homeModules.stylix
   # ];

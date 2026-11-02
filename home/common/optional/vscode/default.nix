@@ -14,9 +14,9 @@
     profiles.default = {
       enableUpdateCheck = false;
       enableExtensionUpdateCheck = false;
-      extensions = (import ./extensions.nix { inherit inputs pkgs; });
-      userSettings = (import ./settings.nix { inherit config lib pkgs; });
-      keybindings = (import ./keybindings.nix);
+      extensions = import ./extensions.nix { inherit inputs pkgs; };
+      userSettings = import ./settings.nix { inherit config lib pkgs; };
+      keybindings = import ./keybindings.nix;
     };
   };
 

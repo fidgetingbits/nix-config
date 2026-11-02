@@ -10,7 +10,7 @@
 }:
 let
   cfg = config.${namespace}.backup-external-host;
-  hostSpec = config.hostSpec;
+  inherit (config) hostSpec;
 in
 {
   options.${namespace}.backup-external-host = {

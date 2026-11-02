@@ -58,7 +58,7 @@
         ;
 
     }
-    // lib.optionalAttrs (osConfig.hostSpec.isProduction) {
+    // lib.optionalAttrs osConfig.hostSpec.isProduction {
       inherit (pkgs.llvmPackages)
         bintools # strings, etc
         ;
@@ -68,7 +68,7 @@
         mdcat # Markdown preview in cli
         ;
     }
-    // lib.optionalAttrs (osConfig.hostSpec.isProduction && (osConfig.hostSpec.useWindowManager)) {
+    // lib.optionalAttrs (osConfig.hostSpec.isProduction && osConfig.hostSpec.useWindowManager) {
       inherit (pkgs)
         ##
         # Core GUI Utilities
@@ -84,7 +84,7 @@
         obsidian # note taking
         ;
     }
-    // lib.optionalAttrs (osConfig.hostSpec.isProduction && (osConfig.hostSpec.useX11)) {
+    // lib.optionalAttrs (osConfig.hostSpec.isProduction && osConfig.hostSpec.useX11) {
       inherit (pkgs)
         xsel # X clipboard manager
         ;

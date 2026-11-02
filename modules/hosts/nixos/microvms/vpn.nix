@@ -16,7 +16,7 @@ let
   vpn = config.hostSpec.networking.vpn.wg-proton-microvms;
 
   vmcfg = config.${namespace}.microvms;
-  vmBridge = vmcfg.vmBridge;
+  inherit (vmcfg) vmBridge;
   vpnCfg = vmcfg.vpn;
 in
 {
@@ -87,7 +87,7 @@ in
 
     sops.secrets = {
       ${cfg.privateKey} = {
-        sopsFile = cfg.sopsFile;
+        inherit (cfg) sopsFile;
       };
     };
 

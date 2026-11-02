@@ -9,7 +9,7 @@
 let
   net = config.hostSpec.networking;
   subnet = net.subnets.o-lan;
-  wg-subnet = subnet.wg-subnet;
+  inherit (subnet) wg-subnet;
   inherit (config.hostSpec)
     isLocal
     isRoaming

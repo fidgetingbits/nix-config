@@ -223,12 +223,12 @@ in
               // (
                 let
                   # FIXME: Make make these configurable
-                  name = (if cfg.luks.enable then "luks" else "root");
+                  name = if cfg.luks.enable then "luks" else "root";
                 in
                 {
                   ${name} = {
                     size = "100%";
-                    content = (if cfg.luks.enable then luksContent else btrfsContent);
+                    content = if cfg.luks.enable then luksContent else btrfsContent;
                   };
                 }
               );
@@ -303,11 +303,9 @@ in
       }
       // lib.optionalAttrs config.introdus.impermanence.enable {
         persistence."${config.hostSpec.persistFolder}" = {
-          files =
-            [ ]
-            ++ lib.optionals (cfg.extraDisks != null) [
-              "/luks-secondary-unlock.key"
-            ];
+          files = lib.optionals (cfg.extraDisks != null) [
+            "/luks-secondary-unlock.key"
+          ];
         };
       };
 

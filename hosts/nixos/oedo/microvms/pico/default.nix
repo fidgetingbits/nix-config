@@ -6,8 +6,8 @@
 }:
 let
   networking = config.hostSpec.networking;
-  subnets = networking.subnets;
-  ports = networking.ports;
+  inherit (networking) subnets;
+  inherit (networking) ports;
   llamaSwapPort = ports.tcp.llama-swap;
   vmSpecs = rec {
     description = "Agent runner with internet";
@@ -20,7 +20,7 @@ let
     inherit (vm-lan.hosts.pico) ip;
     name = "pico";
     user = config.hostSpec.primaryUsername;
-    mac = (lib.head vm-lan.hosts.pico.mac);
+    mac = lib.head vm-lan.hosts.pico.mac;
     sshPort = 22;
     sharedDir = config.${namespace}.microvms.sharedDir;
     allowedPorts = {

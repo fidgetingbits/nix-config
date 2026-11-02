@@ -149,7 +149,7 @@ in
     # https://without.boats/blog/pinned-places/ with huge gaps after the ' character
     enableDefaultPackages = true;
     fontDir.enable = true;
-    packages = (
+    packages =
       lib.attrValues {
         inherit (pkgs)
           # icon fonts
@@ -175,8 +175,7 @@ in
           ;
       }
       ++ chineseFonts
-      ++ bopomofoFonts
-    );
+      ++ bopomofoFonts;
 
     # the reason there's Noto Color Emoji everywhere is to override DejaVu's
     # B&W emojis that would sometimes show instead of some Color emojis

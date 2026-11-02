@@ -80,7 +80,7 @@ stdenv.mkDerivation rec {
     name = "ida-pro";
     # exec = ''env QT_QPA_PLATFORM="xcb;wayland" ida64'';
     exec = "ida";
-    icon = icon;
+    inherit icon;
     comment = meta.description;
     desktopName = "IDA Pro";
     genericName = "Interactive Disassembler";

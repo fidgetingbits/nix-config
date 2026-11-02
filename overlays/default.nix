@@ -30,7 +30,7 @@ let
 
     linuxModifications =
       final: prev:
-      lib.optionalAttrs prev.stdenv.hostPlatform.isLinux ({
+      lib.optionalAttrs prev.stdenv.hostPlatform.isLinux {
         # FIXME: note why I overlayed this
         zsh-edit = prev.zsh-edit.overrideAttrs (oldAttrs: {
           src = prev.fetchFromGitHub {
@@ -93,7 +93,7 @@ let
             export NIX_SSL_CERT_FILE=${prev.cacert}/etc/ssl/certs/ca-bundle.crt
           '';
         });
-      });
+      };
 
     # Override unstable entries exposed via pkgs.unstable
     unstable-packages = final: _prev: {

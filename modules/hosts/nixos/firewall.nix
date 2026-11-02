@@ -5,7 +5,7 @@
 
 let
   cfg = config.networking.granularFirewall;
-  types = lib.types;
+  inherit (lib) types;
   # FIXME(firewall): Should we specify the interfaces?
   portConfigType = types.submodule {
     options = {

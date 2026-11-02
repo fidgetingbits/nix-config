@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   # LG Electronics LG TV SSCR2
   monitors = {
     "HDMI-1" = {

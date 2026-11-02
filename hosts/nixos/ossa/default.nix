@@ -184,11 +184,9 @@
 
     # Add in descriptions for VMs we use from other hosts, so we can auto generate some commands
     # FIXME: This should just be some generated part of microvm where we say "we use host foo"
-    microvms.extraDescriptions = (
-      lib.custom.microvm.mapHostMicrovms inputs.self.nixosConfigurations.oedo.config.microvm.vms (
-        vmSpecs: "oedo: ${vmSpecs.name} - ${vmSpecs.description}"
-      )
-    );
+    microvms.extraDescriptions =
+      lib.custom.microvm.mapHostMicrovms inputs.self.nixosConfigurations.oedo.config.microvm.vms
+        (vmSpecs: "oedo: ${vmSpecs.name} - ${vmSpecs.description}");
   };
 
   # See:

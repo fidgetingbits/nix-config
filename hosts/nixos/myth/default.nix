@@ -68,7 +68,7 @@
     name = "ups";
     username = "monuser";
     ip = config.hostSpec.networking.subnets.${config.hostSpec.hostName}.hosts.synology.ip;
-    powerDownTimeOut = (60 * 30); # 30m. UPS reports ~45min
+    powerDownTimeOut = 60 * 30; # 30m. UPS reports ~45min
   };
 
   ${namespace}.services.monit = {

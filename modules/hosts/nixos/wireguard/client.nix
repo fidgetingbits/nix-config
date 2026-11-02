@@ -14,12 +14,12 @@ let
   mkWireguardPeer = host: {
     inherit (host) name;
     publicKey = host.wireguardPubKey;
-    allowedIPs = cfg.allowedIPs;
+    inherit (cfg) allowedIPs;
     endpoint = "${cfg.endpoint}:${toString cfg.wireguardPort}";
     # Needed on clients for keeping NAT open
     persistentKeepalive = 25;
   };
-  mkWireguardPeers = hosts: (map (host: mkWireguardPeer host) hosts);
+  mkWireguardPeers = hosts: (map mkWireguardPeer hosts);
 in
 lib.mkIf (cfg.enable && cfg.role == "client") {
   # See ./default.nix for shared settings across client/server
@@ -61,7 +61,7 @@ lib.mkIf (cfg.enable && cfg.role == "client") {
                    # FIXME: This will need to change for full tunnel
                    ${resolvectl} default-route ${cfg.interface} false
                    ${resolvectl} domain ${cfg.interface} ${
-                     lib.concatMapStringsSep " " (domain: "\"~${domain}\"") ([ cfg.dns.domain ])
+                     lib.concatMapStringsSep " " (domain: "\"~${domain}\"") [ cfg.dns.domain ]
                    }
                    ${resolvectl} dns ${cfg.interface} ${cfg.dns.server}
 

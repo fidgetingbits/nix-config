@@ -66,7 +66,7 @@
     let
       inherit (config) hostSpec;
       network = hostSpec.networking;
-      domain = hostSpec.domain;
+      inherit (hostSpec) domain;
     in
     {
       # FIXME: This should only be local or wireguard peered

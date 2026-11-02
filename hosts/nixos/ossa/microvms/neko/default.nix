@@ -6,7 +6,7 @@
 }:
 let
   networking = config.hostSpec.networking;
-  subnets = networking.subnets;
+  inherit (networking) subnets;
   olan = subnets.o-lan;
   vmSpecs = rec {
     description = "Agent runner without internet";
@@ -17,7 +17,7 @@ let
     inherit (vm-lan.hosts.neko) ip;
     name = "neko";
     user = config.hostSpec.primaryUsername;
-    mac = (lib.head vm-lan.hosts.neko.mac);
+    mac = lib.head vm-lan.hosts.neko.mac;
     sshPort = 22;
     sharedDir = config.${namespace}.microvms.sharedDir;
     allowedPorts = {

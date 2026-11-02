@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   system.disks = {
     primary = "/dev/disk/by-id/nvme-CT2000P310SSD8_2522509359B2";
     primaryDiskoLabel = "disk0";

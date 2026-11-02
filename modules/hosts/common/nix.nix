@@ -9,7 +9,7 @@
   ...
 }:
 let
-  isNixOS = (config ? hostSpec);
+  isNixOS = config ? hostSpec;
   # NOTE: Differentiate NixOS and HM
   hostSpec = if isNixOS then config.hostSpec else osConfig.hostSpec;
   overridesFile = "/etc/nix/network-overrides.conf";
@@ -150,7 +150,7 @@ in
           # This reduces exposure to privilege escalation bugs like CVE-2026-39860
           allowed-users = [ "@users" ];
         }
-        // lib.optionalAttrs (hostSpec.useAtticCache) {
+        // lib.optionalAttrs hostSpec.useAtticCache {
           # FIXME: This might not only contain attic-related entries in the future
           # NOTE: Assumes sops exist, so eg: minimal should set useAtticCache to false
           netrc-file = "${config.sops.secrets."passwords/netrc".path}";

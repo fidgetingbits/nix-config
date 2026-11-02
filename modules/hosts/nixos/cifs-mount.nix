@@ -70,7 +70,7 @@ in
     };
   };
 
-  config = lib.mkIf cfg.enable (rec {
+  config = lib.mkIf cfg.enable rec {
     sops.secrets =
       cfg.mounts
       |> lib.map (mount: {
@@ -111,5 +111,5 @@ in
     ${namespace}.services = lib.mkIf cfgPerNetworkServices.enable {
       per-network-services.trustedNetworkMounts = lib.map (mount: mount.url) cfg.mounts;
     };
-  });
+  };
 }

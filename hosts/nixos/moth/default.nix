@@ -52,7 +52,7 @@ in
     server.enable = true;
     username = "nut";
     name = "cyberpower";
-    powerDownTimeOut = (2 * 60); # 2m. UPS reports ~10min
+    powerDownTimeOut = 2 * 60; # 2m. UPS reports ~10min
   };
   power.ups.ups.cyberpower = {
     driver = "usbhid-ups";

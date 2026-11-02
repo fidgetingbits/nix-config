@@ -6,45 +6,43 @@
   ...
 }:
 {
-  imports = (
-    map lib.custom.relativeToRoot (
-      [
-        "home/common/core"
-        "home/common/core/nixos.nix"
-      ]
-      ++
-        # Optional common modules
-        (map (f: "home/common/optional/${f}") [
-          "audio-tools.nix"
-          # "vscode"
-          "helper-scripts"
-          "development"
-          "aws.nix"
-          "gpg.nix"
-          "sops.nix"
-          "media.nix"
+  imports = map lib.custom.relativeToRoot (
+    [
+      "home/common/core"
+      "home/common/core/nixos.nix"
+    ]
+    ++
+      # Optional common modules
+      (map (f: "home/common/optional/${f}") [
+        "audio-tools.nix"
+        # "vscode"
+        "helper-scripts"
+        "development"
+        "aws.nix"
+        "gpg.nix"
+        "sops.nix"
+        "media.nix"
 
-          "graphics.nix"
-          "yazi.nix"
+        "graphics.nix"
+        "yazi.nix"
 
-          "atuin.nix"
+        "atuin.nix"
 
-          "remmina.nix"
+        "remmina.nix"
 
-          "chat.nix"
-          "work.nix"
+        "chat.nix"
+        "work.nix"
 
-          "reversing"
+        "reversing"
 
-          "wine.nix"
+        "wine.nix"
 
-          "ghostty.nix"
+        "ghostty.nix"
 
-          # Tied to an enable probably
-          "desktop"
-          "gnome-terminal.nix"
-        ])
-    )
+        # Tied to an enable probably
+        "desktop"
+        "gnome-terminal.nix"
+      ])
   );
 
   home.packages =
