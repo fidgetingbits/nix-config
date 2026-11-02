@@ -86,6 +86,12 @@ let
             wrapProgram $out/bin/anki \
               --set QT_QPA_PLATFORM xcb
           '';
+
+          # FIXME: This broke recently (2026-10-30) probably because of cacert changes
+          preHook = (old.preHook or "") + ''
+            export SSL_CERT_FILE=${prev.cacert}/etc/ssl/certs/ca-bundle.crt
+            export NIX_SSL_CERT_FILE=${prev.cacert}/etc/ssl/certs/ca-bundle.crt
+          '';
         });
       });
 
