@@ -34,6 +34,8 @@ let
       ''
         APP_ID="neovide-scratchpad"
         if ! niri msg --json windows | jq -e --arg app "$APP_ID" '.[] | select(.app_id == $app)' > /dev/null; then
+
+            # export NVIM_LOG_FILE=$HOME/nvim_debug.log
             NEOVIDE_APP_ID="$APP_ID" nvim-neovide -- -c 'lua require([[resession]]).load([[nix]])' &
 
             # Poll for window creation (up to 2 seconds max)
