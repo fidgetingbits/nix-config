@@ -161,13 +161,6 @@ in
         export LLAMA_SWAP_API_KEY="foo"
       '';
 
-  # Using noctalia v5 now
-  # introdus.services.awww = {
-  #   enable = true;
-  #   interval = lib.custom.time.days 1;
-  #   wallpaperDir = "${config.home.homeDirectory}/images/wallpaper/catppuccin-mocha";
-  # };
-
   # FIXME: Make this part of a module
   services.copyq.enable = true;
 
