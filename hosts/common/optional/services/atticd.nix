@@ -2,16 +2,17 @@
   inputs,
   config,
   lib,
+  namespace,
   ...
 }:
 {
-  imports = [ ./nginx.nix ];
   config =
     let
       sopsFolder = (lib.toString inputs.nix-secrets) + "/sops";
       atticPort = config.hostSpec.networking.ports.tcp.atticd;
     in
     {
+      ${namespace}.services.nginx.enable = true;
       sops.secrets = {
         "tokens/attic" = {
           sopsFile = "${sopsFolder}/${config.hostSpec.hostName}.yaml";

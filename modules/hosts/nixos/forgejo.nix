@@ -10,12 +10,6 @@ let
   cfg = config.${namespace}.services.forgejo;
 in
 {
-  imports = lib.flatten [
-    (map lib.custom.relativeToRoot [
-      "hosts/common/optional/acme.nix"
-      "hosts/common/optional/services/nginx.nix"
-    ])
-  ];
   options.${namespace}.services.forgejo = {
     enable = lib.mkEnableOption "Enable forgejo";
     mailer = lib.mkOption {

@@ -1,4 +1,9 @@
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  namespace,
+  ...
+}:
 {
   options.services.nginxProxy = {
     defaultAllowList = lib.mkOption {
@@ -136,5 +141,13 @@
           }) domains
         ) cfg.services
       );
+
+      ${namespace}.acme.enable =
+        (
+          config.security.acme.certs
+          |> lib.attrNames
+          # nixfmt hack
+          |> lib.length
+        ) > 0;
     };
 }

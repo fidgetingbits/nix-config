@@ -1,6 +1,7 @@
 # A locally hosted startpage for the browser.
 {
   pkgs,
+  namespace,
   ...
 }:
 let
@@ -13,7 +14,7 @@ let
 in
 {
 
-  imports = [ ./services/nginx.nix ];
+  ${namespace}.services.nginx.enable = true;
 
   # With no explicit rules this will make nginx listen on localhost only
   # No SSL certs will make it listen on localhost:80, which is okay.

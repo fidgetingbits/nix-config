@@ -54,7 +54,6 @@ in
           "services/unifi.nix" # Unifi Controller
           "services/webdav.nix" # for grapheneos seedvault backups
 
-          "acme.nix"
           "remote-builder.nix"
         ])
     ));

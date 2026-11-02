@@ -1,6 +1,10 @@
-{ lib, config, ... }:
 {
-  imports = [ ./nginx.nix ];
+  lib,
+  config,
+  namespace,
+  ...
+}:
+{
   config =
     let
       atuinPort = config.hostSpec.networking.ports.tcp.atuin;
@@ -24,6 +28,7 @@
     in
     lib.mkMerge [
       {
+        ${namespace}.services.nginx.enable = true;
         services.atuin = {
           enable = true;
           port = atuinPort;

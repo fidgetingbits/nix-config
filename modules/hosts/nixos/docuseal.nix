@@ -12,8 +12,6 @@ let
   sopsFolder = (lib.toString inputs.nix-secrets) + "/sops";
 in
 {
-  # imports = [ ./nginx.nix ];
-
   options.services.docuseal = {
     useProxy = mkOption {
       type = types.bool;
