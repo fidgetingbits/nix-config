@@ -214,7 +214,7 @@ in
         (pkgs.formats.ini { }).generate "10-vpn-routing"
           {
             Resolve = {
-              DNS = "1.1.1.1";
+              # DNS = "1.1.1.1";
               Domains = "~vpn.${config.hostSpec.domain}";
             };
           };
