@@ -11,13 +11,15 @@ let
   # currently due to granularFirewall not supporting darwin and nftables yet
   cfg = config.networking.granularFirewall;
   granularFirewallRules = lib.mkIf cfg.enable {
-    networking.granularFirewall.allowedRules = {
-      ssh = {
-        protocol = "tcp";
-        ports = [ sshPort ];
-        hosts = config.hostSpec.networking.rules.${config.hostSpec.hostName}.sshAllowedHosts;
-      };
-    };
+    networking.granularFirewall.allowedRules =
+      lib.optionalAttrs (config.hostSpec.networking.rules ? ${config.hostSpec.hostName})
+        {
+          ssh = {
+            protocol = "tcp";
+            ports = [ sshPort ];
+            hosts = config.hostSpec.networking.rules.${config.hostSpec.hostName}.sshAllowedHosts;
+          };
+        };
   };
   regularFirewallRules = lib.mkIf (cfg.enable == false) {
     networking.firewall.allowedTCPPorts = [ sshPort ];
