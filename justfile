@@ -28,6 +28,7 @@ rebuild-pre HOST=`hostname`:
     just update {{ HOST }} fidgetingvim && \
     just update {{ HOST }} nix-index-database && \
     just update {{ HOST }} introdus
+    just update {{ HOST }} introdus-git
     git add --intent-to-add .
 
 # Run post-build checks, like if sops is running properly afterwards
