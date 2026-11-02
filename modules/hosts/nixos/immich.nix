@@ -95,8 +95,7 @@ in
           inherit hosts;
         };
     })
-
-    (lib.mkIf cfg.isRemoteMachineLearningServer {
+    (lib.mkIf (cfg.enable && cfg.isRemoteMachineLearningServer) {
       services.immich = {
         enable = true;
         openFirewall = !config.networking.granularFirewall.enable;
