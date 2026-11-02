@@ -44,7 +44,6 @@ in
           "services/atuin.nix"
           "services/calibre-web.nix" # ebook management
           "services/commafeed.nix" # rss reader
-          "services/forgejo.nix" # git forge
           "services/hister.nix" # local document search
           "services/librechat.nix" # llm webui
           "services/mattermost" # chat notifications
@@ -148,6 +147,9 @@ in
       preload = [
         "Nomic Embeddings"
       ];
+    };
+    services.forgejo = {
+      enable = true;
     };
   };
 

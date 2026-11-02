@@ -6,6 +6,10 @@
   namespace,
   ...
 }:
+let
+  net = config.hostSpec.networking;
+  grove = net.subnets.grove;
+in
 {
   imports = lib.flatten [
     inputs.nixos-facter-modules.nixosModules.facter
@@ -72,41 +76,50 @@
     # ];
   };
 
-  ${namespace}.services.monit = {
-    enable = true;
-    usage = {
-      fileSystem = {
-        enable = true;
-        # FIXME:This should be automated from disko subvolume parsing or something
-        fileSystems = {
-          rootfs = {
-            path = "/";
+  ${namespace} = {
+    services.monit = {
+      enable = true;
+      usage = {
+        fileSystem = {
+          enable = true;
+          # FIXME:This should be automated from disko subvolume parsing or something
+          fileSystems = {
+            rootfs = {
+              path = "/";
+            };
+            storage = {
+              path = "/mnt/storage";
+            };
           };
-          storage = {
-            path = "/mnt/storage";
+        };
+      };
+      health = {
+        disks = {
+          enable = true;
+          smart.disks = map (d: lib.baseNameOf d) config.system.disks.raidDisks;
+          emmc = {
+            enable = true;
+            disks = {
+              "mmc-SCA64G_0x56567305" = { };
+            };
           };
+        };
+        mdadm = {
+          enable = true;
+          disks = [ "md127" ];
+        };
+        btrfs = {
+          enable = true;
+          inherit (config.services.btrfs.autoScrub) fileSystems;
         };
       };
     };
-    health = {
-      disks = {
-        enable = true;
-        smart.disks = map (d: lib.baseNameOf d) config.system.disks.raidDisks;
-        emmc = {
-          enable = true;
-          disks = {
-            "mmc-SCA64G_0x56567305" = { };
-          };
-        };
-      };
-      mdadm = {
-        enable = true;
-        disks = [ "md127" ];
-      };
-      btrfs = {
-        enable = true;
-        inherit (config.services.btrfs.autoScrub) fileSystems;
-      };
+
+    services.forgejo = {
+      enable = true;
+      mailer = false;
+      theme = false;
+      #rootURL = "git.${config.hostSpec.hostName}.${config.hostSpec.domain}";
     };
   };
 
@@ -142,5 +155,12 @@
       tcp_client_max_idle = 0
       distribute_network = no
     '';
+  };
+
+  services.nginxProxy = {
+    defaultAllowList = [
+      grove.cidr # FIXME:
+    ];
+    defaultDenyList = [ "all" ];
   };
 }
