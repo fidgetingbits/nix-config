@@ -132,5 +132,4 @@ in
           baseConfig = lib.mkForce "${inputs.introdus-git}/wrappers/neovim";
         };
   };
-
 }
