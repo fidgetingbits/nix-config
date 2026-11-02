@@ -56,4 +56,5 @@
     };
   };
   ${namespace}.language-learning.enable = true;
+  introdus.firefox.autoRestart = true;
 }
