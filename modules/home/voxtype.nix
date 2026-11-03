@@ -114,6 +114,8 @@ in
             "Vox type" = "voxtype";
             "Neary" = "niri";
             "Entalia" = "noctalia";
+            "Neo Vim" = "neovim";
+            "pre shared" = "pre-shared";
           };
 
         };
