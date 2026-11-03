@@ -356,7 +356,7 @@ done
 # Uses a subshell () to allow `set -ex`
 function bump_lock() {
     (
-        cd-gitroot >/dev/null
+        cd-gitroot >/dev/null || exit 1
         if [ ! -e "locks" ]; then
             echo "WARN: Not in your nix-config folder"
             exit 1
@@ -374,15 +374,16 @@ function bump_lock() {
 
 function bump_locks() {
     (
-        cd-gitroot >/dev/null
+        cd-gitroot >/dev/null || exit 1
         if [ ! -e "locks" ]; then
             echo "WARN: Not in your nix-config folder"
             exit 1
         fi
-        if ! git status --porcelain | grep "locks/"; then
+        if ! git status --porcelain | grep -q "locks/"; then
             echo "WARN: No lock changes"
             exit 1
         fi
+        set -ex
         git add "locks/"
         gcm "chore: bump locks"
     )
@@ -445,7 +446,7 @@ function _jcu_units() {
 }
 
 function _jcu() {
-    if [[ $words[CURRENT - 1] == "-u" ]]; then
+    if [[ $words[CURRENT-1] == "-u" ]]; then
         _jcu_units
     else
         words=(journalctl --user "${words[@]:1}")
