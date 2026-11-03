@@ -39,8 +39,8 @@ in
   biggest = "find . -printf '%s %p\n'|sort -nr|head";
   myip = "dig +short myip.opendns.com @resolver1.opendns.com";
 
-  # FIXME: Could be devshell specific for nix-config
   bump = "bump_lock";
+  bumps = "bump_locks";
 
   # lsusb
   lsusb = "cyme --tree";

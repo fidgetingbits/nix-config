@@ -372,6 +372,22 @@ function bump_lock() {
     )
 }
 
+function bump_locks() {
+    (
+        cd-gitroot >/dev/null
+        if [ ! -e "locks" ]; then
+            echo "WARN: Not in your nix-config folder"
+            exit 1
+        fi
+        if ! git status --porcelain | grep "locks/"; then
+            echo "WARN: No lock changes"
+            exit 1
+        fi
+        git add "locks/"
+        gcm "chore: bump locks"
+    )
+}
+
 # FIXME: These should move to the nix-config devshell probably
 function nix_hosts() {
     nix flake show --reference-lock-file locks/"$(hostname)".lock --json 2>/dev/null | jq -r '.nixosConfigurations | keys[]'
@@ -429,7 +445,7 @@ function _jcu_units() {
 }
 
 function _jcu() {
-    if [[ $words[CURRENT-1] == "-u" ]]; then
+    if [[ $words[CURRENT - 1] == "-u" ]]; then
         _jcu_units
     else
         words=(journalctl --user "${words[@]:1}")
