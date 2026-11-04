@@ -116,6 +116,8 @@ in
             "Entalia" = "noctalia";
             "Neo Vim" = "neovim";
             "pre shared" = "pre-shared";
+            "wire guard" = "wireguard";
+            "lama swap" = "llama-swap";
           };
 
         };
