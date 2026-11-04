@@ -651,6 +651,23 @@ in
           };
         }
       );
+
+      # NOTE: We setup https reverse proxy, but also leave plain HTTP enabled for some
+      # hosts. This is mostly because I don't always want every VM to have access to
+      # nginx
+      services.nginxProxy = {
+        defaultAllowList = [
+          olan.cidr
+          olan.wg-subnet.hosts.ossa.ip
+        ];
+        services = [
+          {
+            subDomain = "llm";
+            port = ports.tcp.llama-swap;
+            ssl = false;
+          }
+        ];
+      };
     })
 
     (lib.mkIf cfg.enable {
