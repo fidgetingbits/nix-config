@@ -142,12 +142,15 @@
         ) cfg.services
       );
 
-      ${namespace}.acme.enable =
-        (
-          config.security.acme.certs
-          |> lib.attrNames
-          # nixfmt hack
-          |> lib.length
-        ) > 0;
+      ${namespace} = {
+        services.nginx.enable = true;
+        acme.enable =
+          (
+            config.security.acme.certs
+            |> lib.attrNames
+            # nixfmt hack
+            |> lib.length
+          ) > 0;
+      };
     };
 }
