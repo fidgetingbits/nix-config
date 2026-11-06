@@ -67,7 +67,7 @@ lib.mkIf (lib.length (lib.attrNames osConfig.microvm.vms) != 0) {
     }
     // (
       mapHostMicrovms osConfig.microvm.vms (vm: {
-        "cd${vm.name}" = "cd ${sharedDir}/shared/${vm.name}";
+        "cd${vm.name}" = "cd ${sharedDir}/${vm.name}";
       })
       |> lib.mergeAttrsList
     );
