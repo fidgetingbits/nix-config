@@ -333,8 +333,8 @@ function nix_log_extract() {
 # bindkey "^I" restricted-expand-or-complete
 
 # FIXME: These should be in aliases.nix
-alias nix='nix_wrapper'
-alias nix-log-last='NIX_PAGER=cat nix log $NIX_LAST_DERIVATION'
+# alias nix='nix_wrapper'
+# alias nix-log-last='NIX_PAGER=cat nix log $NIX_LAST_DERIVATION'
 
 # FIXME:This should move into where we setup fzf-git.sh probably
 function git_modified_files() {
@@ -446,7 +446,8 @@ function _jcu_units() {
 }
 
 function _jcu() {
-    if [[ $words[CURRENT-1] == "-u" ]]; then
+    local prev_idx=$((CURRENT - 1))
+    if [[ ${words[prev_idx]} == "-u" ]]; then
         _jcu_units
     else
         words=(journalctl --user "${words[@]:1}")
