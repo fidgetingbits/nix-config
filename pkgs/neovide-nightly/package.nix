@@ -33,17 +33,18 @@ rustPlatform.buildRustPackage.override { stdenv = clangStdenv; } (finalAttrs: re
   # version = "main";
   # Some nightly build to avoid regular rebuilds since they keep changing skia
   # I just want something that runs neovim 0.13 while they are still on 0.16.2
-  version = "105fd640f83616501d7c6bfedb0b4c15ab9515e1";
+  #version = "105fd640f83616501d7c6bfedb0b4c15ab9515e1";
+  version = "0.17.1";
 
   src = fetchFromGitHub {
     owner = "neovide";
     repo = "neovide";
     # tag = finalAttrs.version;
     rev = version;
-    hash = "sha256-AZHPq5x3CGCbGtuSQJvK0YUC4EEiVZQ5znJzyFcqgrE=";
+    hash = "sha256-trl/YctM/E9vIXeJfwBEZLfNK7LS5fEaWthTbeg7Ba0=";
   };
 
-  cargoHash = "sha256-f0SvBpNdsxOxukedxCBvUG4rgwC/Z6nhuiOhCVAQ40I=";
+  cargoHash = "sha256-WS44afUizU6qhXQY77TayNRvlUoS6GrBZ/uaXk+gjU0=";
 
   env = {
     SKIA_SOURCE_DIR =
@@ -53,9 +54,9 @@ rustPlatform.buildRustPackage.override { stdenv = clangStdenv; } (finalAttrs: re
           repo = "skia";
           # see rust-skia:skia-bindings/Cargo.toml#package.metadata skia
           # IMPORTANT: If you change this, don't forget to run ./gen-skia-externals.py <tag>
-          tag = "m153-0.101.2";
+          tag = "m156.5";
           # hash = lib.fakeHash;
-          hash = "sha256-xKCkvQoTAMlLvKdVzzSxTST6kER4kRUIDjvTRZ9z72o=";
+          hash = "sha256-ahqSduR4sCkcEmoo++PpxfcH0SZH4o6k/n8ZZmB1aA0=";
         };
         # The externals for skia are taken from skia/DEPS
         externals = linkFarm "skia-externals" (

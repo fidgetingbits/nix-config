@@ -1,8 +1,8 @@
 {
   "brotli": {
     "url": "https://skia.googlesource.com/external/github.com/google/brotli.git",
-    "rev": "6d03dfbedda1615c4cba1211f8d81735575209c8",
-    "sha256": "0l1wk83y471766n0snqv4i7h9fvqj92rbi63n0y2wqfdix0w8wf2",
+    "rev": "cfa184a997ac19454d5a3ae97f6d600aac2445a6",
+    "sha256": "045p66i6yl4hwg3rwn5f46ih564z02zzr03ngb2697fx0faa5dh0",
     "fetchSubmodules": false
   },
   "d3d12allocator": {
@@ -13,44 +13,44 @@
   },
   "expat": {
     "url": "https://chromium.googlesource.com/external/github.com/libexpat/libexpat.git",
-    "rev": "6154446fccefbf3ca644894f598969113b0c7bcd",
-    "sha256": "1h2rq5ww26xy9yfcf5rmbg3lmhlawpjjllpm4wi7zx5f8ms07ww9",
+    "rev": "a76b1174c1ea52abb639a4c69d52b630a8a106a2",
+    "sha256": "1k79irbhqxw5d1rr4rsxkl5hz3c3cryphvqrb61kakjsa4fpa52i",
     "fetchSubmodules": false
   },
   "freetype": {
     "url": "https://chromium.googlesource.com/chromium/src/third_party/freetype2.git",
-    "rev": "264b5fbf5b912b39f98d038bf75d39be0a73f21b",
-    "sha256": "18dfk4skjgmwv376n7g0w5vdzv5a2lraymblv9xmrjh30567drai",
+    "rev": "891f904e2e7b4289f615598cd4b69832f87d2f3a",
+    "sha256": "133kh4slz06bd9wik51bi2g0xdazfv10fca9ad108i7lycvn9q8c",
     "fetchSubmodules": false
   },
   "harfbuzz": {
     "url": "https://chromium.googlesource.com/external/github.com/harfbuzz/harfbuzz.git",
-    "rev": "9cb1fee51069b206effb4736e443b038d230789d",
-    "sha256": "0hyb2m0413czq5f5j47bdm74qzxmhk67r2b88fv8l1xgwm12v0hi",
+    "rev": "f5efbbef3841bdcdc6427bde7c2971f62ac8c8f1",
+    "sha256": "0pg5macq3gywp1f13971rina0w7m6wc4hfxbzp1zcrv8cmph4i61",
     "fetchSubmodules": false
   },
   "icu": {
     "url": "https://chromium.googlesource.com/chromium/deps/icu.git",
-    "rev": "d578f2e8b7bd5938e21cfb6bf15c079e0aa5b738",
-    "sha256": "1p161vbxx33dr81cpglancjfw2v6kcd4qnaima9bf5c56992vj8f",
+    "rev": "2a51536dfb3b448bdf3dae70c782ea2879c90904",
+    "sha256": "09agrwwqkd3k9drqfa6nidmjs2sn3i7b9hchim45gra6rakgkhcc",
     "fetchSubmodules": false
   },
   "libjpeg-turbo": {
     "url": "https://chromium.googlesource.com/chromium/deps/libjpeg_turbo.git",
-    "rev": "e14cbfaa85529d47f9f55b0f104a579c1061f9ad",
-    "sha256": "1ywl6j1pcmx799h4jr3xmg2mnsmgv8sgrxnfzigzj3nrkadas3r2",
+    "rev": "640f254ad0fa03f6b1f29f89b7dd9366f2f6e533",
+    "sha256": "151b7bpzm653a64z5yvnfgh8r3vx51hp05ni5x2r1zvp652zi2n2",
     "fetchSubmodules": false
   },
   "libpng": {
     "url": "https://skia.googlesource.com/third_party/libpng.git",
-    "rev": "d5515b5b8be3901aac04e5bd8bd5c89f287bcd33",
-    "sha256": "0f8mlsh2vsn9zmn5cdjvg5ck8bsplm23g46wvl4pnpd3bj03p79p",
+    "rev": "3061454d980de7d53608f594194cfac722721d2a",
+    "sha256": "1hsa5rscdfc2r2k0syg7vwkr9a4ih91pwzrhy3j3j1niqwz769r5",
     "fetchSubmodules": false
   },
   "libwebp": {
     "url": "https://chromium.googlesource.com/webm/libwebp.git",
-    "rev": "845d5476a866141ba35ac133f856fa62f0b7445f",
-    "sha256": "0fp9nxxddhxvikjn51r46sjrc3iiggr7mivabfgz02426skp0zll",
+    "rev": "b43b2caa710c0c997c066cb32c7fea1391fad70a",
+    "sha256": "0d3333zckffm6grd78vyz4v8nddrk76xs0ka1x4w3ivbi77h3ai9",
     "fetchSubmodules": false
   },
   "vulkanmemoryallocator": {
@@ -67,14 +67,14 @@
   },
   "wuffs": {
     "url": "https://skia.googlesource.com/external/github.com/google/wuffs-mirror-release-c.git",
-    "rev": "e3f919ccfe3ef542cfc983a82146070258fb57f8",
-    "sha256": "0b04ksbkf4dcm9myvf1sx9aclyh8jbpkrgja3h1chkfjbzcdvgfz",
+    "rev": "7411f488fe2e2c205c3d3b3d28638b7356522930",
+    "sha256": "14w3wa1r7h4gsd9rhaina6p7hj292590fdd7g798j9fd4rl81jq0",
     "fetchSubmodules": false
   },
   "zlib": {
     "url": "https://chromium.googlesource.com/chromium/src/third_party/zlib",
-    "rev": "646b7f569718921d7d4b5b8e22572ff6c76f2596",
-    "sha256": "0d3pv2vazr8haw4gcc8d2dyybx23nwaqfn5vfaxzdryrwi5gmn4c",
+    "rev": "456ae730017b9b4bd3371927abc82627fd51feef",
+    "sha256": "0rgx8v96axy3aqap8jmcsyypa1n4nzifr9b26q9mpsnds1iwskib",
     "fetchSubmodules": false
   }
 }
