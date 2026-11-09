@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ lib, ... }:
 {
   networking.useDHCP = lib.mkForce true;
 
@@ -7,8 +7,8 @@
     settings.Resolve = {
       LLMNR = "false"; # Prevent listening on 0.0.0.0:5355 as we don't need multicast DNS on LAN
       Domains = [
-        "${config.hostSpec.domain}"
-        #"~."
+        # "${config.hostSpec.domain}"
+        # "~."
       ];
       FallbackDNS = [
         "1.1.1.1"

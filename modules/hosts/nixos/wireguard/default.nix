@@ -215,7 +215,10 @@ in
           {
             Resolve = {
               # DNS = "1.1.1.1";
-              Domains = "~vpn.${config.hostSpec.domain}";
+              Domains = lib.concatStringsSep " " [
+                "~."
+                "~vpn.${config.hostSpec.domain}"
+              ];
             };
           };
     };
