@@ -201,7 +201,8 @@ in
       in
       map (host: {
         name = host;
-        inherit host port;
+        host = osConfig.hostSpec.networking.subnets.o-lan.hosts.${host}.ip;
+        inherit port;
       }) hosts;
 
     llm.cli-tools.enable = true;
