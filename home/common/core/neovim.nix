@@ -70,11 +70,12 @@ in
   wrappers.neovim = {
     # package = pkgs.unstable.neovim-unwrapped;
     # package = inputs.neovim-nightly-overlay.packages.${pkgs.stdenv.hostPlatform.system}.default;
-    package =
-      let
-        nightly = inputs.neovim-nightly-overlay.packages.${pkgs.stdenv.hostPlatform.system};
-      in
-      if osConfig.hostSpec.isDevelopment then nightly.neovim-debug else nightly.default;
+    # package =
+    #   let
+    #     nightly = inputs.neovim-nightly-overlay.packages.${pkgs.stdenv.hostPlatform.system};
+    #   in
+    #   if osConfig.hostSpec.isDevelopment then nightly.neovim-debug else nightly.default;
+    # package = pkgs.unstable.neovim;
 
     # We need some sops-secret-based environment variables on development boxes, and
     # won't inherit them from zsh since we are typically running neovide

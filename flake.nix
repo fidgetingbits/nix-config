@@ -324,7 +324,8 @@
 
     noctalia = {
       url = "github:noctalia-dev/noctalia";
-      inputs.nixpkgs.follows = "nixpkgs";
+      # 2026-11-05: gcc was incompatible with building 5.4.1, so swapped to unstable
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
     noctalia-greeter = {
@@ -386,6 +387,7 @@
     };
     neovim-nightly-overlay = {
       url = "github:nix-community/neovim-nightly-overlay";
+      # inputs.neovim-src.url = "github:neovim/neovim/89837bdd72a89cab69d3117021d087fce09c118d";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
   };
