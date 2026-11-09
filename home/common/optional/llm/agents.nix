@@ -21,7 +21,7 @@ let
         # Dynamic skills per microvm
         "/home/aa/dev/ai/shared/${osConfig.networking.hostName}/skills"
         # Dynamic skills shared across all locally hosted VMs
-        "/home/aa/dev/ai/vms-shared//skills"
+        "/home/aa/dev/ai/vms-shared/skills"
         # Declarative private skills
         "${inputs.fidgeting-skills}"
       ];

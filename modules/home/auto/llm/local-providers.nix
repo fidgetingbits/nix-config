@@ -70,7 +70,7 @@ in
     {
       defaultModel = lib.mkOption {
         type = lib.types.str;
-        default = defaultModels."${defaultProvider}".light;
+        default = defaultModels."${defaultProvider}".heavy;
         example = "foo";
         description = "The default model to use in cli tools (ie: llm, fabric). See llama-swap for list";
       };
