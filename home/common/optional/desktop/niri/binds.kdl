@@ -318,9 +318,10 @@ binds {
     Super+Ctrl+x hotkey-overlay-title="Lock screen" {
         spawn-sh "noctalia msg session lock"
     }
-    Super+Ctrl+S hotkey-overlay-title="Suspend" {
-        spawn-sh "noctalia msg session lock-and-suspend"
-    }
+    // Disabled because I too often mistake for creating a scratchpad
+    // Super+Ctrl+S hotkey-overlay-title="Suspend" {
+    //     spawn-sh "noctalia msg session lock-and-suspend"
+    // }
     // FIXME: Not sure how this works in noctalia v5
     Super+Ctrl+M hotkey-overlay-title="System Monitor" {
         spawn-sh "noctalia msg systemMonitor toggle"
