@@ -39,6 +39,9 @@ bindkey -M menuselect '^[[13;5u' accept-mode # ^Enter to accept and execute
 bindkey -M menuselect '^y' accept-mode
 bindkey -M menuselect '^e' send-break
 
+# alt+enter for soft newlines since shift+enter won't work in zsh
+bindkey -M viins '^[^M' self-insert-unmeta
+
 # Keep history of `cd` as in with `pushd` and make `cd -<TAB>` work.
 # shellcheck disable=SC2034
 DIRSTACKSIZE=16
