@@ -23,7 +23,7 @@ let
   };
 in
 {
-  options.${namespace}.llm.cli-tools = {
+  options.${namespace}.llm.fabric = {
     enable = lib.mkEnableOption "Enable AI client cli tooling";
   };
   config = lib.mkIf cfg.enable {
@@ -79,20 +79,45 @@ in
         # enablePatternsAliases = true;
       };
 
-      zsh.shellAliases =
-        let
-          gumSpinner = msg: cmd: "gum spin --spinner dot --title \"靈 ${msg}\" -- sh -c \"${cmd}\"";
-          # Pre-populates the cli for you to run the command
-          prepCmdLine = str: "print -z $(${str})";
-        in
-        {
-          ling = gumSpinner "靈: 思考一下..." "fabric -- ";
-          "lgcs" = prepCmdLine (
-            gumSpinner "Generating commit message..." "git diff --cached | fabric -p git_staged_commit"
-          ); # Auto git commit staged
-          "lgcm" = "print -z $(git diff | fabric -p git_commit_multiple)"; # Auto git commit multiple
-          # "lgcS" = "git diff --cached | fabric -p git_staged_commit"; # Auto git commit single (all in one)
-        };
+      zsh = {
+        shellAliases =
+          let
+            gumSpinner = msg: cmd: "gum spin --spinner dot --title \"靈 ${msg}\" -- sh -c \"${cmd}\"";
+            # Pre-populates the cli for you to run the command
+            prepCmdLine = str: "print -z $(${str})";
+          in
+          {
+            ling = gumSpinner "靈: 思考一下..." "fabric -- ";
+            "lgcs" = prepCmdLine (
+              gumSpinner "Generating commit message..." "git diff --cached | fabric -p git_staged_commit"
+            ); # Auto git commit staged
+            "lgcm" = "print -z $(git diff | fabric -p git_commit_multiple)"; # Auto git commit multiple
+            # "lgcS" = "git diff --cached | fabric -p git_staged_commit"; # Auto git commit single (all in one)
+          };
+        initContent = # bash
+          ''
+            _fabric_patterns() {
+              local -a patterns
+              # Split `fabric -l` on newlines; drop blanks and the "Found existing alias…"
+              # notice (the only line with spaces).
+              patterns=("''${(@f)$(fabric -l 2>/dev/null)}")
+              patterns=(''${patterns:#'''})
+              patterns=(''${patterns:#* *})
+              (( ''${#patterns} )) || return
+              _describe 'fabric patterns' patterns
+            }
+
+            _fabric() {
+              local prev_idx=$((CURRENT - 1))
+              if [[ ''${words[prev_idx]} == "-p" ]]; then
+                _fabric_patterns
+              else
+                _default
+              fi
+            }
+            compdef _fabric fabric
+          '';
+      };
     };
   };
 }

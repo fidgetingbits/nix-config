@@ -118,6 +118,10 @@ in
             "pre shared" = "pre-shared";
             "wire guard" = "wireguard";
             "lama swap" = "llama-swap";
+            "lamaswap" = "llama-swap";
+            "omypy" = "oh-my-pi";
+            "Natalia's" = "noctalia's";
+            "intradice" = "introdus";
           };
 
         };

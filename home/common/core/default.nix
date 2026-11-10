@@ -8,6 +8,7 @@
 {
   imports = lib.flatten [
     inputs.introdus.homeManagerModules.default
+    inputs.nix-secrets.homeManagerModules.default
     (map lib.custom.relativeToRoot [
       "modules/home/"
     ])

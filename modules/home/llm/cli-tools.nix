@@ -14,7 +14,7 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    config.${namespace}.llm.fabric = true;
+    ${namespace}.llm.fabric.enable = true;
     home = {
       packages = lib.attrValues {
         inherit (pkgs.unstable)
