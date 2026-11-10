@@ -83,11 +83,13 @@ in
         shellAliases =
           let
             gumSpinner = msg: cmd: "gum spin --spinner dot --title \"靈 ${msg}\" -- sh -c \"${cmd}\"";
-            # Pre-populates the cli for you to run the command
-            prepCmdLine = str: "print -z $(${str})";
+            # Pre-populates the cli for you to tweak and then run the command
+            prepCmdLine = str: "print -r -z \"\$(IFS=; echo \"\$(${str})\")\"";
           in
           {
             ling = gumSpinner "靈: 思考一下..." "fabric -- ";
+            # Allow tweaking args
+            lingx = gumSpinner "靈: 思考一下..." "fabric ";
             "lgcs" = prepCmdLine (
               gumSpinner "Generating commit message..." "git diff --cached | fabric -p git_staged_commit"
             ); # Auto git commit staged
