@@ -55,7 +55,14 @@ in
 {
   # This is required here now because introdus stopped using mkInstallModule,
   # otherwise introdus will infinite recurse
-  imports = [ inputs.fidgetingvim.wrappers.neovim.install ];
+  imports = [
+    (
+      if osConfig.hostSpec.isDevelopment then
+        inputs.fidgetingvim.wrappers.neovim.install
+      else
+        inputs.fidgetingvim-git.wrappers.neovim.install
+    )
+  ];
 
   home.packages = lib.optionals osConfig.hostSpec.isDevelopment [ nvim-debug ];
 
