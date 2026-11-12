@@ -339,7 +339,6 @@
 
     pwndbg = {
       url = "github:pwndbg/pwndbg";
-
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
@@ -370,8 +369,16 @@
       flake = false;
     };
 
+    fidgetingvim-git = {
+      url = "github:fidgetingbits/neovim";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      inputs.introdus.follows = "introdus";
+      inputs.flake-parts.follows = "flake-parts";
+      inputs.wrappers.follows = "wrappers";
+    };
+
     fidgetingvim = {
-      url = "path:///home/aa/dev/nix/neovim";
+      url = "git+file:///home/aa/dev/nix/neovim";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
       inputs.introdus.follows = "introdus";
       inputs.flake-parts.follows = "flake-parts";
@@ -383,7 +390,7 @@
     };
 
     introdus = {
-      url = "path:///home/aa/dev/nix/introdus/aa";
+      url = "git+file:///home/aa/dev/nix/introdus/aa";
     };
     neovim-nightly-overlay = {
       url = "github:nix-community/neovim-nightly-overlay";
