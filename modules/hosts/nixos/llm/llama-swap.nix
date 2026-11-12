@@ -187,14 +187,15 @@ let
           model = modelPath;
           inherit servedModelName;
           context = ctx;
-          minDraftTokens = 1;
           inherit think;
           reasoningEffort = "low"; # FIXME:
           preserveThinking = "on";
           cacheDisk = cachePath;
           cacheDiskBytes = 8589934592;
           cacheDiskStagingBytes = 8589934592;
-          extraArgs = [ "--log-progress" ];
+          extraArgs = [
+            "--log-progress"
+          ];
         }
         // extraAttrs
       );
@@ -243,9 +244,8 @@ let
           servedModelName = "Qwen 3.8 27B (Heavy)";
           alias = "qwen3.8:27b";
           extraAttrs = {
-            mtpModel = "${modelsPath}/MTP/mtp-Qwen3.8-27B-Q4_0.gguf";
+            # mtpModel = "${modelsPath}/MTP/mtp-Qwen3.8-27B-Q4_0.gguf";
             speculative = "dflash2";
-            draftTokens = 7;
             dflashModel = "${modelsPath}/Qwen3.8-27B-DFlash2-Q4_K_M.gguf";
           };
         };
@@ -287,21 +287,6 @@ let
         ##
         # QWEN
         ##
-
-        # 2026-08-31
-        # strix halo: pp 120.59 t/s tg 10.14 t/s
-        # strix point:
-        "Qwen 3.8 27B (Heavy)" = mkModel {
-          hf = "unsloth/Qwen3.8-27B-GGUF:UD-Q5_K_XL";
-          kv = "q8_0";
-          sampling = [
-            "--temp 1.0"
-            "--top_p 0.95"
-            "--top_k 20 "
-          ];
-          thinking = true;
-          alias = "qwen3.8:27b-q5";
-        };
 
         # strix halo: pp 71.79 t/s, tg 58.24 t/s
         # strix point: pp 36.59 t/s, tg 20.18 t/s
@@ -505,6 +490,7 @@ in
         internal = true;
         description = "Default models for use on this service. Referenced by other client tools (librechat, neovim, etc)";
       };
+
       preload = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [ ];
@@ -665,6 +651,14 @@ in
             subDomain = "llm";
             port = ports.tcp.llama-swap;
             ssl = false;
+            extraLocationSettings = {
+              extraConfig = ''
+                client_max_body_size 50000M;
+                proxy_read_timeout   600s;
+                proxy_send_timeout   600s;
+                send_timeout         600s;
+              '';
+            };
           }
         ];
       };
