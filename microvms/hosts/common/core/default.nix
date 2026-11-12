@@ -145,6 +145,8 @@ in
         }
       ];
     };
+    # We use sshKeyPath as per above, so don't auto-generate if it fails
+    systemd.services.sshd-keygen.enable = false;
 
     networking.firewall.allowedTCPPorts = [ sshPort ];
 
@@ -203,6 +205,7 @@ in
       # into that is to run `NIX_CONFIG="builders =" jr` to avoid using the
       # remote builders for this build
       storeOnDisk = true;
+      writableStoreOverlay = "/nix/.rw-store";
 
       # Persistent volumes (stored in /var/lib/microvms/<name>/)
       # FIXME: These will need to be optional, so some microvms are ramfs only,
