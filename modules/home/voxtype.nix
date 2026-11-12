@@ -9,6 +9,7 @@
 }:
 let
   cfg = config.${namespace}.dictation;
+  defaultModels = osConfig.${namespace}.services.llama-swap.defaultModels;
   llamaSwapPort = osConfig.hostSpec.networking.ports.tcp.llama-swap;
   summaryEndpointPort = osConfig.hostSpec.networking.ports.tcp.voxtype-summary-api;
   meetingSummaryEndpoint =
@@ -31,7 +32,7 @@ let
             prompt_text = data.get("prompt", "")
 
             payload = {
-                "model": "gemma-4:26b-a4b-q6",
+                "model": "${defaultModels."oedo".heavy}",
                 "messages": [
                     {"role": "user", "content": prompt_text}
                 ],
@@ -57,76 +58,98 @@ in
   imports = [ inputs.voxtype.homeManagerModules.default ];
 
   config = lib.mkIf cfg.enable {
-    programs.voxtype = {
-      enable = true;
-      service.enable = true;
+    programs = {
+      voxtype = {
+        enable = true;
+        service.enable = true;
 
-      # Only using this on AMD systems atm (NOTE: rocm crashes)
-      # package = inputs.voxtype.packages.${pkgs.stdenv.hostPlatform.system}.vulkan;
-      package = inputs.voxtype.packages.${pkgs.stdenv.hostPlatform.system}.onnx-migraphx;
+        # Only using this on AMD systems atm (NOTE: rocm crashes)
+        # package = inputs.voxtype.packages.${pkgs.stdenv.hostPlatform.system}.vulkan;
+        package = inputs.voxtype.packages.${pkgs.stdenv.hostPlatform.system}.onnx-migraphx;
 
-      # FIXME: there is an alibaba model that does chinese/english, which we may want to situationally have?
-      settings = {
-        # We need onnx-migraphx for ml diaraization, but that means only parakeet gets GPU acceleration
-        # NOTE: 1) You will have to run voxtype setup to download the model
-        # NOTE: 2) The first run will compile a kernel, so will still seem slow
-        engine = "parakeet";
-        # engine = "whisper"; Enable if using vulkan and not onnx-migraphx
-        whisper = {
-          model = "base.en";
-          language = "en";
-        };
-
-        parakeet = {
-          # English only: parakeet-unified-en-0.6b
-          # Multi-language: parakeet-tdt-0.6b-v3
-          # model = "parakeet-unified-en-0.6b";
-          model = "parakeet-tdt-0.6b-v3";
-          model_type = "tdt";
-        };
-
-        meeting = {
-          enabled = true;
-          summary = {
-            backend = "remote";
-            remote_endpoint = "http://localhost:${toString summaryEndpointPort}/api/summarize";
-            remote_api_key = "foo";
+        # FIXME: there is an alibaba model that does chinese/english, which we may want to situationally have?
+        settings = {
+          # We need onnx-migraphx for ml diaraization, but that means only parakeet gets GPU acceleration
+          # NOTE: 1) You will have to run voxtype setup to download the model
+          # NOTE: 2) The first run will compile a kernel, so will still seem slow
+          engine = "parakeet";
+          # engine = "whisper"; Enable if using vulkan and not onnx-migraphx
+          whisper = {
+            model = "base.en";
+            language = "en";
           };
-          diarization = {
+
+          parakeet = {
+            # English only: parakeet-unified-en-0.6b
+            # Multi-language: parakeet-tdt-0.6b-v3
+            # model = "parakeet-unified-en-0.6b";
+            model = "parakeet-tdt-0.6b-v3";
+            model_type = "tdt";
+          };
+
+          meeting = {
             enabled = true;
-            backend = "ml";
-          };
-        };
-
-        output = {
-          mode = "type";
-          fallback_to_clipboard = true;
-
-          notifications = {
-            on_recording_start = true;
-            on_recording_stop = true;
-            on_transcription = false;
-          };
-        };
-        text = {
-          spoken_punctuation = true;
-          replacements = {
-            "Vox type" = "voxtype";
-            "Neary" = "niri";
-            "Entalia" = "noctalia";
-            "Neo Vim" = "neovim";
-            "pre shared" = "pre-shared";
-            "wire guard" = "wireguard";
-            "lama swap" = "llama-swap";
-            "lamaswap" = "llama-swap";
-            "omypy" = "oh-my-pi";
-            "Natalia's" = "noctalia's";
-            "intradice" = "introdus";
+            summary = {
+              backend = "remote";
+              # Proxy through earlier meetingSummaryEndpoint server from earlier
+              remote_endpoint = "http://localhost:${toString summaryEndpointPort}/api/summarize";
+              remote_api_key = "foo";
+            };
+            diarization = {
+              enabled = true;
+              backend = "ml";
+            };
           };
 
+          output = {
+            mode = "type";
+            fallback_to_clipboard = true;
+
+            notifications = {
+              on_recording_start = true;
+              on_recording_stop = true;
+              on_transcription = false;
+            };
+          };
+          text = {
+            spoken_punctuation = true;
+            replacements = {
+              "Vox type" = "voxtype";
+              "Neary" = "niri";
+              "Entalia" = "noctalia";
+              "Neo Vim" = "neovim";
+              "pre shared" = "pre-shared";
+              "wire guard" = "wireguard";
+              "lama swap" = "llama-swap";
+              "lamaswap" = "llama-swap";
+              "omypy" = "oh-my-pi";
+              "Natalia's" = "noctalia's";
+              "intradice" = "introdus";
+            };
+
+          };
+          # using noctalia plugin
+          osd.enabled = false;
         };
-        # using noctalia plugin
-        osd.enabled = false;
+      };
+      zsh = {
+        shellAliases = {
+          "vml" = "voxtype meeting list";
+          "vme" = "voxtype meeting export --speakers --metadata latest";
+          "vms" = "voxtype meeting summarize latest";
+        };
+        initContent =
+          lib.mkAfter # bash
+            ''
+              voxtype() {
+                if [[ "$1 $2" == "meeting export" ]]; then
+                  shift 2
+                  command voxtype meeting export --speakers --metadata "$@"
+                else
+                  command voxtype "$@"
+                fi
+              }
+            '';
       };
     };
 
