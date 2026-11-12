@@ -95,7 +95,7 @@ update-all:
     just update
     for lock in $(ls locks/); do
         # This can fail if a lock file didn't actually update, so discard result
-        : cp locks/$HOST.lock locks/$lock 2>/dev/null
+        cp locks/$HOST.lock locks/$lock 2>/dev/null || true
     done
 
 # Update and then rebuild
