@@ -16,8 +16,8 @@
     BOOTSTRAP_USER = "aa";
     BOOTSTRAP_SSH_PORT = "10022";
     BOOTSTRAP_SSH_KEY = "/home/aa/.ssh/id_yubikey";
-    NIX_SECRETS_DIR = "/home/aa/dev/nix/nix-secrets";
-    INTRODUS_DIR = "/home/aa/dev/nix/introdus/aa";
+    NIX_SECRETS_DIR = "/home/aa/dev/nix/config/nix-secrets";
+    INTRODUS_DIR = "/home/aa/dev/nix/config/introdus";
 
     buildInputs = checks.pre-commit-check.enabledPackages;
     nativeBuildInputs =

@@ -12,9 +12,9 @@ function talon_folders() {
 
 # Not all of these will exist on every system, but we deal with that later
 repo_paths=(
-    "$HOME/dev/nix/nix-config"
-    "$HOME/dev/nix/nixvim-flake"
-    "$HOME/dev/nix/nix-secrets"
+    "$HOME/dev/nix/config/nix-config"
+    "$HOME/dev/nix/config/neovim"
+    "$HOME/dev/nix/config/nix-secrets"
 )
 
 while IFS= read -r line; do

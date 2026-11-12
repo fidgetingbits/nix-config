@@ -9,6 +9,7 @@ let
   devTalon = "${devFolder}/talon";
   devNix = "${devFolder}/nix";
   devPublic = "~/public/source/";
+  devConfig = "${devNix}/config";
 in
 {
   whichreal = ''function _whichreal(){ (alias "$1" >/dev/null 2>&1 && (alias "$1" | sed "s/.*=.\(.*\).../\1/" | xargs which)) || which "$1"; }; _whichreal'';
@@ -111,14 +112,18 @@ in
   cwp = "cd wiki/personal";
   cdb = "cd dev/blog";
 
-  ## nix
-  cnc = "cd ${devNix}/nix-config";
-  cnn = "cd ${devNix}/neovim";
-  cns = "cd ${devNix}/nix-secrets";
+  ## nix config
+  cnb = "cd  ${devConfig}";
+  cnc = "cd  ${devConfig}/nix-config";
+  cnn = "cd  ${devConfig}/neovim";
+  cns = "cd  ${devConfig}/nix-secrets";
+  cni = "cd  ${devConfig}/introdus";
+  cna = "cd  ${devConfig}/nix-assets";
+  cnin = "cd ${devConfig}/introdus/wrappers/neovim";
+
+  ## other nix forks
   cnh = "cd ${devNix}/nixos-hardware";
   cnp = "cd ${devNix}/nixpkgs";
-  cni = "cd ${devNix}/introdus/aa";
-  cnin = "cd ${devNix}/introdus/aa/wrappers/neovim";
   cne = "cd ${devNix}/emergentmind-nix-config";
   cpn = "cd ${devPublic}/nix";
 

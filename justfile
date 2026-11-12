@@ -37,7 +37,7 @@ rebuild-post: check-sops
 
 [group("dev")]
 update-neovim-flake-inputs:
-    cd ~/dev/nix/neovim && nix flake update introdus
+    cd ~/dev/nix/config/neovim && nix flake update introdus
 
 # Run a flake check on the config and installer
 [group("checks")]

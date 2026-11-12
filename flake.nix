@@ -360,7 +360,7 @@
     #################### Personal ####################
     nix-secrets = {
       url = "git+ssh://olan-forge/fidgetingbits/nix-secrets.git";
-      # url = "path:///home/aa/dev/nix/nix-secrets";
+      # url = "path:///home/aa/dev/nix/config/nix-secrets";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -378,7 +378,7 @@
     };
 
     fidgetingvim = {
-      url = "git+file:///home/aa/dev/nix/neovim";
+      url = "git+file:///home/aa/dev/nix/config/neovim";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
       inputs.introdus.follows = "introdus";
       inputs.flake-parts.follows = "flake-parts";
@@ -390,7 +390,7 @@
     };
 
     introdus = {
-      url = "git+file:///home/aa/dev/nix/introdus/aa";
+      url = "git+file:///home/aa/dev/nix/config/introdus";
     };
     neovim-nightly-overlay = {
       url = "github:nix-community/neovim-nightly-overlay";
