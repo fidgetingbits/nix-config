@@ -78,46 +78,67 @@ in
         enableZshIntegration = true;
         # enablePatternsAliases = true;
       };
-
       zsh = {
-        shellAliases =
+        shellAliases = {
+          "lgcm" = "_lgcm";
+          "lgcs" = "_lgcs"; # staged diff -> commit message pushed into the next command line
+          # "lgcS" = "git diff --cached | fabric -p git_staged_commit"; # Auto git commit single (all in one)
+        };
+        initContent =
           let
-            gumSpinner = msg: cmd: "gum spin --spinner dot --title \"靈 ${msg}\" -- sh -c \"${cmd}\"";
-            # Pre-populates the cli for you to tweak and then run the command
-            prepCmdLine = str: "print -r -z \"\$(IFS=; echo \"\$(${str})\")\"";
+            gum = msg: ''gum spin --spinner dot --title "靈 ${msg}"'';
+            # spinner + sh wrapper: streams output to the tty and passes the
+            # function's args through (the `_` becomes sh's $0, the rest $1...)
+            spin = msg: cmd: ''${gum msg} -- sh -c '${cmd} > /dev/tty' _ "$@"'';
+            spinOut = msg: cmd: ''out="$(${gum msg} --show-output -- ${cmd})"'';
           in
-          {
-            ling = gumSpinner "靈: 思考一下..." "fabric -- ";
-            # Allow tweaking args
-            lingx = gumSpinner "靈: 思考一下..." "fabric ";
-            "lgcs" = prepCmdLine (
-              gumSpinner "Generating commit message..." "git diff --cached | fabric -p git_staged_commit"
-            ); # Auto git commit staged
-            "lgcm" = "print -z $(git diff | fabric -p git_commit_multiple)"; # Auto git commit multiple
-            # "lgcS" = "git diff --cached | fabric -p git_staged_commit"; # Auto git commit single (all in one)
-          };
-        initContent = # bash
+          # bash
           ''
-            _fabric_patterns() {
-              local -a patterns
-              # Split `fabric -l` on newlines; drop blanks and the "Found existing alias…"
-              # notice (the only line with spaces).
-              patterns=("''${(@f)$(fabric -l 2>/dev/null)}")
-              patterns=(''${patterns:#'''})
-              patterns=(''${patterns:#* *})
-              (( ''${#patterns} )) || return
-              _describe 'fabric patterns' patterns
-            }
+              _fabric_patterns() {
+                local -a patterns
+                # Split `fabric -l` on newlines; drop blanks and the "Found existing alias…"
+                # notice (the only line with spaces).
+                patterns=("''${(@f)$(fabric -l 2>/dev/null)}")
+                patterns=(''${patterns:#'''})
+                patterns=(''${patterns:#* *})
+                (( ''${#patterns} )) || return
+                _describe 'fabric patterns' patterns
+              }
 
-            _fabric() {
-              local prev_idx=$((CURRENT - 1))
-              if [[ ''${words[prev_idx]} == "-p" ]]; then
-                _fabric_patterns
-              else
-                _default
-              fi
-            }
-            compdef _fabric fabric
+              _fabric() {
+                local prev_idx=$((CURRENT - 1))
+                if [[ ''${words[prev_idx]} == "-p" ]]; then
+                  _fabric_patterns
+                else
+                  _default
+                fi
+              }
+              compdef _fabric fabric
+
+              # answer output to the terminal
+              ling() {
+                (( $# )) || { print -u2 -- "usage: ling <prompt>"; return 1; }
+                ${spin "思考一下..." ''fabric -- "$@"''}
+              }
+
+              # answer pushed into the next command line
+              lingx() {
+                (( $# )) || { print -u2 -- "usage: lingx <prompt>"; return 1; }
+                local out
+                ${spinOut "靈: 思考一下..." ''fabric -- "$@"''}
+                print -rz -- "$out"
+              }
+
+              # staged diff -> commit message pushed into the next command line
+              _lgcs() {
+                local out
+                ${spinOut "Generating commit message..." "sh -c 'git diff --cached | fabric -p git_staged_commit'"}
+                print -rz -- "$out"
+              }
+
+            _lgcm() {
+                ${spin "Generating commit message..." "{ git diff; echo; git status --porcelain; } | fabric -p git_commit_multiple"}
+              }
           '';
       };
     };
