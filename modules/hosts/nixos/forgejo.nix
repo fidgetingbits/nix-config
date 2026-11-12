@@ -29,6 +29,28 @@ in
       default = "git.${config.hostSpec.domain}";
       description = "Use a simplified domain as root, instead of git.<hostName>.<domain>";
     };
+    appName = lib.mkOption {
+      type = lib.types.str;
+      default = "FidgetingGit";
+      description = "";
+    };
+    appSlogan = lib.mkOption {
+      type = lib.types.str;
+      default = "Like lieutenant Dan we rollin'";
+      description = "";
+    };
+
+    # NOTE: Forgejo doesn't allow creation of an account named "admin"
+    adminUser = lib.mkOption {
+      type = lib.types.str;
+      default = config.hostSpec.primaryUsername;
+      description = "";
+    };
+    adminEmail = lib.mkOption {
+      type = lib.types.str;
+      default = "admin@${config.hostSpec.domain}";
+      description = "";
+    };
   };
   config =
     let
@@ -77,14 +99,14 @@ in
                 HTTP_ADDR = "127.0.0.1"; # Accessed via nginx proxy
                 DOMAIN = config.hostSpec.domain;
                 # You need to specify this to remove the port from URLs in the web UI.
-                ROOT_URL = cfg.rootURL;
+                ROOT_URL = "https://${cfg.rootURL}/";
                 HTTP_PORT = forgejoPort;
                 DISABLE_SSH = false;
                 SSH_PORT = sshPort;
               };
               DEFAULT = {
-                APP_NAME = "FidgetingGit";
-                APP_SLOGAN = "Like lieutenant Dan we rollin'";
+                APP_NAME = cfg.appName;
+                APP_SLOGAN = cfg.appSlogan;
               };
               service.DISABLE_REGISTRATION = true;
               session.COOKIE_SECURE = true;
@@ -93,7 +115,13 @@ in
                 ENABLED = true;
                 DEFAULT_ACTIONS_URL = "github";
               };
-              mailer = lib.optionalAttrs cfg.mailer {
+
+              repository = {
+                FORCE_PRIVATE = true;
+              };
+            }
+            // lib.optionalAttrs cfg.mailer {
+              mailer = {
                 ENABLED = true;
                 SMTP_ADDR = config.hostSpec.email.internalServer;
                 PROTOCOL = "smtp+starttls";
@@ -102,8 +130,9 @@ in
                 USER = config.hostSpec.hostName;
                 SEND_AS_PLAIN_TEXT = true;
               };
-
-              ui = lib.optionalAttrs cfg.theme {
+            }
+            // lib.optionalAttrs cfg.theme {
+              ui = {
                 THEMES =
                   theme
                   |> lib.readDir
@@ -127,10 +156,9 @@ in
           # From nix wiki. Ensure user is setup
           systemd.services.forgejo.postStart =
             let
-              forgejo = "${lib.getExe config.services.forgejo.package} admin user";
+              forgejo = "${lib.getExe config.services.forgejo.package} --config ${config.services.forgejo.stateDir}/custom/conf/app.ini";
               passFile = config.sops.secrets."passwords/forgejo/admin".path;
-              adminUser = config.hostSpec.primaryUsername; # NOTE: Forgejo doesn't allow creation of an account named "admin"
-              adminEmail = "admin@${config.hostSpec.domain}";
+              inherit (cfg) adminUser adminEmail;
             in
             # bash
             ''

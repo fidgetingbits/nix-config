@@ -119,6 +119,8 @@ in
       enable = true;
       mailer = false;
       theme = false;
+      adminUser = "fidgetingbits";
+      adminEmail = "forgejo-admin@${config.hostSpec.domain}";
       #rootURL = "git.${config.hostSpec.hostName}.${config.hostSpec.domain}";
     };
   };
