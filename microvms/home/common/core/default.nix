@@ -36,6 +36,7 @@
         neovim # FIXME: (overlay our neovim package, etc?)
         strace
         wget
+        zoxide
         ;
     };
   };
@@ -48,6 +49,24 @@
       enable = true;
       shellAliases = {
         "cds" = "cd ${vmSpecs.sharedDir}/shared/$(hostname)/";
+      };
+
+      oh-my-zsh = {
+        enable = true;
+        plugins = [
+          "grc" # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/grc
+          "eza" # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/eza/
+          "cp" # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/cp
+          "git" # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/git
+          "zoxide" # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/zoxide
+          "systemd" # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/systemd
+          "colored-man-pages" # # https://github.com/ohmyzsh/ohmyzsh/blob/master/plugins/colored-man-pages/colored-man-pages.plugin.zsh
+
+        ];
+        extraConfig = ''
+          # Disable built-in git aliases, as I prefer my own
+          zstyle ':omz:plugins:git' aliases no
+        '';
       };
     };
   };
