@@ -187,7 +187,7 @@ in
     microvm = {
       hypervisor = "qemu";
       vcpu = 2;
-      mem = 4096;
+      mem = 8192;
       balloon = true;
 
       # IMPORTANT: This is needed if you want microvm cli command to work
@@ -205,7 +205,11 @@ in
       # into that is to run `NIX_CONFIG="builders =" jr` to avoid using the
       # remote builders for this build
       storeOnDisk = true;
-      writableStoreOverlay = "/nix/.rw-store";
+      # Note /nix is too small on the vm for meaningful installs,
+      # so need something that balloons
+      writableStoreOverlay = "/var/nix/.rw-store";
+      # NOTE: upper lives on the persistent 100G /var volume — the tmpfs root
+      # (50% of RAM) fills up and is wiped on reboot.
 
       # Persistent volumes (stored in /var/lib/microvms/<name>/)
       # FIXME: These will need to be optional, so some microvms are ramfs only,

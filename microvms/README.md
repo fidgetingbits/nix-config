@@ -10,6 +10,31 @@ routing bug where you can't connect to the network otherwise.
 microvm -s <name> -- -i ~/.ssh/id_ed25519
 ```
 
+### Temporary internet access
+
+If you need temporarily give an offline microvm access for some reason you can add a local rule like this:
+
+FIXME: Should make helpers for this maybe?
+
+```bash
+ sudo nft add rule inet vm_routing forward iifname vbr-microvms ip saddr 10.0.6.3 oifname vm-vpn accept
+```
+
+Then remove it you need to find the handle, so you'll see something like this in the forward chain from `nftls`:
+
+
+```
+iifname "vbr-microvms" ip saddr 10.0.6.3 oifname "vm-vpn" accept # handle 12
+```
+
+Then you can delete it by handle:
+```bash
+sudo nft delete rule inet vm_routing forward handle 12
+```
+
+
+
+
 ## New Microvm
 
 Remember to:
