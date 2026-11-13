@@ -3,10 +3,12 @@
   osConfig,
   lib,
   secrets,
+  pkgs,
   ...
 }:
 let
   home = config.home.homeDirectory;
+  tomlFormat = pkgs.formats.toml { };
 in
 {
   introdus.gitDev = {
@@ -121,4 +123,11 @@ in
 
     };
   };
+
+  home.file = {
+    ".config/worktrunk/config.toml".source = tomlFormat.generate "worktrunk-config.toml" {
+      worktree-path = "~/dev/nix/agents/{{ repo }}/{{ branch | sanitize }}";
+    };
+  };
+
 }
