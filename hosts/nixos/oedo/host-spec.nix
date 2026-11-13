@@ -23,7 +23,7 @@ in
     useWayland = true;
     defaultDesktop = "niri-uwsm";
 
-    isAmdGpu = true;
+    isAMDGpu = true;
     useRocm = (lib.mkOverride 100) true;
     rocmTarget = "gfx1151";
   };

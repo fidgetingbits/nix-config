@@ -253,17 +253,12 @@
           default = false;
           description = "Indicate system has a AMD GPUs";
         };
-        useVulkan = lib.mkOption {
+        useRocm = lib.mkOption {
           type = lib.types.bool;
           default = config.hostSpec.isAMDGpu;
           description = "On systems with AMD GPUs indicates if we should use rocm or vulkan";
         };
-        useRocm = lib.mkOption {
-          type = lib.types.bool;
-          default = config.hostSpec.isAMDGpu && (!config.hostSpec.useVulkan);
-          description = "On systems with AMD GPUs indicates if we should use rocm or vulkan";
-        };
-        rocmtarget = lib.mkOption {
+        rocmTarget = lib.mkOption {
           type = lib.types.str;
           example = "gfx1201";
           description = "AMD GPU target name";

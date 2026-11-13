@@ -12,7 +12,7 @@
     isAutoStyled = (lib.mkOverride 100) true;
     isProduction = (lib.mkOverride 100) true;
 
-    isAmdGpu = true;
+    isAMDGpu = true;
     useRocm = (lib.mkOverride 100) true;
     rocmTarget = "gfx1150";
 

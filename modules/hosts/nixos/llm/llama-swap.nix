@@ -46,8 +46,8 @@ let
   llama-cpp =
     let
       amdSettings = {
-        rocmSupport = !config.hostSpec.useVulkan;
-        vulkanSupport = config.hostSpec.useVulkan;
+        rocmSupport = config.hostSpec.useRocm;
+        vulkanSupport = !config.hostSpec.useRocm;
         # Enable BLAS for optimized CPU layer performance (OpenBLAS)
         # This is crucial for models using split-mode or CPU offloading
         blasSupport = true;
