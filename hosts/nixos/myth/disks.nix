@@ -1,7 +1,7 @@
 { lib, ... }:
 {
   system.disks = {
-    primary = "/dev/disk/by-id/mmc-SCA64G_0x56567305";
+    primary = "/dev/disk/by-id/mmc-DV4064_0x6101b932";
     swapSize = "2G";
     bootSize = "512M";
     raidLevel = 5;
