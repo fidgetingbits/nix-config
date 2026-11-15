@@ -1,7 +1,6 @@
 # Generate local llm provider lists
 {
   config,
-  osConfig,
   lib,
   namespace,
   inputs,
