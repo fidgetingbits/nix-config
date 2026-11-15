@@ -92,10 +92,10 @@
     }
   );
 
-  # NOTE: This is a hack to allow us to keep using the default tldr custom page folder
-  # but add in the backup notes NixOS.
+  # The borg-backup tldr page (documented in the backup module) is installed
+  # into the default tealdeer custom-page folder.
   home.file.".local/share/tealdeer/pages/borg-backup.page.md".source =
-    "/run/current-system/sw/share/tldr/borg-backup.page.md";
+    ../../../modules/hosts/nixos/backup/borg-backup.page.md;
   programs = {
     bash.enable = true;
     home-manager.enable = true;
