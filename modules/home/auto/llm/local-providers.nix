@@ -64,13 +64,16 @@ in
   # FIXME: We should assert that the model exists in the models array for the defaultProvider
   options.${namespace}.llm =
     let
-      inherit (osConfig.${namespace}.services.llama-swap) defaultModels;
       inherit (config.${namespace}.llm) defaultProvider;
+      # The default model is the "heavy" matrix entry of the default
+      # provider host's llama-swap.
+      defaultModels =
+        inputs.self.nixosConfigurations.${defaultProvider}.config.services.llama-swap.settings.matrix.vars;
     in
     {
       defaultModel = lib.mkOption {
         type = lib.types.str;
-        default = defaultModels."${defaultProvider}".heavy;
+        default = defaultModels.heavy;
         example = "foo";
         description = "The default model to use in cli tools (ie: llm, fabric). See llama-swap for list";
       };
