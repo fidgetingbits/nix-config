@@ -15,7 +15,7 @@ in
       type = lib.types.bool;
       # Enabled when any nginxProxy service is defined — each one requests
       # an ACME cert for its subdomain.
-      default = lib.length config.services.nginxProxy.services > 0;
+      default = lib.length config.${namespace}.services.nginxProxy.services > 0;
       description = "Enable acme cert handling";
     };
   };

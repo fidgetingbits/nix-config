@@ -4,6 +4,7 @@
   lib,
   pkgs,
   inputs,
+  namespace,
   ...
 }:
 let
@@ -30,10 +31,10 @@ let
       fastfetch -c ${./config.jsonc}
     '';
   };
-  cfg = config.system.ssh-motd;
+  cfg = config.${namespace}.system.ssh-motd;
 in
 {
-  options.system.ssh-motd = {
+  options.${namespace}.system.ssh-motd = {
     enable = lib.mkEnableOption "ssh motd";
     # FIXME: Make this a folder where you can cycle random entries
     banner = lib.mkOption {

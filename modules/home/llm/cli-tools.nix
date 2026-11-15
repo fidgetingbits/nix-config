@@ -14,7 +14,14 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    ${namespace}.llm.fabric.enable = true;
+    ${namespace} = {
+      llm.fabric.enable = true;
+      # python cli tool for quick prompt-based outputs
+      #  see ./llm-cli.nix
+      programs.llm = {
+        enable = true;
+      };
+    };
     home = {
       packages = lib.attrValues {
         inherit (pkgs.unstable)
@@ -26,13 +33,6 @@ in
       };
     };
 
-    programs = {
-      # python cli tool for quick prompt-based outputs
-      #  see ./llm-cli.nix
-      llm = {
-        enable = true;
-      };
-    };
   };
 
 }

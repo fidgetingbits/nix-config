@@ -98,7 +98,7 @@ in
     };
   };
 
-  services.nginxProxy.services = [
+  ${namespace}.services.nginxProxy.services = [
     {
       subDomain = "librechat"; # Creates librechat.host.domain
       # extraDomains = [ "search.${config.hostSpec.domain}" ];

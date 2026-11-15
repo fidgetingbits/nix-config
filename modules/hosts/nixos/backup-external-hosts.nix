@@ -19,7 +19,7 @@ in
       primary host. It works by wrapping backup tools already enabled to back
       up the primary host.
 
-      IMPORTANT: This module builds off of config.services.backup settings, so
+      IMPORTANT: This module builds off of config.${namespace}.services.backup settings, so
       its defaults are used as a baseline for the tools run here. It currently
       re-uses the passphrase for backing up the primary host, to encrypt the
       external host data.
@@ -206,8 +206,8 @@ in
 
       assertions = [
         {
-          assertion = config.services.backup.enable;
-          message = "The config.services.backup service must be enabled in order to backup external hosts, as the configs are related.";
+          assertion = config.${namespace}.services.backup.enable;
+          message = "The config.${namespace}.services.backup service must be enabled in order to backup external hosts, as the configs are related.";
         }
       ];
     }

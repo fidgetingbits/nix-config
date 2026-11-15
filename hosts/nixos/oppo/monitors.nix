@@ -1,6 +1,6 @@
-_: {
+{ namespace, ... }: {
   # LG Electronics LG TV SSCR2
-  monitors = {
+  ${namespace}.monitors = {
     "HDMI-1" = {
       width = 3840;
       height = 2160;

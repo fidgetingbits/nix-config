@@ -3,6 +3,7 @@
   osConfig,
   lib,
   pkgs,
+  namespace,
   ...
 }:
 let
@@ -55,7 +56,7 @@ in
         #NOTE: Defining output here is problematic on laptops that may or may not have an external monitor plugged in.
         # If all potential monitors are defined here but not all of them are plugged in, waybar doesn't display on any monitor.
         # with `output` unspecified, waybar will output to all plugged in monitors
-        #output = (map (m: "${m.name}") (osConfig.monitors));
+        #output = (map (m: "${m.name}") (osConfig.${namespace}.monitors));
 
         modules-left = [
           "hyprland/workspaces"

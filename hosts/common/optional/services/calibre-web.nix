@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  namespace,
   ...
 }:
 let
@@ -16,7 +17,7 @@ in
     options.enableKepubify = true;
   };
 
-  services.nginxProxy.services = [
+  ${namespace}.services.nginxProxy.services = [
     {
       subDomain = "books";
       extraDomains = [ "books.${config.hostSpec.domain}" ];

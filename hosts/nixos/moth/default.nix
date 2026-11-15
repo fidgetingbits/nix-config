@@ -123,6 +123,12 @@ in
       adminEmail = "forgejo-admin@${config.hostSpec.domain}";
       #rootURL = "git.${config.hostSpec.hostName}.${config.hostSpec.domain}";
     };
+    services.nginxProxy = {
+      defaultAllowList = [
+        grove.cidr # FIXME:
+      ];
+      defaultDenyList = [ "all" ];
+    };
   };
 
   # Temporary add auditd to monitor folder disappearance
@@ -159,10 +165,4 @@ in
     '';
   };
 
-  services.nginxProxy = {
-    defaultAllowList = [
-      grove.cidr # FIXME:
-    ];
-    defaultDenyList = [ "all" ];
-  };
 }

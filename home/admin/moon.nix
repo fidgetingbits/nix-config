@@ -1,5 +1,6 @@
 {
   lib,
+  namespace,
   ...
 }:
 {
@@ -18,7 +19,7 @@
 
   };
 
-  system.ssh-motd.enable = true;
+  ${namespace}.system.ssh-motd.enable = true;
 
   # FIXME: stylix
   # > In /nix/store/0vm3mzhmj0qpzsn34xwy4xmy1xw572p3-stylix-kde-apply-plasma-theme/bin/stylix-kde-apply-plasma-theme line 7:

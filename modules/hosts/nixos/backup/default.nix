@@ -8,10 +8,11 @@
   pkgs,
   lib,
   config,
+  namespace,
   ...
 }:
 let
-  cfg = config.services.backup;
+  cfg = config.${namespace}.services.backup;
   hasPerNetworkServices = lib.hasAttr "per-network-services" config.services;
   hasImpermanence = config.introdus.impermanence.enable;
 
@@ -83,7 +84,7 @@ let
 
 in
 {
-  options.services.backup = {
+  options.${namespace}.services.backup = {
     enable = lib.mkEnableOption "Enable borg-based backup tooling";
     enableService = lib.mkOption {
       type = lib.types.bool;

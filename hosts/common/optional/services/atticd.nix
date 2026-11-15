@@ -12,7 +12,20 @@
       atticPort = config.hostSpec.networking.ports.tcp.atticd;
     in
     {
-      ${namespace}.services.nginx.enable = true;
+      ${namespace} = {
+        services.nginx.enable = true;
+        services.nginxProxy.services = [
+          {
+            subDomain = "atticd";
+            port = atticPort;
+            ssl = false;
+            # Avoids 413 Request Entity Too Large
+            extraLocationSettings = {
+              extraConfig = "client_max_body_size 0;";
+            };
+          }
+        ];
+      };
       sops.secrets = {
         "tokens/attic" = {
           sopsFile = "${sopsFolder}/${config.hostSpec.hostName}.yaml";
@@ -75,17 +88,6 @@
         };
       };
 
-      services.nginxProxy.services = [
-        {
-          subDomain = "atticd";
-          port = atticPort;
-          ssl = false;
-          # Avoids 413 Request Entity Too Large
-          extraLocationSettings = {
-            extraConfig = "client_max_body_size 0;";
-          };
-        }
-      ];
 
     };
 }

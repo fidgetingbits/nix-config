@@ -622,46 +622,48 @@ in
         };
       };
 
-      networking.granularFirewall = lib.optionalAttrs ((lib.length cfg.allowedHosts) != 0) (
-        let
-          hosts = lib.map (d: cfg.hosts.${d}) cfg.allowedHosts;
-        in
-        {
-          enable = true;
-          allowedRules = {
-            llama-swap = {
-              protocol = "tcp";
-              ports = [ ports.tcp.llama-swap ];
-              inherit hosts;
+      ${namespace} = {
+        networking.granularFirewall = lib.optionalAttrs ((lib.length cfg.allowedHosts) != 0) (
+          let
+            hosts = lib.map (d: cfg.hosts.${d}) cfg.allowedHosts;
+          in
+          {
+            enable = true;
+            allowedRules = {
+              llama-swap = {
+                protocol = "tcp";
+                ports = [ ports.tcp.llama-swap ];
+                inherit hosts;
+              };
             };
-          };
-        }
-      );
+          }
+        );
+        services.nginxProxy = {
+          defaultAllowList = [
+            olan.cidr
+            olan.wg-subnet.hosts.ossa.ip
+          ];
+          services = [
+            {
+              subDomain = "llm";
+              port = ports.tcp.llama-swap;
+              ssl = false;
+              extraLocationSettings = {
+                extraConfig = ''
+                  client_max_body_size 50000M;
+                  proxy_read_timeout   600s;
+                  proxy_send_timeout   600s;
+                  send_timeout         600s;
+                '';
+              };
+            }
+          ];
+        };
+      };
 
       # NOTE: We setup https reverse proxy, but also leave plain HTTP enabled for some
       # hosts. This is mostly because I don't always want every VM to have access to
       # nginx
-      services.nginxProxy = {
-        defaultAllowList = [
-          olan.cidr
-          olan.wg-subnet.hosts.ossa.ip
-        ];
-        services = [
-          {
-            subDomain = "llm";
-            port = ports.tcp.llama-swap;
-            ssl = false;
-            extraLocationSettings = {
-              extraConfig = ''
-                client_max_body_size 50000M;
-                proxy_read_timeout   600s;
-                proxy_send_timeout   600s;
-                send_timeout         600s;
-              '';
-            };
-          }
-        ];
-      };
     })
 
     (lib.mkIf cfg.enable {

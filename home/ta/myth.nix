@@ -1,6 +1,7 @@
 {
   inputs,
   lib,
+  namespace,
   ...
 }:
 {
@@ -17,5 +18,5 @@
   home.packages = lib.attrValues {
 
   };
-  system.ssh-motd.enable = true;
+  ${namespace}.system.ssh-motd.enable = true;
 }

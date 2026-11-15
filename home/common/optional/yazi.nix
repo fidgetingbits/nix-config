@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, namespace, ... }:
 {
   programs.yazi = {
     enable = true;
@@ -14,7 +14,7 @@
       preview = {
         tab_size = 4;
         image_filter = "lanczos3"; # FIXME: Double check this
-        # FIXME: These should be based on osConfig.monitors settings probably
+        # FIXME: These should be based on osConfig.${namespace}.monitors settings probably
         max_width = 1920;
         max_height = 1080;
         image_quality = 90;

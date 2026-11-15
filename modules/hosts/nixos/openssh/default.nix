@@ -9,9 +9,9 @@ let
 
   # NOTE: This slightly odd way of using both was to avoid infinite recursion. Also having both is
   # currently due to granularFirewall not supporting darwin and nftables yet
-  cfg = config.networking.granularFirewall;
+  cfg = config.${namespace}.networking.granularFirewall;
   granularFirewallRules = lib.mkIf cfg.enable {
-    networking.granularFirewall.allowedRules =
+    ${namespace}.networking.granularFirewall.allowedRules =
       lib.optionalAttrs (config.hostSpec.networking.rules ? ${config.hostSpec.hostName})
         {
           ssh = {

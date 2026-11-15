@@ -1,5 +1,5 @@
-_: {
-  monitors = {
+{ namespace, ... }: {
+  ${namespace}.monitors = {
     "eDP-1" = {
       width = 3840;
       height = 2160;

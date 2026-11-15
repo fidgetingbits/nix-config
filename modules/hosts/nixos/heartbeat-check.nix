@@ -3,10 +3,11 @@
   config,
   pkgs,
   lib,
+  namespace,
   ...
 }:
 let
-  cfg = config.services.heartbeat-check;
+  cfg = config.${namespace}.services.heartbeat-check;
   hearbeatScript = pkgs.writeScript "heartbeat.sh" ''
     #!/usr/bin/env bash
     set -euo pipefail
@@ -46,7 +47,7 @@ let
   '';
 in
 {
-  options.services.heartbeat-check = {
+  options.${namespace}.services.heartbeat-check = {
     enable = lib.mkEnableOption "Run timers to check if other systems on the LAN are still alive";
     interval = lib.mkOption {
       type = lib.types.int;

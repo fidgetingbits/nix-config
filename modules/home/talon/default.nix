@@ -2,17 +2,18 @@
   pkgs,
   config,
   lib,
+  namespace,
   ...
 }:
 let
-  cfg = config.talon;
+  cfg = config.${namespace}.talon;
 in
 # linuxPackages = lib.optional pkgs.stdenv.hostPlatform.isLinux [
 #   pkgs.xsel
 #   pkgs.xdg-utils
 # ];
 {
-  options.talon = {
+  options.${namespace}.talon = {
     enable = lib.mkEnableOption "Talon Voice features";
 
     autostart = lib.mkOption {

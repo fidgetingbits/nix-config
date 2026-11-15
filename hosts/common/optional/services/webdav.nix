@@ -2,6 +2,7 @@
 {
   config,
   lib,
+  namespace,
   ...
 }:
 let
@@ -42,7 +43,7 @@ in
     };
   };
 
-  services.nginxProxy.services = [
+  ${namespace}.services.nginxProxy.services = [
     {
       subDomain = "webdav";
       port = servicePort;

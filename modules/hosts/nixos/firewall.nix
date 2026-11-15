@@ -1,10 +1,10 @@
 # As NixOS doesn't provide a way to do more granular firewall rules, this provides a way to do so.
 # Any time you enable a service, rather than specifying the port is allowed, instead you specify the port and a list of
 # IPs you want to accept connections from
-{ config, lib, ... }:
+{ config, lib, namespace, ... }:
 
 let
-  cfg = config.networking.granularFirewall;
+  cfg = config.${namespace}.networking.granularFirewall;
   inherit (lib) types;
   # FIXME(firewall): Should we specify the interfaces?
   portConfigType = types.submodule {
@@ -36,7 +36,7 @@ let
   };
 in
 {
-  options.networking.granularFirewall = {
+  options.${namespace}.networking.granularFirewall = {
     enable = lib.mkEnableOption "Enable granular firewall rules";
     allowedRules = lib.mkOption {
       type = types.attrsOf portConfigType;

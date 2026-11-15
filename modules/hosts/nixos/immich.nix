@@ -4,15 +4,16 @@
   config,
   lib,
   pkgs,
+  namespace,
   ...
 }:
 let
-  cfg = config.services.immichML;
+  cfg = config.${namespace}.services.immichML;
   ports = config.hostSpec.networking.ports;
 in
 {
   # Extend the existing options
-  options.services.immichML = {
+  options.${namespace}.services.immichML = {
     enable = lib.mkEnableOption "Enable Immich with Machine Learning";
     # For regular immich server
     remoteMachineLearningHost = lib.mkOption {
@@ -39,7 +40,7 @@ in
           enable = true;
           package = pkgs.unstable.immich;
           port = ports.tcp.immich;
-          openFirewall = !config.networking.granularFirewall.enable;
+          openFirewall = !config.${namespace}.networking.granularFirewall.enable;
           machine-learning = {
             enable = true;
             environment = {
@@ -57,48 +58,50 @@ in
           };
         };
 
-      services.nginxProxy.services = [
-        {
-          subDomain = "immich"; # Creates git.host.domain
-          extraDomains = [ "photos.${config.hostSpec.domain}" ];
-          port = ports.tcp.immich;
-          ssl = false;
-          # Extra stuff from the wiki
-          extraLocationSettings = {
-            proxyWebsockets = true;
-            extraConfig = ''
-              client_max_body_size 50000M;
-              proxy_read_timeout   600s;
-              proxy_send_timeout   600s;
-              send_timeout         600s;
-            '';
+      ${namespace} = {
+        services.nginxProxy.services = [
+          {
+            subDomain = "immich"; # Creates git.host.domain
+            extraDomains = [ "photos.${config.hostSpec.domain}" ];
+            port = ports.tcp.immich;
+            ssl = false;
+            # Extra stuff from the wiki
+            extraLocationSettings = {
+              proxyWebsockets = true;
+              extraConfig = ''
+                client_max_body_size 50000M;
+                proxy_read_timeout   600s;
+                proxy_send_timeout   600s;
+                send_timeout         600s;
+              '';
+            };
+          }
+        ];
+        networking.granularFirewall.allowedRules.immich =
+          let
+            # FIXME: Make this an option
+            hosts = lib.attrValues {
+              inherit (config.hostSpec.networking.subnets.o-lan.hosts)
+                oppo
+                ossa
+                onyx
+                # opia
+                ;
+            };
+          in
+          {
+            protocol = "tcp";
+            ports = [ ports.tcp.immich ];
+            inherit hosts;
           };
-        }
-      ];
+      };
 
       # FIXME: This somehow breaks because of "opia" reference?
-      networking.granularFirewall.allowedRules.immich =
-        let
-          # FIXME: Make this an option
-          hosts = lib.attrValues {
-            inherit (config.hostSpec.networking.subnets.o-lan.hosts)
-              oppo
-              ossa
-              onyx
-              # opia
-              ;
-          };
-        in
-        {
-          protocol = "tcp";
-          ports = [ ports.tcp.immich ];
-          inherit hosts;
-        };
     })
     (lib.mkIf (cfg.enable && cfg.isRemoteMachineLearningServer) {
       services.immich = {
         enable = true;
-        openFirewall = !config.networking.granularFirewall.enable;
+        openFirewall = !config.${namespace}.networking.granularFirewall.enable;
         database.enable = false;
         redis.enable = false;
         machine-learning.environment = {
@@ -111,10 +114,10 @@ in
       systemd.services.immich-server = lib.mkForce { };
 
       networking.firewall.allowedTCPPorts = lib.optional (
-        !config.networking.granularFirewall.enable
+        !config.${namespace}.networking.granularFirewall.enable
       ) ports.tcp.immich-ml;
 
-      networking.granularFirewall = {
+      ${namespace}.networking.granularFirewall = {
         enable = true;
         allowedRules = {
           immich-ml = {

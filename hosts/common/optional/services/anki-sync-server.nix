@@ -2,6 +2,7 @@
   inputs,
   config,
   lib,
+  namespace,
   ...
 }:
 
@@ -37,8 +38,7 @@ in
         }
       ];
     };
-
-    services.nginxProxy.services = mkIf cfg.useProxy [
+    ${namespace}.services.nginxProxy.services = mkIf cfg.useProxy [
       {
         subDomain = "anki";
         port = servicePort;
@@ -46,6 +46,7 @@ in
       }
 
     ];
+
 
     environment = lib.optionalAttrs config.introdus.impermanence.enable {
       persistence = {

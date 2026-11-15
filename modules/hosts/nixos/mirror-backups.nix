@@ -2,10 +2,11 @@
   config,
   lib,
   pkgs,
+  namespace,
   ...
 }:
 let
-  cfg = config.services.mirror-backups;
+  cfg = config.${namespace}.services.mirror-backups;
   sshKeyPath = "/root/.ssh/id_borg";
   port = toString config.hostSpec.networking.ports.tcp.ssh;
   mirror-backups = pkgs.writeShellApplication rec {
@@ -122,7 +123,7 @@ let
   };
 in
 {
-  options.services.mirror-backups = {
+  options.${namespace}.services.mirror-backups = {
     enable = lib.mkEnableOption "Run a timer to mirror one systems backups to another";
     server = lib.mkOption {
       type = lib.types.str;

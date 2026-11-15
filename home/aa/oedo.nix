@@ -3,6 +3,7 @@
   lib,
   pkgs,
   osConfig,
+  namespace,
   ...
 }:
 {
@@ -71,8 +72,10 @@
   };
 
   services.snixembed.enable = osConfig.hostSpec.voiceCoding;
-  system.ssh-motd.enable = true;
-  settings.work.enable = osConfig.hostSpec.isWork;
+  ${namespace} = {
+    system.ssh-motd.enable = true;
+    settings.work.enable = osConfig.hostSpec.isWork;
+  };
 
   # talon = {
   #   enable = true;

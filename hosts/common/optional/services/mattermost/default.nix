@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  namespace,
   ...
 }:
 let
@@ -44,7 +45,7 @@ in
     };
   };
 
-  services.nginxProxy.services = [
+  ${namespace}.services.nginxProxy.services = [
     {
       subDomain = "chat"; # Creates chat.host.domain
       extraDomains = [

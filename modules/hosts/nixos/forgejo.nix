@@ -58,7 +58,7 @@ in
       forgejoPort = config.hostSpec.networking.ports.tcp.forgejo;
       sshPort = config.hostSpec.networking.ports.tcp.ssh;
 
-      firewallCfg = config.networking.granularFirewall;
+      firewallCfg = config.${namespace}.networking.granularFirewall;
       regularFirewallRules = lib.mkIf (firewallCfg.enable == false) {
         networking.firewall.allowedTCPPorts = [ forgejoPort ];
       };
@@ -173,7 +173,7 @@ in
                 fi
             '';
 
-          services.nginxProxy.services = [
+          ${namespace}.services.nginxProxy.services = [
             {
               subDomain = "git"; # Creates git.host.domain
               extraDomains = [ cfg.rootURL ];

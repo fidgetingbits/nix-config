@@ -2,6 +2,7 @@
   config,
   pkgs,
   lib,
+  namespace,
   ...
 }:
 {
@@ -32,22 +33,33 @@
     requires = [ "mnt-storage.mount" ];
   };
 
-  services.mirror-backups = {
-    enable = true;
-    notify.to = config.hostSpec.email.${config.hostSpec.hostName}.backups;
+  ${namespace} = {
+    services.mirror-backups = {
+      enable = true;
+      notify.to = config.hostSpec.email.${config.hostSpec.hostName}.backups;
 
-    # Moth local time. NOTE: Keep roughly in sync with myth times
-    time = "*-*-* 5:30:00"; # Keep sync with myth times
-    server = "myth.${config.hostSpec.domain}";
-    folders = {
-      destination = "/mnt/storage/mirror";
-      source = {
-        base = "/mnt/storage/backup";
-        collections = [
-          "aa"
-          "ta"
-        ];
+      # Moth local time. NOTE: Keep roughly in sync with myth times
+      time = "*-*-* 5:30:00"; # Keep sync with myth times
+      server = "myth.${config.hostSpec.domain}";
+      folders = {
+        destination = "/mnt/storage/mirror";
+        source = {
+          base = "/mnt/storage/backup";
+          collections = [
+            "aa"
+            "ta"
+          ];
+        };
       };
+    };
+    services.backup = {
+      enable = true;
+      # Moth local time. NOTE: Keep roughly in sync with myth times
+      borgBackupStartTime = "*-*-* 05:00:00";
+      borgServer = "myth.${config.hostSpec.domain}";
+      borgRemotePath = "/run/current-system/sw/bin/borg";
+      borgBackupPath = "/mnt/storage/backup/aa";
+      borgNotifyTo = config.hostSpec.email.${config.hostSpec.hostName}.backups;
     };
   };
 
@@ -57,14 +69,5 @@
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOLLKlQQu/pl8e/Vs3c60crZqjwhB/GV3C58EmTD/L1y ooze"
   ];
 
-  services.backup = {
-    enable = true;
-    # Moth local time. NOTE: Keep roughly in sync with myth times
-    borgBackupStartTime = "*-*-* 05:00:00";
-    borgServer = "myth.${config.hostSpec.domain}";
-    borgRemotePath = "/run/current-system/sw/bin/borg";
-    borgBackupPath = "/mnt/storage/backup/aa";
-    borgNotifyTo = config.hostSpec.email.${config.hostSpec.hostName}.backups;
-  };
 
 }

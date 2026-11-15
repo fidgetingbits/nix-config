@@ -4,6 +4,7 @@
   inputs,
   pkgs,
   config,
+  namespace,
   ...
 }:
 let
@@ -67,7 +68,7 @@ in
         };
       })
 
-      (lib.mkIf config.services.backup.enable {
+      (lib.mkIf config.${namespace}.services.backup.enable {
         "passwords/borg" = {
           owner = "root";
           group = if pkgs.stdenv.hostPlatform.isLinux then "root" else "wheel";

@@ -3,6 +3,7 @@
   pkgs,
   lib,
   osConfig,
+  namespace,
   ...
 }:
 {
@@ -41,5 +42,5 @@
       }))
     ];
 
-  system.ssh-motd.enable = true;
+  ${namespace}.system.ssh-motd.enable = true;
 }

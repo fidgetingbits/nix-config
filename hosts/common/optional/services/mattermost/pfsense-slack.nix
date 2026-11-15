@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  namespace,
   ...
 
 }:
@@ -40,7 +41,7 @@ in
     };
   };
 
-  services.nginxProxy.services = [
+  ${namespace}.services.nginxProxy.services = [
     {
       subDomain = "slack-intercept";
       extraDomains = [

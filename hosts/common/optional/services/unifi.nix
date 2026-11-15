@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  namespace,
   ...
 }:
 let
@@ -27,13 +28,13 @@ in
       jrePackage = pkgs.jdk25_headless;
       mongodbPackage = pkgs.mongodb-ce;
     };
-
-    services.nginxProxy.services = mkIf cfg.useProxy [
+    ${namespace}.services.nginxProxy.services = mkIf cfg.useProxy [
       {
         subDomain = "unifi";
         port = servicePort;
       }
     ];
+
 
     environment = lib.optionalAttrs config.introdus.impermanence.enable {
       persistence = {

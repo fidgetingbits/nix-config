@@ -8,7 +8,7 @@
 let
   time = lib.custom.time;
   homeDirectory = config.hostSpec.home;
-  firewallCfg = config.networking.granularFirewall;
+  firewallCfg = config.${namespace}.networking.granularFirewall;
 
   desktops = [
     "onyx"
@@ -35,7 +35,7 @@ let
   ports = config.hostSpec.networking.ports;
 
   granularFirewallRules = lib.mkIf firewallCfg.enable {
-    networking.granularFirewall.allowedRules = {
+    ${namespace}.networking.granularFirewall.allowedRules = {
       syncthing-tcp = {
         protocol = "tcp";
         ports = [ ports.tcp.syncthing.sync ];

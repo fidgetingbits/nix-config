@@ -38,7 +38,7 @@
         secrets.networking.trusted.homeWired
       ];
     };
+    networking.granularFirewall.enable = true;
   };
 
-  networking.granularFirewall.enable = true;
 }

@@ -85,7 +85,34 @@
   # Keyring, required for auth even without gnome
   # FIXME: double check this
   security.pam.services.sddm.enableGnomeKeyring = true;
-  modules.hardware.radeon.enable = true;
+  ${namespace} = {
+    modules.hardware.radeon.enable = true;
+    services.backup = {
+      enable = true;
+      borgBackupStartTime = "*-*-* 03:00:00";
+    };
+    networking.granularFirewall.enable = true;
+    services.llama-swap = {
+    enable = true;
+    # FIXME: This should also be associated with some default model, with classes
+    preload = [
+    "Qwen 2.5 Coder 1.5B (Ultra Light)"
+    ];
+    # Limit models to those that suit local Strix Point use
+    # See models set in modules/hosts/nixos/llama-swap.nix for full list
+    # models = [
+    #   "fim:qwen-1.5b"
+    #   "gemma-4:26b-a4b-q6"
+    #   "qwen3.6:coder-30b-a3b-q6"
+    # ];
+    };
+
+    # Add in descriptions for VMs we use from other hosts, so we can auto generate some commands
+    # FIXME: This should just be some generated part of microvm where we say "we use host foo"
+    microvms.extraDescriptions =
+    lib.custom.microvm.mapHostMicrovms inputs.self.nixosConfigurations.oedo.config.microvm.vms
+    (vmSpecs: "oedo: ${vmSpecs.name} - ${vmSpecs.description}");
+  };
 
   environment.systemPackages = lib.attrValues {
     inherit (pkgs)
@@ -98,10 +125,6 @@
       ;
   };
   services.fwupd.enable = true;
-  services.backup = {
-    enable = true;
-    borgBackupStartTime = "*-*-* 03:00:00";
-  };
 
   services.remoteLuksUnlock = {
     enable = true;
@@ -161,33 +184,10 @@
     };
   };
 
-  networking.granularFirewall.enable = true;
 
   # Only exposed to microvms, which is handled via allowedPorts in
   # modules/hosts/nixos/microvms/network.nix rather than
   # granularFirewall, as don't have way to specify interface yet
-  ${namespace} = {
-    services.llama-swap = {
-      enable = true;
-      # FIXME: This should also be associated with some default model, with classes
-      preload = [
-        "Qwen 2.5 Coder 1.5B (Ultra Light)"
-      ];
-      # Limit models to those that suit local Strix Point use
-      # See models set in modules/hosts/nixos/llama-swap.nix for full list
-      # models = [
-      #   "fim:qwen-1.5b"
-      #   "gemma-4:26b-a4b-q6"
-      #   "qwen3.6:coder-30b-a3b-q6"
-      # ];
-    };
-
-    # Add in descriptions for VMs we use from other hosts, so we can auto generate some commands
-    # FIXME: This should just be some generated part of microvm where we say "we use host foo"
-    microvms.extraDescriptions =
-      lib.custom.microvm.mapHostMicrovms inputs.self.nixosConfigurations.oedo.config.microvm.vms
-        (vmSpecs: "oedo: ${vmSpecs.name} - ${vmSpecs.description}");
-  };
 
   # See:
   #  https://www.jeffgeerling.com/blog/2025/increasing-vram-allocation-on-amd-ai-apus-under-linux/

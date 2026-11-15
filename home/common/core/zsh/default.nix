@@ -3,13 +3,14 @@
   osConfig,
   lib,
   pkgs,
+  namespace,
   ...
 }:
 let
   homeDirectory = config.home.homeDirectory;
 in
 {
-  p10k.enable = true;
+  ${namespace}.p10k.enable = true;
 
   # programs.starship = {
   #   enable = true;

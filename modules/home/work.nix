@@ -1,10 +1,10 @@
-{ config, lib, ... }:
+{ config, lib, namespace, ... }:
 let
-  cfg = config.settings.work;
+  cfg = config.${namespace}.settings.work;
   homeDirectory = config.home.homeDirectory;
 in
 {
-  options.settings.work = {
+  options.${namespace}.settings.work = {
     enable = lib.mkEnableOption "Host is used for work";
   };
   config = lib.mkIf cfg.enable {

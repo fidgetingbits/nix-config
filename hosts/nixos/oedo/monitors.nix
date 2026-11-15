@@ -1,8 +1,9 @@
-_: rec {
-  #  --------   ------------
-  #  | DP-1 | + | HDMI-A-1 |
-  #  --------   ------------
-  monitors = {
+{ namespace, ... }:
+let
+  monitors = rec {
+    #  --------   ------------
+    #  | DP-1 | + | HDMI-A-1 |
+    #  --------   ------------
     # LG Dualup
     "DP-1" = {
       width = 2560;
@@ -22,4 +23,7 @@ _: rec {
       scale = 1.0;
     };
   };
+in
+{
+  ${namespace}.monitors = monitors;
 }

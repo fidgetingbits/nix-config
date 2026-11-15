@@ -3,6 +3,7 @@
   inputs,
   config,
   lib,
+  namespace,
   ...
 }:
 let
@@ -35,14 +36,14 @@ in
       #secretKeyBaseFile = "/%d/docusealSecret";
       secretKeyBaseFile = "/run/credentials/docuseal.service/docusealSecret";
     };
-
-    services.nginxProxy.services = mkIf cfg.useProxy [
+    ${namespace}.services.nginxProxy.services = mkIf cfg.useProxy [
       {
         subDomain = "docuseal";
         port = servicePort;
         ssl = false;
       }
     ];
+
 
     environment = lib.optionalAttrs config.introdus.impermanence.enable {
       persistence = {

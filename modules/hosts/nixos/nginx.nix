@@ -10,9 +10,9 @@ let
 
   # NOTE: This slightly odd way of using both was to avoid infinite recursion. Also having both is
   # currently due to granularFirewall not supporting darwin and nftables yet
-  firewallCfg = config.networking.granularFirewall;
+  firewallCfg = config.${namespace}.networking.granularFirewall;
   granularFirewallRules = lib.mkIf firewallCfg.enable {
-    networking.granularFirewall.allowedRules = {
+    ${namespace}.networking.granularFirewall.allowedRules = {
       nginx = {
         protocol = "tcp";
         ports = [ nginxPort ];

@@ -3,13 +3,14 @@
   config,
   # osConfig,
   pkgs,
+  namespace,
   ...
 }:
 let
-  cfg = config.p10k;
+  cfg = config.${namespace}.p10k;
 in
 {
-  options.p10k.enable = lib.mkEnableOption "Enable powerlevel10k for zsh";
+  options.${namespace}.p10k.enable = lib.mkEnableOption "Enable powerlevel10k for zsh";
   config = lib.mkIf cfg.enable {
     programs.zsh = {
 

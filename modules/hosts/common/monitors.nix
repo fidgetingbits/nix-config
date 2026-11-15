@@ -2,9 +2,9 @@
 # - hyprland: hyprctl monitors
 # - gnome: gdctl show
 
-{ config, lib, ... }:
+{ config, lib, namespace, ... }:
 {
-  options.monitors = lib.mkOption {
+  options.${namespace}.monitors = lib.mkOption {
     description = "List of monitors for use by hyprland, kanshi, etc";
     type = lib.types.attrsOf (
       lib.types.submodule {
@@ -78,8 +78,8 @@
   #   assertions = [
   #     {
   #       assertion =
-  #         ((lib.length config.monitors) != 0 && programs.hyprland.enable)
-  #         -> ((lib.length (lib.filter (m: m.primary) config.monitors)) == 1);
+  #         ((lib.length config.${namespace}.monitors) != 0 && programs.hyprland.enable)
+  #         -> ((lib.length (lib.filter (m: m.primary) config.${namespace}.monitors)) == 1);
   #       message = "Exactly one monitor must be set to primary.";
   #     }
   #   ];

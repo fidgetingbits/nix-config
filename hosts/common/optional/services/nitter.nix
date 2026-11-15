@@ -2,6 +2,7 @@
   config,
   # lib,
   # inputs,
+  namespace,
   ...
 }:
 let
@@ -17,7 +18,7 @@ in
     redisCreateLocally = false; # Already likely setup by other services. Would be good to somehow actually test this
   };
 
-  services.nginxProxy.services = [
+  ${namespace}.services.nginxProxy.services = [
     {
       subDomain = "nit";
       extraDomains = [ "nit.${config.hostSpec.domain}" ];

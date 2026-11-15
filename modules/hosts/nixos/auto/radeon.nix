@@ -4,13 +4,14 @@
   config,
   lib,
   pkgs,
+  namespace,
   ...
 }:
 let
-  cfg = config.modules.hardware.radeon;
+  cfg = config.${namespace}.modules.hardware.radeon;
 in
 {
-  options.modules.hardware.radeon = {
+  options.${namespace}.modules.hardware.radeon = {
     enable = lib.mkEnableOption "System has AMD radeon card";
   };
   config = lib.mkIf cfg.enable {

@@ -3,14 +3,15 @@
   config,
   lib,
   pkgs,
+  namespace,
   ...
 }:
 let
-  cfg = config.voiceCoding;
+  cfg = config.${namespace}.voiceCoding;
 in
 {
   imports = [ inputs.talon-nix.nixosModules.talon ];
-  options.voiceCoding = {
+  options.${namespace}.voiceCoding = {
     enable = lib.mkOption {
       type = lib.types.bool;
       default = config.hostSpec.voiceCoding;

@@ -1,17 +1,18 @@
 {
   osConfig,
   lib,
+  namespace,
   ...
 }:
 {
   services.kanshi = {
     enable = true;
     settings = [
-      # FIXME: Come up with a way to define profiles via config.monitors?
+      # FIXME: Come up with a way to define profiles via config.${namespace}.monitors?
       {
         profile.name = "default";
         profile.outputs =
-          osConfig.monitors
+          osConfig.${namespace}.monitors
           |> lib.mapAttrsToList (
             name: value: {
               criteria = name;

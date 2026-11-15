@@ -50,9 +50,9 @@ in
         secrets.networking.trusted.homeWired
       ];
     };
+    networking.granularFirewall.enable = true;
   };
 
-  networking.granularFirewall.enable = true;
 
   # We have a microvm network connected with oedo via a wireguard tunnel
   # so that it stays up even when we are roaming

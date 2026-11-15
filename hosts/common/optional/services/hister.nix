@@ -2,6 +2,7 @@
   lib,
   pkgs,
   config,
+  namespace,
   ...
 }:
 let
@@ -46,7 +47,7 @@ in
     };
   };
 
-  services.nginxProxy.services = [
+  ${namespace}.services.nginxProxy.services = [
     {
       subDomain = "hister"; # Creates git.host.domain
       # extraDomains = [ "search.${config.hostSpec.domain}" ];

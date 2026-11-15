@@ -162,7 +162,27 @@ in
   # FIXME: Make this part of a module
   services.copyq.enable = true;
 
-  system.ssh-motd.enable = true;
+  ${namespace} = {
+    system.ssh-motd.enable = true;
+    llm.providers =
+      let
+        port = osConfig.hostSpec.networking.ports.tcp.llama-swap;
+        hosts = [
+          "oedo"
+          "ossa"
+        ];
+      in
+      map (host: {
+        name = host;
+        host = osConfig.hostSpec.networking.subnets.o-lan.hosts.${host}.ip;
+        inherit port;
+      }) hosts;
+
+    llm.cli-tools.enable = true;
+    language-learning.enable = true;
+    dictation.enable = true;
+    rclone.wiki.enable = true;
+  };
 
   stylix = {
     cursor = lib.mkForce {
@@ -190,26 +210,7 @@ in
     };
   };
 
-  ${namespace} = {
-    llm.providers =
-      let
-        port = osConfig.hostSpec.networking.ports.tcp.llama-swap;
-        hosts = [
-          "oedo"
-          "ossa"
-        ];
-      in
-      map (host: {
-        name = host;
-        host = osConfig.hostSpec.networking.subnets.o-lan.hosts.${host}.ip;
-        inherit port;
-      }) hosts;
 
-    llm.cli-tools.enable = true;
-    language-learning.enable = true;
-    dictation.enable = true;
-    rclone.wiki.enable = true;
-  };
 
   # Automatic ssh entries for oedo microvms on shared network
   programs.ssh.settings =

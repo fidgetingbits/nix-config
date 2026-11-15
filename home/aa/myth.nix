@@ -1,6 +1,7 @@
 {
   inputs,
   lib,
+  namespace,
   ...
 }:
 {
@@ -25,5 +26,5 @@
 
   };
 
-  system.ssh-motd.enable = true;
+  ${namespace}.system.ssh-motd.enable = true;
 }

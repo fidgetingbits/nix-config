@@ -8,7 +8,7 @@
   ...
 }:
 let
-  cfg = config.programs.llm;
+  cfg = config.${namespace}.programs.llm;
   llmCfg = config.${namespace}.llm;
   localProviders = config.${namespace}.llm.providerModels;
   yamlFormat = pkgs.formats.yaml { };
@@ -64,7 +64,7 @@ let
   };
 in
 {
-  options.programs.llm = {
+  options.${namespace}.programs.llm = {
     enable = lib.mkEnableOption "LLM CLI configuration";
 
     package = lib.mkOption {

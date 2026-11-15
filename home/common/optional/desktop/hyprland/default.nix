@@ -2,6 +2,7 @@
   config,
   osConfig,
   lib,
+  namespace,
   ...
 }:
 {
@@ -42,7 +43,7 @@
       #
       # parse the monitor spec defined in nix-config/home/<user>/<host>.nix
       monitor =
-        osConfig.monitors
+        osConfig.${namespace}.monitors
         |> lib.mapAttrsToList (
           name: value:
           "${name},${

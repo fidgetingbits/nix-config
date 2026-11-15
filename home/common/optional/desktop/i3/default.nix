@@ -1,11 +1,11 @@
-{ config, lib, ... }:
+{ config, lib, namespace, ... }:
 let
-  cfg = config.modules.desktop.i3;
+  cfg = config.${namespace}.modules.desktop.i3;
 in
 {
   imports = lib.custom.scanPaths ./.;
 
-  options.modules.desktop.i3 = {
+  options.${namespace}.modules.desktop.i3 = {
     enable = lib.mkEnableOption "i3 window manager";
   };
 

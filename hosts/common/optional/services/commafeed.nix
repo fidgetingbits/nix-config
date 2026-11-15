@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  namespace,
   ...
 }:
 let
@@ -11,7 +12,7 @@ in
     enable = true;
   };
 
-  services.nginxProxy.services = [
+  ${namespace}.services.nginxProxy.services = [
     {
       subDomain = "rss";
       extraDomains = [ "rss.${config.hostSpec.domain}" ];

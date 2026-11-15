@@ -3,6 +3,7 @@
   lib,
   pkgs,
   config,
+  namespace,
   ...
 }:
 let
@@ -151,13 +152,16 @@ in
   };
 
   services.fwupd.enable = true;
-  services.backup = {
-    enable = true;
-    borgBackupStartTime = "*-*-* 11:00:00";
-    borgExcludes = [
-      "${config.hostSpec.home}/movies"
-      "${config.hostSpec.home}/.local/share/Steam"
-    ];
+  ${namespace} = {
+    services.backup = {
+      enable = true;
+      borgBackupStartTime = "*-*-* 11:00:00";
+      borgExcludes = [
+        "${config.hostSpec.home}/movies"
+        "${config.hostSpec.home}/.local/share/Steam"
+      ];
+    };
+    modules.hardware.radeon.enable = true;
   };
 
   services.remoteLuksUnlock = {
@@ -249,7 +253,6 @@ in
     allowedUDPPorts = [ 9 ];
   };
 
-  modules.hardware.radeon.enable = true;
   # nixpkgs.config.rocmSupport = config.hostSpec.useRocm;
 
   introdus = {

@@ -1,10 +1,11 @@
 {
   config,
   lib,
+  namespace,
   ...
 }:
 {
-  options.services.nginxProxy = {
+  options.${namespace}.services.nginxProxy = {
     defaultAllowList = lib.mkOption {
       type = lib.types.nullOr (lib.types.listOf lib.types.str);
       default = null;
@@ -70,7 +71,7 @@
 
   config =
     let
-      cfg = config.services.nginxProxy;
+      cfg = config.${namespace}.services.nginxProxy;
       isAcmeDomain = domain: lib.match ".*\.${config.hostSpec.domain}" domain != null;
     in
     {

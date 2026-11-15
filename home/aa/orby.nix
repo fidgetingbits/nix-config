@@ -2,6 +2,7 @@
   inputs,
   pkgs,
   lib,
+  namespace,
   ...
 }:
 {
@@ -30,7 +31,7 @@
     ))
   );
 
-  settings.work.enable = true;
+  ${namespace}.settings.work.enable = true;
 
   home.packages = lib.attrValues {
     inherit (pkgs)

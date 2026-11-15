@@ -65,9 +65,52 @@
 
   ];
 
-  services.backup = {
+  ${namespace} = {
+    services.backup = {
+      enable = true;
+      borgBackupStartTime = "*-*-* 22:00:00";
+    };
+    services.heartbeat-check = {
+      enable = true;
+      interval = 10 * 60;
+      hosts = [ "ooze" ];
+    };
+    services.llama-swap = {
     enable = true;
-    borgBackupStartTime = "*-*-* 22:00:00";
+    allowedHosts = [
+    "ossa"
+    "onyx"
+    # ATM roaming systems will appear as ooze when routing via wireguard
+    "ooze"
+    "opia"
+    ];
+    # See models set in modules/hosts/nixos/llama-swap.nix for full list
+    # Keep default ("all") for now, since everything should run on this box
+    # FIXME: We should probably trim stuff that is "weak" and only for Strix Point
+    # models = [
+    #
+    # ];
+    };
+    networking.granularFirewall.allowedRules.llama-swap.hosts =
+      let
+        inherit (config.hostSpec.networking) subnets;
+      in
+      [
+        { ip = subnets.n-lan.cidr; }
+        { ip = subnets.p-lan.cidr; }
+      ];
+    modules.hardware.radeon.enable = true;
+    services.immichML =
+      let
+        hosts = config.hostSpec.networking.subnets.o-lan.hosts;
+      in
+      {
+
+        # FIXME: Temporary so I can update the rest of the system
+        enable = false;
+        isRemoteMachineLearningServer = true; # Host ML parsing server onlyallowed
+        immichServers = [ hosts.ooze ]; # List of systems allowed to access ML service
+      };
   };
 
   # Bootloader.
@@ -100,11 +143,6 @@
   networking.dhcpcd.wait = "background";
 
   # ooze checks for all other hosts, so we just check ooze
-  services.heartbeat-check = {
-    enable = true;
-    interval = 10 * 60;
-    hosts = [ "ooze" ];
-  };
   # Redundancy in case ooze goes down
   services.dyndns = {
     enable = true;
@@ -126,33 +164,7 @@
     wlans = [ "o-lan" ];
   };
 
-  ${namespace} = {
-    services.llama-swap = {
-      enable = true;
-      allowedHosts = [
-        "ossa"
-        "onyx"
-        # ATM roaming systems will appear as ooze when routing via wireguard
-        "ooze"
-        "opia"
-      ];
-      # See models set in modules/hosts/nixos/llama-swap.nix for full list
-      # Keep default ("all") for now, since everything should run on this box
-      # FIXME: We should probably trim stuff that is "weak" and only for Strix Point
-      # models = [
-      #
-      # ];
-    };
-  };
 
-  networking.granularFirewall.allowedRules.llama-swap.hosts =
-    let
-      inherit (config.hostSpec.networking) subnets;
-    in
-    [
-      { ip = subnets.n-lan.cidr; }
-      { ip = subnets.p-lan.cidr; }
-    ];
 
   boot.kernelParams =
     let
@@ -167,24 +179,12 @@
       "ttm.page_pool_size=${sz}"
     ];
 
-  modules.hardware.radeon.enable = true;
 
   services.btrfs.autoScrub = {
     enable = true;
     interval = "monthly";
   };
 
-  services.immichML =
-    let
-      hosts = config.hostSpec.networking.subnets.o-lan.hosts;
-    in
-    {
-
-      # FIXME: Temporary so I can update the rest of the system
-      enable = false;
-      isRemoteMachineLearningServer = true; # Host ML parsing server onlyallowed
-      immichServers = [ hosts.ooze ]; # List of systems allowed to access ML service
-    };
 
   # ${namespace}.services.monit = {
   #   enable = true;

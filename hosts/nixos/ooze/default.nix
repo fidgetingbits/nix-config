@@ -60,9 +60,66 @@ in
 
   nixpkgs.config.nvidia.acceptLicense = true;
 
-  services.backup = {
+  services.docuseal.enable = true; # Settings in module
+  ${namespace} = {
+    services.backup = {
+      enable = true;
+      borgBackupStartTime = "*-*-* 05:00:00"; # Daily at 5am
+    };
+    services.heartbeat-check = {
+      enable = true;
+      interval = 10 * 60;
+      # FIXME: This should be updated to use host attr sets now
+      hosts = [
+        "ottr"
+        "ogre"
+        "oedo"
+        "otto"
+        "oath"
+        "onus"
+      ];
+    };
+    wireguard = {
+      enable = true;
+      role = "server";
+      externalInterface = "enp3s0";
+      peers = [
+      wg-subnet.hosts.ossa
+      wg-subnet.hosts.opia
+      wg-subnet.hosts.onyx
+      wg-subnet.hosts.moon
+      ];
+      wireguardPort = net.ports.udp.wireguard;
+      rosenpassPort = net.ports.udp.rosenpass;
+      rosenpassExempt = [
+      "opia"
+      "moxy"
+      ];
+      subnet = wg-subnet;
+    };
+
+    services.llama-swap = {
     enable = true;
-    borgBackupStartTime = "*-*-* 05:00:00"; # Daily at 5am
+    preload = [
+    "Nomic Embeddings"
+    ];
+    };
+    services.forgejo = {
+    enable = true;
+    };
+    services.immichML = {
+      enable = true;
+      remoteMachineLearningHost = "oedo.${config.hostSpec.domain}";
+    };
+    services.nginxProxy = {
+      defaultAllowList = [
+        olan.cidr
+        olan.wg-subnet.hosts.ossa.ip
+        olan.wg-subnet.hosts.onyx.ip
+        olan.wg-subnet.hosts.opia.ip
+      ];
+      defaultDenyList = [ "all" ];
+    };
   };
 
   # Conflicts with postfix
@@ -85,22 +142,8 @@ in
     ];
   };
 
-  services.docuseal.enable = true; # Settings in module
 
   # FIXME: This could be swapped with monit now I think
-  services.heartbeat-check = {
-    enable = true;
-    interval = 10 * 60;
-    # FIXME: This should be updated to use host attr sets now
-    hosts = [
-      "ottr"
-      "ogre"
-      "oedo"
-      "otto"
-      "oath"
-      "onus"
-    ];
-  };
 
   # Serial cables into lab systems
   # Two of these devices have identical serials, so we need to use the kernel path
@@ -121,36 +164,6 @@ in
     wake-oppo
   ];
 
-  ${namespace} = {
-    wireguard = {
-      enable = true;
-      role = "server";
-      externalInterface = "enp3s0";
-      peers = [
-        wg-subnet.hosts.ossa
-        wg-subnet.hosts.opia
-        wg-subnet.hosts.onyx
-        wg-subnet.hosts.moon
-      ];
-      wireguardPort = net.ports.udp.wireguard;
-      rosenpassPort = net.ports.udp.rosenpass;
-      rosenpassExempt = [
-        "opia"
-        "moxy"
-      ];
-      subnet = wg-subnet;
-    };
-
-    services.llama-swap = {
-      enable = true;
-      preload = [
-        "Nomic Embeddings"
-      ];
-    };
-    services.forgejo = {
-      enable = true;
-    };
-  };
 
   # Extra peers not on o-lan subnet that can't be auto-generated
   networking = {
@@ -199,20 +212,7 @@ in
   };
 
   # Enable immich service with ML offload to oedo
-  services.immichML = {
-    enable = true;
-    remoteMachineLearningHost = "oedo.${config.hostSpec.domain}";
-  };
 
-  services.nginxProxy = {
-    defaultAllowList = [
-      olan.cidr
-      olan.wg-subnet.hosts.ossa.ip
-      olan.wg-subnet.hosts.onyx.ip
-      olan.wg-subnet.hosts.opia.ip
-    ];
-    defaultDenyList = [ "all" ];
-  };
 
   services.nginx.virtualHosts."photos.${config.hostSpec.domain}".locations."/".extraConfig =
     lib.mkBefore ''
