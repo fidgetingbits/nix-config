@@ -38,7 +38,13 @@ let
 in
 {
   options.${namespace}.services.nginx = {
-    enable = lib.mkEnableOption "Enable nginx";
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      # Every host loading this module runs nginx by default; hosts opt out
+      # explicitly with enable = false.
+      default = true;
+      description = "Enable nginx";
+    };
   };
   config = lib.mkIf cfg.enable (
     lib.mkMerge [

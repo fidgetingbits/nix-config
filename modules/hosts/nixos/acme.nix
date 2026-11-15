@@ -11,7 +11,12 @@ let
 in
 {
   options.${namespace}.acme = {
-    enable = lib.mkEnableOption "Enable acme cert handling";
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      # Enabled when nginx-proxy has requested certs for proxied services.
+      default = lib.length (lib.attrNames config.security.acme.certs) > 0;
+      description = "Enable acme cert handling";
+    };
   };
   config = lib.mkIf cfg.enable {
     security.acme = {
