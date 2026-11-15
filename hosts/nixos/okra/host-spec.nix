@@ -7,5 +7,6 @@
     isProduction = lib.mkForce false;
     persistFolder = lib.mkForce "/persist";
     isImpermanent = lib.mkForce true;
+    defaultDesktop = "gnome";
   };
 }
