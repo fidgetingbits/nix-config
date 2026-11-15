@@ -13,8 +13,9 @@ in
   options.${namespace}.acme = {
     enable = lib.mkOption {
       type = lib.types.bool;
-      # Enabled when nginx-proxy has requested certs for proxied services.
-      default = lib.length (lib.attrNames config.security.acme.certs) > 0;
+      # Enabled when any nginxProxy service is defined — each one requests
+      # an ACME cert for its subdomain.
+      default = lib.length config.services.nginxProxy.services > 0;
       description = "Enable acme cert handling";
     };
   };
