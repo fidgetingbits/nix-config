@@ -96,7 +96,7 @@
                   proxyPass = "${uri}://127.0.0.1:${toString service.port}";
                   # Add optional white/black listing
                   extraConfig = lib.mkAfter (
-                    lib.optionalString (cfg.defaultAllowList != null || cfg.defaultAllowsList != null) ''
+                    lib.optionalString (cfg.defaultAllowList != null || cfg.defaultDenyList != null) ''
                       ${
                         if cfg.defaultAllowList != null then
                           lib.concatStringsSep "\n" (map (host: "allow ${host};") cfg.defaultAllowList)
