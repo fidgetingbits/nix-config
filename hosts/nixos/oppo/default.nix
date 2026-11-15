@@ -145,9 +145,9 @@ in
     inherit (pkgs)
       liquidctl # control nxzt kraken rgb, not in home-manager because of udev rules
       ;
-    inherit (pkgs.introdus)
-      strata
-      ;
+    # inherit (pkgs.introdus)
+    #   strata
+    #   ;
   };
 
   services.fwupd.enable = true;
