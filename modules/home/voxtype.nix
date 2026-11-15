@@ -125,6 +125,7 @@ in
               "omypy" = "oh-my-pi";
               "Natalia's" = "noctalia's";
               "intradice" = "introdus";
+              "ubiquy" = "yubikey";
             };
 
           };
