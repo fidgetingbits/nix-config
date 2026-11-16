@@ -146,7 +146,7 @@ in
       ];
     };
     # We use sshKeyPath as per above, so don't auto-generate if it fails
-    systemd.services.sshd-keygen.enable = false;
+    systemd.services.sshd-keygen.enable = true;
 
     networking.firewall.allowedTCPPorts = [ sshPort ];
 

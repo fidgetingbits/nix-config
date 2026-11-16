@@ -226,4 +226,12 @@ in
   # networking
   traceroute = "tracepath";
   tp = "tracepath";
+
+  ts = "tailscale";
+  tsu = "tailscale up";
+  tsd = "tailscale down";
+  tssh = "tailscale ssh";
+  tss = "tailscale status";
+  tsh = "tailscale help";
+  tsv = "tailscale help";
 }

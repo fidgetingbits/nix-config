@@ -75,6 +75,7 @@ in
         #"sudo" # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/sudo
         "systemd" # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/systemd
         "colored-man-pages" # # https://github.com/ohmyzsh/ohmyzsh/blob/master/plugins/colored-man-pages/colored-man-pages.plugin.zsh
+        "tailscale" # https://github.com/ohmyzsh/ohmyzsh/blob/master/plugins/tailscale
 
       ];
       extraConfig = ''
