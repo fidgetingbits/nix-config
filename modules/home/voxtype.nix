@@ -126,6 +126,10 @@ in
               "Natalia's" = "noctalia's";
               "intradice" = "introdus";
               "ubiquy" = "yubikey";
+              "ommyzish" = "oh my zsh";
+              "zish" = "zsh";
+              "tail scale" = "tailscale";
+              "UFE" = "uefi";
             };
 
           };

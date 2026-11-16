@@ -108,11 +108,11 @@ in
     };
   };
 
-  imports = [ inputs.iets.nixosModules.default ];
+  # imports = [ inputs.iets.nixosModules.default ];
 
   config = lib.mkMerge [
     {
-      iets.classic.enable = true;
+      # iets.classic.enable = true;
       nix = {
         # We want at least 2.30 to get the memory management improvements
         # https://discourse.nixos.org/t/nix-2-30-0-released/66449/4
