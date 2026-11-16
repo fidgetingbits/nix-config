@@ -31,7 +31,7 @@
       );
       secrets = nix-secrets.mkSecrets nixpkgs customLib;
 
-      mkHost = host: isDarwin: {
+      mkHost = host: isDarwin: extraModules: {
         ${host} =
           let
             func = if isDarwin then inputs.nix-darwin.lib.darwinSystem else lib.nixosSystem;
@@ -52,7 +52,8 @@
             };
             modules = [
               ./hosts/${if isDarwin then "darwin" else "nixos"}/${host}
-            ];
+            ]
+            ++ extraModules;
           };
       };
 
@@ -120,7 +121,7 @@
       mkHostConfigs =
         hosts: isDarwin:
         lib.foldl (acc: set: acc // set) { } (
-          (lib.map (host: mkHost host isDarwin) hosts)
+          (lib.map (host: mkHost host isDarwin [ ]) hosts)
           ++ (lib.map mkMinimalHost (lib.filter (h: h != "iso") hosts))
         );
       readHosts = folder: lib.attrNames (lib.readDir ./hosts/${folder});
@@ -129,6 +130,9 @@
       flake = {
         overlays = import ./overlays {
           inherit inputs lib secrets;
+        };
+        lib = {
+          inherit mkHost customLib secrets;
         };
         nixosConfigurations = mkHostConfigs (readHosts "nixos") false;
         darwinConfigurations = mkHostConfigs (readHosts "darwin") true;
