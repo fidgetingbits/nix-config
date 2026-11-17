@@ -382,7 +382,7 @@
     };
 
     fidgetingvim = {
-      url = "git+file:///home/aa/dev/nix/config/neovim";
+      url = "path:///home/aa/dev/nix/config/neovim";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
       inputs.introdus.follows = "introdus";
       inputs.flake-parts.follows = "flake-parts";
@@ -394,7 +394,7 @@
     };
 
     introdus = {
-      url = "git+file:///home/aa/dev/nix/config/introdus";
+      url = "path:///home/aa/dev/nix/config/introdus";
     };
     neovim-nightly-overlay = {
       url = "github:nix-community/neovim-nightly-overlay";
