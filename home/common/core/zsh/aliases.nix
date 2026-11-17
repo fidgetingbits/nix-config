@@ -228,6 +228,7 @@ in
   tp = "tracepath";
 
   ts = "tailscale";
+  tsl = "tailscale login";
   tsu = "tailscale up";
   tsd = "tailscale down";
   tssh = "tailscale ssh";
