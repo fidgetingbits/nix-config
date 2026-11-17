@@ -130,6 +130,8 @@ in
               "zish" = "zsh";
               "tail scale" = "tailscale";
               "UFE" = "uefi";
+              "mygraph" = "migraph";
+              "sequelite" = "sqlite";
             };
 
           };

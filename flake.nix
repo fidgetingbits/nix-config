@@ -269,7 +269,7 @@
 
     # Voice dictation. Allows using rocm builds not in nixpkgs
     voxtype = {
-      # url = "github:peteonrails/voxtype/v1.0.1";
+      # url = "github:peteonrails/voxtype/v1.2.2";
       url = "github:fidgetingbits/voxtype";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
