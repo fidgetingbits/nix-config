@@ -72,7 +72,7 @@ in
         ;
     }
     ++ [
-      inputs.nix-options-search.packages.${pkgs.stdenv.hostPlatform.system}.default
+      # inputs.nix-options-search.packages.${pkgs.stdenv.hostPlatform.system}.default
       (pkgs.long-rsync.overrideAttrs (_: {
         recipients = osConfig.hostSpec.email.olanAdmins;
         deliverer = osConfig.hostSpec.email.notifier;
