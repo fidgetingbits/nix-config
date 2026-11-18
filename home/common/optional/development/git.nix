@@ -30,15 +30,14 @@ in
       "git.ooze.${osConfig.hostSpec.domain}" = "noreply";
     };
   }
+  # FIXME:  refactor this
   // lib.optionalAttrs osConfig.hostSpec.isWork {
     # work
     workKeys = [
       "id_dark.pub"
       "id_drzt.pub"
     ];
-    workFolders = [
-      "${home}/work/"
-    ];
+    workFolders = secrets.development.work.git.folders;
     workServers = secrets.work.git.servers;
     workRepos = secrets.git.work.repos;
   };
