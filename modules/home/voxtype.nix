@@ -132,6 +132,7 @@ in
               "UFE" = "uefi";
               "mygraph" = "migraph";
               "sequelite" = "sqlite";
+              "libg object" = "libgobject";
             };
 
           };

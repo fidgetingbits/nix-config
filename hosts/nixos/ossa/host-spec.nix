@@ -5,7 +5,7 @@
     primaryUsername = (lib.mkOverride 100) "aa";
 
     # System type flags
-    isWork = (lib.mkOverride 100) true;
+    isWork = (lib.mkOverride 100) false;
     isDevelopment = (lib.mkOverride 100) true;
     useAgents = (lib.mkOverride 100) true;
     isRoaming = (lib.mkOverride 100) true;

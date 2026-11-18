@@ -3,7 +3,7 @@
   hostSpec = {
     hostName = "onyx";
     primaryUsername = "aa";
-    isWork = (lib.mkOverride 100) true;
+    isWork = (lib.mkOverride 100) false;
     voiceCoding = (lib.mkOverride 100) false;
     useYubikey = (lib.mkOverride 100) true;
     useWayland = (lib.mkOverride 100) true;
