@@ -102,6 +102,7 @@
 
                 "hosts/nixos/${host}/host-spec.nix"
                 "hosts/nixos/${host}/disks.nix"
+                # FIXME: Need to add network if it exists?
 
                 "hosts/common/optional/minimal-configuration.nix"
               ])

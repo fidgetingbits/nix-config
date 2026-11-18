@@ -25,10 +25,6 @@ Although much of the process is automated, there are still some manual steps.
     booting it into the iso environment and running `lsblk` to see a list of the
     devices. Virtual Machines often using a device called `vda`.
 
-2. Add a `newConfig` entry for the target host in
-   `nix-config/nixos-installer/flake.nix`, passing in the required arguments as
-    noted in the file comments.
-
 3. If you are planning to use the `backup` module on the target host, you
    _must_ temporarily disable it in the target host's config options until
    bootstrapping is complete. Failure to disable these two modules, will cause
@@ -59,6 +55,9 @@ Although much of the process is automated, there are still some manual steps.
   - Only relevant if using swap
 - If using backup, add a borg passphrase to nix-secrets or temporarly disable
   backup from the config
+
+* Add a local DNS entry
+* Add a local DHCP entry
 
 ## Deployment steps
 
@@ -94,6 +93,9 @@ bootstrap-script -n okra -d 192.168.122.29 -k ~/.ssh/id_yubikey -uaa --impermane
 Note that `--lock-file` is only necessary if your host is using per-host lock files.
 
 Answer the questions.
+
+You may need to connect to wifi on the host after minimal installs. This can be done with:
+wpa_supplicant -B -i <wifi name> -c /etc/wpa_supplicant/nixos.conf or manually with nmcli if wpa_supplicant wasn't setup
 
 ### 2. Post install steps for LUKS (optional)
 
