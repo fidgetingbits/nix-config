@@ -159,8 +159,8 @@ in
       }) hosts;
 
     llm.cli-tools.enable = true;
-    language-learning.enable = true;
-    dictation.enable = true;
+    # FIXME
+    dictation.enable = false;
   };
 
   stylix = {

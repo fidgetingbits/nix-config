@@ -97,6 +97,8 @@ Answer the questions.
 You may need to connect to wifi on the host after minimal installs. This can be done with:
 wpa_supplicant -B -i <wifi name> -c /etc/wpa_supplicant/nixos.conf or manually with nmcli if wpa_supplicant wasn't setup
 
+You'll have to update .sops.yaml to add the box to whatever shared yaml files it will need access to
+
 ### 2. Post install steps for LUKS (optional)
 
 FIXME: Demo host-gen-pass

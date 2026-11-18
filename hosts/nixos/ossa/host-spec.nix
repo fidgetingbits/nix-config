@@ -7,6 +7,7 @@
     # System type flags
     isWork = (lib.mkOverride 100) true;
     isDevelopment = (lib.mkOverride 100) true;
+    useAgents = (lib.mkOverride 100) true;
     isRoaming = (lib.mkOverride 100) true;
     isAdmin = (lib.mkOverride 100) true;
     isAutoStyled = (lib.mkOverride 100) true;

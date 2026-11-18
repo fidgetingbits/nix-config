@@ -64,6 +64,8 @@ in
         "tokens/ghcherry" = {
           sopsFile = "${sopsFolder}/development.yaml";
         };
+      }
+      // lib.optionalAttrs osConfig.hostSpec.useAgents {
         # LLM tokens, use agents.yaml since it's shared elsewhere
         # FIXME: This should be automated and synced with other usages in
         # config

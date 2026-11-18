@@ -130,6 +130,11 @@
           default = false;
           description = "Indicate a host used for development";
         };
+        useAgents = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = "Indicate a host will use public model agent tokens";
+        };
         isIntrodusDev = lib.mkOption {
           type = lib.types.bool;
           default = config.hostSpec.isDevelopment;

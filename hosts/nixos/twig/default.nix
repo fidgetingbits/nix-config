@@ -57,6 +57,7 @@
   security.pam.services.sddm.enableGnomeKeyring = true;
   ${namespace} = {
     modules.hardware.radeon.enable = true;
+    services.backup.enable = false;
     #    networking.granularFirewall.enable = true;
   };
 

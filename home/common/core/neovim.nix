@@ -108,6 +108,7 @@ in
           };
         })
         |> lib.mergeAttrsList
+        |> lib.optionalAttrs osConfig.hostSpec.useAgents
       )
       // {
         # FIXME: Some of this could be passed in nixInfo I think?
