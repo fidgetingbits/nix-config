@@ -5,6 +5,7 @@
   osConfig,
   # inputs,
   namespace,
+  secrets,
   ...
 }:
 let
@@ -204,4 +205,8 @@ in
   #   |> lib.mergeAttrsList;
 
   programs.firefox.package = pkgs.unstable.firefox;
+
+  introdus.gitDev = {
+    handle = secrets.userFullName;
+  };
 }

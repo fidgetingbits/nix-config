@@ -39,6 +39,7 @@ in
     ];
     workFolders = secrets.git.work.folders;
     workServers = secrets.git.work.servers;
+    workForges = secrets.git.work.forges;
     workRepos = secrets.git.work.repos;
   };
 
