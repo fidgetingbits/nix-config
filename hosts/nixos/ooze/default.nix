@@ -84,28 +84,29 @@ in
       role = "server";
       externalInterface = "enp3s0";
       peers = [
-      wg-subnet.hosts.ossa
-      wg-subnet.hosts.opia
-      wg-subnet.hosts.onyx
-      wg-subnet.hosts.moon
+        wg-subnet.hosts.ossa
+        wg-subnet.hosts.opia
+        wg-subnet.hosts.onyx
+        wg-subnet.hosts.moon
+        wg-subnet.hosts.twig
       ];
       wireguardPort = net.ports.udp.wireguard;
       rosenpassPort = net.ports.udp.rosenpass;
       rosenpassExempt = [
-      "opia"
-      "moxy"
+        "opia"
+        "moxy"
       ];
       subnet = wg-subnet;
     };
 
     services.llama-swap = {
-    enable = true;
-    preload = [
-    "Nomic Embeddings"
-    ];
+      enable = true;
+      preload = [
+        "Nomic Embeddings"
+      ];
     };
     services.forgejo = {
-    enable = true;
+      enable = true;
     };
     services.immichML = {
       enable = true;
@@ -117,6 +118,7 @@ in
         olan.wg-subnet.hosts.ossa.ip
         olan.wg-subnet.hosts.onyx.ip
         olan.wg-subnet.hosts.opia.ip
+        olan.wg-subnet.hosts.twig.ip
       ];
       defaultDenyList = [ "all" ];
     };
@@ -142,7 +144,6 @@ in
     ];
   };
 
-
   # FIXME: This could be swapped with monit now I think
 
   # Serial cables into lab systems
@@ -163,7 +164,6 @@ in
   environment.systemPackages = [
     wake-oppo
   ];
-
 
   # Extra peers not on o-lan subnet that can't be auto-generated
   networking = {
@@ -212,7 +212,6 @@ in
   };
 
   # Enable immich service with ML offload to oedo
-
 
   services.nginx.virtualHosts."photos.${config.hostSpec.domain}".locations."/".extraConfig =
     lib.mkBefore ''

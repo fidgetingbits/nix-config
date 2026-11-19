@@ -67,6 +67,7 @@ function gen_keys() {
     pqpk="$PWD"/"$host"_pqpk
     cd "$NIX_SECRETS_DIR" || exit
     # Encrypt the pqsk as an individual file due to it being binary format
+    # FIXME: This doesn't work as the .sops.yaml needs a rule injected...
     sops -e "$pqsk" >sops/"$host"_pqsk
     chown "$SUDO_UID:$SUDO_GID" sops/"$host"_pqsk
 
@@ -108,7 +109,7 @@ for host in "${POSITIONAL_ARGS[@]}"; do
     gen_keys "$host"
 done
 
-echo "Put the following in mkHost entry for each host in nix-secrets"
+echo "Put the following in makeHost entry for each host in nix-secrets"
 echo "-----"
 for host in "${POSITIONAL_ARGS[@]}"; do
     echo "${host}: wireguardPubKey = \"$(cat "$host"_wgpk)\";"

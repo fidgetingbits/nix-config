@@ -286,10 +286,10 @@
     };
 
     # Qwen 3.8 Flash Next on oppo
-    strata = {
-      url = "github:Niko1221/Strata";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
+    # strata = {
+    #   url = "github:Niko1221/Strata";
+    #   inputs.nixpkgs.follows = "nixpkgs-unstable";
+    # };
 
     nix-sweep = {
       url = "github:jzbor/nix-sweep/v0.7.0";

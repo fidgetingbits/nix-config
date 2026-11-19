@@ -129,10 +129,13 @@ in
               "ommyzish" = "oh my zsh";
               "zish" = "zsh";
               "tail scale" = "tailscale";
+              "tail scales" = "tailscale";
               "UFE" = "uefi";
               "mygraph" = "migraph";
               "sequelite" = "sqlite";
               "libg object" = "libgobject";
+              "ld library path" = "LD_LIBRARY_PATH";
+              "dl open" = "dlopen";
             };
 
           };

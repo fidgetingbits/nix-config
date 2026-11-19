@@ -335,7 +335,7 @@ binds {
     Super+Shift+Return hotkey-overlay-title="Open non-neovim terminal" {
         spawn "ghostty"
     }
-    Super+V hotkey-overlay-title="Open neovide" {
+    Super+Shift+V hotkey-overlay-title="Open neovide" {
         // From fidgetingvim flake
         spawn "nvim-neovide"
     }
@@ -355,7 +355,11 @@ binds {
     Super+Shift+C hotkey-overlay-title="Focus or Launch Chat" {
         spawn-sh "nirius focus-or-spawn --app-id signal signal"
     }
+    // This is useful for frameworks with the cog key, but less so for other keyboards
     XF86Tools hotkey-overlay-title="Toggle voxtype" {
+        spawn "voxtype" "record" "toggle"
+    }
+    Super+V hotkey-overlay-title="Toggle voxtype" {
         spawn "voxtype" "record" "toggle"
     }
     //
