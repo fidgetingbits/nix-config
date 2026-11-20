@@ -90,10 +90,6 @@
               git add $hostname_lock
               echo "Created a new lock file at $hostname_lock"
           fi
-
-          if git remote -v | grep gitlab; then
-              echo "WARNING: Your git remote is still the old gitlab URL, switch to the new public github repo"
-          fi
       '';
   };
 }
