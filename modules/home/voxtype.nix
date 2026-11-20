@@ -136,6 +136,7 @@ in
               "libg object" = "libgobject";
               "ld library path" = "LD_LIBRARY_PATH";
               "dl open" = "dlopen";
+              "nextos" = "nixos";
             };
 
           };
