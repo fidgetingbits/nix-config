@@ -1,4 +1,8 @@
+set allow-duplicate-variables
+
 import 'just/base.just'
+
+private_hosts := "twig"
 
 export HELPERS_PATH := justfile_directory() + "../introdus/pkgs/introdus-helpers/helpers.sh"
 
@@ -20,7 +24,7 @@ update-neovim-flake-inputs:
 
 # Update all flake inputs for the specified host or the current host if none specified
 [group("update")]
-update HOST=`hostname` *INPUT:
+update HOST=`hostname` *INPUT: (guard-private-host HOST)
     #!/usr/bin/env bash
     nix flake update \
         --reference-lock-file locks/{{ HOST }}.lock \
@@ -37,7 +41,12 @@ update-all:
     HOST=$(hostname)
     just update
     for lock in $(ls locks/); do
-        # This can fail if a lock file didn't actually update, so discard result
+        host_name="${lock%.lock}"
+        skip=0
+        for priv in {{ private_hosts }}; do
+            [ "$host_name" = "$priv" ] && skip=1 && break
+        done
+        [ "$skip" -eq 1 ] && continue
         cp locks/$HOST.lock locks/$lock 2>/dev/null || true
     done
 

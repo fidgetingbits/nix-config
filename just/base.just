@@ -1,8 +1,19 @@
 # Shared recipes
+private_hosts := ""
 
 [private]
 default:
     @just --list
+
+[private]
+guard-private-host HOST:
+    #!/usr/bin/env bash
+    for h in {{ private_hosts }}; do
+        if [ "{{ HOST }}" = "$h" ]; then
+            echo "Error: '{{ HOST }}' is managed by a private wrapper flake. Run 'just' from that repo instead." >&2
+            exit 1
+        fi
+    done
 
 [private]
 copy-lock-in HOST=`hostname`:
@@ -28,7 +39,7 @@ check-sops:
     check-sops
 
 [group("checks")]
-check HOST=`hostname` ARGS="":
+check HOST=`hostname` ARGS="": (guard-private-host HOST)
     #!/usr/bin/env bash
     BUILD_FOLDER=$(mktemp -d)
     echo "Prepping build folder: $BUILD_FOLDER"
@@ -62,7 +73,7 @@ rebuild-full HOST=`hostname`: && rebuild-post
 
 # Run nixos-rebuild on the remote host
 [group("building")]
-rebuild-host HOST=`hostname` NO_SWITCH="0":
+rebuild-host HOST=`hostname` NO_SWITCH="0": (guard-private-host HOST)
     #!/usr/bin/env bash
     just rebuild-pre {{ HOST }}
     BUILD_FOLDER=$(mktemp -d)
