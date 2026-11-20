@@ -29,18 +29,6 @@ in
       "git.${osConfig.hostSpec.domain}" = "noreply";
       "git.ooze.${osConfig.hostSpec.domain}" = "noreply";
     };
-  }
-  # FIXME:  refactor this away
-  // lib.optionalAttrs osConfig.hostSpec.isWork {
-    # work
-    workKeys = [
-      "id_dark.pub"
-      "id_drzt.pub"
-    ];
-    workFolders = secrets.git.work.folders;
-    workServers = secrets.git.work.servers;
-    workForges = secrets.git.work.forges;
-    workRepos = secrets.git.work.repos;
   };
 
   programs.git = {

@@ -8,7 +8,7 @@
 }:
 {
   imports = lib.flatten [
-    inputs.nixos-hardware.nixosModules.framework-16-amd-ai-300-series
+    inputs.nixos-hardware.nixosModules.framework-amd-ai-300-series
     inputs.nixos-facter-modules.nixosModules.facter
     { config.facter.reportPath = ./facter.json; }
     (lib.custom.scanPaths ./.) # Load all extra host-specific *.nix files
@@ -101,10 +101,12 @@
       # ${subnets.moon.hosts.moon.ip} = [ "moon.${config.hostSpec.domain}" ];
     };
 
-  # FIXME: This is a big sketchy, but works for the ossa packages okay (fails on others)
   nixpkgs.config.rocmSupport = config.hostSpec.useRocm;
 
-  services.tailscale.enable = true;
+  services.tailscale = {
+    enable = true;
+    extraSetFlags = [ "--operator=${config.hostSpec.primaryUsername}" ];
+  };
   # FIXME: These are from the wiki, confirm
   networking.firewall = {
     # Always allow traffic from your Tailscale network

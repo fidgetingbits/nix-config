@@ -5,7 +5,6 @@
   osConfig,
   # inputs,
   namespace,
-  secrets,
   ...
 }:
 let
@@ -145,6 +144,7 @@ in
 
   ${namespace} = {
     system.ssh-motd.enable = true;
+    # FIXME: This needs to change
     llm.providers =
       let
         port = osConfig.hostSpec.networking.ports.tcp.llama-swap;
@@ -160,8 +160,7 @@ in
       }) hosts;
 
     llm.cli-tools.enable = true;
-    # FIXME
-    dictation.enable = false;
+    dictation.enable = true;
   };
 
   stylix = {
@@ -172,24 +171,6 @@ in
     };
     targets.neovide.enable = true;
   };
-
-  # https://github.com/FrameworkComputer/linux-docs/blob/87e682ee85eca8b74f5869458f8ffbebc714cb86/easy-effects/README.md?plain=1#L4
-  # Official: https://raw.githubusercontent.com/FrameworkComputer/linux-docs/main/easy-effects/fw16-easy-effects.json
-  # FIXME: Check this for f13
-  # services.easyeffects = {
-  #   enable = true;
-  #   preset = "easyeffects-fw16";
-  #   extraPresets = {
-  #     "easyeffects-fw16" =
-  #       pkgs.fetchurl {
-  #         url = "https://raw.githubusercontent.com/FrameworkComputer/linux-docs/main/easy-effects/fw16-easy-effects.json";
-  #         sha256 = "sha256-Te8S9DsG5P/NuNk5WE6mSB/DjHS+rKjOFRN7mDEVg8g=";
-  #       }
-  #       |> lib.readFile
-  #       # nixfmt hack
-  #       |> lib.fromJSON;
-  #   };
-  # };
 
   # Automatic ssh entries for oedo microvms on shared network
   # programs.ssh.settings =
@@ -206,7 +187,4 @@ in
 
   programs.firefox.package = pkgs.unstable.firefox;
 
-  introdus.gitDev = {
-    handle = secrets.userFullName;
-  };
 }
