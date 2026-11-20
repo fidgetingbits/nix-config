@@ -251,6 +251,7 @@
     microvm = {
       url = "github:microvm-nix/microvm.nix";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.spectrum.follows = "nixpkgs";
     };
 
     pre-commit-hooks = {
@@ -364,8 +365,8 @@
 
     #################### Personal ####################
     nix-secrets = {
-      url = "git+ssh://olan-forge/fidgetingbits/nix-secrets.git";
-      # url = "path:///home/aa/dev/nix/config/nix-secrets";
+      # url = "git+ssh://olan-forge/fidgetingbits/nix-secrets.git";
+      url = "path:///home/aa/dev/nix/config/nix-secrets";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
