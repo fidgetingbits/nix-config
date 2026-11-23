@@ -137,6 +137,9 @@ in
               "ld library path" = "LD_LIBRARY_PATH";
               "dl open" = "dlopen";
               "nextos" = "nixos";
+              "systemd D" = "systemd";
+              "ps-ef" = "ps -ef";
+              "pgrp" = "pgrep";
             };
 
           };
@@ -165,22 +168,24 @@ in
       };
     };
 
-    systemd.user.services.voxtype-summarize = {
-      Unit = {
-        description = "voxtype Meeting Summary API Service";
-        After = [
-          "graphical-session.target"
-          "graphical-session-pre.target"
-        ];
-        PartOf = [ "graphical-session.target" ];
-      };
-      Install.WantedBy = [ "graphical-session.target" ];
-      Service = {
-        Type = "simple";
-        ExecStart = lib.getExe meetingSummaryEndpoint;
-        Restart = "always";
-        RestartSec = 5;
-      };
-    };
+    systemd.user.services.voxtype-summarize =
+      lib.mkIf config.programs.voxtype.settings.meeting.enabled
+        {
+          Unit = {
+            description = "voxtype Meeting Summary API Service";
+            After = [
+              "graphical-session.target"
+              "graphical-session-pre.target"
+            ];
+            PartOf = [ "graphical-session.target" ];
+          };
+          Install.WantedBy = [ "graphical-session.target" ];
+          Service = {
+            Type = "simple";
+            ExecStart = lib.getExe meetingSummaryEndpoint;
+            Restart = "always";
+            RestartSec = 5;
+          };
+        };
   };
 }
