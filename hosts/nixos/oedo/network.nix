@@ -1,5 +1,6 @@
 {
   inputs,
+  outputs,
   config,
   lib,
   namespace,
@@ -84,7 +85,7 @@ in
   systemd.network.networks."20-${vmBridge}".routingPolicyRules = [
     {
       From = config.${namespace}.microvms.vmLan.cidr;
-      To = inputs.self.nixosConfigurations.ossa.config.${namespace}.microvms.vmLan.cidr;
+      To = outputs.nixosConfigurations.ossa.config.${namespace}.microvms.vmLan.cidr;
       Table = "main";
       Priority = 998;
     }

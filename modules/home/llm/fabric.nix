@@ -10,6 +10,7 @@ let
   llmCfg = config.${namespace}.llm;
   cfg = config.${namespace}.llm.fabric;
   defaultProvider = lib.findFirst (p: p.name == llmCfg.defaultProvider) null llmCfg.providers;
+  # FIXME: This needs to be generic and not llama-swap specific
   defaultModels = osConfig.${namespace}.services.llama-swap.defaultModels;
 
   # Populate fabric patterns from: official source, local repo, private repo
@@ -33,7 +34,7 @@ in
           DEFAULT_MODEL="${llmCfg.defaultModel}"
           DEFAULT_MODEL="${defaultModels.${defaultProvider.name}.heavy}"
           DEFAULT_VENDOR="OpenAI"
-          OPENAI_API_BASE_URL="https://llm.${defaultProvider.name}.${osConfig.hostSpec.domain}/v1"
+          OPENAI_API_BASE_URL="https://${defaultProvider.url}/v1"
           CUSTOM_PATTERNS_DIRECTORY="${config.home.homeDirectory}/.config/fabric/patterns"
           PATTERNS_LOADER_GIT_REPO_URL="https://github.com/danielmiessler/fabric.git"
           PATTERNS_LOADER_GIT_REPO_PATTERNS_FOLDER="patterns"

@@ -1,6 +1,6 @@
 # FIXME(roles): This eventually should get slotted into some sort of 'role' thing
 {
-  inputs,
+  outputs,
   osConfig,
   lib,
   secrets,
@@ -38,7 +38,7 @@ lib.mkIf cfg.isAdmin {
   programs.ssh.settings =
     let
       nixosHostNames =
-        inputs.self.nixosConfigurations
+        outputs.nixosConfigurations
         |> lib.attrNames
         |> lib.filter (name: (name != "iso") && (!(lib.hasSuffix "Minimal" name)));
 

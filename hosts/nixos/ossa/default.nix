@@ -1,5 +1,6 @@
 {
   inputs,
+  outputs,
   lib,
   pkgs,
   config,
@@ -93,25 +94,25 @@
     };
     networking.granularFirewall.enable = true;
     services.llama-swap = {
-    enable = true;
-    # FIXME: This should also be associated with some default model, with classes
-    preload = [
-    "Qwen 2.5 Coder 1.5B (Ultra Light)"
-    ];
-    # Limit models to those that suit local Strix Point use
-    # See models set in modules/hosts/nixos/llama-swap.nix for full list
-    # models = [
-    #   "fim:qwen-1.5b"
-    #   "gemma-4:26b-a4b-q6"
-    #   "qwen3.6:coder-30b-a3b-q6"
-    # ];
+      enable = true;
+      # FIXME: This should also be associated with some default model, with classes
+      preload = [
+        "Qwen 2.5 Coder 1.5B (Ultra Light)"
+      ];
+      # Limit models to those that suit local Strix Point use
+      # See models set in modules/hosts/nixos/llama-swap.nix for full list
+      # models = [
+      #   "fim:qwen-1.5b"
+      #   "gemma-4:26b-a4b-q6"
+      #   "qwen3.6:coder-30b-a3b-q6"
+      # ];
     };
 
     # Add in descriptions for VMs we use from other hosts, so we can auto generate some commands
     # FIXME: This should just be some generated part of microvm where we say "we use host foo"
     microvms.extraDescriptions =
-    lib.custom.microvm.mapHostMicrovms inputs.self.nixosConfigurations.oedo.config.microvm.vms
-    (vmSpecs: "oedo: ${vmSpecs.name} - ${vmSpecs.description}");
+      lib.custom.microvm.mapHostMicrovms outputs.nixosConfigurations.oedo.config.microvm.vms
+        (vmSpecs: "oedo: ${vmSpecs.name} - ${vmSpecs.description}");
   };
 
   environment.systemPackages = lib.attrValues {
@@ -183,7 +184,6 @@
       After = [ "xdg-desktop-portal-gnome.service" ];
     };
   };
-
 
   # Only exposed to microvms, which is handled via allowedPorts in
   # modules/hosts/nixos/microvms/network.nix rather than

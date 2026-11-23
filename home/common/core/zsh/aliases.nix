@@ -80,7 +80,7 @@ in
 
   # processes
   p = "ps -ef";
-  pg = "ps -ef | rg -i";
+  pg = "procs ";
   k = "kill";
   k9 = "kill -9";
   kf = "ps -e | fzf | awk '{print $1}' | xargs kill";

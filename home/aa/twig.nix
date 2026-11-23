@@ -3,7 +3,6 @@
   pkgs,
   lib,
   osConfig,
-  # inputs,
   namespace,
   ...
 }:
@@ -144,21 +143,6 @@ in
 
   ${namespace} = {
     system.ssh-motd.enable = true;
-    # FIXME: This needs to change
-    llm.providers =
-      let
-        port = osConfig.hostSpec.networking.ports.tcp.llama-swap;
-        hosts = [
-          "oedo"
-          "ossa"
-        ];
-      in
-      map (host: {
-        name = host;
-        host = osConfig.hostSpec.networking.subnets.o-lan.hosts.${host}.ip;
-        inherit port;
-      }) hosts;
-
     llm.cli-tools.enable = true;
     dictation.enable = true;
   };
@@ -174,7 +158,7 @@ in
 
   # Automatic ssh entries for oedo microvms on shared network
   # programs.ssh.settings =
-  #   mapHostMicrovms inputs.self.nixosConfigurations.oedo.config.microvm.vms (vmSpecs: {
+  #   mapHostMicrovms outputs.nixosConfigurations.oedo.config.microvm.vms (vmSpecs: {
   #     "${vmSpecs.name}" = {
   #       match = "host ${vmSpecs.name}";
   #       hostname = vmSpecs.ip;

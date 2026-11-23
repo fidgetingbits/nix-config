@@ -8,7 +8,7 @@
 #  };
 {
   lib,
-  inputs,
+  outputs,
   namespace,
   secrets,
   # config,
@@ -23,7 +23,7 @@ let
   # wg-lan = subnets.agent-lan;
   # inherit (subnets) o-lan;
   # vmBridge = config.${namespace}.microvms.vmBridge;
-  oedoConfig = inputs.self.nixosConfigurations.oedo.config;
+  oedoConfig = outputs.nixosConfigurations.oedo.config;
 in
 {
   networking.networkmanager.enable = true;

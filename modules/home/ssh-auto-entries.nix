@@ -1,5 +1,5 @@
 {
-  inputs,
+  outputs,
   config,
   osConfig,
   lib,
@@ -83,14 +83,14 @@ in
     let
       isCoreHost = n: ((n != "iso") && !(lib.hasSuffix "Minimal" n));
       nixosHostNames =
-        inputs.self.nixosConfigurations
+        outputs.nixosConfigurations
         |> lib.attrNames
         # nixfmt hack
         |> lib.filter isCoreHost;
 
       nixosHostsUnlockable =
         (
-          inputs.self.nixosConfigurations
+          outputs.nixosConfigurations
           |> lib.filterAttrs (name: host: (isCoreHost name) && host.config.services.remoteLuksUnlock.enable)
           |> lib.attrNames
         )
@@ -153,7 +153,7 @@ in
             Match = "host ${host},${host}.${osConfig.hostSpec.domain}";
             HostName = "${host}.${osConfig.hostSpec.domain}";
             Port = osConfig.hostSpec.networking.ports.tcp.ssh;
-            User = inputs.self.nixosConfigurations.${host}.config.hostSpec.primaryUsername or cfg.defaultUser;
+            User = outputs.nixosConfigurations.${host}.config.hostSpec.primaryUsername or cfg.defaultUser;
           };
         })
         |> lib.attrsets.mergeAttrsList;

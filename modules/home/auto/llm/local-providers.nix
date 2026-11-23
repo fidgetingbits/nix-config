@@ -3,7 +3,7 @@
   config,
   lib,
   namespace,
-  inputs,
+  outputs,
   ...
 }:
 let
@@ -45,14 +45,22 @@ let
       name,
       host,
       port,
+      ...
     }:
     let
       mkModel = id: name: { inherit id name; };
-      rawModels = inputs.self.nixosConfigurations.${name}.config.services.llama-swap.settings.models;
+      rawModels =
+        # We may use local models that don't come from our own llama-swap instance, so
+        # handle that
+        if outputs.nixosConfigurations ? ${name} then
+          outputs.nixosConfigurations.${name}.config.services.llama-swap.settings.models
+        else
+          { };
     in
     [
       {
         provider = name;
+        # FIXME: This could switch ot use URL now
         api_base = "http://${host}:${toString port}/v1";
         api_key = "foo";
         models = lib.mapAttrsToList (k: v: mkModel k k) rawModels;
@@ -67,7 +75,7 @@ in
       # The default model is the "heavy" matrix entry of the default
       # provider host's llama-swap.
       defaultModels =
-        inputs.self.nixosConfigurations.${defaultProvider}.config.services.llama-swap.settings.matrix.vars;
+        outputs.nixosConfigurations.${defaultProvider}.config.services.llama-swap.settings.matrix.vars;
     in
     {
       defaultModel = lib.mkOption {
@@ -90,6 +98,11 @@ in
               name = lib.mkOption { type = lib.types.str; };
               host = lib.mkOption { type = lib.types.str; };
               port = lib.mkOption { type = lib.types.port; };
+              url = lib.mkOption {
+                # Used for fabric
+                type = lib.types.str;
+                default = null;
+              };
             };
           }
         );

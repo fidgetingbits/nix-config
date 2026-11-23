@@ -9,6 +9,7 @@
 {
   lib,
   inputs,
+  outputs,
   namespace,
   secrets,
   config,
@@ -23,7 +24,7 @@ let
   wg-lan = subnets.agent-lan;
   inherit (subnets) o-lan;
   vmBridge = config.${namespace}.microvms.vmBridge;
-  oedoConfig = inputs.self.nixosConfigurations.oedo.config;
+  oedoConfig = outputs.nixosConfigurations.oedo.config;
 in
 {
   networking.networkmanager.enable = true;
@@ -52,7 +53,6 @@ in
     };
     networking.granularFirewall.enable = true;
   };
-
 
   # We have a microvm network connected with oedo via a wireguard tunnel
   # so that it stays up even when we are roaming

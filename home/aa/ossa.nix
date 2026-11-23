@@ -3,7 +3,7 @@
   pkgs,
   lib,
   osConfig,
-  inputs,
+  outputs,
   namespace,
   ...
 }:
@@ -175,6 +175,7 @@ in
       map (host: {
         name = host;
         host = osConfig.hostSpec.networking.subnets.o-lan.hosts.${host}.ip;
+        url = "llm.${host}.${osConfig.hostSpec.domain}";
         inherit port;
       }) hosts;
 
@@ -210,11 +211,9 @@ in
     };
   };
 
-
-
   # Automatic ssh entries for oedo microvms on shared network
   programs.ssh.settings =
-    mapHostMicrovms inputs.self.nixosConfigurations.oedo.config.microvm.vms (vmSpecs: {
+    mapHostMicrovms outputs.nixosConfigurations.oedo.config.microvm.vms (vmSpecs: {
       "${vmSpecs.name}" = {
         match = "host ${vmSpecs.name}";
         hostname = vmSpecs.ip;

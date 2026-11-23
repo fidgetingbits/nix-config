@@ -1,5 +1,5 @@
 {
-  inputs,
+  outputs,
   config,
   pkgs,
   lib,
@@ -100,7 +100,7 @@ in
     |> map (
       host:
       (
-        mapHostMicrovms inputs.self.nixosConfigurations.${host}.config.microvm.vms (vmSpecs: {
+        mapHostMicrovms outputs.nixosConfigurations.${host}.config.microvm.vms (vmSpecs: {
           "${vmSpecs.name}" = {
             match = "host ${vmSpecs.name}";
             hostname = vmSpecs.ip;

@@ -1,5 +1,6 @@
 {
   inputs,
+  outputs,
   pkgs,
   config,
   lib,
@@ -105,6 +106,7 @@ in
       extraSpecialArgs = {
         inherit
           inputs
+          outputs
           namespace
           secrets
           ;
