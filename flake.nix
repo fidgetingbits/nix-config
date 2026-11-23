@@ -31,7 +31,7 @@
       );
       secrets = nix-secrets.mkSecrets nixpkgs customLib;
 
-      mkHost = host: isDarwin: extraModules: {
+      mkHost = host: isDarwin: extraSpecialArgs: extraModules: {
         ${host} =
           let
             func = if isDarwin then inputs.nix-darwin.lib.darwinSystem else lib.nixosSystem;
@@ -49,7 +49,8 @@
                 ;
               lib = customLib;
               inherit isDarwin;
-            };
+            }
+            // extraSpecialArgs; # Allow extra inputs to be added without needing a separate name
             modules = [
               ./hosts/${if isDarwin then "darwin" else "nixos"}/${host}
             ]
@@ -122,7 +123,7 @@
       mkHostConfigs =
         hosts: isDarwin:
         lib.foldl (acc: set: acc // set) { } (
-          (lib.map (host: mkHost host isDarwin [ ]) hosts)
+          (lib.map (host: mkHost host isDarwin { } [ ]) hosts)
           ++ (lib.map mkMinimalHost (lib.filter (h: h != "iso") hosts))
         );
       readHosts = folder: lib.attrNames (lib.readDir ./hosts/${folder});
