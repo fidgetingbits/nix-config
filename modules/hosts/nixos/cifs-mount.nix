@@ -30,7 +30,7 @@ in
         lib.types.submodule (
           { config, ... }:
           {
-            options = rec {
+            options = {
               name = lib.mkOption {
                 type = lib.types.str;
                 example = "server";
@@ -61,6 +61,13 @@ in
                 example = "group";
                 description = "Group to mount as";
               };
+
+              useCredentials = lib.mkOption {
+                type = lib.types.bool;
+                default = true;
+                example = true;
+                description = "Whether the share requires credentials";
+              };
             };
 
           }
@@ -73,13 +80,16 @@ in
   config = lib.mkIf cfg.enable rec {
     sops.secrets =
       cfg.mounts
-      |> lib.map (mount: {
-        "cifs/${mount.name}" = {
-          inherit (cfg) sopsFile;
-          inherit (mount) group;
-          owner = mount.user;
-        };
-      })
+      |> lib.map (
+        mount:
+        lib.optionalAttrs mount.useCredentials {
+          "cifs/${mount.name}" = {
+            inherit (cfg) sopsFile;
+            inherit (mount) group;
+            owner = mount.user;
+          };
+        }
+      )
       |> lib.mergeAttrsList;
 
     systemd.tmpfiles.rules =
@@ -101,8 +111,16 @@ in
           options = [
             # https://www.freedesktop.org/software/systemd/man/latest/systemd.mount.html
             (optionsPrefix + "nofail,_netdev")
+            "x-systemd.automount"
+            "x-systemd.idle-timeout=60"
             "uid=${mount.user},gid=${mount.group},dir_mode=0750,file_mode=0750"
-            "vers=3.0,credentials=${osConfig.sops.secrets."cifs/${mount.name}".path}"
+            "vers=3.0"
+            (
+              if mount.useCredentials then
+                "credentials=${osConfig.sops.secrets."cifs/${mount.name}".path}"
+              else
+                "guest"
+            )
           ];
         };
       })

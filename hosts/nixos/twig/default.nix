@@ -103,18 +103,4 @@
 
   nixpkgs.config.rocmSupport = config.hostSpec.useRocm;
 
-  services.tailscale = {
-    enable = true;
-    extraSetFlags = [ "--operator=${config.hostSpec.primaryUsername}" ];
-  };
-  # FIXME: These are from the wiki, confirm
-  networking.firewall = {
-    # Always allow traffic from your Tailscale network
-    trustedInterfaces = [ config.services.tailscale.interfaceName ];
-    # Allow the Tailscale UDP port through the firewall
-    allowedUDPPorts = [ config.services.tailscale.port ];
-  };
-  systemd.services.tailscaled.serviceConfig.Environment = [
-    "TS_DEBUG_FIREWALL_MODE=nftables"
-  ];
 }

@@ -45,7 +45,6 @@ in
         # === Window Managers ===
         "desktop"
 
-        # "fcitx5"
         # Maybe more role-specific stuff
         "document.nix" # document editing
         "gui-utilities.nix" # core for any desktop
