@@ -71,7 +71,7 @@ let
             };
           });
         neovim = final.unstable.neovim;
-        neovide = final.neovide-nightly; # see pkgs/
+        neovide = final.unstable.neovide; # see pkgs/
         vimPlugins = final.unstable.vimPlugins;
         rocmPackages = final.unstable.rocmPackages;
 

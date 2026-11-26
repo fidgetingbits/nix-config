@@ -64,7 +64,8 @@ in
     )
   ];
 
-  home.packages = lib.optionals osConfig.hostSpec.isDevelopment [ nvim-debug ];
+  # Has some luajit error I need to fix
+  # home.packages = lib.optionals osConfig.hostSpec.isDevelopment [ nvim-debug ];
 
   introdus.neovim = {
     enable = true;
@@ -75,7 +76,7 @@ in
   # and exposed in the config as wrappers.neovim.
 
   wrappers.neovim = {
-    # package = pkgs.unstable.neovim-unwrapped;
+    package = pkgs.unstable.neovim-unwrapped;
     # package = inputs.neovim-nightly-overlay.packages.${pkgs.stdenv.hostPlatform.system}.default;
     # package =
     #   let
