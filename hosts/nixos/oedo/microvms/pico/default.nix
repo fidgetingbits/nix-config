@@ -2,6 +2,7 @@
   config,
   lib,
   namespace,
+  outputs,
   ...
 }:
 let
@@ -50,7 +51,7 @@ in
 
   microvm.vms.pico = {
     specialArgs = {
-      inherit vmSpecs;
+      inherit vmSpecs outputs;
     };
     config = {
       imports = [
