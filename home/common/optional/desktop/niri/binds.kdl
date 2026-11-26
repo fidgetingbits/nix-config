@@ -384,4 +384,33 @@ binds {
     Super+a hotkey-overlay-title="Spawn anki" {
         spawn-sh "QT_QPA_PLATFORM=xgb anki"
     }
+    //
+    // ========== Multi monitor ==========
+    //
+    // Focus Monitor
+    Mod+Ctrl+H {
+        focus-monitor-left
+    }
+    Mod+Ctrl+J {
+        focus-monitor-down
+    }
+    Mod+Ctrl+K {
+        focus-monitor-up
+    }
+    Mod+Ctrl+L {
+        focus-monitor-right
+    }
+    // Move monitor
+    Mod+Shift+Ctrl+H {
+        move-column-to-monitor-left
+    }
+    Mod+Shift+Ctrl+J {
+        move-column-to-monitor-down
+    }
+    Mod+Shift+Ctrl+K {
+        move-column-to-monitor-up
+    }
+    Mod+Shift+Ctrl+L {
+        move-column-to-monitor-right
+    }
 }
