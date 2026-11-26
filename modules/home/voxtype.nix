@@ -140,6 +140,7 @@ in
               "systemd D" = "systemd";
               "ps-ef" = "ps -ef";
               "pgrp" = "pgrep";
+              "luojit" = "luajit";
             };
 
           };

@@ -9,6 +9,7 @@
 # FIXME: Break this across a few files probably
 {
   inputs,
+  outputs,
   lib,
   pkgs,
   vmSpecs,
@@ -41,6 +42,7 @@ in
         inherit
           user
           inputs
+          outputs
           vmSpecs
           namespace
           ;

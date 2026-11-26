@@ -2,6 +2,7 @@
   config,
   lib,
   namespace,
+  outputs,
   ...
 }:
 let
@@ -48,8 +49,10 @@ in
   # NOTE: Below this line is the config of the VM itself
   microvm.vms.neko = {
     specialArgs = {
-      inherit vmSpecs;
+      # FIXME: outputs should come generically..
+      inherit vmSpecs outputs;
     };
+
     config = {
       imports = [
         (lib.custom.relativeToRoot "microvms/hosts/common/optional/agents.nix")

@@ -2,6 +2,7 @@
   config,
   lib,
   namespace,
+  outputs,
   ...
 }:
 let
@@ -48,7 +49,7 @@ in
   # NOTE: Below this line is the config of the VM itself
   microvm.vms.nano = {
     specialArgs = {
-      inherit vmSpecs;
+      inherit vmSpecs outputs;
     };
     config = {
       imports = [
